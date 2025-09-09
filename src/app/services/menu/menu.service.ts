@@ -120,31 +120,14 @@ export class MenuService {
         route: '/'
       },
       {
-        id: 'about',
-        label: 'Sobre',
-        icon: 'info',
-        route: '/about'
+        id: 'production-orders',
+        label: 'Ordens de produção',
+        icon: 'mail',
+        route: '/contact'
       },
       {
-        id: 'services',
-        label: 'Serviços',
-        icon: 'build',
-        children: [
-          {
-            id: 'web-dev',
-            label: 'Desenvolvimento Web',
-            route: '/services/web-development'
-          },
-          {
-            id: 'mobile-dev',
-            label: 'Desenvolvimento Mobile',
-            route: '/services/mobile-development'
-          }
-        ]
-      },
-      {
-        id: 'contact',
-        label: 'Contato',
+        id: 'production-sheets',
+        label: 'Fichas de produção',
         icon: 'mail',
         route: '/contact'
       }

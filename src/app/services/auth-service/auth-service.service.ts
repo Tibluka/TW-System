@@ -141,6 +141,9 @@ export class AuthService {
    * Verifica se o usuário está autenticado (método síncrono)
    */
   isLoggedIn(): boolean {
+    debugger
+    console.log(this.isAuthenticatedSubject.value);
+
     return this.isAuthenticatedSubject.value;
   }
 

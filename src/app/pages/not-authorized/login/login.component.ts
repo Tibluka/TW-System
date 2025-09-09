@@ -44,7 +44,7 @@ export class LoginComponent {
       next: (response) => {
         this.isLoading = false;
         // Redireciona para a página original ou home
-        this.router.navigate(['home']);
+        this.router.navigate(['authorized/home']);
       },
       error: (error) => {
         this.isLoading = false;
