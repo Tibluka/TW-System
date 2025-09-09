@@ -45,7 +45,7 @@ export const routes: Routes = [
                 component: ProductionOrdersComponent
             },
             {
-                path: 'production-sheet',
+                path: 'production-sheets',
                 component: ProductionSheetComponent
             }
         ]

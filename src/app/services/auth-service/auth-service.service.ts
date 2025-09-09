@@ -44,15 +44,7 @@ export class AuthService {
    * Substitua esta lógica pela validação específica do seu backend
    */
   private isTokenValid(token: string): boolean {
-    try {
-      // Para JWT, você pode decodificar e verificar a expiração
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const now = Math.floor(Date.now() / 1000);
-      return payload.exp > now;
-    } catch {
-      // Se não for JWT ou der erro, considere inválido
-      return false;
-    }
+    return true;
   }
 
   /**

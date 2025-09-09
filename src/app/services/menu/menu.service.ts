@@ -123,13 +123,13 @@ export class MenuService {
         id: 'production-orders',
         label: 'Ordens de produção',
         icon: 'mail',
-        route: '/contact'
+        route: '/authorized/production-orders'
       },
       {
         id: 'production-sheets',
         label: 'Fichas de produção',
         icon: 'mail',
-        route: '/contact'
+        route: '/authorized/production-sheets'
       }
     ];
 
