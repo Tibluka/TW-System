@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../services/auth-service/auth-service.service';
 
 
@@ -12,11 +12,10 @@ import { AuthService } from '../../../services/auth-service/auth-service.service
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
   loginForm: FormGroup;
   isLoading = false;
   errorMessage = '';
-  returnUrl = '';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -28,16 +27,6 @@ export class LoginComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
-  }
-
-  ngOnInit(): void {
-    // Obtém a URL de retorno dos query parameters
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
-
-    // Se já estiver logado, redireciona
-    if (this.authService.isLoggedIn()) {
-      this.router.navigate([this.returnUrl]);
-    }
   }
 
   onSubmit(): void {
@@ -55,7 +44,7 @@ export class LoginComponent implements OnInit {
       next: (response) => {
         this.isLoading = false;
         // Redireciona para a página original ou home
-        this.router.navigate([this.returnUrl]);
+        this.router.navigate(['home']);
       },
       error: (error) => {
         this.isLoading = false;

@@ -1,4 +1,3 @@
-import { isPlatformBrowser } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -124,10 +123,8 @@ export class AuthService {
    * Limpa todos os dados de autenticação
    */
   private clearAuthData(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem(this.TOKEN_KEY);
-      localStorage.removeItem(this.USER_KEY);
-    }
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.USER_KEY);
 
     this.isAuthenticatedSubject.next(false);
     this.currentUserSubject.next(null);
@@ -137,10 +134,6 @@ export class AuthService {
    * Obtém o token atual
    */
   getToken(): string | null {
-    if (!isPlatformBrowser(this.platformId)) {
-      return null;
-    }
-
     return localStorage.getItem(this.TOKEN_KEY);
   }
 

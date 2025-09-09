@@ -7,7 +7,11 @@ export const routes: Routes = [
     {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'login'
+        redirectTo: (route) => {
+            // Verifica se o usuário está logado no localStorage
+            const isLoggedIn = localStorage.getItem('auth_token');
+            return isLoggedIn ? 'home' : 'login';
+        }
     },
     {
         path: 'login',

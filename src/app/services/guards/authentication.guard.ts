@@ -1,8 +1,9 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from '../auth-service/auth-service.service';
+import { AuthService } from '../auth-service/auth-service.service'; // Ajuste o caminho conforme sua estrutura
 
 export const authenticationGuard: CanActivateFn = (route, state) => {
+  debugger
   const authService = inject(AuthService);
   const router = inject(Router);
 
@@ -12,9 +13,8 @@ export const authenticationGuard: CanActivateFn = (route, state) => {
   }
 
   // Se não estiver autenticado, redireciona para login
-  router.navigate(['/login'], {
-    queryParams: { returnUrl: state.url } // Salva a URL original para redirecionamento após login
-  });
+  console.log('Usuário não autenticado, redirecionando para login...');
+  router.navigate(['/login']);
 
   return false;
 };
