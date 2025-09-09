@@ -1,0 +1,88 @@
+<!-- menu.component.html -->
+
+<!-- Overlay para fechar o menu ao clicar fora -->
+<div class="menu-overlay" [class.active]="menuService.isOpen()" (click)="closeMenu()" role="presentation"
+    aria-hidden="true">
+</div>
+
+<!-- Botão toggle do menu -->
+<button class="menu-toggle" (click)="toggleMenu()" [disabled]="menuService.isAnimating()"
+    [attr.aria-expanded]="menuService.isOpen()"
+    [attr.aria-label]="menuService.isOpen() ? 'Fechar menu de navegação' : 'Abrir menu de navegação'" type="button">
+
+    <div class="hamburger" [class.active]="menuService.isOpen()">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+    </div>
+</button>
+
+<!-- Container do menu lateral -->
+<nav class="side-menu" [class.open]="menuService.isOpen()" [class.animating]="menuService.isAnimating()"
+    role="navigation" [attr.aria-hidden]="!menuService.isOpen()" aria-label="Menu principal de navegação">
+
+    <!-- Cabeçalho do menu -->
+    <header class="menu-header">
+        <h2 class="menu-title">Navegação</h2>
+        <button class="close-button" (click)="closeMenu()" [disabled]="menuService.isAnimating()"
+            aria-label="Fechar menu de navegação" type="button">
+            <span class="close-icon" aria-hidden="true">&times;</span>
+        </button>
+    </header>
+
+    <!-- Lista de itens do menu -->
+    <ul class="menu-list" role="menubar">
+        <li *ngFor="let item of menuService.menuItems(); trackBy: trackByItemId" class="menu-item"
+            [class.has-children]="hasChildren(item)" [class.active]="isItemActive(item)"
+            [class.disabled]="item.disabled" role="none">
+
+            <button class="menu-link" (click)="handleItemClick(item)" [disabled]="item.disabled || !canInteract()"
+                role="menuitem" [attr.aria-expanded]="hasChildren(item) ? 'false' : undefined"
+                [attr.aria-describedby]="item.disabled ? item.id + '-disabled' : undefined" type="button">
+
+                <span class="menu-icon" *ngIf="item.icon" [attr.aria-hidden]="true">
+                    {{ getIconContent(item.icon) }}
+                </span>
+
+                <span class="menu-text">{{ item.label }}</span>
+
+                <span class="menu-arrow" *ngIf="hasChildren(item)" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8.59 16.59L13.17 12L8.59 7.41L10 6l6 6-6 6-1.41-1.41z" />
+                    </svg>
+                </span>
+            </button>
+
+            <!-- Texto para screen readers sobre item desabilitado -->
+            <span *ngIf="item.disabled" [id]="item.id + '-disabled'" class="sr-only">
+                Este item está desabilitado
+            </span>
+
+            <!-- Submenu (se houver) -->
+            <ul *ngIf="hasChildren(item)" class="submenu" role="menu" [attr.aria-labelledby]="item.id">
+                <li *ngFor="let child of item.children" class="submenu-item" [class.active]="isItemActive(child)"
+                    [class.disabled]="child.disabled" role="none">
+
+                    <button class="submenu-link" (click)="handleItemClick(child)"
+                        [disabled]="child.disabled || !canInteract()" role="menuitem"
+                        [attr.aria-describedby]="child.disabled ? child.id + '-disabled' : undefined" type="button">
+
+                        <span class="submenu-text">{{ child.label }}</span>
+                    </button>
+
+                    <!-- Texto para screen readers sobre subitem desabilitado -->
+                    <span *ngIf="child.disabled" [id]="child.id + '-disabled'" class="sr-only">
+                        Este item está desabilitado
+                    </span>
+                </li>
+            </ul>
+        </li>
+    </ul>
+
+    <!-- Rodapé do menu (opcional) -->
+    <footer class="menu-footer">
+        <div class="menu-footer-content">
+            <small class="menu-version">v1.0.0</small>
+        </div>
+    </footer>
+</nav>
