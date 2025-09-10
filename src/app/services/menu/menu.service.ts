@@ -120,6 +120,12 @@ export class MenuService {
         route: '/'
       },
       {
+        id: 'developments',
+        label: 'Desenvolvimentos',
+        icon: 'mail',
+        route: '/authorized/developments'
+      },
+      {
         id: 'production-orders',
         label: 'Ordens de produção',
         icon: 'mail',
@@ -127,7 +133,7 @@ export class MenuService {
       },
       {
         id: 'production-receipt',
-        label: 'Fichas de produção',
+        label: 'Recibos de produção',
         icon: 'mail',
         route: '/authorized/production-receipt'
       }

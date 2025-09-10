@@ -6,6 +6,7 @@ import { HomeComponent } from './pages/authorized/home/home.component';
 import { ProductionOrdersComponent } from './pages/authorized/production-orders/production-orders.component';
 import { ProductionReceiptComponent } from './pages/authorized/production-receipt/production-receipt.component';
 import { AuthorizedComponent } from './pages/authorized/authorized.component';
+import { DevelopmentsComponent } from './pages/authorized/developments/developments.component';
 
 export const routes: Routes = [
     // Rota raiz redireciona para login
@@ -39,6 +40,10 @@ export const routes: Routes = [
             {
                 path: 'home',
                 component: HomeComponent
+            },
+            {
+                path: 'developments',
+                component: DevelopmentsComponent
             },
             {
                 path: 'production-orders',
