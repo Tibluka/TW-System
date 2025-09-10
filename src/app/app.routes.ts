@@ -4,7 +4,7 @@ import { LoginComponent } from './pages/not-authorized/login/login.component';
 import { SignupComponent } from './pages/not-authorized/signup/signup.component';
 import { HomeComponent } from './pages/authorized/home/home.component';
 import { ProductionOrdersComponent } from './pages/authorized/production-orders/production-orders.component';
-import { ProductionSheetComponent } from './pages/authorized/production-sheet/production-sheet.component';
+import { ProductionReceiptComponent } from './pages/authorized/production-receipt/production-receipt.component';
 import { AuthorizedComponent } from './pages/authorized/authorized.component';
 
 export const routes: Routes = [
@@ -45,8 +45,8 @@ export const routes: Routes = [
                 component: ProductionOrdersComponent
             },
             {
-                path: 'production-sheets',
-                component: ProductionSheetComponent
+                path: 'production-receipt',
+                component: ProductionReceiptComponent
             }
         ]
     },

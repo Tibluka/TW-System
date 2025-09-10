@@ -126,10 +126,10 @@ export class MenuService {
         route: '/authorized/production-orders'
       },
       {
-        id: 'production-sheets',
+        id: 'production-receipt',
         label: 'Fichas de produção',
         icon: 'mail',
-        route: '/authorized/production-sheets'
+        route: '/authorized/production-receipt'
       }
     ];
 
