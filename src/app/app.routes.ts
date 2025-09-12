@@ -7,6 +7,7 @@ import { ProductionOrdersComponent } from './pages/authorized/production-orders/
 import { ProductionReceiptComponent } from './pages/authorized/production-receipt/production-receipt.component';
 import { AuthorizedComponent } from './pages/authorized/authorized.component';
 import { DevelopmentsComponent } from './pages/authorized/developments/developments.component';
+import { ProductionSheetsComponent } from './pages/authorized/production-sheets/production-sheets.component';
 
 export const routes: Routes = [
     // Rota raiz redireciona para login
@@ -48,6 +49,10 @@ export const routes: Routes = [
             {
                 path: 'production-orders',
                 component: ProductionOrdersComponent
+            },
+            {
+                path: 'production-sheets',
+                component: ProductionSheetsComponent
             },
             {
                 path: 'production-receipt',

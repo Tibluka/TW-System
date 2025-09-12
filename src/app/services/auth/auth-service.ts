@@ -1,11 +1,22 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface User {
   id: string;
   email: string;
   name: string;
-  // Adicione outros campos conforme necessário
+  role: string;
+}
+
+export interface LoginResponse {
+  success: boolean;
+  data: {
+    token: string;
+    refreshToken: string;
+    user: User;
+  };
 }
 
 @Injectable({
@@ -15,111 +26,42 @@ export class AuthService {
   private readonly TOKEN_KEY = 'auth_token';
   private readonly USER_KEY = 'user_data';
 
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasValidToken());
-  private currentUserSubject = new BehaviorSubject<User | null>(this.getCurrentUser());
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());
+  private currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
 
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor() {
-    // Verifica se o token ainda é válido na inicialização
-    this.validateToken();
+  constructor(private http: HttpClient) { }
+
+  /**
+   * Faz login na API
+   */
+  login(email: string, password: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, {
+      email,
+      password
+    }).pipe(
+      tap(response => {
+        if (response.success) {
+          this.setAuthData(response.data.token, response.data.user);
+        }
+      })
+    );
   }
 
   /**
-   * Verifica se existe um token válido no localStorage
+   * Faz logout
    */
-  private hasValidToken(): boolean {
-    const token = localStorage.getItem(this.TOKEN_KEY);
-    if (!token) {
-      return false;
-    }
-
-    // Verifica se o token não expirou (caso você use JWT)
-    return this.isTokenValid(token);
-  }
-
-  /**
-   * Valida se o token JWT ainda é válido (opcional)
-   * Substitua esta lógica pela validação específica do seu backend
-   */
-  private isTokenValid(token: string): boolean {
-    return true;
-  }
-
-  /**
-   * Obtém os dados do usuário atual do localStorage
-   */
-  private getCurrentUser(): User | null {
-    const userData = localStorage.getItem(this.USER_KEY);
-    return userData ? JSON.parse(userData) : null;
-  }
-
-  /**
-   * Valida o token atual e atualiza o estado
-   */
-  private validateToken(): void {
-    const isValid = this.hasValidToken();
-    this.isAuthenticatedSubject.next(isValid);
-
-    if (!isValid) {
-      this.clearAuthData();
-    }
-  }
-
-  /**
-   * Realiza o login do usuário
-   */
-  login(email: string, password: string): Observable<any> {
-    // Aqui você faria a chamada para sua API
-    // Este é apenas um exemplo - substitua pela sua implementação
-    return new Observable(observer => {
-      // Simula uma chamada de API
-      setTimeout(() => {
-        // Exemplo de resposta de sucesso
-        const mockResponse = {
-          token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-          user: {
-            id: '1',
-            email: email,
-            name: 'Usuário Teste'
-          }
-        };
-
-        this.setAuthData(mockResponse.token, mockResponse.user);
-        observer.next(mockResponse);
-        observer.complete();
-      }, 1000);
-    });
-  }
-
-  /**
-   * Define os dados de autenticação
-   */
-  setAuthData(token: string, user: User): void {
-    localStorage.setItem(this.TOKEN_KEY, token);
-    localStorage.setItem(this.USER_KEY, JSON.stringify(user));
-
-    this.isAuthenticatedSubject.next(true);
-    this.currentUserSubject.next(user);
-  }
-
-  /**
-   * Realiza o logout do usuário
-   */
-  logout(): void {
+  logout() {
     this.clearAuthData();
   }
 
   /**
-   * Limpa todos os dados de autenticação
+   * Verifica se está logado
    */
-  private clearAuthData(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.USER_KEY);
-
-    this.isAuthenticatedSubject.next(false);
-    this.currentUserSubject.next(null);
+  isLoggedIn(): boolean {
+    return this.isAuthenticatedSubject.value;
   }
 
   /**
@@ -130,19 +72,46 @@ export class AuthService {
   }
 
   /**
-   * Verifica se o usuário está autenticado (método síncrono)
+   * Obtém dados do usuário atual
    */
-  isLoggedIn(): boolean {
-    debugger
-    console.log(this.isAuthenticatedSubject.value);
-
-    return this.isAuthenticatedSubject.value;
+  getCurrentUser(): User | null {
+    return this.currentUserSubject.value;
   }
 
   /**
-   * Obtém os dados do usuário atual (método síncrono)
+   * Salva dados de autenticação
    */
-  getCurrentUserData(): User | null {
-    return this.currentUserSubject.value;
+  private setAuthData(token: string, user: User): void {
+    localStorage.setItem(this.TOKEN_KEY, token);
+    localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+
+    this.isAuthenticatedSubject.next(true);
+    this.currentUserSubject.next(user);
+  }
+
+  /**
+   * Limpa dados de autenticação
+   */
+  private clearAuthData(): void {
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.USER_KEY);
+
+    this.isAuthenticatedSubject.next(false);
+    this.currentUserSubject.next(null);
+  }
+
+  /**
+   * Verifica se existe token
+   */
+  private hasToken(): boolean {
+    return !!localStorage.getItem(this.TOKEN_KEY);
+  }
+
+  /**
+   * Obtém usuário do localStorage
+   */
+  private getUserFromStorage(): User | null {
+    const userData = localStorage.getItem(this.USER_KEY);
+    return userData ? JSON.parse(userData) : null;
   }
 }

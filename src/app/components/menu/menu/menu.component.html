@@ -23,11 +23,7 @@
 
     <!-- Cabeçalho do menu -->
     <header class="menu-header">
-        <h2 class="menu-title">Navegação</h2>
-        <button class="close-button" (click)="closeMenu()" [disabled]="menuService.isAnimating()"
-            aria-label="Fechar menu de navegação" type="button">
-            <span class="close-icon" aria-hidden="true">&times;</span>
-        </button>
+
     </header>
 
     <!-- Lista de itens do menu -->
@@ -81,6 +77,9 @@
 
     <!-- Rodapé do menu (opcional) -->
     <footer class="menu-footer">
+        <span (click)="logout()">
+            Logout
+        </span>
         <div class="menu-footer-content">
             <small class="menu-version">v1.0.0</small>
         </div>

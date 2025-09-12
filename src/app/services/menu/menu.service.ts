@@ -132,6 +132,12 @@ export class MenuService {
         route: '/authorized/production-orders'
       },
       {
+        id: 'production-sheets',
+        label: 'Fichas de produção',
+        icon: 'mail',
+        route: '/authorized/production-sheets'
+      },
+      {
         id: 'production-receipt',
         label: 'Recibos de produção',
         icon: 'mail',

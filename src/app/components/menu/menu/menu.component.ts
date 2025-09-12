@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MenuItem } from '../../../models/menu/menu';
 import { MenuService } from '../../../services/menu/menu.service';
+import { AuthService } from '../../../services/auth/auth-service';
 
 @Component({
   selector: 'app-menu',
@@ -15,6 +16,7 @@ import { MenuService } from '../../../services/menu/menu.service';
 export class MenuComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   protected menuService = inject(MenuService);
+  private authService = inject(AuthService);
 
   @HostListener('document:keydown.escape')
   onEscapeKey(): void {
@@ -142,5 +144,10 @@ export class MenuComponent implements OnInit, OnDestroy {
    */
   canInteract(): boolean {
     return this.menuService.canInteract();
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }
