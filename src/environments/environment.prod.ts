@@ -1,5 +1,5 @@
 export const environment = {
     production: true,
-    apiUrl: 'http://localhost:3000/api/v1',
+    apiUrl: 'https://tw-system-api.onrender.com/api/v1',
     appName: 'TW-System Dev'
 };
