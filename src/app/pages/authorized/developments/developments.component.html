@@ -1,1 +1,38 @@
-<p>developments works!</p>
+<!-- Exemplo de uso no formulário de development -->
+<!-- src/app/pages/development/development-form/development-form.component.html -->
+
+<form [formGroup]="developmentForm" (ngSubmit)="onSubmit()">
+    <!-- Outros campos do formulário -->
+
+    <div class="form-group">
+        <label class="form-label">Descrição</label>
+        <textarea class="form-control" formControlName="description" rows="3">
+      </textarea>
+    </div>
+
+    <!-- SEÇÃO DA IMAGEM DA PEÇA -->
+    <div class="form-group">
+        <label class="form-label">
+            <i class="fas fa-image"></i>
+            Imagem da Peça
+        </label>
+
+        <app-image-upload [developmentId]="developmentId" [currentImage]="currentDevelopment?.pieceImage"
+            [readonly]="isReadonly" (imageUploaded)="onImageUploaded($event)" (imageRemoved)="onImageRemoved()">
+        </app-image-upload>
+    </div>
+
+    <!-- Outros campos -->
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="developmentForm.invalid">
+            <i class="fas fa-save"></i>
+            {{ isEditMode ? 'Atualizar' : 'Criar' }} Development
+        </button>
+
+        <button type="button" class="btn btn-secondary" (click)="goBack()">
+            <i class="fas fa-arrow-left"></i>
+            Voltar
+        </button>
+    </div>
+</form>

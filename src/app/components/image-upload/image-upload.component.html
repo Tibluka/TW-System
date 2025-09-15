@@ -1,0 +1,106 @@
+<!-- src/app/components/image-upload/image-upload.component.html -->
+<div class="image-upload-container">
+    <!-- Imagem Atual -->
+    <div class="current-image" *ngIf="currentImage && !imagePreview">
+        <img [src]="getImageUrl('medium')" [alt]="currentImage.filename || 'Imagem da peça'" class="uploaded-image"
+            (click)="showImageModal()">
+
+        <div class="image-actions" *ngIf="!readonly">
+            <button type="button" class="btn btn-danger btn-sm" (click)="removeImage()" title="Remover imagem">
+                <i class="fas fa-trash"></i> Remover
+            </button>
+        </div>
+
+        <div class="image-info">
+            <small class="text-muted">
+                Enviado em: {{ currentImage.uploadedAt | date:'dd/MM/yyyy HH:mm' }}
+            </small>
+        </div>
+    </div>
+
+    <!-- Upload Area -->
+    <div class="upload-area" *ngIf="!currentImage || imagePreview">
+        <!-- Preview da imagem selecionada -->
+        <div class="image-preview" *ngIf="imagePreview">
+            <img [src]="imagePreview" alt="Preview" class="preview-image">
+
+            <div class="preview-actions">
+                <button type="button" class="btn btn-primary" (click)="uploadImage()" [disabled]="isUploading">
+                    <span *ngIf="!isUploading">
+                        <i class="fas fa-upload"></i> Enviar Imagem
+                    </span>
+                    <span *ngIf="isUploading">
+                        <i class="fas fa-spinner fa-spin"></i> Enviando...
+                    </span>
+                </button>
+
+                <button type="button" class="btn btn-secondary" (click)="clearSelection()" [disabled]="isUploading">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+
+        <!-- Input de arquivo -->
+        <div class="file-input-area" *ngIf="!imagePreview && !readonly">
+            <input type="file" accept="image/*" (change)="onFileSelected($event)" class="file-input" id="imageUpload"
+                [disabled]="isUploading">
+
+            <label for="imageUpload" class="file-input-label">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>Clique para selecionar uma imagem</span>
+                <small>JPG, PNG ou WebP - Máximo 10MB</small>
+            </label>
+        </div>
+    </div>
+
+    <!-- Barra de Progresso -->
+    <div class="upload-progress" *ngIf="uploadProgress && isUploading">
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated"
+                [style.width.%]="uploadProgress.percentage">
+                {{ uploadProgress.percentage }}%
+            </div>
+        </div>
+        <small class="text-muted">Enviando imagem...</small>
+    </div>
+
+    <!-- Mensagem de Erro -->
+    <div class="alert alert-danger" *ngIf="error">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ error }}
+    </div>
+</div>
+
+<!-- Modal para visualizar imagem em tamanho maior -->
+<div class="modal fade" id="imageModal" tabindex="-1" *ngIf="currentImage">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ currentImage.filename || 'Imagem da Peça' }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img [src]="getImageUrl('large')" [alt]="currentImage.filename || 'Imagem da peça'" class="img-fluid">
+            </div>
+            <div class="modal-footer">
+                <div class="image-sizes">
+                    <a [href]="getImageUrl('thumbnail')" target="_blank" class="btn btn-outline-primary btn-sm">
+                        Thumbnail
+                    </a>
+                    <a [href]="getImageUrl('small')" target="_blank" class="btn btn-outline-primary btn-sm">
+                        Pequena
+                    </a>
+                    <a [href]="getImageUrl('medium')" target="_blank" class="btn btn-outline-primary btn-sm">
+                        Média
+                    </a>
+                    <a [href]="getImageUrl('large')" target="_blank" class="btn btn-outline-primary btn-sm">
+                        Grande
+                    </a>
+                    <a [href]="getImageUrl('original')" target="_blank" class="btn btn-primary btn-sm">
+                        Original
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
