@@ -1,179 +1,82 @@
-// src/app/pages/development/development-form/development-form.component.ts
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ImageData } from '../../../services/image-upload/image-upload.service';
-import { DevelopmentService } from '../../../services/development/development.service';
+// src/app/pages/authorized/developments/developments.component.ts
+import { NgIf } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { Component } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-developments',
   templateUrl: './developments.component.html',
+  standalone: true,
+  imports: [
+    NgIf,
+    ReactiveFormsModule
+  ],
   styleUrls: ['./developments.component.scss']
 })
-export class DevelopmentsComponent implements OnInit {
-  developmentForm!: FormGroup;
-  developmentId: string | null = null;
-  currentDevelopment: any = null;
-  isEditMode = false;
-  isReadonly = false;
-  loading = false;
+export class DevelopmentsComponent {
+  selectedFile: File | null = null;
+  previewUrl: string | null = null;
+  isUploading = false;
+  message: string | null = null;
   error: string | null = null;
 
-  constructor(
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private developmentService: DevelopmentService
-  ) {
-    this.initForm();
+  // ID de um development existente para testar (substitua por um ID real)
+  developmentId = '68c376da0306a9ef8241b3e5'; // Coloque um ID real aqui
+
+  constructor(private http: HttpClient) { }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    this.selectedFile = file;
+    this.error = null;
+    this.message = null;
+
+    // Criar preview
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.previewUrl = reader.result as string;
+    };
+    reader.readAsDataURL(file);
   }
 
-  ngOnInit() {
-    this.route.params.subscribe(params => {
-      if (params['id']) {
-        this.developmentId = params['id'];
-        this.isEditMode = true;
-        this.loadDevelopment();
-      }
-    });
+  uploadImage() {
+    if (!this.selectedFile) return;
 
-    // Verificar se é modo de visualização
-    this.route.url.subscribe(url => {
-      this.isReadonly = url.some(segment => segment.path === 'view');
-    });
-  }
+    this.isUploading = true;
+    this.error = null;
+    this.message = null;
 
-  private initForm() {
-    this.developmentForm = this.fb.group({
-      clientId: ['', [Validators.required]],
-      description: ['', [Validators.required, Validators.minLength(10)]],
-      clientReference: [''],
-      variants: this.fb.array([]),
-      productionType: this.fb.group({
-        rotary: this.fb.group({
-          enabled: [false],
-          negotiatedPrice: [null]
-        }),
-        localized: this.fb.group({
-          enabled: [false],
-          sizes: this.fb.group({
-            xs: [0],
-            s: [0],
-            m: [0],
-            l: [0],
-            xl: [0]
-          })
-        })
-      })
-    });
-  }
+    const formData = new FormData();
+    formData.append('image', this.selectedFile);
 
-  private loadDevelopment() {
-    if (!this.developmentId) return;
+    // Substitua pela sua URL de API
+    const apiUrl = `${environment.apiUrl}/developments/${this.developmentId}/image`;
 
-    this.loading = true;
-    this.developmentService.getDevelopment(this.developmentId)
-      .subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.currentDevelopment = response.data;
-            this.populateForm(this.currentDevelopment);
-          }
-          this.loading = false;
-        },
-        error: (error) => {
-          console.error('Erro ao carregar development:', error);
-          this.error = 'Erro ao carregar dados do development';
-          this.loading = false;
-        }
-      });
-  }
-
-  private populateForm(development: any) {
-    this.developmentForm.patchValue({
-      clientId: development.clientId,
-      description: development.description,
-      clientReference: development.clientReference,
-      productionType: development.productionType
-    });
-
-    // Popular variants se existirem
-    // ... código para popular variants array
-  }
-
-  // Callback quando imagem é enviada com sucesso
-  onImageUploaded(imageData: ImageData) {
-    console.log('Imagem enviada:', imageData);
-
-    // Atualizar dados locais
-    if (this.currentDevelopment) {
-      this.currentDevelopment.pieceImage = imageData;
-    }
-
-    // Exibir mensagem de sucesso
-    // Aqui você pode usar seu sistema de notificações
-    alert('Imagem enviada com sucesso!');
-  }
-
-  // Callback quando imagem é removida
-  onImageRemoved() {
-    console.log('Imagem removida');
-
-    // Limpar dados locais
-    if (this.currentDevelopment) {
-      this.currentDevelopment.pieceImage = null;
-    }
-
-    // Exibir mensagem
-    alert('Imagem removida com sucesso!');
-  }
-
-  onSubmit() {
-    if (this.developmentForm.invalid) {
-      this.markFormGroupTouched(this.developmentForm);
-      return;
-    }
-
-    const formData = this.developmentForm.value;
-    this.loading = true;
-
-    const request = this.isEditMode
-      ? this.developmentService.updateDevelopment(this.developmentId!, formData)
-      : this.developmentService.createDevelopment(formData);
-
-    request.subscribe({
-      next: (response) => {
-        if (response.success) {
-          console.log('Development salvo:', response.data);
-          this.router.navigate(['/developments']);
-        }
-        this.loading = false;
+    this.http.post(apiUrl, formData).subscribe({
+      next: (response: any) => {
+        console.log('Sucesso:', response);
+        this.message = 'Upload realizado com sucesso! ✅';
+        this.isUploading = false;
+        this.clearSelection();
       },
       error: (error) => {
-        console.error('Erro ao salvar development:', error);
-        this.error = error.error?.message || 'Erro ao salvar development';
-        this.loading = false;
+        console.error('Erro:', error);
+        this.error = `Erro no upload: ${error.error?.message || error.message}`;
+        this.isUploading = false;
       }
     });
   }
 
-  private markFormGroupTouched(formGroup: FormGroup) {
-    Object.keys(formGroup.controls).forEach(key => {
-      const control = formGroup.controls[key];
-      control.markAsTouched();
-
-      if (control instanceof FormGroup) {
-        this.markFormGroupTouched(control);
-      }
-    });
-  }
-
-  goBack() {
-    this.router.navigate(['/developments']);
-  }
-
-  // Getter para facilitar acesso aos controles do form
-  get f() {
-    return this.developmentForm.controls;
+  clearSelection() {
+    this.selectedFile = null;
+    this.previewUrl = null;
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
   }
 }

@@ -1,38 +1,24 @@
-<!-- Exemplo de uso no formulário de development -->
-<!-- src/app/pages/development/development-form/development-form.component.html -->
+<!-- src/app/pages/authorized/developments/developments.component.html -->
+<div class="container">
+    <h2>Teste de Upload</h2>
 
-<form [formGroup]="developmentForm" (ngSubmit)="onSubmit()">
-    <!-- Outros campos do formulário -->
+    <!-- Input de arquivo -->
+    <div class="upload-section">
+        <input type="file" accept="image/*" (change)="onFileSelected($event)" #fileInput class="form-control mb-3">
 
-    <div class="form-group">
-        <label class="form-label">Descrição</label>
-        <textarea class="form-control" formControlName="description" rows="3">
-      </textarea>
-    </div>
+        <!-- Preview da imagem -->
+        <div *ngIf="previewUrl" class="mb-3">
+            <img [src]="previewUrl" alt="Preview" style="max-width: 300px; height: auto;">
+        </div>
 
-    <!-- SEÇÃO DA IMAGEM DA PEÇA -->
-    <div class="form-group">
-        <label class="form-label">
-            <i class="fas fa-image"></i>
-            Imagem da Peça
-        </label>
-
-        <app-image-upload [developmentId]="developmentId" [currentImage]="currentDevelopment?.pieceImage"
-            [readonly]="isReadonly" (imageUploaded)="onImageUploaded($event)" (imageRemoved)="onImageRemoved()">
-        </app-image-upload>
-    </div>
-
-    <!-- Outros campos -->
-
-    <div class="form-actions">
-        <button type="submit" class="btn btn-primary" [disabled]="developmentForm.invalid">
-            <i class="fas fa-save"></i>
-            {{ isEditMode ? 'Atualizar' : 'Criar' }} Development
+        <!-- Botão de upload -->
+        <button class="btn btn-primary" (click)="uploadImage()" [disabled]="!selectedFile || isUploading">
+            <span *ngIf="!isUploading">📤 Fazer Upload</span>
+            <span *ngIf="isUploading">⏳ Enviando...</span>
         </button>
 
-        <button type="button" class="btn btn-secondary" (click)="goBack()">
-            <i class="fas fa-arrow-left"></i>
-            Voltar
-        </button>
+        <!-- Mensagens -->
+        <div *ngIf="message" class="alert alert-info mt-3">{{ message }}</div>
+        <div *ngIf="error" class="alert alert-danger mt-3">{{ error }}</div>
     </div>
-</form>
+</div>

@@ -1,0 +1,64 @@
+// src/app/pages/authorized/developments/developments.component.scss
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.upload-section {
+    border: 2px dashed #007bff;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    background: #f8f9fa;
+}
+
+.form-control {
+    margin-bottom: 1rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+
+    &:hover:not(:disabled) {
+        background: #0056b3;
+        transform: translateY(-1px);
+    }
+
+    &:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+    }
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 6px;
+    border: none;
+}
+
+.alert-info {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+img {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
