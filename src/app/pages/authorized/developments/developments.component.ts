@@ -6,9 +6,9 @@ import { ImageData } from '../../../services/image-upload/image-upload.service';
 import { DevelopmentService } from '../../../services/development/development.service';
 
 @Component({
-  selector: 'app-development-form',
-  templateUrl: './development-form.component.html',
-  styleUrls: ['./development-form.component.scss']
+  selector: 'app-developments',
+  templateUrl: './developments.component.html',
+  styleUrls: ['./developments.component.scss']
 })
 export class DevelopmentsComponent implements OnInit {
   developmentForm!: FormGroup;
