@@ -1,11 +1,8 @@
-<!-- menu.component.html -->
-
-<!-- Overlay para fechar o menu ao clicar fora -->
-<div class="menu-overlay" [class.active]="menuService.isOpen()" (click)="closeMenu()" role="presentation"
+<!-- <div class="menu-overlay" [class.active]="menuService.isOpen()" (click)="closeMenu()" role="presentation"
     aria-hidden="true">
 </div>
 
-<!-- Botão toggle do menu -->
+
 <button class="menu-toggle" (click)="toggleMenu()" [disabled]="menuService.isAnimating()"
     [attr.aria-expanded]="menuService.isOpen()"
     [attr.aria-label]="menuService.isOpen() ? 'Fechar menu de navegação' : 'Abrir menu de navegação'" type="button">
@@ -17,16 +14,16 @@
     </div>
 </button>
 
-<!-- Container do menu lateral -->
+
 <nav class="side-menu" [class.open]="menuService.isOpen()" [class.animating]="menuService.isAnimating()"
     role="navigation" [attr.aria-hidden]="!menuService.isOpen()" aria-label="Menu principal de navegação">
 
-    <!-- Cabeçalho do menu -->
+
     <header class="menu-header">
 
     </header>
 
-    <!-- Lista de itens do menu -->
+
     <ul class="menu-list" role="menubar">
         <li *ngFor="let item of menuService.menuItems(); trackBy: trackByItemId" class="menu-item"
             [class.has-children]="hasChildren(item)" [class.active]="isItemActive(item)"
@@ -49,12 +46,12 @@
                 </span>
             </button>
 
-            <!-- Texto para screen readers sobre item desabilitado -->
+
             <span *ngIf="item.disabled" [id]="item.id + '-disabled'" class="sr-only">
                 Este item está desabilitado
             </span>
 
-            <!-- Submenu (se houver) -->
+
             <ul *ngIf="hasChildren(item)" class="submenu" role="menu" [attr.aria-labelledby]="item.id">
                 <li *ngFor="let child of item.children" class="submenu-item" [class.active]="isItemActive(child)"
                     [class.disabled]="child.disabled" role="none">
@@ -66,7 +63,7 @@
                         <span class="submenu-text">{{ child.label }}</span>
                     </button>
 
-                    <!-- Texto para screen readers sobre subitem desabilitado -->
+
                     <span *ngIf="child.disabled" [id]="child.id + '-disabled'" class="sr-only">
                         Este item está desabilitado
                     </span>
@@ -75,7 +72,6 @@
         </li>
     </ul>
 
-    <!-- Rodapé do menu (opcional) -->
     <footer class="menu-footer">
         <span (click)="logout()">
             Logout
@@ -84,4 +80,10 @@
             <small class="menu-version">v1.0.0</small>
         </div>
     </footer>
-</nav>
+</nav> -->
+
+<section>
+    <div class="menu-container">
+
+    </div>
+</section>

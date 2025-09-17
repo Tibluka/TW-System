@@ -2,9 +2,10 @@
 import { Component, OnInit, OnDestroy, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { MenuItem } from '../../../models/menu/menu';
-import { MenuService } from '../../../services/menu/menu.service';
-import { AuthService } from '../../../services/auth/auth-service';
+import { MenuItem } from '../../models/menu/menu';
+import { AuthService } from '../../services/auth/auth-service';
+import { MenuService } from '../../services/menu/menu.service';
+
 
 @Component({
   selector: 'app-menu',
