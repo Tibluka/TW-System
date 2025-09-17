@@ -1,0 +1,72 @@
+@use '../themes';
+@use '../abstracts/' as *;
+
+.main-container {
+    width: 100%;
+    //max-width: 1100px;
+    margin: 0 auto;
+}
+
+.regular-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.mid-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.small-container {
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto;
+}
+
+.card-container {
+    width: 100%;
+    position: relative;
+    background-color: var(--bg-2);
+    border-radius: $border-radius-xb;
+
+    .header {
+        display: flex;
+        align-items: center;
+        width: inherit;
+        padding: $padding-sm;
+        background-color: var(--primary-1);
+        border-radius: $border-radius-xb $border-radius-xb 0 0;
+
+        h1 {
+            font-weight: $font-weight-bg;
+            font-size: $font-md;
+        }
+
+        line-height: 100%;
+
+        img {
+            margin-right: 8px;
+        }
+    }
+
+    .card-content {
+        padding: $padding-md;
+
+        h2 {
+            font-size: $font-sm;
+            font-weight: $font-weight-md;
+            margin-bottom: 6px;
+            line-height: 150%;
+            letter-spacing: 0.5px;
+        }
+
+        p {
+            font-size: $font-xs;
+            font-weight: $font-weight-mdl;
+            line-height: 150%;
+            letter-spacing: 0.5px;
+        }
+    }
+}

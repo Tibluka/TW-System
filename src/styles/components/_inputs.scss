@@ -1,0 +1,116 @@
+input {
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    outline: none;
+    border: 1px solid var(--bord-1);
+    height: 44px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    label {
+        margin-bottom: 8px;
+    }
+
+    label:has(input[type="checkbox"]) {
+        padding-left: 25px;
+        margin-bottom: 8px;
+        width: fit-content;
+    }
+
+    input {
+        background-color: var(--bg-1);
+        color: var(--txt-1);
+        font-size: 16px;
+
+        &::placeholder {
+            color: var(--bg-6);
+            font-weight: 300;
+            font-size: 14px;
+            line-height: 100%;
+            letter-spacing: 0%;
+        }
+
+        &.invalid {
+            border: 2px solid #d54343;
+        }
+    }
+
+    input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+
+        &.invalid {
+            border: 2px solid #d54343;
+        }
+    }
+
+    .custom-checkbox {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 16px;
+        width: 16px;
+        background-color: var(--bg-1);
+        border: 1px solid var(--bg-6);
+        border-radius: 4px;
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+
+
+    input[type="checkbox"]:checked+.custom-checkbox {
+        background-color: var(--bg-1);
+        border-color: var(--bg-6);
+    }
+
+    .custom-checkbox::after {
+        content: "";
+        position: absolute;
+        display: none;
+        left: 4.8px;
+        top: 1px;
+        width: 4px;
+        height: 8px;
+        border: solid var(--bg-6);
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    input[type="checkbox"]:checked+.custom-checkbox::after {
+        display: block;
+    }
+}
+
+.file-upload-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.file-upload-label {
+    border: 1px dashed var(--bord-1);
+    border-style: dashed;
+    border-spacing: 10px;
+    background-color: var(--primary-lilac-100);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.file-upload-label:hover {
+    background-color: var(--primary-lilac-80);
+}

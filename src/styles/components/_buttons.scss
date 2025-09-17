@@ -1,0 +1,50 @@
+button {
+    padding: 14px 16px;
+    border: none;
+    border-radius: 12px;
+    height: 44px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &.primary-btn {
+        background-color: var(--primary-1);
+
+        i {
+            color: white;
+        }
+
+        &:hover {
+            background-color: #0d8e6c;
+        }
+    }
+
+
+    &.secondary-btn {
+        background-color: transparent;
+        border: 1px solid var(--primary-1);
+        color: var(--primary-1);
+
+        i {
+            color: var(--primary-1);
+        }
+    }
+
+    &.outline-btn {
+        border: 1px solid var(--txt-1);
+        color: var(--txt-1);
+        border-radius: 12px;
+        font-size: 14px;
+        background-color: var(--bg-1);
+
+
+        i {
+            color: var(--txt-1);
+        }
+    }
+
+
+    &:disabled {
+        cursor: not-allowed;
+    }
+}

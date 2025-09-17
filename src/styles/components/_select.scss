@@ -1,0 +1,37 @@
+select {
+    padding: 12px;
+    border: none;
+    border-radius: 16px;
+    outline: none;
+    border: 1px solid var(--bord-2);
+    resize: none;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+
+    label {
+        margin-bottom: 8px;
+    }
+
+    select {
+        box-sizing: border-box;
+        background-color: var(--bg-1);
+        color: var(--txt-1);
+        font-size: 16px;
+        border: 1px solid var(--bord-1);
+
+        &::placeholder {
+            color: var(--bg-6);
+            font-weight: 300;
+            font-size: 14px;
+            line-height: 100%;
+            letter-spacing: 0%;
+        }
+
+        &.invalid {
+            border: 2px solid #d54343;
+        }
+    }
+}
