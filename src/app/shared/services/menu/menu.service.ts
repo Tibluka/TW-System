@@ -1,6 +1,6 @@
 // menu.service.ts
 import { computed, Injectable, signal } from '@angular/core';
-import { MenuItem } from '../../models/menu/menu';
+import { MenuItem } from '../../../models/menu/menu';
 
 @Injectable({
   providedIn: 'root'

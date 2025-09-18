@@ -2,7 +2,7 @@ import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { routes } from './app.routes';
-import { JwtInterceptor } from './services/interceptors/jwt.interceptor';
+import { JwtInterceptor } from './shared/services/interceptors/jwt.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [

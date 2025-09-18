@@ -3,8 +3,9 @@ import { Component, OnInit, OnDestroy, HostListener, inject } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MenuItem } from '../../models/menu/menu';
-import { AuthService } from '../../services/auth/auth-service';
-import { MenuService } from '../../services/menu/menu.service';
+import { AuthService } from '../../shared/services/auth/auth-service';
+import { MenuService } from '../../shared/services/menu/menu.service';
+
 
 
 @Component({
