@@ -33,7 +33,7 @@
               "src/_redirects"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles/main.scss"
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
