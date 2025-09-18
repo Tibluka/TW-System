@@ -16,14 +16,6 @@
     padding: 0 0.5rem;
 }
 
-// Colunas específicas
-@for $i from 1 through 12 {
-    .col-#{$i} {
-        flex: 0 0 percentage($i / 12);
-        padding: 0 0.5rem;
-    }
-}
-
 // Grid responsivo
 @media (max-width: 768px) {
     .container {

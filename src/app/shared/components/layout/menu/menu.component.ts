@@ -5,13 +5,17 @@ import { Router } from '@angular/router';
 import { MenuItem } from '../../../../models/menu/menu';
 import { AuthService } from '../../../services/auth/auth-service';
 import { MenuService } from '../../../services/menu/menu.service';
+import { IconComponent } from '../../atoms/icon/icon.component';
 
 
 
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    IconComponent
+  ],
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.scss']
 })

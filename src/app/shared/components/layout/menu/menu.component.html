@@ -84,6 +84,16 @@
 
 <section>
     <div class="menu-container">
-
+        <div class="menu-header">
+            <app-icon color="white" fontSize="32px" icon="fa-solid fa-bars" />
+            <h4>Menu</h4>
+        </div>
+        <div class="menu-items">
+            <div class="menu-item" [ngClass]="{'active': i === 0}"
+                *ngFor="let menu of menuService.menuItems(); index as i">
+                <app-icon color="white" fontSize="32px" cursor="pointer" [icon]="menu.icon" />
+                <p class="mb-0" [innerText]="menu.label"></p>
+            </div>
+        </div>
     </div>
 </section>

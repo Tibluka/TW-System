@@ -114,33 +114,33 @@ export class MenuService {
   private initializeDefaultItems(): void {
     const defaultItems: MenuItem[] = [
       {
-        id: 'home',
-        label: 'Início',
-        icon: 'home',
-        route: '/'
+        id: 'clients',
+        label: 'Clientes',
+        icon: 'fa-solid fa-users',
+        route: '/clients'
       },
       {
         id: 'developments',
         label: 'Desenvolvimentos',
-        icon: 'mail',
+        icon: 'fa-solid fa-palette',
         route: '/authorized/developments'
       },
       {
         id: 'production-orders',
         label: 'Ordens de produção',
-        icon: 'mail',
+        icon: 'fa-solid fa-print',
         route: '/authorized/production-orders'
       },
       {
         id: 'production-sheets',
         label: 'Fichas de produção',
-        icon: 'mail',
+        icon: 'fa-solid fa-file',
         route: '/authorized/production-sheets'
       },
       {
         id: 'production-receipt',
         label: 'Recibos de produção',
-        icon: 'mail',
+        icon: 'fa-solid fa-sack-dollar',
         route: '/authorized/production-receipt'
       }
     ];

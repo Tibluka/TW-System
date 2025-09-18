@@ -1,13 +1,14 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/not-authorized/login/login.component';
 import { SignupComponent } from './pages/not-authorized/signup/signup.component';
-import { HomeComponent } from './pages/authorized/home/home.component';
+
 import { ProductionOrdersComponent } from './pages/authorized/production-orders/production-orders.component';
 import { ProductionReceiptComponent } from './pages/authorized/production-receipt/production-receipt.component';
 import { AuthorizedComponent } from './pages/authorized/authorized.component';
 import { DevelopmentsComponent } from './pages/authorized/developments/developments.component';
 import { ProductionSheetsComponent } from './pages/authorized/production-sheets/production-sheets.component';
 import { authenticationGuard } from './shared/services/guards/authentication.guard';
+import { ClientsComponent } from './pages/authorized/clients/clients.component';
 
 export const routes: Routes = [
     // Rota raiz redireciona para login
@@ -35,12 +36,12 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                redirectTo: 'home',
+                redirectTo: 'clients',
                 pathMatch: 'full'
             },
             {
-                path: 'home',
-                component: HomeComponent
+                path: 'clients',
+                component: ClientsComponent
             },
             {
                 path: 'developments',
