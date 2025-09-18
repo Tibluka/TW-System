@@ -117,7 +117,7 @@ export class MenuService {
         id: 'clients',
         label: 'Clientes',
         icon: 'fa-solid fa-users',
-        route: '/clients'
+        route: '/authorized/clients'
       },
       {
         id: 'developments',

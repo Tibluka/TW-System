@@ -7,8 +7,6 @@ import { AuthService } from '../../../services/auth/auth-service';
 import { MenuService } from '../../../services/menu/menu.service';
 import { IconComponent } from '../../atoms/icon/icon.component';
 
-
-
 @Component({
   selector: 'app-menu',
   standalone: true,
@@ -42,13 +40,11 @@ export class MenuComponent implements OnInit, OnDestroy {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
     const target = event.target as Element;
-    const menuElement = document.querySelector('.side-menu');
-    const toggleButton = document.querySelector('.menu-toggle');
+    const menuElement = document.querySelector('.menu-container');
 
     // Fecha o menu se clicar fora dele
     if (this.menuService.isOpen() &&
-      !menuElement?.contains(target) &&
-      !toggleButton?.contains(target)) {
+      !menuElement?.contains(target)) {
       this.closeMenu();
     }
   }
@@ -86,7 +82,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   /**
    * Manipula o clique em um item do menu
    */
-  handleItemClick(item: MenuItem): void {
+  onMenuItemClick(item: MenuItem, index: number): void {
     if (item.disabled || this.menuService.isAnimating()) return;
 
     // Executa a ação do item através do service
@@ -104,38 +100,7 @@ export class MenuComponent implements OnInit, OnDestroy {
    * TrackBy function para otimizar o *ngFor
    */
   trackByItemId(index: number, item: MenuItem): string {
-    return item.id;
-  }
-
-  /**
-   * Retorna o conteúdo do ícone baseado no nome
-   */
-  getIconContent(iconName: string): string {
-    const iconMap: Record<string, string> = {
-      'home': '🏠',
-      'info': 'ℹ️',
-      'build': '🔧',
-      'mail': '✉️',
-      'user': '👤',
-      'settings': '⚙️',
-      'search': '🔍',
-      'heart': '❤️',
-      'star': '⭐',
-      'folder': '📁',
-      'file': '📄',
-      'image': '🖼️',
-      'video': '🎥',
-      'music': '🎵'
-    };
-
-    return iconMap[iconName] || '•';
-  }
-
-  /**
-   * Verifica se o item tem filhos
-   */
-  hasChildren(item: MenuItem): boolean {
-    return !!(item.children && item.children.length > 0);
+    return item.id || index.toString();
   }
 
   /**

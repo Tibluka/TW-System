@@ -1,99 +1,21 @@
-<!-- <div class="menu-overlay" [class.active]="menuService.isOpen()" (click)="closeMenu()" role="presentation"
-    aria-hidden="true">
-</div>
-
-
-<button class="menu-toggle" (click)="toggleMenu()" [disabled]="menuService.isAnimating()"
-    [attr.aria-expanded]="menuService.isOpen()"
-    [attr.aria-label]="menuService.isOpen() ? 'Fechar menu de navegação' : 'Abrir menu de navegação'" type="button">
-
-    <div class="hamburger" [class.active]="menuService.isOpen()">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-    </div>
-</button>
-
-
-<nav class="side-menu" [class.open]="menuService.isOpen()" [class.animating]="menuService.isAnimating()"
-    role="navigation" [attr.aria-hidden]="!menuService.isOpen()" aria-label="Menu principal de navegação">
-
-
-    <header class="menu-header">
-
-    </header>
-
-
-    <ul class="menu-list" role="menubar">
-        <li *ngFor="let item of menuService.menuItems(); trackBy: trackByItemId" class="menu-item"
-            [class.has-children]="hasChildren(item)" [class.active]="isItemActive(item)"
-            [class.disabled]="item.disabled" role="none">
-
-            <button class="menu-link" (click)="handleItemClick(item)" [disabled]="item.disabled || !canInteract()"
-                role="menuitem" [attr.aria-expanded]="hasChildren(item) ? 'false' : undefined"
-                [attr.aria-describedby]="item.disabled ? item.id + '-disabled' : undefined" type="button">
-
-                <span class="menu-icon" *ngIf="item.icon" [attr.aria-hidden]="true">
-                    {{ getIconContent(item.icon) }}
-                </span>
-
-                <span class="menu-text">{{ item.label }}</span>
-
-                <span class="menu-arrow" *ngIf="hasChildren(item)" aria-hidden="true">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M8.59 16.59L13.17 12L8.59 7.41L10 6l6 6-6 6-1.41-1.41z" />
-                    </svg>
-                </span>
-            </button>
-
-
-            <span *ngIf="item.disabled" [id]="item.id + '-disabled'" class="sr-only">
-                Este item está desabilitado
-            </span>
-
-
-            <ul *ngIf="hasChildren(item)" class="submenu" role="menu" [attr.aria-labelledby]="item.id">
-                <li *ngFor="let child of item.children" class="submenu-item" [class.active]="isItemActive(child)"
-                    [class.disabled]="child.disabled" role="none">
-
-                    <button class="submenu-link" (click)="handleItemClick(child)"
-                        [disabled]="child.disabled || !canInteract()" role="menuitem"
-                        [attr.aria-describedby]="child.disabled ? child.id + '-disabled' : undefined" type="button">
-
-                        <span class="submenu-text">{{ child.label }}</span>
-                    </button>
-
-
-                    <span *ngIf="child.disabled" [id]="child.id + '-disabled'" class="sr-only">
-                        Este item está desabilitado
-                    </span>
-                </li>
-            </ul>
-        </li>
-    </ul>
-
-    <footer class="menu-footer">
-        <span (click)="logout()">
-            Logout
-        </span>
-        <div class="menu-footer-content">
-            <small class="menu-version">v1.0.0</small>
-        </div>
-    </footer>
-</nav> -->
-
-<section>
+<!-- menu.component.html -->
+<nav role="navigation" aria-label="Menu principal">
     <div class="menu-container">
-        <div class="menu-header">
-            <app-icon color="white" fontSize="32px" icon="fa-solid fa-bars" />
+        <header class="menu-header">
+            <app-icon color="white" fontSize="32px" icon="fa-solid fa-bars" [attr.aria-hidden]="true" />
             <h4>Menu</h4>
-        </div>
-        <div class="menu-items">
-            <div class="menu-item" [ngClass]="{'active': i === 0}"
-                *ngFor="let menu of menuService.menuItems(); index as i">
-                <app-icon color="white" fontSize="32px" cursor="pointer" [icon]="menu.icon" />
-                <p class="mb-0" [innerText]="menu.label"></p>
-            </div>
-        </div>
+        </header>
+        <ul class="menu-items" role="menubar">
+            <li class="menu-item" [ngClass]="{'active': i === 0}"
+                *ngFor="let menu of menuService.menuItems(); let i = index; trackBy: trackByItemId" role="none">
+                <button type="button" class="menu-item-button" (click)="onMenuItemClick(menu, i)"
+                    [attr.aria-current]="i === 0 ? 'page' : null" [attr.aria-label]="menu.label"
+                    [disabled]="menu.disabled" role="menuitem">
+                    <app-icon color="white" fontSize="32px" cursor="pointer" [icon]="menu.icon"
+                        [attr.aria-hidden]="true" />
+                    <span class="mb-0" [innerText]="menu.label"></span>
+                </button>
+            </li>
+        </ul>
     </div>
-</section>
+</nav>
