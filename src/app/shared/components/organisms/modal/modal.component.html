@@ -1,11 +1,10 @@
 <!-- modal.component.html -->
-<div class="modal-backdrop" [@backdropFade]="animationState" (click)="onBackdropClick($event)"
-    *ngIf="isVisible || animationState === 'in'">
+<div class="modal-backdrop" (click)="onBackdropClick($event)" *ngIf="shouldShowModal">
 
     <div [class]="getModalClasses()" [@fade]="animationState" (@fade.done)="onAnimationDone($event)"
         (click)="onModalContentClick($event)">
 
-        <div class="modal-content" [@slideInContent]="animationState">
+        <div class="modal-content">
 
             <!-- Header do Modal -->
             <div class="modal-header" *ngIf="modalConfig?.showHeader">

@@ -23,7 +23,8 @@ export class ModalComponent implements OnInit, OnDestroy {
   // Estados do modal
   isVisible = false;
   modalConfig: ModalConfig | null = null;
-  animationState = 'out';
+  animationState: 'in' | 'out' = 'out';
+  shouldShowModal = false; // Controla quando o modal deve estar no DOM
 
   constructor() {
     // Usa effect para reagir às mudanças nos signals do service
@@ -34,7 +35,19 @@ export class ModalComponent implements OnInit, OnDestroy {
 
         if (newVisibility !== this.isVisible) {
           this.isVisible = newVisibility;
-          this.animationState = newVisibility ? 'in' : 'out';
+
+          if (newVisibility) {
+            // Modal está abrindo
+            this.shouldShowModal = true;
+            // Aguarda próximo ciclo para permitir que o elemento seja renderizado
+            setTimeout(() => {
+              this.animationState = 'in';
+            }, 0);
+          } else {
+            // Modal está fechando
+            this.animationState = 'out';
+            // shouldShowModal será definido como false após a animação terminar
+          }
         }
 
         this.modalConfig = modal ? modal.config : null;
@@ -91,12 +104,13 @@ export class ModalComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Callback para quando a animação de saída termina
+   * Callback para quando a animação do modal termina
    */
   onAnimationDone(event: any): void {
     if (event.toState === 'out' && event.fromState === 'in') {
-      // Animação de saída terminou, pode esconder o elemento
-      this.isVisible = false;
+      // Animação de saída terminou, remove do DOM
+      this.shouldShowModal = false;
+      console.log('Modal removido do DOM após animação');
     }
   }
 }
