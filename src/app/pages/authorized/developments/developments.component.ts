@@ -1,4 +1,4 @@
-// src/app/pages/authorized/developments/developments.component.ts
+// developments.component.ts - Atualizado com seu contexto atual
 import { NgIf } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
@@ -7,6 +7,9 @@ import { environment } from '../../../../environments/environment';
 import { ModalService } from '../../../shared/services/modal/modal.service';
 import { ModalComponent } from "../../../shared/components/organisms/modal/modal.component";
 
+// Importa o componente que vai dentro do modal
+import { ClientsComponent } from '../clients/clients.component';
+
 @Component({
   selector: 'app-developments',
   templateUrl: './developments.component.html',
@@ -14,7 +17,8 @@ import { ModalComponent } from "../../../shared/components/organisms/modal/modal
   imports: [
     NgIf,
     ReactiveFormsModule,
-    ModalComponent
+    ModalComponent,
+    ClientsComponent  // ← Importa o componente filho
   ],
   styleUrls: ['./developments.component.scss']
 })
@@ -27,9 +31,6 @@ export class DevelopmentsComponent {
   message: string | null = null;
   error: string | null = null;
 
-  // ID de um development existente para testar (substitua por um ID real)
-  developmentId = '68c376da0306a9ef8241b3e5'; // Coloque um ID real aqui
-
   constructor(private http: HttpClient) { }
 
   onFileSelected(event: any) {
@@ -40,7 +41,6 @@ export class DevelopmentsComponent {
     this.error = null;
     this.message = null;
 
-    // Criar preview
     const reader = new FileReader();
     reader.onload = () => {
       this.previewUrl = reader.result as string;
@@ -58,8 +58,7 @@ export class DevelopmentsComponent {
     const formData = new FormData();
     formData.append('image', this.selectedFile);
 
-    // Substitua pela sua URL de API
-    const apiUrl = `${environment.apiUrl}/developments/${this.developmentId}/image`;
+    const apiUrl = `${environment.apiUrl}/developments/68c376da0306a9ef8241b3e5/image`;
 
     this.http.post(apiUrl, formData).subscribe({
       next: (response: any) => {
@@ -85,13 +84,32 @@ export class DevelopmentsComponent {
     }
   }
 
-  openModal() {
+  // Método para abrir o modal com o componente filho
+  openModalWithComponent() {
     this.modalService.open({
-      id: 'meu-modal',
-      title: 'Título do Modal',
-      size: 'md'
+      id: 'clients-component',
+      title: 'Gerenciar Clientes',
+      size: 'lg', // Modal maior para acomodar a lista de clientes
+      showHeader: true,
+      showCloseButton: true,
+      closeOnBackdropClick: false, // Desabilita fechar clicando fora
+      closeOnEscapeKey: false      // Desabilita fechar com ESC
     }).subscribe(result => {
-      console.log('Modal fechado:', result);
+      console.log('Modal fechado pelo componente filho:', result);
+
+      if (result?.action === 'saved') {
+        this.message = `Cliente salvo com sucesso!`;
+      } else if (result?.action === 'canceled') {
+        console.log('Operação cancelada');
+      } else if (result?.action === 'selected') {
+        this.message = `Cliente selecionado: ${result.data?.name || 'Cliente'}`;
+      }
     });
+  }
+
+  // Handlers para os eventos do componente filho
+  onClientAction(data: any) {
+    console.log('Ação do cliente recebida:', data);
+    // Aqui você pode processar as ações do componente de clientes
   }
 }

@@ -1,15 +1,17 @@
 // modal.component.ts
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModalService, ModalConfig } from '../../../services/modal/modal.service';
 import { IconComponent } from '../../atoms/icon/icon.component';
+import { modalAnimations } from '../../../animations/fade-animation';
 
 @Component({
   selector: 'app-modal',
   standalone: true,
   imports: [CommonModule, IconComponent],
   templateUrl: './modal.component.html',
-  styleUrls: ['./modal.component.scss']
+  styleUrls: ['./modal.component.scss'],
+  animations: modalAnimations
 })
 export class ModalComponent implements OnInit, OnDestroy {
   @Input() modalId!: string;
@@ -21,36 +23,34 @@ export class ModalComponent implements OnInit, OnDestroy {
   // Estados do modal
   isVisible = false;
   modalConfig: ModalConfig | null = null;
+  animationState = 'out';
+
+  constructor() {
+    // Usa effect para reagir às mudanças nos signals do service
+    effect(() => {
+      if (this.modalId) {
+        const modal = this.modalService.modals().find(m => m.id === this.modalId);
+        const newVisibility = modal ? modal.isOpen : false;
+
+        if (newVisibility !== this.isVisible) {
+          this.isVisible = newVisibility;
+          this.animationState = newVisibility ? 'in' : 'out';
+        }
+
+        this.modalConfig = modal ? modal.config : null;
+      }
+    });
+  }
 
   ngOnInit(): void {
     if (!this.modalId) {
       console.error('Modal ID é obrigatório');
       return;
     }
-
-    // Observa mudanças nos modais para atualizar a visibilidade
-    this.updateModalState();
   }
 
   ngOnDestroy(): void {
-    // Cleanup se necessário
-  }
-
-  /**
-   * Atualiza o estado do modal baseado no service
-   */
-  private updateModalState(): void {
-    // Usar effect ou subscription baseado nos signals do service
-    const checkModalState = () => {
-      const modal = this.modalService.modals().find(m => m.id === this.modalId);
-      this.isVisible = modal ? modal.isOpen : false;
-      this.modalConfig = modal ? modal.config : null;
-
-      // Agenda próxima verificação
-      requestAnimationFrame(checkModalState);
-    };
-
-    checkModalState();
+    // Cleanup automático do effect quando o componente for destruído
   }
 
   /**
@@ -88,5 +88,15 @@ export class ModalComponent implements OnInit, OnDestroy {
     }
 
     return classes.join(' ');
+  }
+
+  /**
+   * Callback para quando a animação de saída termina
+   */
+  onAnimationDone(event: any): void {
+    if (event.toState === 'out' && event.fromState === 'in') {
+      // Animação de saída terminou, pode esconder o elemento
+      this.isVisible = false;
+    }
   }
 }

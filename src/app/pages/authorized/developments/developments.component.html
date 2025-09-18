@@ -22,12 +22,12 @@
         <div *ngIf="error" class="alert alert-danger mt-3">{{ error }}</div>
     </div>
 
-    <button class="btn btn-primary" (click)="openModal()">
+    <button class="btn btn-primary" (click)="openModalWithComponent()">
         Open
     </button>
 </div>
 
-<app-modal modalId="meu-modal">
-    <p>Qualquer conteúdo aqui!</p>
-
+<!-- Modal para edição -->
+<app-modal modalId="clients-component">
+    <app-clients></app-clients>
 </app-modal>
