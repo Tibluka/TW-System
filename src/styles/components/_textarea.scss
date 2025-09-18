@@ -3,7 +3,7 @@ textarea {
     border: none;
     border-radius: 16px;
     outline: none;
-    border: 1px solid var(--bord-2);
+    border: 1px solid var(--stroke);
     resize: none;
 }
 
@@ -13,17 +13,18 @@ textarea {
 
     label {
         margin-bottom: 8px;
+        color: var(--label);
     }
 
     textarea {
         box-sizing: border-box;
-        background-color: var(--bg-1);
-        color: var(--txt-1);
+        background-color: var(--background);
+        color: var(--primary-dark);
         font-size: 16px;
-        border: 1px solid var(--bord-1);
+        border: 1px solid var(--stroke);
 
         &::placeholder {
-            color: var(--bg-6);
+            color: var(--placeholder);
             font-weight: 300;
             font-size: 14px;
             line-height: 100%;
@@ -31,7 +32,12 @@ textarea {
         }
 
         &.invalid {
-            border: 2px solid #d54343;
+            border: 2px solid var(--tertiary);
+        }
+
+        &:focus {
+            border-color: var(--primary-medium);
+            box-shadow: 0 0 0 3px rgba(1, 80, 120, 0.1);
         }
     }
 }

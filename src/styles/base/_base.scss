@@ -2,7 +2,7 @@
 
 body {
     margin: 0;
-    background-color: var(--bg-1);
+    background-color: var(--background);
     transition: background-color 0.5s ease, color 0.5s ease;
 }
 
@@ -20,5 +20,5 @@ footer {
 }
 
 .box-shadow {
-    box-shadow: 0 2px 15px var(--box-shadow);
+    box-shadow: 0 2px 15px rgba(1, 48, 71, 0.25);
 }

@@ -1,12 +1,12 @@
-@use './abstracts/variables';
+// Importa todas as dependências dos estilos
+@use './abstracts';
 @use './base';
 @use './themes';
 @use './utils';
 @use './layout';
 @use './components';
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
-
+// Estilos globais
 html,
 body {
     margin: 0;
@@ -20,15 +20,12 @@ body {
     font-optical-sizing: auto;
 }
 
-/* Aplica globalmente no seu styles.scss */
+/* Scrollbar customizada */
 * {
     scrollbar-width: thin;
-    /* Para Firefox */
-    scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
-    /* Cor do thumb e do track */
+    scrollbar-color: rgba(1, 48, 71, 0.3) transparent;
 }
 
-/* Para navegadores WebKit (Chrome, Edge, Safari, Opera) */
 *::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -36,17 +33,15 @@ body {
 
 *::-webkit-scrollbar-track {
     background: transparent;
-    /* Fundo invisível */
 }
 
 *::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(1, 48, 71, 0.3);
     border-radius: 999px;
     border: 2px solid transparent;
-    /* Dá efeito de espaçamento */
     background-clip: content-box;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(1, 48, 71, 0.5);
 }

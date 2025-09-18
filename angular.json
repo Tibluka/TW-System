@@ -35,6 +35,14 @@
             "styles": [
               "src/styles.scss"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/styles",
+                "src/styles/abstracts",
+                "src/styles/base",
+                "src/styles/themes"
+              ]
+            },
             "scripts": []
           },
           "configurations": {

@@ -1,8 +1,25 @@
+// === CORES DO SISTEMA ===
+$primary-dark: #013047;
+$primary-medium: #015078;
+$secondary: #0B495C;
+$secondary-medium: #1593BB;
+$background: #F8F8F8;
+$stroke: #D8D8D8;
+$label: #618495;
+$placeholder: #61646B;
+$tertiary: #F9792A;
+
+// === GRADIENTES ===
+$primary-gradient: linear-gradient(180deg, #013048 0%, #01517A 100%);
+$secondary-gradient: linear-gradient(270deg, #1593BB 0%, #0B495C 100%);
+
+// === BORDAS E RAIOS ===
 $border-radius-sm: 8px;
 $border-radius-md: 12px;
 $border-radius-bg: 16px;
 $border-radius-xb: 24px;
 
+// === ESPAÇAMENTOS ===
 $padding-xs: 8px;
 $padding-sm: 20px;
 $padding-md: 24px;
