@@ -1,82 +1,263 @@
+// menu.component.scss - Versão retrátil
 @use '../../../../../styles/abstracts/typography' as *;
 @use '../../../../../styles/abstracts/variables' as *;
 
 .menu-container {
-    padding: 32px 12px;
+    padding: $padding-bg $padding-md;
     background: var(--primary-gradient);
-    width: fit-content;
-    max-width: 300px;
+    width: 300px; // Largura padrão expandida
     height: 100vh;
+    overflow: hidden;
+    position: relative;
+    transition: width 500ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    // Estado colapsado
+    &.collapsed {
+        width: 104px;
+
+        .menu-header {
+            justify-content: center;
+
+            h4 {
+                opacity: 0;
+                visibility: hidden;
+                position: absolute;
+            }
+        }
+
+        .menu-items {
+            .menu-item {
+                .menu-item-button {
+                    justify-content: center;
+                    padding: $padding-xs;
+                    position: relative;
+
+                    span {
+                        opacity: 0;
+                        visibility: hidden;
+                        position: absolute;
+                        left: 100%;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        background: var(--primary-dark);
+                        color: var(--white);
+                        padding: $padding-xs $padding-xs;
+                        border-radius: $border-radius-sm;
+                        font-size: $font-sm;
+                        white-space: nowrap;
+                        z-index: 1000;
+                        margin-left: $padding-xs;
+                        pointer-events: none;
+                        transition: all 0.2s ease;
+
+                        // Seta do tooltip
+                        &::before {
+                            content: '';
+                            position: absolute;
+                            left: -5px;
+                            top: 50%;
+                            transform: translateY(-50%);
+                            border: 5px solid transparent;
+                            border-right-color: var(--primary-dark);
+                        }
+                    }
+
+                    // Mostra tooltip no hover quando colapsado
+                    &:hover span {
+                        opacity: 1;
+                        visibility: visible;
+                        transition-delay: 0.5s;
+                    }
+                }
+            }
+        }
+    }
 
     .menu-header {
-        padding: 12px;
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 24px;
+        gap: $padding-xs;
+        margin-bottom: $padding-md;
+        transition: all 0.3s ease;
 
         h4 {
             color: var(--white);
             font-weight: $font-weight-md;
             font-size: $font-xmd;
-            margin: 0; // Adiciona reset de margin para semântica
+            margin: 0;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        app-icon {
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            padding: $padding-xs;
+            border-radius: $border-radius-md;
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                transform: scale(1.05);
+            }
+
+            &:active {
+                transform: scale(0.95);
+            }
         }
     }
 
     .menu-items {
         display: flex;
         flex-direction: column;
-        gap: 24px;
-        list-style: none; // Remove bullets da lista
-        padding: 0; // Remove padding padrão da lista
-        margin: 0; // Remove margin padrão da lista
+        gap: $padding-md;
+        list-style: none;
+        padding: 0;
+        margin: 0;
 
         .menu-item {
-            // Remove estilos visuais da li, transfere para o button
-
             .menu-item-button {
-                // Transfere todos os estilos visuais para o button
                 display: flex;
                 align-items: center;
-                gap: 12px;
-                padding: 12px;
+                gap: $padding-xs;
+                padding: $padding-xs;
                 cursor: pointer;
-                background: none; // Remove background padrão do button
-                border: none; // Remove border padrão do button
-                width: 100%; // Button ocupa toda a largura
-                text-align: left; // Alinha texto à esquerda
-                font-family: inherit; // Herda font da página
-                outline: none; // Remove outline padrão
+                background: none;
+                border: none;
+                width: 100%;
+                text-align: left;
+                font-family: inherit;
+                outline: none;
+                border-radius: $border-radius-md;
+                transition: all 0.3s ease;
+                position: relative;
 
                 span {
                     color: var(--white);
                     font-weight: $font-weight-md;
                     font-size: $font-xmd;
+                    transition: all 0.3s ease;
+                    white-space: nowrap;
+                    overflow: hidden;
+                }
+
+                app-icon {
+                    flex-shrink: 0;
+                    transition: all 0.3s ease;
                 }
 
                 // Estados de focus para acessibilidade
                 &:focus-visible {
                     outline: 2px solid rgba(255, 255, 255, 0.5);
                     outline-offset: 2px;
-                    border-radius: $border-radius-md;
                 }
 
                 &:disabled {
                     opacity: 0.5;
                     cursor: not-allowed;
                 }
+
+                &:hover:not(:disabled) {
+                    background-color: rgba(255, 255, 255, 0.1);
+                    transform: translateX(2px);
+                }
+
+                &:active:not(:disabled) {
+                    transform: translateX(1px) scale(0.98);
+                }
             }
 
             &.active {
                 .menu-item-button {
                     background-color: var(--tertiary);
-                    border-radius: $border-radius-md;
 
                     span {
                         font-weight: $font-weight-xbold;
                     }
+
+                    // Indicador visual do item ativo
+                    &::after {
+                        content: '';
+                        position: absolute;
+                        left: 0;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        width: 4px;
+                        height: 60%;
+                        background: var(--white);
+                        border-radius: 0 2px 2px 0;
+                    }
                 }
             }
+        }
+    }
+}
+
+// Responsividade para mobile
+@media (max-width: 768px) {
+    .menu-container {
+        width: 100% !important;
+        max-width: 280px;
+
+        // No mobile, sempre mostra expandido
+        &.collapsed {
+            width: 100% !important;
+
+            .menu-header {
+                justify-content: flex-start;
+
+                h4 {
+                    opacity: 1;
+                    visibility: visible;
+                    position: static;
+                }
+            }
+
+            .menu-items {
+                .menu-item {
+                    .menu-item-button {
+                        justify-content: flex-start;
+                        padding: $padding-xs;
+
+                        span {
+                            opacity: 1;
+                            visibility: visible;
+                            position: static;
+                            background: none;
+                            color: var(--white);
+                            padding: 0;
+                            margin: 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Redução de movimento
+@media (prefers-reduced-motion: reduce) {
+
+    .menu-container,
+    .menu-item-button,
+    .menu-header h4,
+    .menu-header app-icon {
+        transition: none;
+    }
+
+    .menu-item-button {
+
+        &:hover,
+        &:active {
+            transform: none;
+        }
+    }
+
+    .menu-header app-icon {
+
+        &:hover,
+        &:active {
+            transform: none;
         }
     }
 }

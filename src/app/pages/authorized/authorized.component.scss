@@ -1,0 +1,22 @@
+@use '../../../styles/abstracts/spacing' as *;
+
+// authorized.component.scss
+.authorized-layout {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+
+    // Menu sempre visível à esquerda
+    app-menu {
+        flex-shrink: 0; // Não permite que o menu diminua
+    }
+
+    // Conteúdo principal à direita
+    .main-content {
+        flex: 1; // Ocupa todo o espaço restante
+        overflow-y: auto; // Permite scroll vertical no conteúdo
+        overflow-x: hidden;
+        background: var(--background); // Cor de fundo suave
+        padding: $spacing-xl $spacing-xxl;
+    }
+}

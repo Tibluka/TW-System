@@ -1,16 +1,20 @@
-<!-- menu.component.html -->
+<!-- menu.component.html - Versão retrátil -->
 <nav role="navigation" aria-label="Menu principal">
-    <div class="menu-container">
+    <div class="menu-container" [class.collapsed]="menuService.isCollapsed()"
+        [attr.aria-expanded]="!menuService.isCollapsed()">
+
         <header class="menu-header">
-            <app-icon color="white" fontSize="32px" icon="fa-solid fa-bars" [attr.aria-hidden]="true" />
+            <app-icon (click)="toggleMenu()" color="white" fontSize="32px" icon="fa-solid fa-bars"
+                [attr.aria-hidden]="true" />
             <h4>Menu</h4>
         </header>
+
         <ul class="menu-items" role="menubar">
-            <li class="menu-item" [ngClass]="{'active': i === 0}"
+            <li class="menu-item" [ngClass]="{'active': isItemActive(menu)}"
                 *ngFor="let menu of menuService.menuItems(); let i = index; trackBy: trackByItemId" role="none">
                 <button type="button" class="menu-item-button" (click)="onMenuItemClick(menu, i)"
-                    [attr.aria-current]="i === 0 ? 'page' : null" [attr.aria-label]="menu.label"
-                    [disabled]="menu.disabled" role="menuitem">
+                    [attr.aria-current]="isItemActive(menu) ? 'page' : null" [attr.aria-label]="menu.label"
+                    [disabled]="menu.disabled || menuService.isAnimating()" role="menuitem">
                     <app-icon color="white" fontSize="32px" cursor="pointer" [icon]="menu.icon"
                         [attr.aria-hidden]="true" />
                     <span class="mb-0" [innerText]="menu.label"></span>

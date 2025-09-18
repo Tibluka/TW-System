@@ -1,4 +1,4 @@
-// menu.component.ts
+// menu.component.ts - Versão retrátil
 import { Component, OnInit, OnDestroy, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -22,30 +22,20 @@ export class MenuComponent implements OnInit, OnDestroy {
   protected menuService = inject(MenuService);
   private authService = inject(AuthService);
 
-  @HostListener('document:keydown.escape')
-  onEscapeKey(): void {
-    if (this.menuService.isOpen()) {
-      this.closeMenu();
+  @HostListener('document:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent): void {
+    // Ctrl + B para toggle do menu
+    if (event.ctrlKey && event.key === 'b') {
+      event.preventDefault();
+      this.toggleMenu();
     }
   }
 
   @HostListener('window:resize')
   onWindowResize(): void {
-    // Fecha o menu automaticamente em telas grandes
-    if (window.innerWidth > 768 && this.menuService.isOpen()) {
-      this.closeMenu();
-    }
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: Event): void {
-    const target = event.target as Element;
-    const menuElement = document.querySelector('.menu-container');
-
-    // Fecha o menu se clicar fora dele
-    if (this.menuService.isOpen() &&
-      !menuElement?.contains(target)) {
-      this.closeMenu();
+    // Em telas pequenas, força o menu expandido
+    if (window.innerWidth <= 768 && this.menuService.isCollapsed()) {
+      this.menuService.expand();
     }
   }
 
@@ -59,24 +49,25 @@ export class MenuComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Alterna o estado do menu
+   * Alterna o estado do menu (colapsar/expandir)
    */
   toggleMenu(): void {
+    if (this.menuService.isAnimating()) return;
     this.menuService.toggle();
   }
 
   /**
-   * Fecha o menu
+   * Colapsa o menu
    */
-  closeMenu(): void {
-    this.menuService.close();
+  collapseMenu(): void {
+    this.menuService.collapse();
   }
 
   /**
-   * Abre o menu
+   * Expande o menu
    */
-  openMenu(): void {
-    this.menuService.open();
+  expandMenu(): void {
+    this.menuService.expand();
   }
 
   /**
@@ -84,6 +75,9 @@ export class MenuComponent implements OnInit, OnDestroy {
    */
   onMenuItemClick(item: MenuItem, index: number): void {
     if (item.disabled || this.menuService.isAnimating()) return;
+
+    // Define o item ativo
+    this.menuService.setActiveItem(item.id);
 
     // Executa a ação do item através do service
     this.menuService.executeMenuItem(item);
@@ -115,6 +109,27 @@ export class MenuComponent implements OnInit, OnDestroy {
    */
   canInteract(): boolean {
     return this.menuService.canInteract();
+  }
+
+  /**
+   * Obtém a largura atual do menu
+   */
+  getMenuWidth(): number {
+    return this.menuService.isCollapsed() ? 104 : 300;
+  }
+
+  /**
+   * Verifica se o menu está colapsado
+   */
+  isMenuCollapsed(): boolean {
+    return this.menuService.isCollapsed();
+  }
+
+  /**
+   * Verifica se está em modo mobile
+   */
+  isMobile(): boolean {
+    return window.innerWidth <= 768;
   }
 
   logout() {

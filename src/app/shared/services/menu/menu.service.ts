@@ -1,4 +1,4 @@
-// menu.service.ts
+// menu.service.ts - Versão retrátil
 import { computed, Injectable, signal } from '@angular/core';
 import { MenuItem } from '../../../models/menu/menu';
 
@@ -6,13 +6,13 @@ import { MenuItem } from '../../../models/menu/menu';
   providedIn: 'root'
 })
 export class MenuService {
-  private readonly _isOpen = signal(false);
+  private readonly _isCollapsed = signal(false);
   private readonly _isAnimating = signal(false);
   private readonly _menuItems = signal<MenuItem[]>([]);
   private readonly _activeItem = signal<string | null>(null);
 
   // Computed signals
-  readonly isOpen = this._isOpen.asReadonly();
+  readonly isCollapsed = this._isCollapsed.asReadonly();
   readonly isAnimating = this._isAnimating.asReadonly();
   readonly menuItems = this._menuItems.asReadonly();
   readonly activeItem = this._activeItem.asReadonly();
@@ -20,43 +20,55 @@ export class MenuService {
   // Estados combinados
   readonly canInteract = computed(() => !this._isAnimating());
   readonly menuState = computed(() => ({
-    isOpen: this._isOpen(),
+    isCollapsed: this._isCollapsed(),
     isAnimating: this._isAnimating(),
     canInteract: this.canInteract()
   }));
 
   constructor() {
     this.initializeDefaultItems();
+    this.loadCollapsedState();
   }
 
   /**
-   * Alterna o estado do menu
+   * Alterna o estado do menu (colapsado/expandido)
    */
   toggle(): void {
     if (this._isAnimating()) return;
 
     this._isAnimating.set(true);
-    this._isOpen.update(current => !current);
+    this._isCollapsed.update(current => !current);
 
-    // Simula o tempo da animação CSS
+    // Salva o estado
+    this.saveCollapsedState();
+
+    // Simula o tempo da animação CSS (500ms)
     setTimeout(() => {
       this._isAnimating.set(false);
-    }, 300);
+    }, 500);
   }
 
   /**
-   * Abre o menu
+   * Expande o menu
    */
-  open(): void {
-    if (this._isOpen() || this._isAnimating()) return;
+  expand(): void {
+    if (!this._isCollapsed() || this._isAnimating()) return;
     this.toggle();
   }
 
   /**
-   * Fecha o menu
+   * Colapsa o menu
    */
-  close(): void {
-    if (!this._isOpen() || this._isAnimating()) return;
+  collapse(): void {
+    if (this._isCollapsed() || this._isAnimating()) return;
+    this.toggle();
+  }
+
+  /**
+   * Define se o menu está colapsado
+   */
+  setCollapsed(collapsed: boolean): void {
+    if (this._isCollapsed() === collapsed || this._isAnimating()) return;
     this.toggle();
   }
 
@@ -101,11 +113,6 @@ export class MenuService {
     if (item.action) {
       item.action();
     }
-
-    // Fecha o menu após executar a ação (comportamento típico em mobile)
-    if (this._isOpen()) {
-      setTimeout(() => this.close(), 150);
-    }
   }
 
   /**
@@ -149,11 +156,58 @@ export class MenuService {
   }
 
   /**
+   * Salva o estado colapsado no localStorage
+   */
+  private saveCollapsedState(): void {
+    try {
+      localStorage.setItem('menuCollapsed', JSON.stringify(this._isCollapsed()));
+    } catch (error) {
+      console.warn('Erro ao salvar estado do menu:', error);
+    }
+  }
+
+  /**
+   * Carrega o estado colapsado do localStorage
+   */
+  private loadCollapsedState(): void {
+    try {
+      const saved = localStorage.getItem('menuCollapsed');
+      if (saved !== null) {
+        this._isCollapsed.set(JSON.parse(saved));
+      }
+    } catch (error) {
+      console.warn('Erro ao carregar estado do menu:', error);
+    }
+  }
+
+  /**
    * Reseta o menu para o estado inicial
    */
   reset(): void {
-    this._isOpen.set(false);
+    this._isCollapsed.set(false);
     this._isAnimating.set(false);
     this._activeItem.set(null);
+  }
+
+  // Métodos mantidos para compatibilidade (deprecated)
+  /**
+   * @deprecated Use isCollapsed() ao invés de isOpen()
+   */
+  isOpen() {
+    return !this._isCollapsed();
+  }
+
+  /**
+   * @deprecated Use collapse() ao invés de close()
+   */
+  close(): void {
+    this.collapse();
+  }
+
+  /**
+   * @deprecated Use expand() ao invés de open()
+   */
+  open(): void {
+    this.expand();
   }
 }
