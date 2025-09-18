@@ -1,9 +1,11 @@
 // src/app/pages/authorized/developments/developments.component.ts
 import { NgIf } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { environment } from '../../../../environments/environment';
+import { ModalService } from '../../../shared/services/modal/modal.service';
+import { ModalComponent } from "../../../shared/components/organisms/modal/modal.component";
 
 @Component({
   selector: 'app-developments',
@@ -11,11 +13,14 @@ import { environment } from '../../../../environments/environment';
   standalone: true,
   imports: [
     NgIf,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ModalComponent
   ],
   styleUrls: ['./developments.component.scss']
 })
 export class DevelopmentsComponent {
+  private modalService = inject(ModalService);
+
   selectedFile: File | null = null;
   previewUrl: string | null = null;
   isUploading = false;
@@ -78,5 +83,15 @@ export class DevelopmentsComponent {
     if (fileInput) {
       fileInput.value = '';
     }
+  }
+
+  openModal() {
+    this.modalService.open({
+      id: 'meu-modal',
+      title: 'Título do Modal',
+      size: 'md'
+    }).subscribe(result => {
+      console.log('Modal fechado:', result);
+    });
   }
 }

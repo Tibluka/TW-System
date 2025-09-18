@@ -21,4 +21,13 @@
         <div *ngIf="message" class="alert alert-info mt-3">{{ message }}</div>
         <div *ngIf="error" class="alert alert-danger mt-3">{{ error }}</div>
     </div>
+
+    <button class="btn btn-primary" (click)="openModal()">
+        Open
+    </button>
 </div>
+
+<app-modal modalId="meu-modal">
+    <p>Qualquer conteúdo aqui!</p>
+
+</app-modal>

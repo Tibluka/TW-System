@@ -1,1 +1,27 @@
-<p>modal works!</p>
+<!-- modal.component.html -->
+<div class="modal-backdrop" [class.show]="isVisible" (click)="onBackdropClick($event)" *ngIf="isVisible">
+
+    <div [class]="getModalClasses()" (click)="onModalContentClick($event)">
+
+        <div class="modal-content">
+            <!-- Header do Modal -->
+            <div class="modal-header" *ngIf="modalConfig?.showHeader">
+
+                <h4 class="modal-title" *ngIf="modalConfig?.title">
+                    {{ modalConfig?.title }}
+                </h4>
+
+                <button type="button" class="modal-close-btn" (click)="closeModal()"
+                    *ngIf="modalConfig?.showCloseButton" aria-label="Fechar modal">
+                    <app-icon icon="fa-solid fa-times" [fontSize]="'1.2rem'" [color]="'#6b7280'">
+                    </app-icon>
+                </button>
+            </div>
+
+            <!-- Corpo do Modal -->
+            <div class="modal-body">
+                <ng-content></ng-content>
+            </div>
+        </div>
+    </div>
+</div>
