@@ -9,21 +9,56 @@
 
         <!-- Campo Nome -->
         <ds-input [fullWidth]="true" label="Nome do Cliente" placeholder="Digite o nome completo" formControlName="name"
-            [required]="true" [invalid]="isFormControlInvalid(clientForm.controls['name'])" errorMessage="Erro"
-            icon="fa fa-search" iconPosition="left" />
+            [required]="true" [invalid]="isFormControlInvalid(clientForm.controls['name'])"
+            errorMessage="Nome é obrigatório" icon="fa-solid fa-user" iconPosition="left" />
 
-        <ds-textarea [fullWidth]="false" label="Observações" placeholder="Informações adicionais sobre o cliente..."
-            formControlName="notes" [invalid]="isFormControlInvalid(clientForm.controls['notes'])" errorMessage="erro"
-            icon="fa-solid fa-sticky-note" iconPosition="left" [rows]="4" [maxlength]="500" resize="vertical"
-            helperText="">
+        <!-- Campo Categoria (Select Simples) -->
+        <ds-select [fullWidth]="true" label="Categoria do Cliente" placeholder="Selecione a categoria"
+            formControlName="category" [required]="true"
+            [invalid]="isFormControlInvalid(clientForm.controls['category'])" errorMessage="Categoria é obrigatória"
+            [options]="categoryOptions" icon="fa-solid fa-tags" iconPosition="left" [clearable]="true"
+            (selectionChanged)="onCategoryChange($event)">
+        </ds-select>
+
+        <!-- Campo Status (Select com valor padrão) -->
+        <ds-select [fullWidth]="true" label="Status" placeholder="Selecione o status" formControlName="status"
+            [options]="statusOptions" icon="fa-solid fa-circle-dot" iconPosition="left">
+        </ds-select>
+
+        <!-- Campo Tags (Select Múltiplo) -->
+        <ds-select [fullWidth]="true" label="Tags" placeholder="Selecione as tags" formControlName="tags"
+            [options]="tagOptions" [multiple]="true" [clearable]="true" [searchable]="true" icon="fa-solid fa-hashtag"
+            iconPosition="left" helperText="Você pode selecionar múltiplas tags"
+            (selectionChanged)="onTagsChange($event)">
+        </ds-select>
+
+        <!-- Campo País (Select com busca) -->
+        <ds-select [fullWidth]="true" label="País" placeholder="Selecione o país" formControlName="country"
+            [options]="countryOptions" [searchable]="true" [clearable]="true" icon="fa-solid fa-globe"
+            iconPosition="left" helperText="Digite para buscar países" (searched)="onCountrySearch($event)">
+        </ds-select>
+
+        <!-- Campo Observações -->
+        <ds-textarea [fullWidth]="true" label="Observações" placeholder="Informações adicionais sobre o cliente..."
+            formControlName="notes" [invalid]="isFormControlInvalid(clientForm.controls['notes'])"
+            errorMessage="Observações são obrigatórias" icon="fa-solid fa-sticky-note" iconPosition="left" [rows]="4"
+            [maxlength]="500" resize="vertical">
         </ds-textarea>
 
-        <ds-button (onClickEmitter)="submit()" label="Enviar" />
+        <!-- Botões -->
+        <div class="form-actions">
+            <ds-button (onClickEmitter)="submit()" label="Salvar Cliente" variant="fill" icon="fa-solid fa-save" />
+
+            <ds-button type="button" label="Limpar Formulário" variant="outline"
+                (onClickEmitter)="clientForm.reset()" />
+        </div>
     </form>
+
 </div>
 
-<ds-card title="Estatísticas" variant="filled" size="sm" padding="sm">
+<!-- Cards de Exemplo -->
 
+<ds-card title="Estatísticas" variant="filled" size="sm" padding="sm">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <h2 style="margin: 0; color: var(--primary-dark);">1,234</h2>

@@ -15,7 +15,6 @@ export class CardComponent implements AfterContentInit {
   @Input() clickable: boolean = false;
   @Input() size: 'sm' | 'md' | 'lg' = 'md';
   @Input() variant: 'default' | 'outlined' | 'filled' = 'default';
-  @Input() padding: 'sm' | 'md' | 'lg' = 'md';
   @Input() borderRadius: 'sm' | 'md' | 'lg' | 'xl' = 'md';
 
   hasFooterContent = false;
@@ -34,7 +33,6 @@ export class CardComponent implements AfterContentInit {
 
     classes.push(`card--${this.size}`);
     classes.push(`card--${this.variant}`);
-    classes.push(`card--padding-${this.padding}`);
     classes.push(`card--radius-${this.borderRadius}`);
 
     return classes;

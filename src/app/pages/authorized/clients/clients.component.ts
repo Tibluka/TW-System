@@ -5,6 +5,7 @@ import { ButtonComponent } from '../../../shared/components/atoms/button/button.
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
 import { FormValidator } from '../../../shared/utils/form';
 import { TextareaComponent } from '../../../shared/components/atoms/textarea/textarea.component';
+import { SelectComponent, SelectOption } from '../../../shared/components/atoms/select/select.component';
 import { CardComponent } from '../../../shared/components/organisms/card/card.component';
 
 @Component({
@@ -15,6 +16,7 @@ import { CardComponent } from '../../../shared/components/organisms/card/card.co
     ReactiveFormsModule,
     InputComponent,
     TextareaComponent,
+    SelectComponent, // ← Adicionar o SelectComponent
     CardComponent
   ],
   templateUrl: './clients.component.html',
@@ -23,9 +25,50 @@ import { CardComponent } from '../../../shared/components/organisms/card/card.co
 export class ClientsComponent extends FormValidator {
 
   clientForm = new FormGroup({
-    name: new FormControl('', Validators.required),
-    notes: new FormControl('', Validators.required)
+    name: new FormControl<string>('', Validators.required),
+    notes: new FormControl<string>('', Validators.required),
+    category: new FormControl<string>('', Validators.required),
+    status: new FormControl<string>('ativo'),
+    tags: new FormControl<string[]>([], Validators.required), // ← Tipagem explícita como array de strings
+    country: new FormControl<string>('')
   });
+
+  // Opções para os selects
+  categoryOptions: SelectOption[] = [
+    { value: 'premium', label: 'Cliente Premium' },
+    { value: 'standard', label: 'Cliente Padrão' },
+    { value: 'basic', label: 'Cliente Básico' },
+    { value: 'vip', label: 'Cliente VIP' },
+    { value: 'corporate', label: 'Cliente Corporativo' }
+  ];
+
+  statusOptions: SelectOption[] = [
+    { value: 'ativo', label: 'Ativo' },
+    { value: 'inativo', label: 'Inativo' },
+    { value: 'suspenso', label: 'Suspenso' },
+    { value: 'pendente', label: 'Pendente' }
+  ];
+
+  tagOptions: SelectOption[] = [
+    { value: 'importante', label: 'Importante' },
+    { value: 'frequente', label: 'Comprador Frequente' },
+    { value: 'novo', label: 'Cliente Novo' },
+    { value: 'fidelizado', label: 'Fidelizado' },
+    { value: 'promocional', label: 'Promoções' },
+    { value: 'desconto', label: 'Elegível para Desconto' }
+  ];
+
+  countryOptions: SelectOption[] = [
+    { value: 'BR', label: 'Brasil' },
+    { value: 'AR', label: 'Argentina' },
+    { value: 'UY', label: 'Uruguai' },
+    { value: 'PY', label: 'Paraguai' },
+    { value: 'CL', label: 'Chile' },
+    { value: 'PE', label: 'Peru' },
+    { value: 'CO', label: 'Colômbia' },
+    { value: 'US', label: 'Estados Unidos' },
+    { value: 'CA', label: 'Canadá' }
+  ];
 
   click() {
     alert('Sucesso!')
@@ -33,6 +76,36 @@ export class ClientsComponent extends FormValidator {
 
   submit() {
     this.clientForm.markAllAsTouched();
+
+    if (this.clientForm.valid) {
+      console.log('Dados do formulário:', this.clientForm.value);
+      alert('Formulário válido! Dados: ' + JSON.stringify(this.clientForm.value, null, 2));
+    } else {
+      alert('Formulário inválido! Verifique os campos obrigatórios.');
+    }
   }
 
+  // Método para lidar com mudanças no select de categoria
+  onCategoryChange(categoryValue: string) {
+    console.log('Categoria selecionada:', categoryValue);
+
+    // Exemplo: ajustar tags baseado na categoria
+    if (categoryValue === 'vip') {
+      this.clientForm.patchValue({
+        tags: ['importante', 'fidelizado'] as string[]
+      });
+    }
+  }
+
+  // Método para lidar com mudanças nas tags
+  onTagsChange(tags: string[]) {
+    console.log('Tags selecionadas:', tags);
+  }
+
+  // Método para lidar com busca de países (simulação de API)
+  onCountrySearch(searchTerm: string) {
+    console.log('Buscando países:', searchTerm);
+    // Aqui você poderia fazer uma chamada para API
+    // this.countryService.searchCountries(searchTerm).subscribe(...)
+  }
 }

@@ -1,1 +1,118 @@
-<p>select works!</p>
+<div class="form-group" [ngStyle]="{
+    'width': fullWidth ? '100%': width
+}" [id]="uniqueId + '-container'">
+
+    <!-- Label -->
+    <label *ngIf="label" [for]="uniqueId" [class]="labelClasses">
+        {{ label }}
+    </label>
+
+    <!-- Container do Select -->
+    <div class="select-container" [class.has-icon]="icon">
+
+        <!-- Ícone -->
+        <app-icon *ngIf="icon" [icon]="icon" fontSize="18px" color="placeholder" [class]="'icon-' + iconPosition">
+        </app-icon>
+
+        <!-- Campo Select -->
+        <div [id]="uniqueId" [class]="selectClasses" [attr.tabindex]="disabled ? -1 : 0" (click)="toggleDropdown()"
+            (keydown.enter)="toggleDropdown()" (keydown.space)="toggleDropdown()" (keydown.escape)="closeDropdown()"
+            (blur)="onTouched()">
+
+            <!-- Valor selecionado ou placeholder -->
+            <div class="select-value">
+
+                <!-- Múltiplas seleções (chips) -->
+                <div *ngIf="multiple && hasValue" class="selected-chips">
+                    <span *ngFor="let option of selectedOptions" class="chip">
+                        {{ option[optionLabel] }}
+                        <button type="button" class="chip-remove" (click)="removeOption(option, $event)"
+                            [disabled]="disabled">
+                            ×
+                        </button>
+                    </span>
+                </div>
+
+                <!-- Valor único ou placeholder -->
+                <span *ngIf="!multiple || !hasValue" class="select-display-text" [class.placeholder]="!hasValue">
+                    {{ displayValue }}
+                </span>
+            </div>
+
+            <!-- Ações do select -->
+            <div class="select-actions">
+                <!-- Botão de limpar -->
+                <button *ngIf="clearable && hasValue && !disabled" type="button" class="clear-button"
+                    (click)="clearSelection($event)" tabindex="-1">
+                    ×
+                </button>
+
+                <!-- Seta do dropdown -->
+                <app-icon icon="fa-solid fa-chevron-down" fontSize="12px" color="placeholder" class="dropdown-arrow"
+                    [class.rotated]="isOpen">
+                </app-icon>
+            </div>
+        </div>
+
+        <!-- Dropdown Options -->
+        <div *ngIf="isOpen" class="select-dropdown">
+
+            <!-- Campo de busca -->
+            <div *ngIf="searchable" class="search-container">
+                <input type="text" class="search-input" placeholder="Buscar..." [(ngModel)]="searchTerm"
+                    (input)="onSearchChange($event)" (click)="$event.stopPropagation()">
+                <app-icon icon="fa-solid fa-search" fontSize="14px" color="placeholder" class="search-icon">
+                </app-icon>
+            </div>
+
+            <!-- Lista de opções -->
+            <div class="options-container">
+
+                <!-- Loading -->
+                <div *ngIf="loading" class="option-item loading">
+                    <app-icon icon="fa-solid fa-spinner" fontSize="16px" color="placeholder" class="spinning">
+                    </app-icon>
+                    {{ loadingText }}
+                </div>
+
+                <!-- Nenhuma opção encontrada -->
+                <div *ngIf="!loading && filteredOptions.length === 0" class="option-item no-options">
+                    {{ noOptionsText }}
+                </div>
+
+                <!-- Opções -->
+                <div *ngFor="let option of filteredOptions" class="option-item"
+                    [class.selected]="isOptionSelected(option)" [class.disabled]="option.disabled"
+                    (click)="selectOption(option)">
+
+                    <!-- Checkbox para múltipla seleção -->
+                    <input *ngIf="multiple" type="checkbox" class="option-checkbox" [checked]="isOptionSelected(option)"
+                        [disabled]="option.disabled" tabindex="-1">
+
+                    <!-- Label da opção -->
+                    <span class="option-label">
+                        {{ option[optionLabel] }}
+                    </span>
+
+                    <!-- Ícone de selecionado (seleção única) -->
+                    <app-icon *ngIf="!multiple && isOptionSelected(option)" icon="fa-solid fa-check" fontSize="14px"
+                        color="primary-medium" class="selected-icon">
+                    </app-icon>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensagens de feedback -->
+    <div class="form-feedback">
+        <!-- Mensagem de Erro -->
+        <div *ngIf="showError" class="error-message">
+            {{ errorMessage }}
+        </div>
+
+        <!-- Texto de Ajuda -->
+        <div *ngIf="showHelper" class="helper-text">
+            {{ helperText }}
+        </div>
+    </div>
+</div>
