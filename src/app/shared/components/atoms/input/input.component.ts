@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, forwardRef, OnDestroy, Output, EventEmitter } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule, NgModel } from '@angular/forms';
 import { IconComponent } from '../icon/icon.component';
 import { MaskDirective } from 'mask-directive';
 
@@ -11,6 +11,7 @@ import { MaskDirective } from 'mask-directive';
   templateUrl: './input.component.html',
   styleUrls: ['./input.component.scss'],
   providers: [
+    NgModel,
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => InputComponent),
@@ -25,7 +26,7 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
   @Input() required: boolean = false;
   @Input() disabled: boolean = false;
   @Input() invalid: boolean = false;
-  @Input() icon: string = ''; // Ícone opcional
+  @Input() icon: string = '';
   @Input() iconPosition: 'left' | 'right' = 'left';
   @Input() maxlength: number | null = null;
   @Input() minlength: number | null = null;
@@ -37,11 +38,11 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
   @Input() width: string = 'fit-content';
 
   // Propriedades da máscara
-  @Input() mask: string = ''; // Máscara a ser aplicada
-  @Input() dropSpecialCharacters: boolean = false; // Remove caracteres especiais do valor
+  @Input() mask: string = '000.000.000-00';
+  @Input() dropSpecialCharacters: boolean = false;
 
   // Eventos
-  @Output() valueChanged = new EventEmitter<string>(); // Evento para valor sem máscara
+  @Output() valueChanged = new EventEmitter<string>();
 
   // Propriedades internas
   value: string = '';
@@ -53,13 +54,10 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
   private onTouched = () => { };
 
   ngOnInit() {
-    // Gerar ID único para o input
     this.uniqueId = `ds-input-${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  ngOnDestroy() {
-    // Cleanup se necessário
-  }
+  ngOnDestroy() { }
 
   // Implementação do ControlValueAccessor
   writeValue(value: string): void {
@@ -82,7 +80,19 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
   onInputChange(event: Event): void {
     const target = event.target as HTMLInputElement;
     this.value = target.value;
-    this.onChange(this.value);
+
+    // Se não tem máscara ou dropSpecialCharacters é false, propaga o valor normal
+    if (!this.dropSpecialCharacters || !this.mask) {
+      this.onChange(this.value);
+    }
+  }
+
+  onValueChanged(unmaskedValue: any): void {
+    // Evento da mask-directive quando dropSpecialCharacters é true
+    if (this.dropSpecialCharacters && this.mask) {
+      this.onChange(unmaskedValue);
+      this.valueChanged.emit(unmaskedValue);
+    }
   }
 
   onInputFocus(): void {
@@ -94,36 +104,21 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
     this.onTouched();
   }
 
-  // Getters para classes CSS dinâmicas
+  // Getters
   get inputClasses(): string {
     const classes = ['input-field'];
 
-    if (this.invalid) {
-      classes.push('invalid');
-    }
-
-    if (this.disabled) {
-      classes.push('disabled');
-    }
-
-    if (this.readonly) {
-      classes.push('readonly');
-    }
-
-    if (this.icon) {
-      classes.push(`has-icon-${this.iconPosition}`);
-    }
+    if (this.invalid) classes.push('invalid');
+    if (this.disabled) classes.push('disabled');
+    if (this.readonly) classes.push('readonly');
+    if (this.icon) classes.push(`has-icon-${this.iconPosition}`);
 
     return classes.join(' ');
   }
 
   get labelClasses(): string {
     const classes = [];
-
-    if (this.required) {
-      classes.push('required');
-    }
-
+    if (this.required) classes.push('required');
     return classes.join(' ');
   }
 
@@ -133,5 +128,9 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
 
   get showHelper(): boolean {
     return !this.showError && !!this.helperText;
+  }
+
+  get hasMask(): boolean {
+    return !!this.mask;
   }
 }
