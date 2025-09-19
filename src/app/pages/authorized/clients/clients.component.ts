@@ -5,6 +5,7 @@ import { ButtonComponent } from '../../../shared/components/atoms/button/button.
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
 import { FormValidator } from '../../../shared/utils/form';
 import { TextareaComponent } from '../../../shared/components/atoms/textarea/textarea.component';
+import { CardComponent } from '../../../shared/components/organisms/card/card.component';
 
 @Component({
   selector: 'app-clients',
@@ -13,7 +14,8 @@ import { TextareaComponent } from '../../../shared/components/atoms/textarea/tex
     ButtonComponent,
     ReactiveFormsModule,
     InputComponent,
-    TextareaComponent
+    TextareaComponent,
+    CardComponent
   ],
   templateUrl: './clients.component.html',
   styleUrl: './clients.component.scss'
