@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, forwardRef, OnDestroy, Output, EventEmitter } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule, NgModel } from '@angular/forms';
-import { IconComponent } from '../icon/icon.component';
+import { Component, EventEmitter, forwardRef, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, NgModel } from '@angular/forms';
 import { MaskDirective } from 'mask-directive';
+import { IconComponent } from '../icon/icon.component';
 
 @Component({
   selector: 'ds-input',
