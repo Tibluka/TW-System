@@ -1,5 +1,7 @@
-<i class="{{icon}} c-p" [ngStyle]="{
-    'font-size': fontSize,
-    'cursor': cursorType,
-    'color': color ? `var(--${color})` : null
-}"></i>
+<span [ngClass]="{'icon-hover-pointer': cursorType === 'pointer'}">
+    <i class="{{icon}} c-p" [ngStyle]="{
+        'font-size': fontSize,
+        'cursor': cursorType,
+        'color': color ? `var(--${color})` : null
+    }"></i>
+</span>

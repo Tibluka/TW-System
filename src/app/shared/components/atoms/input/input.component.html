@@ -16,7 +16,9 @@
         <input [id]="uniqueId" [class]="inputClasses" [type]="type" [placeholder]="placeholder" [value]="value"
             [required]="required" [disabled]="disabled" [readonly]="readonly" [max]="maxlength" [min]="minlength"
             [autocomplete]="autocomplete" (input)="onInputChange($event)" (focus)="onInputFocus()"
-            (blur)="onInputBlur()" />
+            (blur)="onInputBlur()" [libMask]="mask" [dropSpecialCharacters]="dropSpecialCharacters"
+            (input)="onInputChange($event)" (focus)="onInputFocus()" (blur)="onInputBlur()"
+            (valueChanged)="onValueChanged($event)" />
     </div>
 
     <!-- Mensagem de Erro -->

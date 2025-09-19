@@ -1,5 +1,6 @@
 /* modal.component.scss */
 @use 'abstracts/variables' as *;
+@use 'abstracts/typography' as *;
 
 .modal-backdrop {
     position: fixed;
@@ -12,9 +13,6 @@
     align-items: center;
     justify-content: center;
     z-index: 1050;
-
-    // Remove transições CSS já que usamos Angular Animations
-    // As animações são controladas pelo fade.animation.ts
 }
 
 .modal-dialog {
@@ -78,37 +76,13 @@
     justify-content: space-between;
     padding: $padding-sm $padding-md; // 20px 24px do design system
     border-bottom: 1px solid var(--stroke);
-    background-color: var(--background);
+    background-color: var(--tertiary);
 
     .modal-title {
         margin: 0;
-        font-size: 1.25rem;
+        font-size: $font-xl;
         font-weight: 600;
-        color: var(--primary-dark);
-        font-family: "Inter", sans-serif;
-    }
-
-    .modal-close-btn {
-        background: none;
-        border: none;
-        padding: $padding-xs; // 8px
-        cursor: pointer;
-        border-radius: $border-radius-sm; // 8px
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 2rem;
-        height: 2rem;
-        transition: all 0.2s ease;
-
-        &:hover {
-            background-color: var(--stroke);
-        }
-
-        &:focus {
-            outline: 2px solid var(--primary-medium);
-            outline-offset: 2px;
-        }
+        color: var(--white);
     }
 }
 
@@ -141,158 +115,6 @@
             background-color: rgba(1, 48, 71, 0.5);
         }
     }
-}
-
-// Responsividade
-@media (max-width: 768px) {
-    .modal-dialog {
-        margin: $padding-xs; // 8px
-
-        &.modal-sm,
-        &.modal-md,
-        &.modal-lg,
-        &.modal-xl {
-            max-width: none;
-            width: calc(100vw - #{$padding-sm}); // Usando variável do sistema
-        }
-
-        &.modal-fullscreen {
-            width: 100vw;
-            height: 100vh;
-            margin: 0;
-            border-radius: 0;
-        }
-    }
-
-    .modal-header {
-        padding: $padding-sm; // 20px do sistema
-
-        .modal-title {
-            font-size: 1.125rem;
-        }
-    }
-
-    .modal-body {
-        padding: $padding-sm; // 20px do sistema
-    }
-}
-
-.modal-content {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    // Animação controlada pelo Angular Animations
-}
-
-.modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: $padding-sm $padding-md; // 20px 24px do design system
-    border-bottom: 1px solid var(--stroke);
-    background-color: var(--background);
-
-    .modal-title {
-        margin: 0;
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--primary-dark);
-        font-family: "Inter", sans-serif;
-    }
-
-    .modal-close-btn {
-        background: none;
-        border: none;
-        padding: $padding-xs; // 8px
-        cursor: pointer;
-        border-radius: $border-radius-sm; // 8px
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 2rem;
-        height: 2rem;
-        transition: all 0.2s ease;
-
-        &:hover {
-            background-color: var(--stroke);
-        }
-
-        &:focus {
-            outline: 2px solid var(--primary-medium);
-            outline-offset: 2px;
-        }
-    }
-}
-
-.modal-body {
-    padding: $padding-md; // 24px
-    flex: 1;
-    overflow-y: auto;
-    background-color: var(--white);
-
-    // Usando a scrollbar customizada do sistema
-    scrollbar-width: thin;
-    scrollbar-color: rgba(1, 48, 71, 0.3) transparent;
-
-    &::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background-color: rgba(1, 48, 71, 0.3);
-        border-radius: 999px;
-        border: 2px solid transparent;
-        background-clip: content-box;
-
-        &:hover {
-            background-color: rgba(1, 48, 71, 0.5);
-        }
-    }
-}
-
-// Responsividade
-@media (max-width: 768px) {
-    .modal-dialog {
-        margin: $padding-xs; // 8px
-
-        &.modal-sm,
-        &.modal-md,
-        &.modal-lg,
-        &.modal-xl {
-            max-width: none;
-            width: calc(100vw - #{$padding-sm}); // Usando variável do sistema
-        }
-
-        &.modal-fullscreen {
-            width: 100vw;
-            height: 100vh;
-            margin: 0;
-            border-radius: 0;
-        }
-    }
-
-    .modal-header {
-        padding: $padding-sm; // 20px do sistema
-
-        .modal-title {
-            font-size: 1.125rem;
-        }
-    }
-
-    .modal-body {
-        padding: $padding-sm; // 20px do sistema
-    }
-}
-
-// Acessibilidade
-@media (prefers-reduced-motion: reduce) {
-    // As animações Angular respeitam automaticamente prefers-reduced-motion
-    // quando configuradas adequadamente
 }
 
 // Estado de foco para acessibilidade usando cores do sistema

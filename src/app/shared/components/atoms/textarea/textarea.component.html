@@ -1,0 +1,39 @@
+<div class="form-group" [ngStyle]="{
+    'width': fullWidth ? '100%': width
+}">
+    <!-- Label -->
+    <label *ngIf="label" [for]="uniqueId" [class]="labelClasses">
+        {{ label }}
+    </label>
+
+    <!-- Container do Textarea com Ícone -->
+    <div class="textarea-container" [class.has-icon]="icon">
+        <!-- Ícone -->
+        <app-icon *ngIf="icon" [icon]="icon" fontSize="24px" color="placeholder" [class]="'icon-' + iconPosition">
+        </app-icon>
+
+        <!-- Textarea Field -->
+        <textarea [id]="uniqueId" [class]="textareaClasses" [placeholder]="placeholder" [value]="value"
+            [required]="required" [disabled]="disabled" [readonly]="readonly" maxlength="maxlength"
+            minlength="minlength" [rows]="rows" [cols]="cols" [autocomplete]="autocomplete"
+            (input)="onTextareaInput($event)" (change)="onTextareaChange($event)" (focus)="onTextareaFocus()"
+            (blur)="onTextareaBlur()">{{ value }}</textarea>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between">
+        <!-- Character Count -->
+        <div *ngIf="showCharacterCount" class="character-count">
+            {{ characterCount }}{{ maxlength ? '/' + maxlength : '' }}
+        </div>
+
+        <!-- Mensagem de Erro -->
+        <div *ngIf="showError" class="error-message">
+            {{ errorMessage }}
+        </div>
+    </div>
+
+    <!-- Texto de Ajuda -->
+    <div *ngIf="showHelper" class="helper-text">
+        {{ helperText }}
+    </div>
+</div>

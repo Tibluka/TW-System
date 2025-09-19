@@ -1,0 +1,12 @@
+@use 'abstracts/variables' as *;
+
+.icon-hover-pointer {
+    :hover {
+        background: var(--background-hover);
+        border-radius: $border-radius-max;
+    }
+
+    i {
+        padding: $padding-xsm;
+    }
+}

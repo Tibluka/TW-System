@@ -13,11 +13,11 @@
                     {{ modalConfig?.title }}
                 </h4>
 
-                <button type="button" class="modal-close-btn" (click)="closeModal()"
-                    *ngIf="modalConfig?.showCloseButton" aria-label="Fechar modal">
-                    <app-icon icon="fa-solid fa-times" [fontSize]="'1.2rem'" [color]="'#6b7280'">
-                    </app-icon>
-                </button>
+
+                <app-icon (click)="closeModal()" cursorType="pointer" *ngIf="modalConfig?.showCloseButton"
+                    aria-label="Fechar modal" icon="fa-solid fa-xmark" fontSize="24px" color="white">
+                </app-icon>
+
             </div>
 
             <!-- Corpo do Modal -->

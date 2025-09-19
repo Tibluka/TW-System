@@ -8,9 +8,15 @@
     <form [formGroup]="clientForm" (ngSubmit)="submit()">
 
         <!-- Campo Nome -->
-        <ds-input label="Nome do Cliente" placeholder="Digite o nome completo" formControlName="name" [required]="true"
-            [invalid]="isFormControlInvalid(clientForm.controls['name'])" errorMessage="Erro" icon="fa fa-search"
-            iconPosition="left" />
+        <ds-input [fullWidth]="true" label="Nome do Cliente" placeholder="Digite o nome completo" formControlName="name"
+            [required]="true" [invalid]="isFormControlInvalid(clientForm.controls['name'])" errorMessage="Erro"
+            icon="fa fa-search" iconPosition="left" />
+
+        <ds-textarea [fullWidth]="false" label="Observações" placeholder="Informações adicionais sobre o cliente..."
+            formControlName="notes" [invalid]="isFormControlInvalid(clientForm.controls['notes'])" errorMessage="erro"
+            icon="fa-solid fa-sticky-note" iconPosition="left" [rows]="4" [maxlength]="500" resize="vertical"
+            helperText="">
+        </ds-textarea>
 
         <ds-button (onClickEmitter)="submit()" label="Enviar" />
     </form>

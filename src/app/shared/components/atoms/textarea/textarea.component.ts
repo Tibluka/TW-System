@@ -1,27 +1,24 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, forwardRef, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, forwardRef, OnDestroy } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { IconComponent } from '../icon/icon.component';
-import { MaskDirective } from 'mask-directive';
 
 @Component({
-  selector: 'ds-input',
-  imports: [CommonModule, IconComponent, MaskDirective],
-  standalone: true,
-  templateUrl: './input.component.html',
-  styleUrls: ['./input.component.scss'],
+  selector: 'ds-textarea',
+  imports: [CommonModule, IconComponent],
+  templateUrl: './textarea.component.html',
+  styleUrls: ['./textarea.component.scss'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => InputComponent),
+      useExisting: forwardRef(() => TextareaComponent),
       multi: true
     }
   ]
 })
-export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
+export class TextareaComponent implements OnInit, OnDestroy, ControlValueAccessor {
   @Input() label: string = '';
   @Input() placeholder: string = '';
-  @Input() type: string = 'text';
   @Input() required: boolean = false;
   @Input() disabled: boolean = false;
   @Input() invalid: boolean = false;
@@ -30,18 +27,14 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
   @Input() maxlength: number | null = null;
   @Input() minlength: number | null = null;
   @Input() readonly: boolean = false;
+  @Input() rows: number = 4; // Número de linhas visíveis
+  @Input() cols: number | null = null; // Número de colunas
+  @Input() resize: 'none' | 'vertical' | 'horizontal' | 'both' = 'vertical'; // Controle de redimensionamento
   @Input() autocomplete: string = 'off';
   @Input() errorMessage: string = '';
   @Input() helperText: string = '';
   @Input() fullWidth: boolean = false;
   @Input() width: string = 'fit-content';
-
-  // Propriedades da máscara
-  @Input() mask: string = ''; // Máscara a ser aplicada
-  @Input() dropSpecialCharacters: boolean = false; // Remove caracteres especiais do valor
-
-  // Eventos
-  @Output() valueChanged = new EventEmitter<string>(); // Evento para valor sem máscara
 
   // Propriedades internas
   value: string = '';
@@ -53,8 +46,8 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
   private onTouched = () => { };
 
   ngOnInit() {
-    // Gerar ID único para o input
-    this.uniqueId = `ds-input-${Math.random().toString(36).substr(2, 9)}`;
+    // Gerar ID único para o textarea
+    this.uniqueId = `ds-textarea-${Math.random().toString(36).substr(2, 9)}`;
   }
 
   ngOnDestroy() {
@@ -79,24 +72,41 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
   }
 
   // Métodos de evento
-  onInputChange(event: Event): void {
-    const target = event.target as HTMLInputElement;
+  onTextareaChange(event: Event): void {
+    const target = event.target as HTMLTextAreaElement;
     this.value = target.value;
     this.onChange(this.value);
   }
 
-  onInputFocus(): void {
+  onTextareaFocus(): void {
     this.isFocused = true;
   }
 
-  onInputBlur(): void {
+  onTextareaBlur(): void {
     this.isFocused = false;
     this.onTouched();
   }
 
+  // Auto-resize para textarea (opcional)
+  onTextareaInput(event: Event): void {
+    const target = event.target as HTMLTextAreaElement;
+    this.value = target.value;
+    this.onChange(this.value);
+
+    // Auto-resize se não tiver rows fixo e resize for 'none'
+    if (this.resize === 'none' || this.resize === 'horizontal') {
+      this.autoResize(target);
+    }
+  }
+
+  private autoResize(textarea: HTMLTextAreaElement): void {
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+  }
+
   // Getters para classes CSS dinâmicas
-  get inputClasses(): string {
-    const classes = ['input-field'];
+  get textareaClasses(): string {
+    const classes = ['textarea-field'];
 
     if (this.invalid) {
       classes.push('invalid');
@@ -113,6 +123,8 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
     if (this.icon) {
       classes.push(`has-icon-${this.iconPosition}`);
     }
+
+    classes.push(`resize-${this.resize}`);
 
     return classes.join(' ');
   }
@@ -133,5 +145,13 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
 
   get showHelper(): boolean {
     return !this.showError && !!this.helperText;
+  }
+
+  get characterCount(): number {
+    return this.value ? this.value.length : 0;
+  }
+
+  get showCharacterCount(): boolean {
+    return !!this.maxlength;
   }
 }

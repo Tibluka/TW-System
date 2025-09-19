@@ -21,6 +21,7 @@
     "@cloudinary/ng": "^2.1.5",
     "@fortawesome/fontawesome-free": "^7.0.1",
     "axios": "^1.12.2",
+    "mask-directive": "^0.2.24",
     "moment": "^2.30.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

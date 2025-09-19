@@ -1,9 +1,9 @@
-import { NgStyle } from '@angular/common';
+import { NgClass, NgStyle } from '@angular/common';
 import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-icon',
-  imports: [NgStyle],
+  imports: [NgStyle, NgClass],
   templateUrl: './icon.component.html',
   styleUrl: './icon.component.scss'
 })

@@ -4,6 +4,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angula
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
 import { FormValidator } from '../../../shared/utils/form';
+import { TextareaComponent } from '../../../shared/components/atoms/textarea/textarea.component';
 
 @Component({
   selector: 'app-clients',
@@ -11,7 +12,8 @@ import { FormValidator } from '../../../shared/utils/form';
     CommonModule,
     ButtonComponent,
     ReactiveFormsModule,
-    InputComponent
+    InputComponent,
+    TextareaComponent
   ],
   templateUrl: './clients.component.html',
   styleUrl: './clients.component.scss'
@@ -19,7 +21,8 @@ import { FormValidator } from '../../../shared/utils/form';
 export class ClientsComponent extends FormValidator {
 
   clientForm = new FormGroup({
-    name: new FormControl('', Validators.required)
+    name: new FormControl('', Validators.required),
+    notes: new FormControl('', Validators.required)
   });
 
   click() {
