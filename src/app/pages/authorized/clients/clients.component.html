@@ -2,6 +2,16 @@
 <ds-button [rounded]="false" (onClickEmitter)="click()" [fullWidth]="false" variant="outline" label="Label"
     icon="fa-solid fa-bars" />
 
-<form action="">
-    <ds-input class="" formControlName="123" label="Teste" placeholder="teste 123" />
-</form>
+<div class="clients-container">
+    <h2>Gerenciar Clientes</h2>
+
+    <form [formGroup]="clientForm" (ngSubmit)="submit()">
+
+        <!-- Campo Nome -->
+        <ds-input label="Nome do Cliente" placeholder="Digite o nome completo" formControlName="name" [required]="true"
+            [invalid]="isFormControlInvalid(clientForm.controls['name'])" errorMessage="Erro" icon="fa fa-search"
+            iconPosition="left" />
+
+        <ds-button (onClickEmitter)="submit()" label="Enviar" />
+    </form>
+</div>
