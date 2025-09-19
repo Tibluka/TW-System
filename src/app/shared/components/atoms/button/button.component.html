@@ -1,1 +1,6 @@
-<p>button works!</p>
+<button class="btn {{variant}}" [ngStyle]="{
+    'width': fullWidth ? '100%' : ''
+}" [ngClass]="{'rounded': rounded}" (click)="emitAction()">
+    <i class="{{icon}}"></i>
+    {{label}}
+</button>

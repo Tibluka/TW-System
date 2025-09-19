@@ -1,42 +1,77 @@
+@use '../abstracts/variables' as *;
+
 // Componentes base
 .btn {
-    padding: 0.5rem 1rem;
+    padding: $padding-s $padding-ssm;
     border: none;
-    border-radius: 0.375rem;
+    border-radius: $border-radius-md;
     cursor: pointer;
     font-weight: 500;
-    transition: all 0.2s;
+    transition: background-color 0.5s, color 0.5s, border-color 0.5s, opacity 0.5s, scale 0.2s;
+    outline: 0;
 
-    &.btn-primary {
-        background: var(--primary-dark);
+    &:hover {
+        transition: background-color 0.5s, color 0.5s, border-color 0.5s, opacity 0.5s;
+    }
+
+    &:active {
+        scale: 0.98;
+        transition: scale 0.2s;
+    }
+
+    i {
+        margin-right: 6px;
+    }
+
+    &.fill {
+        background-color: var(--tertiary);
         color: white;
 
         &:hover {
-            background: var(--primary-medium);
+            background-color: var(--tertiary-medium);
+        }
+
+        i {
+            color: white;
         }
     }
 
-    &.btn-secondary {
-        background: var(--secondary);
-        color: white;
-
-        &:hover {
-            background: var(--secondary-medium);
-        }
-    }
-
-    &.btn-tertiary {
-        background: var(--tertiary);
-        color: white;
+    &.outline {
+        color: var(--tertiary);
+        border: 1px solid var(--tertiary);
+        background-color: transparent;
 
         &:hover {
             opacity: 0.9;
+            background-color: var(--tertiary-fade);
         }
+
+        i {
+            color: var(--tertiary);
+        }
+    }
+
+    &.ghost {
+        background-color: transparent;
+        color: var(--tertiary);
+
+        &:hover {
+            opacity: 0.9;
+            background-color: var(--tertiary-fade);
+        }
+
+        i {
+            color: var(--tertiary);
+        }
+    }
+
+    &.rounded {
+        border-radius: $border-radius-max;
     }
 }
 
 .card {
-    background: white;
+    background-color: white;
     border: 1px solid var(--stroke);
     border-radius: 0.5rem;
     padding: 1rem;
