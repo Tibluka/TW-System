@@ -1,139 +1,284 @@
 @use 'abstracts/variables' as *;
 @use 'abstracts/spacing' as *;
 
-.ds-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0 12px; // Separação vertical de 12px entre os TRs
-    border: none;
-    background: transparent;
+.clients-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: $spacing-lg;
 
-    // Remove todas as bordas de th e td por padrão
-    th,
-    td {
-        border: none;
-        padding: $spacing-md $spacing-sm;
-        text-align: left;
-        vertical-align: middle;
-        border-top: 1px solid $stroke;
-        border-bottom: 1px solid $stroke;
+    .page-header {
+        text-align: center;
+        margin-bottom: $spacing-xxl;
 
-        &:first-child {
-            border-left: 1px solid $stroke;
-            border-top-left-radius: $border-radius-md;
-            border-bottom-left-radius: $border-radius-md;
+        h2 {
+            color: $primary-dark;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: $spacing-sm;
         }
 
-        &:last-child {
-            border-right: 1px solid $stroke;
-            border-top-right-radius: $border-radius-md;
-            border-bottom-right-radius: $border-radius-md;
+        .page-subtitle {
+            color: $label;
+            font-size: 16px;
+            margin: 0;
         }
     }
 
-    // Estilos do thead
-    thead {
-        tr {
-            th {
-                background-color: var(--background-medium);
-                color: $secondary;
-                font-weight: 500;
-                font-size: 14px;
-                letter-spacing: 0.4px;
+    // Estilos do formulário
+    .client-form {
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: $spacing-lg;
+            margin-bottom: $spacing-lg;
+
+            @media (max-width: 768px) {
+                grid-template-columns: 1fr;
+                gap: $spacing-md;
+            }
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: $spacing-md;
+            margin-top: $spacing-xxl;
+            padding-top: $spacing-lg;
+            border-top: 1px solid $stroke;
+
+            @media (max-width: 768px) {
+                flex-direction: column;
+                align-items: stretch;
             }
         }
     }
 
-    // Estilos do tbody
-    tbody {
-        tr {
-            transition: all 0.2s ease;
+    // Estilos específicos da tabela
+    .client-info {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+
+        .client-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid $stroke;
+        }
+
+        .client-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+
+            .client-name {
+                color: $primary-dark;
+                font-weight: 600;
+                font-size: 14px;
+                line-height: 1.2;
+            }
+
+            .client-company {
+                color: $label;
+                font-size: 12px;
+                line-height: 1.2;
+            }
+        }
+    }
+
+    .contact-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .client-email {
+            color: $primary-medium;
+            text-decoration: none;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
 
             &:hover {
-                td {
-                    border-color: rgba($primary-medium, 0.3);
-                }
+                text-decoration: underline;
             }
 
-            td {
-                background-color: var(--white);
-                color: $primary-dark;
-                font-size: 14px;
-
-                &:first-child {
-                    padding-left: $spacing-md; // Mantém padding padrão no tbody
-                }
-
-                &:last-child {
-                    padding-right: $spacing-md; // Mantém padding padrão no tbody
-                }
+            i {
+                color: $label;
+                font-size: 11px;
             }
         }
-    }
 
-    // Estado vazio
-    .empty-state {
-        td {
-            text-align: center;
-            color: $placeholder;
-            font-style: italic;
-            padding: $spacing-xxl 0;
-            background-color: transparent;
-            border: none;
-            border-radius: 0;
-        }
-    }
-
-    // Colunas ordenáveis
-    .sortable {
-        cursor: pointer;
-        user-select: none;
-        position: relative;
-
-        &:hover {
-            background-color: rgba($label, 0.1) !important;
-        }
-
-        .sort-indicator {
-            margin-left: $spacing-xs;
-            font-size: 12px;
+        .client-phone {
             color: $label;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+
+            i {
+                font-size: 10px;
+            }
+        }
+    }
+
+    .category-badge {
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        &.category-premium {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #8B4513;
+        }
+
+        &.category-vip {
+            background: linear-gradient(135deg, #9B59B6, #8E44AD);
+            color: white;
+        }
+
+        &.category-corporate {
+            background: linear-gradient(135deg, #3498DB, #2980B9);
+            color: white;
+        }
+
+        &.category-standard {
+            background: linear-gradient(135deg, #95A5A6, #7F8C8D);
+            color: white;
+        }
+
+        &.category-basic {
+            background: linear-gradient(135deg, #BDC3C7, #95A5A6);
+            color: $primary-dark;
+        }
+    }
+
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-transform: capitalize;
+
+        .status-icon {
+            font-size: 6px;
+        }
+
+        &.status-ativo {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27AE60;
+
+            .status-icon {
+                color: #27AE60;
+            }
+        }
+
+        &.status-inativo {
+            background: rgba(231, 76, 60, 0.1);
+            color: #E74C3C;
+
+            .status-icon {
+                color: #E74C3C;
+            }
+        }
+
+        &.status-pendente {
+            background: rgba(230, 126, 34, 0.1);
+            color: #E67E22;
+
+            .status-icon {
+                color: #E67E22;
+            }
+        }
+
+        &.status-bloqueado {
+            background: rgba(149, 165, 166, 0.1);
+            color: #95A5A6;
+
+            .status-icon {
+                color: #95A5A6;
+            }
+        }
+    }
+
+    .client-summary {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        text-align: right;
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+
+            strong {
+                color: $primary-dark;
+                font-size: 13px;
+                font-weight: 600;
+            }
+
+            small {
+                color: $label;
+                font-size: 10px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+        }
+
+        .last-contact {
+            color: $placeholder;
+            font-size: 10px;
+            margin-top: 2px;
+        }
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+
+        ::ng-deep ds-button {
+            min-width: auto;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &:hover {
+                transform: scale(1.1);
+            }
         }
     }
 }
 
-// Paginação
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: $spacing-md;
-    margin-top: $spacing-lg;
+// Responsividade para mobile
+@media (max-width: 768px) {
+    .clients-container {
+        padding: $spacing-md;
 
-    button {
-        padding: $spacing-xs $spacing-md;
-        border: 1px solid $stroke;
-        background: white;
-        color: $primary-dark;
-        border-radius: $border-radius-sm;
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        &:hover:not(:disabled) {
-            background-color: var(--background);
-            border-color: $primary-medium;
+        .page-header h2 {
+            font-size: 24px;
         }
 
-        &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background-color: #f5f5f5;
+        .page-subtitle {
+            font-size: 14px;
         }
-    }
 
-    .page-info {
-        color: $label;
-        font-size: 14px;
-        font-weight: 500;
+        // Esconder algumas colunas em mobile
+        ::ng-deep {
+
+            ds-table-cell:nth-child(3),
+            ds-table-cell:nth-child(5) {
+                display: none;
+            }
+        }
     }
 }

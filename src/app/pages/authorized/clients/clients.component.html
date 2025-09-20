@@ -1,72 +1,171 @@
-<p>clients works!</p>
-<ds-button [rounded]="false" (onClickEmitter)="click()" [fullWidth]="false" variant="outline" label="Label"
-    icon="fa-solid fa-bars" />
-
 <div class="clients-container">
-    <h2>Gerenciar Clientes</h2>
-
-    <form [formGroup]="clientForm" (ngSubmit)="submit()">
-
-        <!-- Campo Nome -->
-        <ds-input [fullWidth]="true" label="Nome do Cliente" placeholder="Digite o nome completo" formControlName="name"
-            [required]="true" [invalid]="isFormControlInvalid(clientForm.controls['name'])"
-            errorMessage="Nome é obrigatório" icon="fa-solid fa-user" iconPosition="left" />
-
-        <!-- Campo Categoria (Select Simples) -->
-        <ds-select [fullWidth]="true" label="Categoria do Cliente" placeholder="Selecione a categoria"
-            formControlName="category" [required]="true"
-            [invalid]="isFormControlInvalid(clientForm.controls['category'])" errorMessage="Categoria é obrigatória"
-            [options]="categoryOptions" icon="fa-solid fa-tags" iconPosition="left" [clearable]="true"
-            (selectionChanged)="onCategoryChange($event)">
-        </ds-select>
-
-        <!-- Campo Status (Select com valor padrão) -->
-        <ds-select [fullWidth]="true" label="Status" placeholder="Selecione o status" formControlName="status"
-            [options]="statusOptions" icon="fa-solid fa-circle-dot" iconPosition="left">
-        </ds-select>
-
-        <!-- Campo Tags (Select Múltiplo) -->
-        <ds-select [fullWidth]="true" label="Tags" placeholder="Selecione as tags" formControlName="tags"
-            [options]="tagOptions" [multiple]="true" [clearable]="true" [searchable]="true" icon="fa-solid fa-hashtag"
-            iconPosition="left" helperText="Você pode selecionar múltiplas tags"
-            (selectionChanged)="onTagsChange($event)">
-        </ds-select>
-
-        <!-- Campo País (Select com busca) -->
-        <ds-select [fullWidth]="true" label="País" placeholder="Selecione o país" formControlName="country"
-            [options]="countryOptions" [searchable]="true" [clearable]="true" icon="fa-solid fa-globe"
-            iconPosition="left" helperText="Digite para buscar países" (searched)="onCountrySearch($event)">
-        </ds-select>
-
-        <!-- Campo Observações -->
-        <ds-textarea [fullWidth]="true" label="Observações" placeholder="Informações adicionais sobre o cliente..."
-            formControlName="notes" [invalid]="isFormControlInvalid(clientForm.controls['notes'])"
-            errorMessage="Observações são obrigatórias" icon="fa-solid fa-sticky-note" iconPosition="left" [rows]="4"
-            [maxlength]="500" resize="vertical">
-        </ds-textarea>
-
-        <!-- Botões -->
-        <div class="form-actions">
-            <ds-button (onClickEmitter)="submit()" label="Salvar Cliente" variant="fill" icon="fa-solid fa-save" />
-
-            <ds-button type="button" label="Limpar Formulário" variant="outline"
-                (onClickEmitter)="clientForm.reset()" />
-        </div>
-    </form>
-
-</div>
-
-<!-- Cards de Exemplo -->
-
-<ds-card title="Estatísticas" variant="filled" size="sm" padding="sm">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-            <h2 style="margin: 0; color: var(--primary-dark);">1,234</h2>
-            <p style="margin: 0; color: var(--label);">Total de Vendas</p>
-        </div>
-        <div style="color: var(--tertiary); font-size: 2rem;">📈</div>
+    <!-- Header da página -->
+    <div class="page-header mb-24">
+        <h2>Gerenciamento de Clientes</h2>
+        <p class="page-subtitle">Cadastre e gerencie seus clientes de forma eficiente</p>
     </div>
-</ds-card>
 
-<ds-table [columns]="columns" [data]="tableData" emptyMessage="Nenhum usuário encontrado">
-</ds-table>
+    <!-- Card do formulário -->
+    <ds-card class="mb-24" title="Cadastrar Novo Cliente">
+        <form [formGroup]="clientForm" (ngSubmit)="submit()" class="client-form">
+
+            <!-- Primeira linha: Nome e Email -->
+            <div class="form-row">
+                <ds-input [fullWidth]="true" label="Nome Completo" placeholder="Digite o nome completo do cliente"
+                    formControlName="name" [required]="true"
+                    [invalid]="isFormControlInvalid(clientForm.controls['name'])" errorMessage="Nome é obrigatório"
+                    icon="fa-solid fa-user" iconPosition="left" />
+
+                <ds-input [fullWidth]="true" label="Email" placeholder="cliente@empresa.com" type="email"
+                    formControlName="email" [required]="true"
+                    [invalid]="isFormControlInvalid(clientForm.controls['email'])"
+                    errorMessage="Email válido é obrigatório" icon="fa-solid fa-envelope" iconPosition="left" />
+            </div>
+
+            <!-- Segunda linha: Telefone e Empresa -->
+            <div class="form-row">
+                <ds-input [fullWidth]="true" label="Telefone" placeholder="(11) 99999-9999" formControlName="phone"
+                    icon="fa-solid fa-phone" iconPosition="left" mask="(00) 00000-0000" />
+
+                <ds-input [fullWidth]="true" label="Empresa" placeholder="Nome da empresa" formControlName="company"
+                    icon="fa-solid fa-building" iconPosition="left" />
+            </div>
+
+            <!-- Terceira linha: Categoria e Status -->
+            <div class="form-row">
+                <ds-select [fullWidth]="true" label="Categoria do Cliente" placeholder="Selecione a categoria"
+                    formControlName="category" [required]="true"
+                    [invalid]="isFormControlInvalid(clientForm.controls['category'])"
+                    errorMessage="Categoria é obrigatória" [options]="categoryOptions" icon="fa-solid fa-tags"
+                    iconPosition="left" [clearable]="true" (selectionChanged)="onCategoryChange($event)">
+                </ds-select>
+
+                <ds-select [fullWidth]="true" label="Status" placeholder="Selecione o status" formControlName="status"
+                    [options]="statusOptions" icon="fa-solid fa-circle-dot" iconPosition="left">
+                </ds-select>
+            </div>
+
+            <!-- Quarta linha: Tags e País -->
+            <div class="form-row">
+                <ds-select [fullWidth]="true" label="Tags" placeholder="Selecione as tags" formControlName="tags"
+                    [options]="tagOptions" [multiple]="true" [clearable]="true" [searchable]="true"
+                    icon="fa-solid fa-hashtag" iconPosition="left" helperText="Você pode selecionar múltiplas tags"
+                    (selectionChanged)="onTagsChange($event)">
+                </ds-select>
+
+                <ds-select [fullWidth]="true" label="País" placeholder="Selecione o país" formControlName="country"
+                    [options]="countryOptions" [searchable]="true" [clearable]="true" icon="fa-solid fa-globe"
+                    iconPosition="left" helperText="Digite para buscar países">
+                </ds-select>
+            </div>
+
+            <!-- Campo Observações -->
+            <ds-textarea [fullWidth]="true" label="Observações" placeholder="Informações adicionais sobre o cliente..."
+                formControlName="notes" [rows]="4" helperText="Máximo de 500 caracteres" />
+
+            <!-- Botões de ação -->
+            <div class="form-actions">
+                <ds-button variant="outline" label="Limpar Formulário" icon="fa-solid fa-eraser" type="button"
+                    (onClickEmitter)="clientForm.reset()" />
+
+                <ds-button variant="fill" label="Salvar Cliente" icon="fa-solid fa-save" type="submit" />
+            </div>
+        </form>
+    </ds-card>
+
+    <!-- Card da tabela -->
+    <ds-card title="Lista de Clientes" subtitle="Gerencie todos os seus clientes cadastrados">
+
+        <!-- Tabela componentizada -->
+        <ds-table>
+            <!-- Header -->
+            <ds-table-row [isHeader]="true">
+                <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="left">Contato</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="center">Categoria</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="right">Resumo</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="center" width="120px">Ações</ds-table-cell>
+            </ds-table-row>
+
+            <!-- Dados -->
+            <ds-table-row *ngFor="let client of clients" [clickable]="true" [data]="client"
+                (rowClick)="onClientClick($event)">
+
+                <!-- Coluna Cliente -->
+                <ds-table-cell align="left">
+                    <div class="client-info">
+                        <img [src]="client.avatar" [alt]="client.name" class="client-avatar" />
+                        <div class="client-details">
+                            <strong class="client-name">{{ client.name }}</strong>
+                            <small class="client-company">{{ client.company }}</small>
+                        </div>
+                    </div>
+                </ds-table-cell>
+
+                <!-- Coluna Contato -->
+                <ds-table-cell align="left">
+                    <div class="contact-info">
+                        <a [href]="'mailto:' + client.email" class="client-email">
+                            <i class="fa-solid fa-envelope mr-4"></i>
+                            {{ client.email }}
+                        </a>
+                        <div class="client-phone" *ngIf="client.phone">
+                            <i class="fa-solid fa-phone mr-4"></i>
+                            {{ client.phone }}
+                        </div>
+                    </div>
+                </ds-table-cell>
+
+                <!-- Coluna Categoria -->
+                <ds-table-cell align="center">
+                    <span [class]="'category-badge category-' + client.category">
+                        {{ getCategoryLabel(client.category) }}
+                    </span>
+                </ds-table-cell>
+
+                <!-- Coluna Status -->
+                <ds-table-cell align="center">
+                    <span [class]="'status-badge ' + getStatusClass(client.status)">
+                        <i [class]="'status-icon fa-solid fa-circle mr-4'"></i>
+                        {{ client.status | titlecase }}
+                    </span>
+                </ds-table-cell>
+
+                <!-- Coluna Resumo -->
+                <ds-table-cell align="right">
+                    <div class="client-summary">
+                        <div class="summary-item">
+                            <strong>{{ client.totalOrders }}</strong>
+                            <small>pedidos</small>
+                        </div>
+                        <div class="summary-item">
+                            <strong>{{ formatCurrency(client.totalValue) }}</strong>
+                            <small>total</small>
+                        </div>
+                        <div class="summary-item">
+                            <small class="last-contact">
+                                Último contato: {{ formatDate(client.lastContact) }}
+                            </small>
+                        </div>
+                    </div>
+                </ds-table-cell>
+
+                <!-- Coluna Ações -->
+                <ds-table-cell align="center">
+                    <div class="action-buttons">
+                        <ds-button variant="ghost" icon="fa-solid fa-eye" (onClickEmitter)="viewClient(client)"
+                            title="Visualizar cliente">
+                        </ds-button>
+                        <ds-button variant="ghost" icon="fa-solid fa-edit" (onClickEmitter)="editClient(client)"
+                            title="Editar cliente">
+                        </ds-button>
+                        <ds-button variant="ghost" icon="fa-solid fa-trash" (onClickEmitter)="deleteClient(client)"
+                            title="Excluir cliente">
+                        </ds-button>
+                    </div>
+                </ds-table-cell>
+            </ds-table-row>
+        </ds-table>
+    </ds-card>
+</div>
