@@ -1,284 +1,190 @@
 @use 'abstracts/variables' as *;
 @use 'abstracts/spacing' as *;
 
-.clients-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: $spacing-lg;
+// ========================================
+// COMPONENTE DS-TABLE (PRINCIPAL)
+// ========================================
+.ds-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 12px; // Separação vertical de 12px entre os TRs
+    border: none;
+    background: transparent;
 
-    .page-header {
-        text-align: center;
-        margin-bottom: $spacing-xxl;
-
-        h2 {
-            color: $primary-dark;
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: $spacing-sm;
-        }
-
-        .page-subtitle {
-            color: $label;
-            font-size: 16px;
-            margin: 0;
-        }
-    }
-
-    // Estilos do formulário
-    .client-form {
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: $spacing-lg;
-            margin-bottom: $spacing-lg;
-
-            @media (max-width: 768px) {
-                grid-template-columns: 1fr;
-                gap: $spacing-md;
-            }
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: $spacing-md;
-            margin-top: $spacing-xxl;
-            padding-top: $spacing-lg;
-            border-top: 1px solid $stroke;
-
-            @media (max-width: 768px) {
-                flex-direction: column;
-                align-items: stretch;
-            }
-        }
-    }
-
-    // Estilos específicos da tabela
-    .client-info {
-        display: flex;
-        align-items: center;
-        gap: $spacing-md;
-
-        .client-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid $stroke;
-        }
-
-        .client-details {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-
-            .client-name {
-                color: $primary-dark;
-                font-weight: 600;
-                font-size: 14px;
-                line-height: 1.2;
-            }
-
-            .client-company {
-                color: $label;
-                font-size: 12px;
-                line-height: 1.2;
-            }
-        }
-    }
-
-    .contact-info {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-
-        .client-email {
-            color: $primary-medium;
-            text-decoration: none;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-
-            &:hover {
-                text-decoration: underline;
-            }
-
-            i {
-                color: $label;
-                font-size: 11px;
-            }
-        }
-
-        .client-phone {
-            color: $label;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-
-            i {
-                font-size: 10px;
-            }
-        }
-    }
-
-    .category-badge {
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-size: 11px;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-
-        &.category-premium {
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            color: #8B4513;
-        }
-
-        &.category-vip {
-            background: linear-gradient(135deg, #9B59B6, #8E44AD);
-            color: white;
-        }
-
-        &.category-corporate {
-            background: linear-gradient(135deg, #3498DB, #2980B9);
-            color: white;
-        }
-
-        &.category-standard {
-            background: linear-gradient(135deg, #95A5A6, #7F8C8D);
-            color: white;
-        }
-
-        &.category-basic {
-            background: linear-gradient(135deg, #BDC3C7, #95A5A6);
-            color: $primary-dark;
-        }
-    }
-
-    .status-badge {
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-transform: capitalize;
-
-        .status-icon {
-            font-size: 6px;
-        }
-
-        &.status-ativo {
-            background: rgba(46, 204, 113, 0.1);
-            color: #27AE60;
-
-            .status-icon {
-                color: #27AE60;
-            }
-        }
-
-        &.status-inativo {
-            background: rgba(231, 76, 60, 0.1);
-            color: #E74C3C;
-
-            .status-icon {
-                color: #E74C3C;
-            }
-        }
-
-        &.status-pendente {
-            background: rgba(230, 126, 34, 0.1);
-            color: #E67E22;
-
-            .status-icon {
-                color: #E67E22;
-            }
-        }
-
-        &.status-bloqueado {
-            background: rgba(149, 165, 166, 0.1);
-            color: #95A5A6;
-
-            .status-icon {
-                color: #95A5A6;
-            }
-        }
-    }
-
-    .client-summary {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        text-align: right;
-
-        .summary-item {
-            display: flex;
-            flex-direction: column;
-            gap: 1px;
-
-            strong {
-                color: $primary-dark;
-                font-size: 13px;
-                font-weight: 600;
-            }
-
-            small {
-                color: $label;
-                font-size: 10px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-        }
-
-        .last-contact {
+    // Estado vazio
+    .empty-state {
+        td {
+            text-align: center;
             color: $placeholder;
-            font-size: 10px;
-            margin-top: 2px;
+            font-style: italic;
+            padding: $spacing-xxl 0;
+            background-color: transparent;
+            border: none;
+            border-radius: 0;
         }
     }
+}
 
-    .action-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 4px;
+// ========================================
+// COMPONENTE DS-TABLE-CELL
+// ========================================
+ds-table-cell {
+    display: table-cell;
+    border: none;
+    padding: $spacing-md $spacing-sm;
+    text-align: left;
+    vertical-align: middle;
+    border-top: 1px solid $stroke;
+    border-bottom: 1px solid $stroke;
+    background-color: var(--white);
+    color: $primary-dark;
+    font-size: 14px;
 
-        ::ng-deep ds-button {
-            min-width: auto;
-            width: 32px;
-            height: 32px;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+    &:first-child {
+        border-left: 1px solid $stroke;
+        border-top-left-radius: $border-radius-md;
+        border-bottom-left-radius: $border-radius-md;
+        padding-left: $spacing-md;
+    }
+
+    &:last-child {
+        border-right: 1px solid $stroke;
+        border-top-right-radius: $border-radius-md;
+        border-bottom-right-radius: $border-radius-md;
+        padding-right: $spacing-md;
+    }
+
+    // Estilos para células de header
+    &.header-cell {
+        background-color: var(--background-medium);
+        color: $secondary;
+        font-weight: 500;
+        font-size: 14px;
+        padding: 20px $spacing-sm;
+        letter-spacing: 0.4px;
+
+        &:first-child {
+            padding-left: 24px;
+        }
+
+        &:last-child {
+            padding-right: 24px;
+        }
+
+        // Cursor para células ordenáveis
+        &.sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
 
             &:hover {
-                transform: scale(1.1);
+                background-color: rgba($label, 0.1) !important;
             }
         }
     }
 }
 
-// Responsividade para mobile
-@media (max-width: 768px) {
-    .clients-container {
-        padding: $spacing-md;
+// ========================================
+// COMPONENTE DS-TABLE-ROW
+// ========================================
+ds-table-row {
+    display: table-row;
+    transition: all 0.2s ease;
 
-        .page-header h2 {
-            font-size: 24px;
+    &:hover:not(.header-row) {
+        ds-table-cell {
+            border-color: rgba($primary-medium, 0.3);
         }
+    }
 
-        .page-subtitle {
-            font-size: 14px;
-        }
+    &.clickable-row {
+        cursor: pointer;
 
-        // Esconder algumas colunas em mobile
-        ::ng-deep {
-
-            ds-table-cell:nth-child(3),
-            ds-table-cell:nth-child(5) {
-                display: none;
+        &:hover {
+            ds-table-cell {
+                background-color: rgba($primary-medium, 0.05) !important;
             }
+        }
+    }
+}
+
+// ========================================
+// PAGINAÇÃO DA TABELA
+// ========================================
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: $spacing-md;
+    margin-top: $spacing-lg;
+
+    button {
+        padding: $spacing-xs $spacing-md;
+        border: 1px solid $stroke;
+        background: white;
+        color: $primary-dark;
+        border-radius: $border-radius-sm;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover:not(:disabled) {
+            background-color: var(--background);
+            border-color: $primary-medium;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f5f5f5;
+        }
+    }
+
+    .page-info {
+        color: $label;
+        font-size: 14px;
+        font-weight: 500;
+    }
+}
+
+
+// ========================================
+// RESPONSIVIDADE
+// ========================================
+@media (max-width: 768px) {
+    .ds-table {
+        font-size: 12px;
+    }
+
+    ds-table-cell {
+        padding: $spacing-sm $spacing-xs;
+        font-size: 12px;
+
+        &.header-cell {
+            padding: $spacing-md $spacing-sm;
+        }
+
+        &:first-child {
+            padding-left: $spacing-sm;
+        }
+
+        &:last-child {
+            padding-right: $spacing-sm;
+        }
+    }
+
+    // Esconder algumas colunas em mobile
+    .hide-mobile {
+        display: none;
+    }
+
+    .user-info,
+    .client-info {
+        gap: $spacing-xs;
+
+        .avatar,
+        .client-avatar {
+            width: 32px;
+            height: 32px;
         }
     }
 }

@@ -39,7 +39,8 @@
     &.outline {
         color: var(--tertiary);
         border: 1px solid var(--tertiary);
-        background-color: transparent;
+        background-color: var(--white);
+        ;
 
         &:hover {
             opacity: 0.9;
@@ -52,7 +53,7 @@
     }
 
     &.ghost {
-        background-color: transparent;
+        background-color: var(--white);
         color: var(--tertiary);
 
         &:hover {
