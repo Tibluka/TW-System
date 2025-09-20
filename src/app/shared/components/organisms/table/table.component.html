@@ -1,1 +1,54 @@
-<p>table works!</p>
+<table class="ds-table">
+    <thead>
+        <tr>
+            <th *ngFor="let column of columns" [style.width]="column.width" [style.text-align]="column.align || 'left'"
+                [class.sortable]="column.sortable" (click)="onSort(column)">
+                {{ column.label }}
+                <span *ngIf="column.sortable && sortColumn === column.key" class="sort-indicator">
+                    {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                </span>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Dados da tabela -->
+        <tr *ngFor="let row of paginatedData; let i = index">
+            <td *ngFor="let column of columns" [style.text-align]="column.align || 'left'">
+
+                <!-- Conteúdo personalizado -->
+                <ng-container *ngIf="column.type === 'custom'">
+                    <ng-content [ngTemplateOutlet]="customCellTemplate"
+                        [ngTemplateOutletContext]="{ $implicit: row, column: column, index: i }">
+                    </ng-content>
+                </ng-container>
+
+                <!-- Conteúdo padrão -->
+                <span *ngIf="column.type !== 'custom'">
+                    {{ formatCellValue(row[column.key], column.type) }}
+                </span>
+            </td>
+        </tr>
+
+        <!-- Estado vazio -->
+        <tr *ngIf="!data || data.length === 0" class="empty-state">
+            <td [attr.colspan]="columns.length">
+                {{ emptyMessage }}
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Paginação simples (opcional) -->
+<div *ngIf="showPagination && totalPages > 1" class="pagination">
+    <button (click)="previousPage()" [disabled]="currentPage === 1">
+        Anterior
+    </button>
+
+    <span class="page-info">
+        Página {{ currentPage }} de {{ totalPages }}
+    </span>
+
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages">
+        Próxima
+    </button>
+</div>

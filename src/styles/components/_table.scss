@@ -1,0 +1,139 @@
+@use 'abstracts/variables' as *;
+@use 'abstracts/spacing' as *;
+
+.ds-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 12px; // Separação vertical de 12px entre os TRs
+    border: none;
+    background: transparent;
+
+    // Remove todas as bordas de th e td por padrão
+    th,
+    td {
+        border: none;
+        padding: $spacing-md $spacing-sm;
+        text-align: left;
+        vertical-align: middle;
+        border-top: 1px solid $stroke;
+        border-bottom: 1px solid $stroke;
+
+        &:first-child {
+            border-left: 1px solid $stroke;
+            border-top-left-radius: $border-radius-md;
+            border-bottom-left-radius: $border-radius-md;
+        }
+
+        &:last-child {
+            border-right: 1px solid $stroke;
+            border-top-right-radius: $border-radius-md;
+            border-bottom-right-radius: $border-radius-md;
+        }
+    }
+
+    // Estilos do thead
+    thead {
+        tr {
+            th {
+                background-color: var(--background-medium);
+                color: $secondary;
+                font-weight: 500;
+                font-size: 14px;
+                letter-spacing: 0.4px;
+            }
+        }
+    }
+
+    // Estilos do tbody
+    tbody {
+        tr {
+            transition: all 0.2s ease;
+
+            &:hover {
+                td {
+                    border-color: rgba($primary-medium, 0.3);
+                }
+            }
+
+            td {
+                background-color: var(--white);
+                color: $primary-dark;
+                font-size: 14px;
+
+                &:first-child {
+                    padding-left: $spacing-md; // Mantém padding padrão no tbody
+                }
+
+                &:last-child {
+                    padding-right: $spacing-md; // Mantém padding padrão no tbody
+                }
+            }
+        }
+    }
+
+    // Estado vazio
+    .empty-state {
+        td {
+            text-align: center;
+            color: $placeholder;
+            font-style: italic;
+            padding: $spacing-xxl 0;
+            background-color: transparent;
+            border: none;
+            border-radius: 0;
+        }
+    }
+
+    // Colunas ordenáveis
+    .sortable {
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+
+        &:hover {
+            background-color: rgba($label, 0.1) !important;
+        }
+
+        .sort-indicator {
+            margin-left: $spacing-xs;
+            font-size: 12px;
+            color: $label;
+        }
+    }
+}
+
+// Paginação
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: $spacing-md;
+    margin-top: $spacing-lg;
+
+    button {
+        padding: $spacing-xs $spacing-md;
+        border: 1px solid $stroke;
+        background: white;
+        color: $primary-dark;
+        border-radius: $border-radius-sm;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover:not(:disabled) {
+            background-color: var(--background);
+            border-color: $primary-medium;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f5f5f5;
+        }
+    }
+
+    .page-info {
+        color: $label;
+        font-size: 14px;
+        font-weight: 500;
+    }
+}

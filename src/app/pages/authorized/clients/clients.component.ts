@@ -7,6 +7,8 @@ import { FormValidator } from '../../../shared/utils/form';
 import { TextareaComponent } from '../../../shared/components/atoms/textarea/textarea.component';
 import { SelectComponent, SelectOption } from '../../../shared/components/atoms/select/select.component';
 import { CardComponent } from '../../../shared/components/organisms/card/card.component';
+import { TableComponent } from "../../../shared/components/organisms/table/table.component";
+import { TableColumn, TableData } from '../../../models/table/table';
 
 @Component({
   selector: 'app-clients',
@@ -17,7 +19,8 @@ import { CardComponent } from '../../../shared/components/organisms/card/card.co
     InputComponent,
     TextareaComponent,
     SelectComponent, // ← Adicionar o SelectComponent
-    CardComponent
+    CardComponent,
+    TableComponent
   ],
   templateUrl: './clients.component.html',
   styleUrl: './clients.component.scss'
@@ -108,4 +111,88 @@ export class ClientsComponent extends FormValidator {
     // Aqui você poderia fazer uma chamada para API
     // this.countryService.searchCountries(searchTerm).subscribe(...)
   }
+
+  // Definição das colunas
+  columns: TableColumn[] = [
+    {
+      key: 'id',
+      label: 'ID',
+      sortable: true,
+      width: '80px',
+      align: 'center',
+      type: 'number'
+    },
+    {
+      key: 'nome',
+      label: 'Nome',
+      sortable: true,
+      type: 'text'
+    },
+    {
+      key: 'email',
+      label: 'E-mail',
+      sortable: true,
+      type: 'text'
+    },
+    {
+      key: 'dataCriacao',
+      label: 'Data de Criação',
+      sortable: true,
+      type: 'date',
+      align: 'center'
+    },
+    {
+      key: 'ativo',
+      label: 'Ativo',
+      type: 'boolean',
+      align: 'center'
+    }
+  ];
+
+  // Colunas com conteúdo customizado
+  customColumns: TableColumn[] = [
+    ...this.columns,
+    {
+      key: 'status',
+      label: 'Status',
+      type: 'custom',
+      align: 'center'
+    },
+    {
+      key: 'actions',
+      label: 'Ações',
+      type: 'custom',
+      align: 'center',
+      width: '150px'
+    }
+  ];
+
+  // Dados da tabela
+  tableData: TableData[] = [
+    {
+      id: 1,
+      nome: 'João Sil lfaksdflkdslkfdslkdsflksdlk va',
+      email: 'joao@email.com',
+      dataCriacao: '2024-01-15',
+      ativo: true,
+      status: 'Ativo'
+    },
+    {
+      id: 2,
+      nome: 'Maria Santos',
+      email: 'maria@emaasasdasdasdadasdlaksil.com',
+      dataCriacao: '2024-02-20',
+      ativo: false,
+      status: 'Inativo'
+    },
+    {
+      id: 3,
+      nome: 'Pedro Costa',
+      email: 'pedro@email.com',
+      dataCriacao: '2024-03-10',
+      ativo: true,
+      status: 'Pendente'
+    }
+  ];
+
 }
