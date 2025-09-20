@@ -1,31 +1,15 @@
 <!-- src/app/pages/authorized/developments/developments.component.html -->
-<div class="container">
-    <h2>Teste de Upload</h2>
 
-    <!-- Input de arquivo -->
-    <div class="upload-section">
-        <input type="file" accept="image/*" (change)="onFileSelected($event)" #fileInput class="form-control mb-3">
+<ds-file-upload label="Galeria de Imagens" placeholder="Clique ou arraste múltiplas imagens aqui"
+    helperText="Múltiplas imagens (JPG, JPEG, PNG) de até 5MB cada" [multiple]="true" [fullWidth]="true"
+    (filesChanged)="onMultipleFilesChanged($event)" (fileAdded)="onMultipleFileAdded($event)"
+    (fileRemoved)="onMultipleFileRemoved($event)" (uploadError)="onUploadError($event)">
+</ds-file-upload>
 
-        <!-- Preview da imagem -->
-        <div *ngIf="previewUrl" class="mb-3">
-            <img [src]="previewUrl" alt="Preview" style="max-width: 300px; height: auto;">
-        </div>
+<ds-button label="Upload images" variant="outline" [disabled]="isUploading" [isLoading]="isUploading"
+    (onClickEmitter)="uploadToServer()" />
 
-        <!-- Botão de upload -->
-        <button class="btn btn-primary" (click)="uploadImage()" [disabled]="!selectedFile || isUploading">
-            <span *ngIf="!isUploading">📤 Fazer Upload</span>
-            <span *ngIf="isUploading">⏳ Enviando...</span>
-        </button>
-
-        <!-- Mensagens -->
-        <div *ngIf="message" class="alert alert-info mt-3">{{ message }}</div>
-        <div *ngIf="error" class="alert alert-danger mt-3">{{ error }}</div>
-    </div>
-
-    <button class="btn btn-primary" (click)="openModalWithComponent()">
-        Open
-    </button>
-</div>
+<ds-button label="Open modal" (onClickEmitter)="openModalWithComponent()" />
 
 <!-- Modal para edição -->
 <app-modal modalId="clients-component">

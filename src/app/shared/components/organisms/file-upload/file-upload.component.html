@@ -1,0 +1,70 @@
+<div class="file-upload-container" [ngStyle]="{
+    'width': fullWidth ? '100%' : width
+}">
+    <!-- Label -->
+    <label *ngIf="label" [class]="labelClasses">
+        {{ label }}
+    </label>
+
+    <!-- Área de Upload -->
+    <div class="upload-area" [class.disabled]="disabled" [class.drag-over]="isDragOver"
+        [class.processing]="isProcessing" (click)="triggerFileInput()" (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+
+        <!-- Input file oculto -->
+        <input type="file" [id]="inputId" [accept]="acceptedTypes.join(',')" [multiple]="multiple" [disabled]="disabled"
+            (change)="onFileSelect($event)" style="display: none;">
+
+        <!-- Conteúdo da área de upload -->
+        <div class="upload-content">
+            <app-icon *ngIf="!isProcessing" icon="fa-solid fa-cloud-arrow-up" fontSize="48px" color="label">
+            </app-icon>
+
+            <app-icon *ngIf="isProcessing" icon="fa-solid fa-spinner fa-spin" fontSize="32px" color="primary-medium">
+            </app-icon>
+
+            <h3 class="upload-title" *ngIf="!isProcessing">{{ placeholder }}</h3>
+            <p class="upload-subtitle" *ngIf="isProcessing">Processando arquivos...</p>
+
+            <p class="upload-helper" *ngIf="helperText && !isProcessing">{{ helperText }}</p>
+        </div>
+    </div>
+
+    <!-- Lista de arquivos carregados -->
+    <div class="uploaded-files" *ngIf="uploadedFiles.length > 0">
+        <div class="files-header">
+            <h4>Arquivos carregados ({{ uploadedFiles.length }})</h4>
+            <button type="button" class="clear-all-btn" (click)="clearAllFiles()" *ngIf="uploadedFiles.length > 1"
+                [disabled]="disabled">
+                <app-icon icon="fa-solid fa-trash" fontSize="14px" color="tertiary"></app-icon>
+                Limpar tudo
+            </button>
+        </div>
+
+        <div class="files-grid">
+            <div class="file-item" *ngFor="let file of uploadedFiles">
+                <!-- Preview da imagem -->
+                <div class="file-preview">
+                    <img [src]="file.previewUrl" [alt]="file.name" class="preview-image">
+
+                    <!-- Botão de remover -->
+                    <button type="button" class="remove-btn" (click)="removeFile(file)" [disabled]="disabled"
+                        title="Remover arquivo">
+                        <app-icon icon="fa-solid fa-times" fontSize="14px" color="white"></app-icon>
+                    </button>
+                </div>
+
+                <!-- Informações do arquivo -->
+                <div class="file-info">
+                    <p class="file-name" [title]="file.name">{{ file.name }}</p>
+                    <p class="file-size">{{ formatFileSize(file.size) }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Texto de ajuda -->
+    <div *ngIf="helperText && uploadedFiles.length === 0" class="helper-text">
+        {{ helperText }}
+    </div>
+</div>

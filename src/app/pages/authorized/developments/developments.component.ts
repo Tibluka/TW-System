@@ -1,88 +1,130 @@
-// developments.component.ts - Atualizado com seu contexto atual
-import { NgIf } from '@angular/common';
+// developments.component.ts - Atualizado com componente de upload
+import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { environment } from '../../../../environments/environment';
-import { ModalService } from '../../../shared/services/modal/modal.service';
 import { ModalComponent } from "../../../shared/components/organisms/modal/modal.component";
+import { ModalService } from '../../../shared/services/modal/modal.service';
 
 // Importa o componente que vai dentro do modal
+import { FileUploadComponent, UploadedFile } from '../../../shared/components/organisms/file-upload/file-upload.component';
 import { ClientsComponent } from '../clients/clients.component';
+import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
+import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-developments',
   templateUrl: './developments.component.html',
   standalone: true,
   imports: [
-    NgIf,
+    CommonModule,
     ReactiveFormsModule,
     ModalComponent,
-    ClientsComponent  // ← Importa o componente filho
+    ClientsComponent,
+    FileUploadComponent,
+    ButtonComponent
   ],
   styleUrls: ['./developments.component.scss']
 })
 export class DevelopmentsComponent {
   private modalService = inject(ModalService);
 
+  // Propriedades para upload único
+  singleFiles: UploadedFile[] = [];
+
+  // Propriedades para upload múltiplo
+  multipleFiles: UploadedFile[] = [];
+
+  // Propriedades do upload antigo (manter para compatibilidade)
   selectedFile: File | null = null;
   previewUrl: string | null = null;
-  isUploading = false;
+  isUploading: boolean = false;
   message: string | null = null;
   error: string | null = null;
 
   constructor(private http: HttpClient) { }
 
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    this.selectedFile = file;
-    this.error = null;
-    this.message = null;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.previewUrl = reader.result as string;
-    };
-    reader.readAsDataURL(file);
+  // Handlers para o componente de upload único
+  onSingleFileChanged(files: UploadedFile[]): void {
+    this.singleFiles = files;
+    console.log('Arquivos únicos alterados:', files);
   }
 
-  uploadImage() {
-    if (!this.selectedFile) return;
+  onSingleFileAdded(file: UploadedFile): void {
+    console.log('Arquivo único adicionado:', file);
+  }
+
+  onSingleFileRemoved(file: UploadedFile): void {
+    console.log('Arquivo único removido:', file);
+  }
+
+  // Handlers para o componente de upload múltiplo
+  onMultipleFilesChanged(files: UploadedFile[]): void {
+    this.multipleFiles = files;
+    console.log('Arquivos múltiplos alterados:', files);
+  }
+
+  onMultipleFileAdded(file: UploadedFile): void {
+    console.log('Arquivo múltiplo adicionado:', file);
+  }
+
+  onMultipleFileRemoved(file: UploadedFile): void {
+    console.log('Arquivo múltiplo removido:', file);
+  }
+
+  // Handler para erros de upload
+  onUploadError(error: string): void {
+    this.error = error;
+    console.error('Erro no upload:', error);
+
+    // Limpar a mensagem de erro após 5 segundos
+    setTimeout(() => {
+      this.error = null;
+    }, 5000);
+  }
+
+  // Método para fazer upload dos arquivos para o servidor
+  async uploadToServer() {
+    const allFiles = [...this.singleFiles, ...this.multipleFiles];
+
+    if (allFiles.length === 0) {
+      this.error = 'Nenhum arquivo selecionado para upload';
+      return;
+    }
 
     this.isUploading = true;
     this.error = null;
     this.message = null;
 
+    // Simular upload para múltiplos arquivos
     const formData = new FormData();
-    formData.append('image', this.selectedFile);
+
+    allFiles.forEach((uploadedFile) => {
+      formData.append(`image`, uploadedFile.file);
+    });
+
 
     const apiUrl = `${environment.apiUrl}/developments/68c376da0306a9ef8241b3e5/image`;
 
-    this.http.post(apiUrl, formData).subscribe({
-      next: (response: any) => {
-        console.log('Sucesso:', response);
-        this.message = 'Upload realizado com sucesso! ✅';
-        this.isUploading = false;
-        this.clearSelection();
-      },
-      error: (error) => {
-        console.error('Erro:', error);
-        this.error = `Erro no upload: ${error.error?.message || error.message}`;
-        this.isUploading = false;
-      }
-    });
+    try {
+      const response = await lastValueFrom(this.http.post(apiUrl, formData));
+      console.log('Sucesso:', response);
+      this.message = `Upload de ${allFiles.length} arquivo(s) realizado com sucesso!`;
+
+      // Limpar arquivos após upload bem-sucedido
+      this.singleFiles = [];
+      this.multipleFiles = [];
+    } catch (error) {
+      console.error('Erro:', error);
+      this.error = 'Erro ao fazer upload dos arquivos. Tente novamente.';
+    } finally {
+      this.isUploading = false;
+    }
+
+
   }
 
-  clearSelection() {
-    this.selectedFile = null;
-    this.previewUrl = null;
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-    if (fileInput) {
-      fileInput.value = '';
-    }
-  }
 
   // Método para abrir o modal com o componente filho
   openModalWithComponent() {
@@ -111,5 +153,21 @@ export class DevelopmentsComponent {
   onClientAction(data: any) {
     console.log('Ação do cliente recebida:', data);
     // Aqui você pode processar as ações do componente de clientes
+  }
+
+  // Métodos antigos de upload (mantidos para compatibilidade)
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    this.selectedFile = file;
+    this.error = null;
+    this.message = null;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.previewUrl = reader.result as string;
+    };
+    reader.readAsDataURL(file);
   }
 }

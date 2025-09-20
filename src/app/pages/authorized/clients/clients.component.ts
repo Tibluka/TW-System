@@ -23,6 +23,7 @@ import { TableCellComponent } from "../../../shared/components/organisms/table/t
     CardComponent,
     TableComponent,
     TableRowComponent,
+    ButtonComponent,
     TableCellComponent
   ],
   templateUrl: './clients.component.html',
