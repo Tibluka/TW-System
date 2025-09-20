@@ -1,3 +1,4 @@
+// input.component.ts - CORREÇÃO SIMPLES QUE MANTÉM NGMODEL FUNCIONANDO
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, forwardRef, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -60,8 +61,8 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
     this.uniqueId = `ds-input-${Math.random().toString(36).substr(2, 9)}`;
 
     // Se ngModel foi passado, inicializar value
-    if (this.ngModel !== undefined) {
-      this.value = this.ngModel;
+    if (this.ngModel !== undefined && this.ngModel !== null) {
+      this.value = String(this.ngModel);
     }
   }
 
@@ -69,7 +70,11 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
 
   // Implementação do ControlValueAccessor
   writeValue(value: any): void {
-    this.value = value || '';
+    if (value === null || value === undefined) {
+      this.value = '';
+    } else {
+      this.value = String(value);
+    }
   }
 
   registerOnChange(fn: (value: any) => void): void {
@@ -84,25 +89,42 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
     this.disabled = isDisabled;
   }
 
-  // Método principal para mudanças de valor
-  onInputChange(newValue: any): void {
-    this.value = newValue.value;
+  // MANTÉM O MÉTODO ORIGINAL
+  onInputChange(target: any): void {
+    if (!target) return;
 
-    // Emitir para ControlValueAccessor (FormControl)
+    const newValue = target.value || '';
+    this.value = newValue;
+
+    // Para formulários reativos
     this.onChange(newValue);
 
-    // Emitir para ngModel standalone
+    // Para ngModel standalone  
     this.ngModelChange.emit(newValue);
 
-    // Emitir evento customizado
+    // Evento customizado
     this.valueChanged.emit(newValue);
   }
 
-  onValueChanged(unmaskedValue: any): void {
-    // Evento da mask-directive quando dropSpecialCharacters é true
+  // NOVO: Tratamento específico da máscara
+  onMaskValueChange(unmaskedValue: any): void {
+    // Só processa se dropSpecialCharacters estiver ativo
     if (this.dropSpecialCharacters && this.mask) {
-      this.onInputChange(unmaskedValue);
+      const cleanValue = unmaskedValue !== null && unmaskedValue !== undefined
+        ? String(unmaskedValue)
+        : '';
+
+      console.log('🎯 Valor sem máscara:', cleanValue);
+
+      // Atualizar o valor interno
+      this.value = cleanValue;
+
+      // Notificar todos os sistemas com valor limpo
+      this.onChange(cleanValue);
+      this.ngModelChange.emit(cleanValue);
+      this.valueChanged.emit(cleanValue);
     }
+    // Se dropSpecialCharacters for false, deixa o onInputChange tratar normalmente
   }
 
   onInputFocus(): void {

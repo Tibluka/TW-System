@@ -2,10 +2,13 @@
     <h1 class="title-semibold primary-dark mb-48">Clientes</h1>
 
     <div class="search-input">
-        <ds-input width="400px" label="Buscar" placeholder="Digite o nome, CPF, etc." [(ngModel)]="searchInput"
-            icon="fa-solid fa-search" iconPosition="left" />
+        <ds-input width="400px" label="Buscar" mask="000.000.000-00" [dropSpecialCharacters]="false"
+            placeholder="Digite o nome, CPF, etc." [(ngModel)]="searchInput" icon="fa-solid fa-search"
+            iconPosition="left" />
 
         <ds-button label="Novo cliente" icon="fa-solid fa-circle-plus" />
     </div>
+
+    {{searchInput}}
 
 </div>

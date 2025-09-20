@@ -13,7 +13,7 @@ import { FormValidator } from '../../../shared/utils/form';
     ReactiveFormsModule,
     InputComponent,
     FormsModule,
-    ButtonComponent,
+    ButtonComponent
   ],
   providers: [
     NgModel
