@@ -15,9 +15,9 @@
         <!-- Input Field com mask-directive -->
         <input [id]="uniqueId" [class]="inputClasses" [type]="type" [placeholder]="placeholder" [required]="required"
             [disabled]="disabled" [readonly]="readonly" [attr.maxlength]="maxlength" [attr.minlength]="minlength"
-            [autocomplete]="autocomplete" [libMask]="mask" [dropSpecialCharacters]="dropSpecialCharacters"
-            (ngModelChange)="onInputChange($event)" (focus)="onInputFocus()" (blur)="onInputBlur()"
-            (valueChanged)="onValueChanged($event)" />
+            [autocomplete]="autocomplete" [libMask]="hasMask ? mask : ''"
+            [dropSpecialCharacters]="dropSpecialCharacters" [value]="value" (input)="onInputChange($event.target)"
+            (focus)="onInputFocus()" (blur)="onInputBlur()" (valueChanged)="onValueChanged($event)" />
     </div>
 
     <!-- Mensagem de Erro -->

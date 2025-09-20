@@ -1,40 +1,271 @@
-@use '../abstracts/' as *;
+// Importar todas as variáveis dos abstracts
+@use 'abstracts/typography' as *;
+@use 'abstracts/variables' as *;
 
-p,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-span,
-strong,
-b,
-em,
-i,
-u,
-a,
-small,
-sub,
-sup,
-blockquote,
-q,
-cite,
-abbr,
-code,
-pre,
-kbd,
-samp,
-var,
-mark,
-del,
-ins,
-dfn,
-address,
-time,
-label,
-li {
-    color: var(--primary-dark);
+// ========================================
+// MIXINS DE TIPOGRAFIA
+// ========================================
+
+@mixin menu-header() {
     font-family: $font-primary;
-    font-optical-sizing: auto;
+    font-weight: $font-weight-md; // 400
+    font-size: 22px;
+    line-height: 1.2;
+    letter-spacing: 0.1px;
+    vertical-align: middle;
+}
+
+@mixin title-page() {
+    font-family: $font-primary;
+    font-weight: $font-weight-xbold; // 600
+    font-size: 26px;
+    line-height: 24px;
+    letter-spacing: 0.16px;
+    vertical-align: middle;
+}
+
+@mixin title-modal() {
+    font-family: $font-primary;
+    font-weight: $font-weight-bold; // 500
+    font-size: $font-xl; // 24px
+    line-height: 32px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+}
+
+@mixin header() {
+    font-family: $font-primary;
+    font-weight: $font-weight-bold; // 500
+    font-size: $font-sm; // 14px
+    line-height: 20px;
+    letter-spacing: 0.4px;
+}
+
+@mixin body() {
+    font-family: $font-primary;
+    font-weight: $font-weight-bold; // 500
+    font-size: $font-sm; // 14px
+    line-height: 20px;
+    letter-spacing: 0.4px;
+}
+
+@mixin input-label() {
+    font-family: $font-primary;
+    font-weight: $font-weight-bold; // 500
+    font-size: $font-sm; // 14px
+    line-height: 20px;
+    letter-spacing: 0.4px;
+}
+
+@mixin placeholder() {
+    font-family: $font-primary;
+    font-weight: $font-weight-md; // 400
+    font-size: $font-md; // 16px
+    line-height: 24px;
+    letter-spacing: 0px;
+}
+
+@mixin subheadline() {
+    font-family: $font-primary;
+    font-weight: $font-weight-md; // 400
+    font-size: $font-md; // 16px
+    line-height: 24px;
+    letter-spacing: 0px;
+}
+
+@mixin subtitle-section() {
+    font-family: $font-primary;
+    font-weight: $font-weight-md; // 400
+    font-size: $font-md; // 16px
+    line-height: 24px;
+    letter-spacing: 0px;
+}
+
+@mixin tab() {
+    font-family: $font-primary;
+    font-weight: $font-weight-md; // 400
+    font-size: $font-md; // 16px
+    line-height: 24px;
+    letter-spacing: 0px;
+}
+
+@mixin number-bigger() {
+    font-family: $font-primary;
+    font-weight: $font-weight-xbold; // 600
+    font-size: 36px;
+    line-height: 24px;
+    letter-spacing: 0.16px;
+    vertical-align: middle;
+}
+
+@mixin card-small() {
+    font-family: $font-primary;
+    font-weight: $font-weight-md; // 400
+    font-size: $font-xs; // 12px
+    line-height: 20px;
+    letter-spacing: 0.4px;
+}
+
+@mixin card-medium-semibold() {
+    font-family: $font-primary;
+    font-weight: $font-weight-xbold; // 600
+    font-size: $font-xmd; // 18px
+    line-height: 24px;
+    letter-spacing: 0px;
+}
+
+@mixin card-medium-regular() {
+    font-family: $font-primary;
+    font-weight: $font-weight-md; // 400
+    font-size: $font-xmd; // 18px
+    line-height: 24px;
+    letter-spacing: 0px;
+}
+
+// Mixin já existente (verificar se você tem $font-xxl, se não usar $font-xl)
+@mixin title-semibold() {
+    font-size: $font-xl; // 24px (ajustei porque $font-xxl não existe)
+    font-weight: $font-weight-xbold;
+    letter-spacing: 0.06px;
+}
+
+// ========================================
+// MIXIN PARA CORES
+// ========================================
+
+@mixin color-variants() {
+    &.primary-dark {
+        color: var(--primary-dark);
+    }
+
+    &.primary-medium {
+        color: var(--primary-medium);
+    }
+
+    &.secondary {
+        color: var(--secondary);
+    }
+
+    &.secondary-medium {
+        color: var(--secondary-medium);
+    }
+
+    &.background {
+        color: var(--background);
+    }
+
+    &.background-medium {
+        color: var(--background-medium);
+    }
+
+    &.white {
+        color: var(--white);
+    }
+
+    &.stroke {
+        color: var(--stroke);
+    }
+
+    &.label {
+        color: var(--label);
+    }
+
+    &.placeholder {
+        color: var(--placeholder);
+    }
+
+    &.tertiary {
+        color: var(--tertiary);
+    }
+
+    &.tertiary-medium {
+        color: var(--tertiary-medium);
+    }
+
+    &.tertiary-fade {
+        color: var(--tertiary-fade);
+    }
+
+    &.background-hover {
+        color: var(--background-hover);
+    }
+}
+
+// ========================================
+// CLASSES DE TIPOGRAFIA COM MODIFICADORES
+// ========================================
+
+.menu-header {
+    @include menu-header();
+    @include color-variants();
+}
+
+.title-page {
+    @include title-page();
+    @include color-variants();
+}
+
+.title-modal {
+    @include title-modal();
+    @include color-variants();
+}
+
+.title-semibold {
+    @include title-semibold();
+    @include color-variants();
+}
+
+.header {
+    @include header();
+    @include color-variants();
+}
+
+.body {
+    @include body();
+    @include color-variants();
+}
+
+.input-label {
+    @include input-label();
+    @include color-variants();
+}
+
+.placeholder {
+    @include placeholder();
+    @include color-variants();
+}
+
+.subheadline {
+    @include subheadline();
+    @include color-variants();
+}
+
+.subtitle-section {
+    @include subtitle-section();
+    @include color-variants();
+}
+
+.tab {
+    @include tab();
+    @include color-variants();
+}
+
+.number-bigger {
+    @include number-bigger();
+    @include color-variants();
+}
+
+.card-small {
+    @include card-small();
+    @include color-variants();
+}
+
+.card-medium-semibold {
+    @include card-medium-semibold();
+    @include color-variants();
+}
+
+.card-medium-regular {
+    @include card-medium-regular();
+    @include color-variants();
 }

@@ -1,9 +1,22 @@
 <div class="clients-container">
+    <h1 class="title-semibold primary-dark mb-48">Clientes</h1>
+
+
+    <div class="search-input">
+
+        <ds-input width="400px" label="Nome Completo" placeholder="Digite o nome, CPF, etc." [(ngModel)]="searchInput"
+            icon="fa-solid fa-search" iconPosition="left" />
+
+        <ds-button label="Novo cliente" icon="fa-solid fa-circle-plus" />
+    </div>
+
     <!-- Header da página -->
     <div class="page-header mb-24">
-        <h2>Gerenciamento de Clientes</h2>
+        <h1>Gerenciamento de Clientes</h1>
         <p class="page-subtitle">Cadastre e gerencie seus clientes de forma eficiente</p>
     </div>
+
+
 
     <form [formGroup]="clientForm" (ngSubmit)="submit()" class="client-form">
 

@@ -1,17 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, forwardRef, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, NgModel } from '@angular/forms';
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MaskDirective } from 'mask-directive';
 import { IconComponent } from '../icon/icon.component';
 
 @Component({
   selector: 'ds-input',
-  imports: [CommonModule, IconComponent, MaskDirective],
+  imports: [CommonModule, IconComponent, MaskDirective, FormsModule],
   standalone: true,
   templateUrl: './input.component.html',
   styleUrls: ['./input.component.scss'],
   providers: [
-    NgModel,
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => InputComponent),
@@ -38,10 +37,14 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
   @Input() width: string = 'fit-content';
 
   // Propriedades da máscara
-  @Input() mask: string = '000.000.000-00';
+  @Input() mask: string = '';
   @Input() dropSpecialCharacters: boolean = false;
 
-  // Eventos
+  // Para ngModel standalone
+  @Input() ngModel: any;
+  @Output() ngModelChange = new EventEmitter<any>();
+
+  // Outros eventos
   @Output() valueChanged = new EventEmitter<string>();
 
   // Propriedades internas
@@ -50,21 +53,26 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
   uniqueId: string = '';
 
   // Callbacks do ControlValueAccessor
-  private onChange = (value: string) => { };
+  private onChange = (value: any) => { };
   private onTouched = () => { };
 
   ngOnInit() {
     this.uniqueId = `ds-input-${Math.random().toString(36).substr(2, 9)}`;
+
+    // Se ngModel foi passado, inicializar value
+    if (this.ngModel !== undefined) {
+      this.value = this.ngModel;
+    }
   }
 
   ngOnDestroy() { }
 
   // Implementação do ControlValueAccessor
-  writeValue(value: string): void {
+  writeValue(value: any): void {
     this.value = value || '';
   }
 
-  registerOnChange(fn: (value: string) => void): void {
+  registerOnChange(fn: (value: any) => void): void {
     this.onChange = fn;
   }
 
@@ -76,22 +84,24 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
     this.disabled = isDisabled;
   }
 
-  // Métodos de evento
-  onInputChange(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    this.value = target.value;
+  // Método principal para mudanças de valor
+  onInputChange(newValue: any): void {
+    this.value = newValue.value;
 
-    // Se não tem máscara ou dropSpecialCharacters é false, propaga o valor normal
-    if (!this.dropSpecialCharacters || !this.mask) {
-      this.onChange(this.value);
-    }
+    // Emitir para ControlValueAccessor (FormControl)
+    this.onChange(newValue);
+
+    // Emitir para ngModel standalone
+    this.ngModelChange.emit(newValue);
+
+    // Emitir evento customizado
+    this.valueChanged.emit(newValue);
   }
 
   onValueChanged(unmaskedValue: any): void {
     // Evento da mask-directive quando dropSpecialCharacters é true
     if (this.dropSpecialCharacters && this.mask) {
-      this.onChange(unmaskedValue);
-      this.valueChanged.emit(unmaskedValue);
+      this.onInputChange(unmaskedValue);
     }
   }
 

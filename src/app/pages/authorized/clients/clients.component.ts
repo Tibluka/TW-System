@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { FormControl, FormGroup, FormsModule, NgModel, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
 import { FormValidator } from '../../../shared/utils/form';
@@ -19,6 +19,7 @@ import { TableCellComponent } from "../../../shared/components/organisms/table/t
     ReactiveFormsModule,
     InputComponent,
     TextareaComponent,
+    FormsModule,
     SelectComponent,
     CardComponent,
     TableComponent,
@@ -26,10 +27,15 @@ import { TableCellComponent } from "../../../shared/components/organisms/table/t
     ButtonComponent,
     TableCellComponent
   ],
+  providers: [
+    NgModel
+  ],
   templateUrl: './clients.component.html',
   styleUrl: './clients.component.scss'
 })
 export class ClientsComponent extends FormValidator {
+
+  searchInput: string = '';
 
   clientForm = new FormGroup({
     name: new FormControl<string>('', Validators.required),

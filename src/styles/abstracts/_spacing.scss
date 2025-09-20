@@ -1,36 +1,6 @@
-.gap-24 {
-    gap: 24px;
-}
-
-.mt-4 {
-    margin-top: 4px;
-}
-
-.mb-0 {
-    margin-bottom: 0 !important;
-}
-
-.mt-24 {
-    margin-top: 24px;
-}
-
-.ml-8 {
-    margin-left: 8px;
-}
-
-.mb-0 {
-    margin-bottom: 0 !important;
-}
-
-.ml-8 {
-    margin-left: 8px;
-}
-
-.position-relative {
-    position: relative;
-}
-
-// === ESPAÇAMENTOS ===
+// ========================================
+// VARIÁVEIS DE ESPAÇAMENTO
+// ========================================
 $spacing-xs: 4px;
 $spacing-sm: 8px;
 $spacing-md: 16px;
@@ -38,7 +8,9 @@ $spacing-lg: 24px;
 $spacing-xl: 32px;
 $spacing-xxl: 48px;
 
-// === MIXINS DE ESPAÇAMENTO ===
+// ========================================
+// MIXINS DE ESPAÇAMENTO
+// ========================================
 @mixin padding($size) {
     padding: $size;
 }
@@ -49,4 +21,294 @@ $spacing-xxl: 48px;
 
 @mixin gap($size) {
     gap: $size;
+}
+
+// Mixins específicos para cada direção
+@mixin margin-top($size) {
+    margin-top: $size;
+}
+
+@mixin margin-bottom($size) {
+    margin-bottom: $size;
+}
+
+@mixin margin-left($size) {
+    margin-left: $size;
+}
+
+@mixin margin-right($size) {
+    margin-right: $size;
+}
+
+@mixin padding-top($size) {
+    padding-top: $size;
+}
+
+@mixin padding-bottom($size) {
+    padding-bottom: $size;
+}
+
+@mixin padding-left($size) {
+    padding-left: $size;
+}
+
+@mixin padding-right($size) {
+    padding-right: $size;
+}
+
+// ========================================
+// GERADOR AUTOMÁTICO DE CLASSES
+// ========================================
+
+// Lista dos tamanhos (números pares de 2 a 48)
+$spacing-sizes: (
+    2,
+    4,
+    6,
+    8,
+    10,
+    12,
+    14,
+    16,
+    18,
+    20,
+    22,
+    24,
+    26,
+    28,
+    30,
+    32,
+    34,
+    36,
+    38,
+    40,
+    42,
+    44,
+    46,
+    48
+);
+
+// ========================================
+// CLASSES DE MARGIN
+// ========================================
+
+// Margin Top
+@each $size in $spacing-sizes {
+    .mt-#{$size} {
+        @include margin-top(#{$size}px);
+    }
+}
+
+// Margin Bottom
+@each $size in $spacing-sizes {
+    .mb-#{$size} {
+        @include margin-bottom(#{$size}px);
+    }
+}
+
+// Margin Left
+@each $size in $spacing-sizes {
+    .ml-#{$size} {
+        @include margin-left(#{$size}px);
+    }
+}
+
+// Margin Right
+@each $size in $spacing-sizes {
+    .mr-#{$size} {
+        @include margin-right(#{$size}px);
+    }
+}
+
+// Margin All (todas as direções)
+@each $size in $spacing-sizes {
+    .m-#{$size} {
+        @include margin(#{$size}px);
+    }
+}
+
+// Margin Horizontal (left + right)
+@each $size in $spacing-sizes {
+    .mx-#{$size} {
+        @include margin-left(#{$size}px);
+        @include margin-right(#{$size}px);
+    }
+}
+
+// Margin Vertical (top + bottom)
+@each $size in $spacing-sizes {
+    .my-#{$size} {
+        @include margin-top(#{$size}px);
+        @include margin-bottom(#{$size}px);
+    }
+}
+
+// ========================================
+// CLASSES DE PADDING
+// ========================================
+
+// Padding Top
+@each $size in $spacing-sizes {
+    .pt-#{$size} {
+        @include padding-top(#{$size}px);
+    }
+}
+
+// Padding Bottom
+@each $size in $spacing-sizes {
+    .pb-#{$size} {
+        @include padding-bottom(#{$size}px);
+    }
+}
+
+// Padding Left
+@each $size in $spacing-sizes {
+    .pl-#{$size} {
+        @include padding-left(#{$size}px);
+    }
+}
+
+// Padding Right
+@each $size in $spacing-sizes {
+    .pr-#{$size} {
+        @include padding-right(#{$size}px);
+    }
+}
+
+// Padding All (todas as direções)
+@each $size in $spacing-sizes {
+    .p-#{$size} {
+        @include padding(#{$size}px);
+    }
+}
+
+// Padding Horizontal (left + right)
+@each $size in $spacing-sizes {
+    .px-#{$size} {
+        @include padding-left(#{$size}px);
+        @include padding-right(#{$size}px);
+    }
+}
+
+// Padding Vertical (top + bottom)
+@each $size in $spacing-sizes {
+    .py-#{$size} {
+        @include padding-top(#{$size}px);
+        @include padding-bottom(#{$size}px);
+    }
+}
+
+// ========================================
+// CLASSES DE GAP
+// ========================================
+
+@each $size in $spacing-sizes {
+    .gap-#{$size} {
+        @include gap(#{$size}px);
+    }
+}
+
+// ========================================
+// CLASSES ESPECIAIS
+// ========================================
+
+// Margin/Padding zero
+.m-0 {
+    margin: 0;
+}
+
+.mt-0 {
+    margin-top: 0;
+}
+
+.mb-0 {
+    margin-bottom: 0;
+}
+
+.ml-0 {
+    margin-left: 0;
+}
+
+.mr-0 {
+    margin-right: 0;
+}
+
+.mx-0 {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.my-0 {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.p-0 {
+    padding: 0;
+}
+
+.pt-0 {
+    padding-top: 0;
+}
+
+.pb-0 {
+    padding-bottom: 0;
+}
+
+.pl-0 {
+    padding-left: 0;
+}
+
+.pr-0 {
+    padding-right: 0;
+}
+
+.px-0 {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.py-0 {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.gap-0 {
+    gap: 0;
+}
+
+// Auto margins (útil para centralização)
+.mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.ml-auto {
+    margin-left: auto;
+}
+
+.mr-auto {
+    margin-right: auto;
+}
+
+// Classe de posição (já existente)
+.position-relative {
+    position: relative;
+}
+
+// Classes importantes (sobrescrever outros estilos)
+.mb-0-important {
+    margin-bottom: 0 !important;
+}
+
+.mt-0-important {
+    margin-top: 0 !important;
+}
+
+.ml-0-important {
+    margin-left: 0 !important;
+}
+
+.mr-0-important {
+    margin-right: 0 !important;
 }

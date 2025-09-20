@@ -1,6 +1,14 @@
 @use '../../../../styles/abstracts/variables' as *;
 @use '../../../../styles/abstracts/spacing' as *;
 
+.clients-container {
+    .search-input {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+}
+
 // Resumo do cliente
 .client-summary {
     display: flex;
