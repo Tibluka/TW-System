@@ -103,7 +103,7 @@
         }
 
         // Ícones - sempre centralizados no container
-        app-icon {
+        ds-icon {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
@@ -121,7 +121,7 @@
         }
 
         // Quando o input está focado, muda a cor do ícone
-        &:focus-within app-icon {
+        &:focus-within ds-icon {
             color: var(--primary-medium);
         }
     }
@@ -146,7 +146,7 @@
 
 // Estados especiais
 .form-group.invalid {
-    app-icon {
+    ds-icon {
         color: var(--tertiary);
     }
 }

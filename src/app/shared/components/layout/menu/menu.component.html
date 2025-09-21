@@ -4,7 +4,7 @@
         [attr.aria-expanded]="!menuService.isCollapsed()">
 
         <header class="menu-header">
-            <app-icon (click)="toggleMenu()" color="white" fontSize="32px" icon="fa-solid fa-bars"
+            <ds-icon (click)="toggleMenu()" color="white" fontSize="32px" icon="fa-solid fa-bars"
                 [attr.aria-hidden]="true" />
             <h4>Menu</h4>
         </header>
@@ -15,7 +15,7 @@
                 <button type="button" class="menu-item-button" (click)="onMenuItemClick(menu, i)"
                     [attr.aria-current]="isItemActive(menu) ? 'page' : null" [attr.aria-label]="menu.label"
                     [disabled]="menu.disabled || menuService.isAnimating()" role="menuitem">
-                    <app-icon color="white" fontSize="32px" cursor="pointer" [icon]="menu.icon"
+                    <ds-icon color="white" fontSize="32px" cursor="pointer" [icon]="menu.icon"
                         [attr.aria-hidden]="true" />
                     <span class="mb-0" [innerText]="menu.label"></span>
                 </button>

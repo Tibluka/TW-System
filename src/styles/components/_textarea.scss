@@ -118,7 +118,7 @@
         }
 
         // Ícones - posicionados no topo para textarea
-        app-icon {
+        ds-icon {
             position: absolute;
             top: 14px; // Posição fixa no topo (12px padding + 2px ajuste)
             z-index: 1;
@@ -135,7 +135,7 @@
         }
 
         // Quando o textarea está focado, muda a cor do ícone
-        &:focus-within app-icon {
+        &:focus-within ds-icon {
             color: var(--primary-medium);
         }
     }
@@ -175,7 +175,7 @@
 
 // Estados especiais
 .form-group.invalid {
-    app-icon {
+    ds-icon {
         color: var(--tertiary);
     }
 
@@ -196,7 +196,7 @@
             min-height: 60px;
         }
 
-        app-icon {
+        ds-icon {
             top: 12px; // Ajuste para mobile
         }
     }

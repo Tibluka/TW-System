@@ -2,7 +2,7 @@ import { NgClass, NgStyle } from '@angular/common';
 import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'app-icon',
+  selector: 'ds-icon',
   imports: [NgStyle, NgClass],
   templateUrl: './icon.component.html',
   styleUrl: './icon.component.scss'

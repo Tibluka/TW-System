@@ -17,11 +17,11 @@
 
         <!-- Conteúdo da área de upload -->
         <div class="upload-content">
-            <app-icon *ngIf="!isProcessing" icon="fa-solid fa-cloud-arrow-up" fontSize="48px" color="label">
-            </app-icon>
+            <ds-icon *ngIf="!isProcessing" icon="fa-solid fa-cloud-arrow-up" fontSize="48px" color="label">
+            </ds-icon>
 
-            <app-icon *ngIf="isProcessing" icon="fa-solid fa-spinner fa-spin" fontSize="32px" color="primary-medium">
-            </app-icon>
+            <ds-icon *ngIf="isProcessing" icon="fa-solid fa-spinner fa-spin" fontSize="32px" color="primary-medium">
+            </ds-icon>
 
             <h3 class="upload-title" *ngIf="!isProcessing">{{ placeholder }}</h3>
             <p class="upload-subtitle" *ngIf="isProcessing">Processando arquivos...</p>
@@ -36,7 +36,7 @@
             <h4>Arquivos carregados ({{ uploadedFiles.length }})</h4>
             <button type="button" class="clear-all-btn" (click)="clearAllFiles()" *ngIf="uploadedFiles.length > 1"
                 [disabled]="disabled">
-                <app-icon icon="fa-solid fa-trash" fontSize="14px" color="tertiary"></app-icon>
+                <ds-icon icon="fa-solid fa-trash" fontSize="14px" color="tertiary"></ds-icon>
                 Limpar tudo
             </button>
         </div>
@@ -50,7 +50,7 @@
                     <!-- Botão de remover -->
                     <button type="button" class="remove-btn" (click)="removeFile(file)" [disabled]="disabled"
                         title="Remover arquivo">
-                        <app-icon icon="fa-solid fa-times" fontSize="14px" color="white"></app-icon>
+                        <ds-icon icon="fa-solid fa-times" fontSize="14px" color="white"></ds-icon>
                     </button>
                 </div>
 

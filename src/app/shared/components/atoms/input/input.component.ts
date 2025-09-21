@@ -1,4 +1,4 @@
-// input.component.ts - CORREÇÃO SIMPLES QUE MANTÉM NGMODEL FUNCIONANDO
+// input.component.ts - CORREÇÃO FINAL DEFINITIVA
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, forwardRef, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -89,42 +89,44 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
     this.disabled = isDisabled;
   }
 
-  // MANTÉM O MÉTODO ORIGINAL
+  // CORREÇÃO: Tratamento principal do input
   onInputChange(target: any): void {
     if (!target) return;
 
-    const newValue = target.value || '';
-    this.value = newValue;
+    let newValue = target.value || '';
 
-    // Para formulários reativos
+    // Se tem máscara E dropSpecialCharacters ativo, processar manualmente
+    if (this.mask && this.dropSpecialCharacters) {
+      // Extrair apenas números/letras do valor formatado
+      const cleanValue = newValue.replace(/[^a-zA-Z0-9]/g, '');
+      console.log('🧹 Limpando manualmente:', newValue, '→', cleanValue);
+
+      // Usar valor limpo
+      this.value = cleanValue;
+      newValue = cleanValue;
+    } else {
+      // Comportamento normal
+      this.value = newValue;
+    }
+
+    // Notificar todos os sistemas
     this.onChange(newValue);
-
-    // Para ngModel standalone  
     this.ngModelChange.emit(newValue);
-
-    // Evento customizado
     this.valueChanged.emit(newValue);
   }
 
-  // NOVO: Tratamento específico da máscara
+  // BACKUP: Caso o evento valueChange funcione
   onMaskValueChange(unmaskedValue: any): void {
-    // Só processa se dropSpecialCharacters estiver ativo
+    // Este evento só é chamado pela biblioteca quando dropSpecialCharacters=true
     if (this.dropSpecialCharacters && this.mask) {
-      const cleanValue = unmaskedValue !== null && unmaskedValue !== undefined
-        ? String(unmaskedValue)
-        : '';
+      const cleanValue = String(unmaskedValue || '');
+      console.log('📡 Evento da biblioteca:', cleanValue);
 
-      console.log('🎯 Valor sem máscara:', cleanValue);
-
-      // Atualizar o valor interno
       this.value = cleanValue;
-
-      // Notificar todos os sistemas com valor limpo
       this.onChange(cleanValue);
       this.ngModelChange.emit(cleanValue);
       this.valueChanged.emit(cleanValue);
     }
-    // Se dropSpecialCharacters for false, deixa o onInputChange tratar normalmente
   }
 
   onInputFocus(): void {

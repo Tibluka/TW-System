@@ -11,8 +11,8 @@
     <div class="select-container" [class.has-icon]="icon">
 
         <!-- Ícone -->
-        <app-icon *ngIf="icon" [icon]="icon" fontSize="18px" color="placeholder" [class]="'icon-' + iconPosition">
-        </app-icon>
+        <ds-icon *ngIf="icon" [icon]="icon" fontSize="18px" color="placeholder" [class]="'icon-' + iconPosition">
+        </ds-icon>
 
         <!-- Campo Select -->
         <div [id]="uniqueId" [class]="selectClasses" [attr.tabindex]="disabled ? -1 : 0" (click)="toggleDropdown()"
@@ -48,9 +48,9 @@
                 </button>
 
                 <!-- Seta do dropdown -->
-                <app-icon icon="fa-solid fa-chevron-down" fontSize="12px" color="placeholder" class="dropdown-arrow"
+                <ds-icon icon="fa-solid fa-chevron-down" fontSize="12px" color="placeholder" class="dropdown-arrow"
                     [class.rotated]="isOpen">
-                </app-icon>
+                </ds-icon>
             </div>
         </div>
 
@@ -61,8 +61,8 @@
             <div *ngIf="searchable" class="search-container">
                 <input type="text" class="search-input" placeholder="Buscar..." [(ngModel)]="searchTerm"
                     (input)="onSearchChange($event)" (click)="$event.stopPropagation()">
-                <app-icon icon="fa-solid fa-search" fontSize="14px" color="placeholder" class="search-icon">
-                </app-icon>
+                <ds-icon icon="fa-solid fa-search" fontSize="14px" color="placeholder" class="search-icon">
+                </ds-icon>
             </div>
 
             <!-- Lista de opções -->
@@ -70,8 +70,8 @@
 
                 <!-- Loading -->
                 <div *ngIf="loading" class="option-item loading">
-                    <app-icon icon="fa-solid fa-spinner" fontSize="16px" color="placeholder" class="spinning">
-                    </app-icon>
+                    <ds-icon icon="fa-solid fa-spinner" fontSize="16px" color="placeholder" class="spinning">
+                    </ds-icon>
                     {{ loadingText }}
                 </div>
 
@@ -95,9 +95,9 @@
                     </span>
 
                     <!-- Ícone de selecionado (seleção única) -->
-                    <app-icon *ngIf="!multiple && isOptionSelected(option)" icon="fa-solid fa-check" fontSize="14px"
+                    <ds-icon *ngIf="!multiple && isOptionSelected(option)" icon="fa-solid fa-check" fontSize="14px"
                         color="primary-medium" class="selected-icon">
-                    </app-icon>
+                    </ds-icon>
                 </div>
             </div>
         </div>

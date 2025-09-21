@@ -9,8 +9,8 @@
     <!-- Container do Textarea com Ícone -->
     <div class="textarea-container" [class.has-icon]="icon">
         <!-- Ícone -->
-        <app-icon *ngIf="icon" [icon]="icon" fontSize="24px" color="placeholder" [class]="'icon-' + iconPosition">
-        </app-icon>
+        <ds-icon *ngIf="icon" [icon]="icon" fontSize="24px" color="placeholder" [class]="'icon-' + iconPosition">
+        </ds-icon>
 
         <!-- Textarea Field -->
         <textarea [id]="uniqueId" [class]="textareaClasses" [placeholder]="placeholder" [value]="value"

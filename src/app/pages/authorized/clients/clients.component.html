@@ -2,13 +2,93 @@
     <h1 class="title-semibold primary-dark mb-48">Clientes</h1>
 
     <div class="search-input">
-        <ds-input width="400px" label="Buscar" mask="000.000.000-00" [dropSpecialCharacters]="false"
-            placeholder="Digite o nome, CPF, etc." [(ngModel)]="searchInput" icon="fa-solid fa-search"
-            iconPosition="left" />
-
+        <ds-input width="400px" label="Buscar" placeholder="Digite o nome, CPF, etc." [(ngModel)]="searchInput"
+            icon="fa-solid fa-search" iconPosition="left" />
         <ds-button label="Novo cliente" icon="fa-solid fa-circle-plus" />
     </div>
 
-    {{searchInput}}
+    <div class="results mt-32">
+        <ds-table *ngIf="">
+            <!-- Cabeçalho da tabela -->
+            <ds-table-row [isHeader]="true">
+                <ds-table-cell [isHeader]="true" align="left">Sigla</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="left">Razão Social</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="left">CNPJ</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="left">Telefone</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="left">Email</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="center">Preço por Metro</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="left">Responsável</ds-table-cell>
+            </ds-table-row>
+
+            <!-- Dados dos clientes -->
+            <ds-table-row *ngFor="let client of clients" [clickable]="true" [data]="client"
+                (rowClick)="onClienteClick($event)">
+
+                <!-- Sigla (Acronym) -->
+                <ds-table-cell align="left">
+                    <span class="body primary-dark">{{ client.acronym }}</span>
+                </ds-table-cell>
+
+                <!-- Razão Social -->
+                <ds-table-cell align="left">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <strong class="body primary-dark">{{ client.companyName }}</strong>
+                        </div>
+                    </div>
+                </ds-table-cell>
+
+                <!-- CNPJ -->
+                <ds-table-cell align="left">
+                    <span class="body label">{{ client.cnpj | libPipe: cnpjMask }}</span>
+                </ds-table-cell>
+
+                <!-- Telefone -->
+                <ds-table-cell align="left">
+                    <a [href]="'tel:' + client.contact.phone" class="body secondary-medium">
+                        {{ client.contact.phone | libPipe: phoneMask }}
+                    </a>
+                </ds-table-cell>
+
+                <!-- Email -->
+                <ds-table-cell align="left">
+                    <a [href]="'mailto:' + client.contact.email" class="body secondary-medium">
+                        {{ client.contact.email }}
+                    </a>
+                </ds-table-cell>
+
+                <!-- Preço por Metro -->
+                <ds-table-cell align="center">
+                    <span class="body primary-dark">
+                        {{ client.values.valuePerMeter | currency:'BRL':'symbol':'1.2-2' }}
+                    </span>
+                </ds-table-cell>
+
+                <!-- Responsável -->
+                <ds-table-cell align="left">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <div class="body primary-dark">{{ client.contact.responsibleName }}</div>
+                            <div class="placeholder" style="font-size: 12px;">
+                                {{ client.contact.email }}
+                            </div>
+                        </div>
+                    </div>
+                </ds-table-cell>
+            </ds-table-row>
+
+            <!-- Estado vazio -->
+            <ds-table-row *ngIf="!clients || clients.length === 0">
+                <ds-table-cell colspan="7" align="center">
+                    <div class="py-32">
+                        <ds-icon class="mb-16 label" icon="fa-solid fa-building" size="24px"></ds-icon>
+                        <div class="body label">Nenhum cliente encontrado</div>
+                        <div class="placeholder mt-8">Cadastre o primeiro cliente para começar</div>
+                    </div>
+                </ds-table-cell>
+            </ds-table-row>
+        </ds-table>
+    </div>
+
 
 </div>

@@ -89,7 +89,7 @@
             white-space: nowrap;
         }
 
-        app-icon {
+        ds-icon {
             flex-shrink: 0;
             transition: all 0.3s ease;
             cursor: pointer;
@@ -141,7 +141,7 @@
                     overflow: hidden;
                 }
 
-                app-icon {
+                ds-icon {
                     flex-shrink: 0;
                     transition: all 0.3s ease;
                 }
@@ -241,7 +241,7 @@
     .menu-container,
     .menu-item-button,
     .menu-header h4,
-    .menu-header app-icon {
+    .menu-header ds-icon {
         transition: none;
     }
 
@@ -253,7 +253,7 @@
         }
     }
 
-    .menu-header app-icon {
+    .menu-header ds-icon {
 
         &:hover,
         &:active {
