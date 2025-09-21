@@ -1,12 +1,9 @@
 // src/app/shared/services/client/client.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { ClientFilters, ClientListResponse, ClientResponse, CreateClientRequest, UpdateClientRequest } from '../../../models/clients/clients';
-import { ApiResponse } from '../development/development.service';
-
 
 @Injectable({
     providedIn: 'root'
@@ -17,7 +14,7 @@ export class ClientService {
     constructor(private http: HttpClient) { }
 
     // ============================================
-    // CRUD BÁSICO
+    // CRUD BÁSICO - SEM TRATAMENTO DE ERRO
     // ============================================
 
     /**
@@ -25,7 +22,6 @@ export class ClientService {
      * GET /api/v1/clients
      */
     getClients(filters: ClientFilters = {}): Observable<ClientListResponse> {
-        debugger
         let params = new HttpParams();
 
         // Adiciona parâmetros apenas se existirem
@@ -36,8 +32,8 @@ export class ClientService {
             }
         });
 
-        return this.http.get<ClientListResponse>(this.apiUrl, { params })
-            .pipe(catchError(this.handleError));
+        // ✨ Não há mais .pipe(catchError) - o interceptor cuida dos erros!
+        return this.http.get<ClientListResponse>(this.apiUrl, { params });
     }
 
     /**
@@ -45,8 +41,7 @@ export class ClientService {
      * GET /api/v1/clients/:id
      */
     getClientById(id: string): Observable<ClientResponse> {
-        return this.http.get<ClientResponse>(`${this.apiUrl}/${id}`)
-            .pipe(catchError(this.handleError));
+        return this.http.get<ClientResponse>(`${this.apiUrl}/${id}`);
     }
 
     /**
@@ -54,8 +49,7 @@ export class ClientService {
      * POST /api/v1/clients
      */
     createClient(clientData: CreateClientRequest): Observable<ClientResponse> {
-        return this.http.post<ClientResponse>(this.apiUrl, clientData)
-            .pipe(catchError(this.handleError));
+        return this.http.post<ClientResponse>(this.apiUrl, clientData);
     }
 
     /**
@@ -63,8 +57,7 @@ export class ClientService {
      * PUT /api/v1/clients/:id
      */
     updateClient(id: string, clientData: UpdateClientRequest): Observable<ClientResponse> {
-        return this.http.put<ClientResponse>(`${this.apiUrl}/${id}`, clientData)
-            .pipe(catchError(this.handleError));
+        return this.http.put<ClientResponse>(`${this.apiUrl}/${id}`, clientData);
     }
 
     /**
@@ -72,52 +65,51 @@ export class ClientService {
      * DELETE /api/v1/clients/:id
      */
     deleteClient(id: string): Observable<any> {
-        return this.http.delete<any>(`${this.apiUrl}/${id}`)
-            .pipe(catchError(this.handleError));
+        return this.http.delete<any>(`${this.apiUrl}/${id}`);
     }
 
     // ============================================
-    // TRATAMENTO DE ERROS
+    // MÉTODOS AUXILIARES (se necessário)
     // ============================================
 
-    private handleError(error: HttpErrorResponse): Observable<never> {
-        let userMessage = 'Algo deu errado; tente novamente mais tarde.';
+    /**
+     * Busca clientes por texto (helper method)
+     */
+    searchClients(searchTerm: string, page: number = 1): Observable<ClientListResponse> {
+        const filters: ClientFilters = {
+            search: searchTerm.trim(),
+            page,
+            limit: 10,
+            active: true
+        };
 
-        if (error.error instanceof ErrorEvent) {
-            // Erro do lado do cliente
-            userMessage = 'Problema de conexão. Verifique sua internet.';
-        } else {
-            // Erro do lado do servidor
-            switch (error.status) {
-                case 400:
-                    userMessage = error.error?.message || 'Dados inválidos fornecidos.';
-                    break;
-                case 401:
-                    userMessage = 'Você não está autorizado. Faça login novamente.';
-                    break;
-                case 403:
-                    userMessage = 'Você não tem permissão para esta operação.';
-                    break;
-                case 404:
-                    userMessage = 'Cliente não encontrado.';
-                    break;
-                case 422:
-                    userMessage = error.error?.message || 'Dados fornecidos são inválidos.';
-                    break;
-                case 500:
-                    userMessage = 'Erro interno do servidor. Tente novamente mais tarde.';
-                    break;
-                default:
-                    userMessage = error.error?.message || userMessage;
-            }
-        }
-
-        console.error('Erro no ClientService:', error);
-
-        return throwError(() => ({
-            message: userMessage,
-            originalError: error,
-            status: error.status
-        }));
+        return this.getClients(filters);
     }
+
+    /**
+     * Lista apenas clientes ativos
+     */
+    getActiveClients(page: number = 1): Observable<ClientListResponse> {
+        const filters: ClientFilters = {
+            page,
+            limit: 10,
+            active: true
+        };
+
+        return this.getClients(filters);
+    }
+
+    /**
+     * Lista apenas clientes inativos
+     */
+    getInactiveClients(page: number = 1): Observable<ClientListResponse> {
+        const filters: ClientFilters = {
+            page,
+            limit: 10,
+            active: false
+        };
+
+        return this.getClients(filters);
+    }
+
 }

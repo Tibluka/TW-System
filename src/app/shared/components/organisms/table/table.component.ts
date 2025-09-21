@@ -11,8 +11,9 @@ import { TableRowComponent } from './table-row/table-row.component';
 export class TableComponent implements AfterContentInit {
   // Inputs opcionais para modo compatível
   @Input() showPagination: boolean = false;
-  @Input() pageSize: number = 10;
+  @Input() pageSize?: number = 10;
   @Input() currentPage: number = 1;
+  @Input() totalPages?: number = 1;
   @Input() emptyMessage: string = 'Nenhum dado encontrado';
 
   // Outputs
@@ -21,18 +22,16 @@ export class TableComponent implements AfterContentInit {
   // ContentChildren para detectar rows
   @ContentChildren(TableRowComponent) rows!: QueryList<TableRowComponent>;
 
-  // Propriedades internas para paginação
-  totalPages: number = 1;
 
   ngAfterContentInit() {
     this.updatePagination();
   }
 
   private updatePagination() {
-    if (this.showPagination && this.rows) {
+    if (this.showPagination && this.rows && this.pageSize) {
       // Filtra apenas as rows que não são header
-      const dataRows = this.rows.filter(row => !row.isHeader);
-      this.totalPages = Math.ceil(dataRows.length / this.pageSize);
+      //const dataRows = this.rows.filter(row => !row.isHeader);
+      //this.totalPages = Math.ceil(dataRows.length / this.pageSize);
     }
   }
 
@@ -50,7 +49,7 @@ export class TableComponent implements AfterContentInit {
    * Navega para a próxima página
    */
   nextPage() {
-    if (this.currentPage < this.totalPages) {
+    if (this.totalPages && this.currentPage < this.totalPages) {
       this.currentPage++;
       this.pageChanged.emit(this.currentPage);
     }

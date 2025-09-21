@@ -13,7 +13,7 @@ export interface User {
 export interface LoginResponse {
   success: boolean;
   data: {
-    token: string;
+    accessToken: string;
     refreshToken: string;
     user: User;
   };
@@ -44,7 +44,7 @@ export class AuthService {
     }).pipe(
       tap(response => {
         if (response.success) {
-          this.setAuthData(response.data.token, response.data.user);
+          this.setAuthData(response.data.accessToken, response.data.user);
         }
       })
     );
@@ -82,6 +82,7 @@ export class AuthService {
    * Salva dados de autenticação
    */
   private setAuthData(token: string, user: User): void {
+
     localStorage.setItem(this.TOKEN_KEY, token);
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));
 

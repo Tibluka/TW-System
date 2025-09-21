@@ -1,9 +1,8 @@
 <table class="ds-table">
     <!-- Conteúdo dinâmico projetado -->
     <ng-content></ng-content>
-
     <!-- Estado vazio (se necessário) -->
-    <tbody *ngIf="rows?.length === 0">
+    <tbody *ngIf="totalPages === 0">
         <tr class="empty-state">
             <td colspan="100%">
                 {{ emptyMessage }}
@@ -11,9 +10,8 @@
         </tr>
     </tbody>
 </table>
-
 <!-- Paginação (se habilitada) -->
-<div *ngIf="showPagination && totalPages > 1" class="pagination">
+<div *ngIf="showPagination && totalPages && totalPages > 1" class="pagination">
     <button (click)="previousPage()" [disabled]="currentPage === 1">
         Anterior
     </button>
