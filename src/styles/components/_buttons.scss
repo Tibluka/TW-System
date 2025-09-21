@@ -54,7 +54,8 @@
     }
 
     &.ghost {
-        background-color: var(--white);
+        background-color: transparent;
+        border: none;
         color: var(--tertiary);
 
         &:hover {

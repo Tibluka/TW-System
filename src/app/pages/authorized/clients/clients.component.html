@@ -7,7 +7,7 @@
         <ds-input width="400px" label="Buscar" placeholder="Digite o nome, CNPJ, etc." [(ngModel)]="searchInput"
             (ngModelChange)="onSearchChange()" icon="fa-solid fa-search" iconPosition="left" />
 
-        <ds-button label="Novo cliente" icon="fa-solid fa-circle-plus" (onClickEmitter)="click()" />
+        <ds-button label="Novo cliente" icon="fa-solid fa-circle-plus" (onClickEmitter)="createClient()" />
     </div>
 
     <!-- ✨ MENSAGEM DE ERRO (se houver) -->
@@ -104,3 +104,8 @@
 
     </div>
 </div>
+
+
+<ds-modal modalId="client-modal" (modalClosed)="onModalClosed($event)">
+    <app-client-modal></app-client-modal>
+</ds-modal>

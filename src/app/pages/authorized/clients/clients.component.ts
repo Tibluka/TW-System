@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { FormsModule, NgModel, ReactiveFormsModule } from "@angular/forms";
 import { MaskPipe } from 'mask-directive';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
@@ -15,6 +15,9 @@ import { TableComponent } from '../../../shared/components/organisms/table/table
 import { FormValidator } from '../../../shared/utils/form';
 import { Client, PaginationInfo, ClientFilters, ClientListResponse } from '../../../models/clients/clients';
 import { ClientService } from '../../../shared/services/clients/clients.service';
+import { ModalService } from '../../../shared/services/modal/modal.service';
+import { ModalComponent } from "../../../shared/components/organisms/modal/modal.component";
+import { ClientModalComponent } from "./client-modal/client-modal.component";
 
 @Component({
   selector: 'app-clients',
@@ -29,7 +32,9 @@ import { ClientService } from '../../../shared/services/clients/clients.service'
     TableCellComponent,
     IconComponent,
     SpinnerComponent,
-    MaskPipe
+    MaskPipe,
+    ModalComponent,
+    ClientModalComponent
   ],
   providers: [NgModel],
   templateUrl: './clients.component.html',
@@ -37,9 +42,8 @@ import { ClientService } from '../../../shared/services/clients/clients.service'
 })
 export class ClientsComponent extends FormValidator implements OnInit, OnDestroy {
 
-  // ============================================
-  // PROPRIEDADES
-  // ============================================
+  private clientService = inject(ClientService);
+  private modalService = inject(ModalService);
 
   searchInput: string = '';
 
@@ -71,7 +75,7 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
   // CONSTRUCTOR E LIFECYCLE
   // ============================================
 
-  constructor(private clientService: ClientService) {
+  constructor() {
     super();
     this.setupSearchDebounce();
   }
@@ -149,8 +153,19 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
    */
   onClienteClick(cliente: Client): void {
     console.log('👆 Cliente selecionado para edição:', cliente);
+    this.modalService.open({
+      id: 'client-modal',
+      closeOnBackdropClick: true,
+      closeOnEscapeKey: true,
+      size: 'lg',
+      title: "Editar modal"
+    })
     // TODO: Implementar navegação para página de edição
     // this.router.navigate(['/clients/edit', cliente._id]);
+  }
+
+  onModalClosed(result: any) {
+    console.log("Modal fechado:", result);
   }
 
   /**
@@ -164,13 +179,10 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
         .subscribe({
           next: (response) => {
             if (response.success) {
-              console.log('✅ Cliente deletado com sucesso');
-              this.showSuccessMessage(`Cliente "${clientName}" foi desativado.`);
               this.loadClients(); // Recarrega a lista
             }
           },
           error: (error) => {
-            console.error('❌ Erro ao deletar cliente:', error);
             this.showErrorMessage(error.message || 'Erro ao deletar cliente.');
           }
         });
@@ -266,10 +278,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
     this.errorMessage = '';
   }
 
-  // ============================================
-  // GETTERS AUXILIARES
-  // ============================================
-
   get hasClients(): boolean {
     return this.clients && this.clients.length > 0;
   }
@@ -294,15 +302,8 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
     return this.searchInput.length > 0;
   }
 
-  // ============================================
-  // MÉTODOS MANTIDOS DO SEU CÓDIGO ORIGINAL
-  // ============================================
+  createClient() {
 
-  click() {
-    console.log('Button clicked!');
   }
 
-  submit() {
-    console.log('Form submitted!');
-  }
 }

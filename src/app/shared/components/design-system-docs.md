@@ -54,10 +54,10 @@ interface ModalConfig {
 <!-- Template -->
 <ds-button label="Abrir Modal" (onClickEmitter)="openModal()" />
 
-<app-modal modalId="example-modal" (modalClosed)="onModalClosed($event)">
+<ds-modal modalId="example-modal" (modalClosed)="onModalClosed($event)">
   <h2>Conteúdo do Modal</h2>
   <p>Aqui vai o conteúdo do seu modal...</p>
-</app-modal>
+</ds-modal>
 ```
 
 ```typescript

@@ -6,7 +6,7 @@ import { IconComponent } from '../../atoms/icon/icon.component';
 import { modalAnimations } from '../../../animations/fade-animation';
 
 @Component({
-  selector: 'app-modal',
+  selector: 'ds-modal',
   standalone: true,
   imports: [CommonModule, IconComponent],
   templateUrl: './modal.component.html',

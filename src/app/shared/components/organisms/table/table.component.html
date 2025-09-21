@@ -12,15 +12,12 @@
 </table>
 <!-- Paginação (se habilitada) -->
 <div *ngIf="showPagination && totalPages && totalPages > 1" class="pagination">
-    <button (click)="previousPage()" [disabled]="currentPage === 1">
-        Anterior
-    </button>
+    <ds-button label="Anterior" icon="fa-solid fa-arrow-left" [disabled]="currentPage === 1"
+        (onClickEmitter)="previousPage()" variant="ghost" />
 
-    <span class="page-info">
-        Página {{ currentPage }} de {{ totalPages }}
-    </span>
+    <p class="body primary">Página {{ currentPage }} de {{ totalPages }}</p>
 
-    <button (click)="nextPage()" [disabled]="currentPage === totalPages">
-        Próxima
-    </button>
+    <ds-button label="Próxima" icon="fa-solid fa-arrow-right" [disabled]="currentPage === totalPages"
+        (onClickEmitter)="nextPage()" variant="ghost" />
+
 </div>

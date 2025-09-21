@@ -1,10 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { AfterContentInit, Component, ContentChildren, EventEmitter, Input, Output, QueryList } from '@angular/core';
 import { TableRowComponent } from './table-row/table-row.component';
+import { ButtonComponent } from "../../atoms/button/button.component";
 
 @Component({
   selector: 'ds-table',
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    ButtonComponent
+  ],
   templateUrl: './table.component.html',
   styleUrl: './table.component.scss'
 })
