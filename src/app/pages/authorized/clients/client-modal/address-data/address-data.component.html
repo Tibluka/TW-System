@@ -1,1 +1,60 @@
-<p>address-data works!</p>
+<!-- address-data.component.html -->
+<form [formGroup]="parentForm" class="address-form">
+
+    <!-- CEP -->
+    <div class="cep-field">
+        <ds-input label="CEP" placeholder="12345-678" formControlName="zipcode" [fullWidth]="true" [required]="true"
+            [invalid]="isFieldInvalid('zipcode')" [errorMessage]="getErrorMessage('zipcode')" mask="00000-000"
+            icon="fa-solid fa-map-pin" iconPosition="left" (blur)="onCepBlur()">
+        </ds-input>
+    </div>
+
+    <!-- Logradouro -->
+    <div class="street-field">
+        <ds-input label="Logradouro" placeholder="Rua das Flores, Avenida Brasil..." formControlName="street"
+            [fullWidth]="true" [required]="true" [invalid]="isFieldInvalid('street')"
+            [errorMessage]="getErrorMessage('street')" icon="fa-solid fa-road" iconPosition="left">
+        </ds-input>
+    </div>
+
+    <!-- Número -->
+    <div class="number-field">
+        <ds-input label="Número" placeholder="123" formControlName="number" [fullWidth]="true" [required]="true"
+            [invalid]="isFieldInvalid('number')" [errorMessage]="getErrorMessage('number')" icon="fa-solid fa-hashtag"
+            iconPosition="left">
+        </ds-input>
+    </div>
+
+    <!-- Bairro -->
+    <div class="neighborhood-field">
+        <ds-input label="Bairro" placeholder="Centro, Jardim América..." formControlName="neighborhood"
+            [fullWidth]="true" [required]="true" [invalid]="isFieldInvalid('neighborhood')"
+            [errorMessage]="getErrorMessage('neighborhood')" icon="fa-solid fa-location-dot" iconPosition="left">
+        </ds-input>
+    </div>
+
+    <!-- Complemento -->
+    <div class="complement-field">
+        <ds-input label="Complemento" placeholder="Apt 12, Sala 5... (opcional)" formControlName="complement"
+            [fullWidth]="true" [invalid]="isFieldInvalid('complement')" [errorMessage]="getErrorMessage('complement')"
+            icon="fa-solid fa-plus" iconPosition="left">
+        </ds-input>
+    </div>
+
+    <!-- Cidade -->
+    <div class="city-field">
+        <ds-input label="Cidade" placeholder="São Paulo, Rio de Janeiro..." formControlName="city" [fullWidth]="true"
+            [required]="true" [invalid]="isFieldInvalid('city')" [errorMessage]="getErrorMessage('city')"
+            icon="fa-solid fa-city" iconPosition="left">
+        </ds-input>
+    </div>
+
+    <!-- Estado -->
+    <div class="state-field">
+        <ds-input label="Estado" placeholder="SP, RJ, MG..." formControlName="state" [fullWidth]="true"
+            [required]="true" [invalid]="isFieldInvalid('state')" [errorMessage]="getErrorMessage('state')"
+            [maxlength]="2" icon="fa-solid fa-flag" iconPosition="left">
+        </ds-input>
+    </div>
+
+</form>

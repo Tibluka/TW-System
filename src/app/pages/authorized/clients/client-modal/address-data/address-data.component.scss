@@ -1,0 +1,159 @@
+// address-data.component.scss
+@use "abstracts/variables" as *;
+@use "abstracts/spacing" as *;
+
+.address-form {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr; // 3 colunas: 33% 33% 33% (mas CEP+Logradouro span)
+    grid-template-areas:
+        "cep street street"
+        "number neighborhood complement"
+        "city city state";
+    gap: $spacing-md; // 16px do design system
+
+    // ============================================
+    // GRID AREAS
+    // ============================================
+    .cep-field {
+        grid-area: cep;
+    }
+
+    .street-field {
+        grid-area: street;
+    }
+
+    .number-field {
+        grid-area: number;
+    }
+
+    .neighborhood-field {
+        grid-area: neighborhood;
+    }
+
+    .complement-field {
+        grid-area: complement;
+    }
+
+    .city-field {
+        grid-area: city;
+    }
+
+    .state-field {
+        grid-area: state;
+    }
+
+    // ============================================
+    // RESPONSIVE - TABLET (768px - 992px)
+    // ============================================
+    @media (max-width: 992px) and (min-width: 769px) {
+        grid-template-columns: 1fr 2fr; // Mantém CEP + Logradouro
+        grid-template-areas:
+            "cep street"
+            "number neighborhood"
+            "complement complement"
+            "city state";
+        gap: $spacing-sm; // 8px em tablets
+    }
+
+    // ============================================
+    // RESPONSIVE - MOBILE (até 768px)  
+    // ============================================
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr; // Uma coluna só
+        grid-template-areas:
+            "cep"
+            "street"
+            "number"
+            "neighborhood"
+            "complement"
+            "city"
+            "state";
+        gap: $spacing-sm; // 8px em mobile
+    }
+
+    // Garantir que os inputs preencham toda a largura disponível
+    ds-input {
+        display: block;
+        width: 100%;
+    }
+
+    // ============================================
+    // ÍCONES COLORIDOS POR TIPO DE CAMPO
+    // ============================================
+    ds-input {
+        &[icon="fa-solid fa-map-pin"] {
+
+            // CEP
+            ::ng-deep .icon-left {
+                color: var(--primary-medium);
+            }
+        }
+
+        &[icon="fa-solid fa-road"] {
+
+            // Logradouro
+            ::ng-deep .icon-left {
+                color: var(--secondary-medium);
+            }
+        }
+
+        &[icon="fa-solid fa-hashtag"] {
+
+            // Número
+            ::ng-deep .icon-left {
+                color: var(--tertiary);
+            }
+        }
+
+        &[icon="fa-solid fa-location-dot"] {
+
+            // Bairro
+            ::ng-deep .icon-left {
+                color: var(--primary-dark);
+            }
+        }
+
+        &[icon="fa-solid fa-plus"] {
+
+            // Complemento
+            ::ng-deep .icon-left {
+                color: var(--label);
+            }
+        }
+
+        &[icon="fa-solid fa-city"] {
+
+            // Cidade
+            ::ng-deep .icon-left {
+                color: var(--secondary);
+            }
+        }
+
+        &[icon="fa-solid fa-flag"] {
+
+            // Estado
+            ::ng-deep .icon-left {
+                color: var(--tertiary-medium);
+            }
+        }
+    }
+
+    // ============================================
+    // MELHORIAS VISUAIS
+    // ============================================
+
+    // Campo de estado - transformar em maiúscula
+    .state-field ds-input {
+        ::ng-deep input {
+            text-transform: uppercase;
+        }
+    }
+
+    // Campo de complemento com estilo diferenciado (opcional)
+    .complement-field ds-input {
+        ::ng-deep .ds-label {
+            color: var(--label);
+            font-style: italic;
+        }
+    }
+}

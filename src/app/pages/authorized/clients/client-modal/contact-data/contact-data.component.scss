@@ -1,0 +1,66 @@
+// contact-data.component.scss
+@use "abstracts/variables" as *;
+@use "abstracts/spacing" as *;
+
+.contact-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr; // 2 colunas iguais (50% cada)
+    grid-template-areas:
+        "responsible-name email" // Nome (50%) + Email (50%)
+        "phone ."; // Telefone (50%) + espaço vazio
+    gap: $spacing-md; // 16px do design system
+
+    // ============================================
+    // GRID AREAS
+    // ============================================
+    .responsible-name-field {
+        grid-area: responsible-name;
+    }
+
+    .email-field {
+        grid-area: email;
+    }
+
+    .phone-field {
+        grid-area: phone;
+    }
+
+    // ============================================
+    // RESPONSIVE - MOBILE (até 768px)
+    // ============================================
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr; // Uma coluna só
+        grid-template-areas:
+            "responsible-name"
+            "email"
+            "phone";
+        gap: $spacing-sm; // 8px em mobile
+    }
+
+    // Garantir que os inputs preencham toda a largura disponível
+    ds-input {
+        display: block;
+        width: 100%;
+    }
+
+    // ============================================
+    // ÍCONES COLORIDOS POR TIPO DE CAMPO
+    // ============================================
+    .responsible-name-field ds-input {
+        ::ng-deep .icon-left {
+            color: var(--primary-medium);
+        }
+    }
+
+    .email-field ds-input {
+        ::ng-deep .icon-left {
+            color: var(--secondary-medium);
+        }
+    }
+
+    .phone-field ds-input {
+        ::ng-deep .icon-left {
+            color: var(--tertiary);
+        }
+    }
+}

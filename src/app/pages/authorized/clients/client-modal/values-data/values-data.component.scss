@@ -1,0 +1,45 @@
+// values-data.component.scss
+@use "abstracts/variables" as *;
+@use "abstracts/spacing" as *;
+
+.values-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr; // 2 colunas iguais (50% cada)
+    grid-template-areas:
+        "value-per-meter value-per-piece";
+    gap: $spacing-md; // 16px do design system
+
+
+    .value-per-meter-field {
+        grid-area: value-per-meter;
+    }
+
+    .value-per-piece-field {
+        grid-area: value-per-piece;
+    }
+
+
+    // ============================================
+    // RESPONSIVE - MOBILE (até 768px)
+    // ============================================
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr; // Uma coluna só
+        grid-template-areas:
+            "value-per-meter"
+            "value-per-piece";
+        gap: $spacing-sm; // 8px em mobile
+    }
+
+    .value-per-meter-field ds-input {
+        ::ng-deep .icon-left {
+            color: var(--primary-medium);
+        }
+    }
+
+    .value-per-piece-field ds-input {
+        ::ng-deep .icon-left {
+            color: var(--secondary-medium);
+        }
+    }
+
+}

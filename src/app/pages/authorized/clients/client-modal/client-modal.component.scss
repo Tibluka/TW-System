@@ -1,0 +1,7 @@
+@use 'abstracts/spacing' as *;
+
+.footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-md;
+}

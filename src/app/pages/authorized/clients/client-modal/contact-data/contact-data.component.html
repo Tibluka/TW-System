@@ -1,1 +1,29 @@
-<p>contact-data works!</p>
+<!-- contact-data.component.html -->
+<form [formGroup]="parentForm" class="contact-form">
+
+    <!-- Nome do Responsável - 50% da largura -->
+    <div class="responsible-name-field">
+        <ds-input label="Nome do Responsável" placeholder="Digite o nome completo do responsável"
+            formControlName="responsibleName" [fullWidth]="true" [required]="true"
+            [invalid]="isFieldInvalid('responsibleName')" [errorMessage]="getErrorMessage('responsibleName')"
+            [maxlength]="100" icon="fa-solid fa-user" iconPosition="left">
+        </ds-input>
+    </div>
+
+    <!-- Email - 50% da largura -->
+    <div class="email-field">
+        <ds-input label="Email" placeholder="exemplo@empresa.com" formControlName="email" type="email"
+            [fullWidth]="true" [required]="true" [invalid]="isFieldInvalid('email')"
+            [errorMessage]="getErrorMessage('email')" icon="fa-solid fa-envelope" iconPosition="left">
+        </ds-input>
+    </div>
+
+    <!-- Telefone - 50% da largura -->
+    <div class="phone-field">
+        <ds-input label="Telefone" placeholder="(11) 99999-9999" formControlName="phone" [fullWidth]="true"
+            [required]="true" [invalid]="isFieldInvalid('phone')" [errorMessage]="getErrorMessage('phone')"
+            mask="(00) 00000-0000" icon="fa-solid fa-phone" iconPosition="left">
+        </ds-input>
+    </div>
+
+</form>

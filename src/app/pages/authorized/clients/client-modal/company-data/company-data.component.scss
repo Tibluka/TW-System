@@ -1,0 +1,45 @@
+// company-data.component.scss
+@use "abstracts/variables" as *;
+@use "abstracts/spacing" as *;
+
+.company-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr; // 2 colunas iguais (50% cada)
+    grid-template-areas:
+        "company-name company-name" // Razão Social (100%)
+        "cnpj acronym"; // CNPJ (50%) + Sigla (50%)
+    gap: $spacing-md; // 16px do design system
+
+    // ============================================
+    // GRID AREAS
+    // ============================================
+    .company-name-field {
+        grid-area: company-name;
+    }
+
+    .cnpj-field {
+        grid-area: cnpj;
+    }
+
+    .acronym-field {
+        grid-area: acronym;
+    }
+
+    // ============================================
+    // RESPONSIVE - MOBILE (até 768px)
+    // ============================================
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr; // Uma coluna só
+        grid-template-areas:
+            "company-name"
+            "cnpj"
+            "acronym";
+        gap: $spacing-sm; // 8px em mobile
+    }
+
+    // Garantir que os inputs preencham toda a largura disponível
+    ds-input {
+        display: block;
+        width: 100%;
+    }
+}

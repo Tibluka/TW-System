@@ -1,25 +1,49 @@
-<ds-tabs [tabs]="advancedTabs" [activeTabId]="currentTab" size="large" (tabChange)="handleTabChange($event)"
-    (tabClick)="handleTabClick($event)">
+<!-- client-modal.component.html -->
+<div class="client-modal-container">
 
-    <!-- Conteúdo das tabs usando ng-container com ngSwitch -->
-    <ng-container [ngSwitch]="currentTab">
+    <!-- Tabs do formulário -->
+    <ds-tabs [tabs]="advancedTabs" [activeTabId]="currentTab" size="large" (tabChange)="handleTabChange($event)"
+        (tabClick)="handleTabClick($event)">
 
-        <div *ngSwitchCase="'company'">
-            <app-company-data></app-company-data>
-        </div>
+        <!-- Conteúdo das tabs usando ng-container com ngSwitch -->
+        <ng-container [ngSwitch]="currentTab">
 
-        <div *ngSwitchCase="'contact'">
-            <app-contact-data></app-contact-data>
-        </div>
+            <div *ngSwitchCase="'company'">
+                <app-company-data [parentForm]="clientForm"></app-company-data>
+            </div>
 
-        <div *ngSwitchCase="'address'">
-            <app-address-data></app-address-data>
-        </div>
+            <div *ngSwitchCase="'contact'">
+                <app-contact-data [parentForm]="clientForm"></app-contact-data>
+            </div>
 
-        <div *ngSwitchCase="'values'">
-            <app-values-data></app-values-data>
-        </div>
+            <div *ngSwitchCase="'address'">
+                <app-address-data [parentForm]="clientForm"></app-address-data>
+            </div>
 
-    </ng-container>
+            <div *ngSwitchCase="'values'">
+                <app-values-data [parentForm]="clientForm"></app-values-data>
+            </div>
 
-</ds-tabs>
+        </ng-container>
+
+    </ds-tabs>
+
+    <!-- Botões alinhados à direita -->
+    <div class="footer-actions">
+
+        <!-- Botão Cancelar (sempre visível) -->
+        <ds-button label="Cancelar" variant="ghost" (onClickEmitter)="onCancelClick()">
+        </ds-button>
+
+        <!-- Botão Voltar (visível quando não é o primeiro passo) -->
+        <ds-button *ngIf="showBackButton" label="Voltar" variant="outline" icon="fa-solid fa-arrow-left"
+            (onClickEmitter)="onBackClick()">
+        </ds-button>
+
+        <!-- Botão Próximo/Salvar -->
+        <ds-button [label]="nextButtonLabel" [icon]="nextButtonIcon" variant="fill" (onClickEmitter)="onNextClick()">
+        </ds-button>
+
+    </div>
+
+</div>
