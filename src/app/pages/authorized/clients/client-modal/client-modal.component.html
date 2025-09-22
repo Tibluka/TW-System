@@ -1,1 +1,25 @@
-<p>client-modal works!</p>
+<ds-tabs [tabs]="advancedTabs" [activeTabId]="currentTab" size="large" (tabChange)="handleTabChange($event)"
+    (tabClick)="handleTabClick($event)">
+
+    <!-- Conteúdo das tabs usando ng-container com ngSwitch -->
+    <ng-container [ngSwitch]="currentTab">
+
+        <div *ngSwitchCase="'company'">
+            <app-company-data></app-company-data>
+        </div>
+
+        <div *ngSwitchCase="'contact'">
+            <app-contact-data></app-contact-data>
+        </div>
+
+        <div *ngSwitchCase="'address'">
+            <app-address-data></app-address-data>
+        </div>
+
+        <div *ngSwitchCase="'values'">
+            <app-values-data></app-values-data>
+        </div>
+
+    </ng-container>
+
+</ds-tabs>

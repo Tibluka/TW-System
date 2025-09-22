@@ -1,0 +1,281 @@
+@use 'abstracts/variables' as *;
+@use 'abstracts/spacing' as *;
+@use 'abstracts/typography' as *;
+@use 'base/typography' as *;
+
+// ========================================
+// COMPONENTE DS-TABS
+// ========================================
+
+.ds-tabs-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+// ========================================
+// HEADER DAS TABS
+// ========================================
+.ds-tabs-header {
+    position: relative;
+    border-bottom: 1px solid $stroke;
+    background-color: var(--white);
+
+    &.scrollable {
+        overflow-x: auto;
+        scrollbar-width: none; // Firefox
+
+        &::-webkit-scrollbar {
+            display: none; // Chrome, Safari
+        }
+    }
+}
+
+.ds-tabs-nav {
+    display: flex;
+    align-items: center;
+    min-height: 48px; // Usando valor direto pois não há variável
+    gap: $spacing-xs; // 4px
+    padding: 0 $spacing-md; // 0 16px
+
+    .scrollable & {
+        padding: 0 $spacing-lg; // 0 24px
+    }
+}
+
+// ========================================
+// BOTÕES DAS TABS
+// ========================================
+.ds-tab-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs; // 4px
+    padding: $spacing-sm $spacing-md; // 8px 16px
+    border: none;
+    background: transparent;
+    border-radius: $border-radius-sm; // 8px
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    min-height: 40px; // Usando valor direto
+
+    @include body(); // Usando mixin de tipografia
+    color: var(--label);
+
+    &:hover:not(:disabled) {
+        background-color: rgba($primary-medium, 0.05);
+        color: var(--primary-medium);
+    }
+
+    &.active {
+        color: var(--primary-dark);
+        font-weight: $font-weight-bold; // 500
+        background-color: rgba($primary-dark, 0.05);
+    }
+
+    &:disabled,
+    &.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+
+        &:hover {
+            background: transparent;
+            color: var(--label);
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--primary-medium);
+        outline-offset: 2px;
+    }
+}
+
+// ========================================
+// ELEMENTOS INTERNOS DA TAB
+// ========================================
+.ds-tab-icon {
+    font-size: $font-md; // 16px
+    line-height: 1;
+
+    .ds-tab-button.active & {
+        color: var(--primary-dark);
+    }
+}
+
+.ds-tab-label {
+    font-size: inherit;
+    line-height: 1.2;
+}
+
+.ds-tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px; // Usando valor direto
+    height: 20px; // Usando valor direto
+    padding: 0 $spacing-xs; // 0 4px
+    border-radius: $border-radius-max; // 99px
+    background-color: var(--tertiary);
+    color: var(--white);
+    font-size: $font-xs; // 12px
+    font-weight: $font-weight-bold; // 500
+    line-height: 1;
+
+    .ds-tab-button.active & {
+        background-color: var(--primary-dark);
+    }
+}
+
+// ========================================
+// INDICADOR DA TAB ATIVA
+// ========================================
+.ds-tab-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px; // Usando valor direto
+    background: linear-gradient(90deg, var(--primary-dark) 0%, var(--primary-medium) 100%);
+    border-radius: 2px 2px 0 0; // Usando valores diretos
+    transition: transform 0.3s ease;
+    transform-origin: left center;
+    width: 0;
+}
+
+// ========================================
+// CONTEÚDO DAS TABS
+// ========================================
+.ds-tabs-content {
+    padding: $spacing-lg; // 24px
+    background-color: var(--white);
+    border-radius: 0 0 $border-radius-md $border-radius-md; // 0 0 12px 12px
+
+    // Remover padding quando usado em cards ou containers já com padding
+    &.no-padding {
+        padding: 0;
+    }
+
+    &.compact-padding {
+        padding: $spacing-md; // 16px
+    }
+}
+
+// ========================================
+// VARIAÇÕES DE TAMANHO
+// ========================================
+.ds-tabs-container.size-small {
+    .ds-tab-button {
+        padding: $spacing-xs $spacing-sm; // 4px 8px
+        min-height: 32px; // Usando valor direto
+        font-size: $font-sm; // 14px
+    }
+
+    .ds-tab-badge {
+        min-width: 16px; // Usando valor direto
+        height: 16px; // Usando valor direto
+        font-size: 10px; // Usando valor direto
+    }
+
+    .ds-tabs-content {
+        padding: $spacing-md; // 16px
+    }
+}
+
+.ds-tabs-container.size-large {
+    .ds-tab-button {
+        padding: $spacing-md $spacing-lg; // 16px 24px
+        min-height: 56px; // Usando valor direto
+        font-size: $font-lg; // 18px
+    }
+
+    .ds-tabs-content {
+        padding: $spacing-xl; // 32px
+    }
+}
+
+// ========================================
+// VARIAÇÃO VERTICAL
+// ========================================
+.ds-tabs-container.vertical {
+    flex-direction: row;
+
+    .ds-tabs-header {
+        border-bottom: none;
+        border-right: 1px solid $stroke;
+        width: auto;
+        min-width: 200px; // Usando valor direto
+    }
+
+    .ds-tabs-nav {
+        flex-direction: column;
+        align-items: stretch;
+        padding: $spacing-md; // 16px
+        gap: $spacing-xs; // 4px
+    }
+
+    .ds-tab-button {
+        justify-content: flex-start;
+        width: 100%;
+        text-align: left;
+    }
+
+    .ds-tab-indicator {
+        top: 0;
+        bottom: auto;
+        right: 0;
+        left: auto;
+        width: 3px; // Usando valor direto
+        height: 0;
+        border-radius: 0 2px 2px 0; // Usando valores diretos
+        background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary-medium) 100%);
+    }
+
+    .ds-tabs-content {
+        flex: 1;
+        border-radius: 0 $border-radius-md $border-radius-md 0; // 0 12px 12px 0
+    }
+}
+
+// ========================================
+// RESPONSIVIDADE
+// ========================================
+@media (max-width: 768px) {
+    .ds-tabs-nav {
+        padding: 0 $spacing-sm; // 0 8px
+    }
+
+    .ds-tab-button {
+        padding: $spacing-xs $spacing-sm; // 4px 8px
+        font-size: $font-sm; // 14px
+    }
+
+    .ds-tabs-content {
+        padding: $spacing-md; // 16px
+    }
+
+    .ds-tabs-container.vertical {
+        flex-direction: column;
+
+        .ds-tabs-header {
+            border-right: none;
+            border-bottom: 1px solid $stroke;
+            min-width: auto;
+        }
+
+        .ds-tabs-nav {
+            flex-direction: row;
+            overflow-x: auto;
+        }
+
+        .ds-tab-indicator {
+            top: auto;
+            bottom: 0;
+            right: auto;
+            left: 0;
+            width: 0;
+            height: 3px; // Usando valor direto
+            border-radius: 2px 2px 0 0; // Usando valores diretos
+            background: linear-gradient(90deg, var(--primary-dark) 0%, var(--primary-medium) 100%);
+        }
+    }
+}

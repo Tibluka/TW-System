@@ -1,1 +1,35 @@
-<p>tabs works!</p>
+<div [class]="containerClasses.join(' ')">
+    <!-- Header das tabs -->
+    <div [class]="headerClasses.join(' ')">
+        <div class="ds-tabs-nav" #tabsNav role="tablist">
+            <button *ngFor="let tab of tabs; trackBy: trackByTab" type="button"
+                [class]="getTabButtonClasses(tab).join(' ')" [disabled]="tab.disabled" [attr.data-tab-id]="tab.id"
+                [attr.aria-selected]="isTabActive(tab.id)" [attr.aria-controls]="'tab-content-' + tab.id"
+                [attr.id]="'tab-' + tab.id" [attr.tabindex]="isTabActive(tab.id) ? 0 : -1" role="tab"
+                (click)="selectTab(tab.id)" (keydown)="onKeyDown($event, tab.id)">
+                <!-- Ícone da tab -->
+                <i *ngIf="tab.icon" [class]="tab.icon + ' ds-tab-icon'" [attr.aria-hidden]="true">
+                </i>
+
+                <!-- Label da tab -->
+                <span class="ds-tab-label">{{ tab.label }}</span>
+
+                <!-- Badge da tab -->
+                <span *ngIf="tab.badge !== undefined && tab.badge !== null && tab.badge !== ''" class="ds-tab-badge"
+                    [attr.aria-label]="'Badge: ' + formatBadge(tab.badge)">
+                    {{ formatBadge(tab.badge) }}
+                </span>
+            </button>
+        </div>
+
+        <!-- Indicador da tab ativa -->
+        <div class="ds-tab-indicator" [style.transform]="indicatorTransform" [attr.aria-hidden]="true">
+        </div>
+    </div>
+
+    <!-- Conteúdo das tabs -->
+    <div [class]="contentClasses.join(' ')" [attr.id]="'tab-content-' + activeTabId"
+        [attr.aria-labelledby]="'tab-' + activeTabId" role="tabpanel">
+        <ng-content></ng-content>
+    </div>
+</div>
