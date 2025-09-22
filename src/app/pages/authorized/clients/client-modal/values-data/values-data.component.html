@@ -1,20 +1,29 @@
-<!-- values-data.component.html -->
+<!-- values-data.component.html - TEMPLATE CORRIGIDO SEM MÁSCARA -->
 <form [formGroup]="parentForm" class="values-form">
 
     <!-- Valor por Metro - 50% da largura -->
     <div class="value-per-meter-field">
-        <ds-input label="Valor por Metro" placeholder="0,00" formControlName="valuePerMeter" type="number"
-            [fullWidth]="true" [required]="true" [invalid]="isFormControlInvalid(parentForm.get('valuePerMeter'))"
-            [errorMessage]="getErrorMessage('valuePerMeter')" icon="fa-solid fa-ruler-horizontal" iconPosition="left">
+        <ds-input label="Valor por Metro (R$)" placeholder="0.00" formControlName="valuePerMeter" type="number"
+            step="0.01" min="0" [fullWidth]="true" [required]="true" [invalid]="isFieldInvalid('valuePerMeter')"
+            [errorMessage]="getErrorMessage('valuePerMeter')" icon="fa-solid fa-ruler-horizontal" iconPosition="left"
+            (blur)="onCurrencyBlur('valuePerMeter')" helperText="Digite o valor em reais por metro">
         </ds-input>
     </div>
 
     <!-- Valor por Peça - 50% da largura -->
     <div class="value-per-piece-field">
-        <ds-input label="Valor por Peça" placeholder="0,00" formControlName="valuePerPiece" type="number"
-            [fullWidth]="true" [required]="true" [invalid]="isFormControlInvalid(parentForm.get('valuePerPiece'))"
-            [errorMessage]="getErrorMessage('valuePerPiece')" icon="fa-solid fa-tags" iconPosition="left">
+        <ds-input label="Valor por Peça (R$)" placeholder="0.00" formControlName="valuePerPiece" type="number"
+            step="0.01" min="0" [fullWidth]="true" [required]="true" [invalid]="isFieldInvalid('valuePerPiece')"
+            [errorMessage]="getErrorMessage('valuePerPiece')" icon="fa-solid fa-tags" iconPosition="left"
+            (blur)="onCurrencyBlur('valuePerPiece')" helperText="Digite o valor em reais por peça">
         </ds-input>
+    </div>
+
+    <!-- Informação adicional opcional -->
+    <div class="values-info" style="grid-column: 1 / -1; margin-top: 1rem;">
+        <p class="body label" style="font-size: 0.875rem; text-align: center;">
+            💡 Os valores serão automaticamente formatados ao sair do campo
+        </p>
     </div>
 
 </form>

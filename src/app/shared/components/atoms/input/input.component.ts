@@ -1,4 +1,4 @@
-// input.component.ts - CORREÇÃO FINAL DEFINITIVA
+// input.component.ts - CORREÇÃO COMPLETA DO ERRO REPLACE
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, forwardRef, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -73,6 +73,7 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
     if (value === null || value === undefined) {
       this.value = '';
     } else {
+      // 🔧 CORREÇÃO: Sempre converter para string antes de usar
       this.value = String(value);
     }
   }
@@ -89,17 +90,17 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
     this.disabled = isDisabled;
   }
 
-  // CORREÇÃO: Tratamento principal do input
+  // 🔧 CORREÇÃO: Tratamento seguro do input
   onInputChange(target: any): void {
     if (!target) return;
 
-    let newValue = target.value || '';
+    // Garantir que newValue é sempre string
+    let newValue = String(target.value || '');
 
     // Se tem máscara E dropSpecialCharacters ativo, processar manualmente
-    if (this.mask && this.dropSpecialCharacters) {
+    if (this.mask && this.dropSpecialCharacters && newValue) {
       // Extrair apenas números/letras do valor formatado
       const cleanValue = newValue.replace(/[^a-zA-Z0-9]/g, '');
-      console.log('🧹 Limpando manualmente:', newValue, '→', cleanValue);
 
       // Usar valor limpo
       this.value = cleanValue;
@@ -120,7 +121,6 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
     // Este evento só é chamado pela biblioteca quando dropSpecialCharacters=true
     if (this.dropSpecialCharacters && this.mask) {
       const cleanValue = String(unmaskedValue || '');
-      console.log('📡 Evento da biblioteca:', cleanValue);
 
       this.value = cleanValue;
       this.onChange(cleanValue);
@@ -166,5 +166,13 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
 
   get hasMask(): boolean {
     return !!this.mask;
+  }
+
+  // 🔧 CORREÇÃO: Getter seguro para o valor
+  get safeValue(): string {
+    if (this.value === null || this.value === undefined) {
+      return '';
+    }
+    return String(this.value);
   }
 }
