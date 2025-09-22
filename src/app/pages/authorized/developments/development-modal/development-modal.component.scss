@@ -1,12 +1,12 @@
 // development-modal.component.scss
 @use "abstracts/variables" as *;
 @use "abstracts/spacing" as *;
+@use "abstracts/typography" as *;
 
 .development-modal-container {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-lg); // 24px
-    padding: var(--spacing-md); // 16px
+    gap: $spacing-lg; // 24px - usando variável
     max-height: 60vh;
     overflow-y: auto;
 
@@ -17,7 +17,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 200px;
+        min-height: 200px; // Pode manter, não há variável específica
     }
 
     // ============================================
@@ -26,8 +26,7 @@
     .form-section {
         display: flex;
         flex-direction: column;
-        gap: var(--spacing-md); // 16px
-
+        gap: $spacing-md; // 16px - usando variável
     }
 
     // ============================================
@@ -41,7 +40,7 @@
             "image image"
             "description description"
             "production-type client-reference";
-        gap: 16px;
+        gap: $spacing-md; // 16px - usando variável do sistema
 
         .client-field {
             grid-area: client;
@@ -65,6 +64,7 @@
 
         // Responsive
         @media (max-width: 768px) {
+            // Pode manter breakpoint, não há variável específica
             grid-template-columns: 1fr;
             grid-template-areas:
                 "client"
@@ -72,7 +72,7 @@
                 "description"
                 "production-type"
                 "client-reference";
-            gap: var(--spacing-sm); // 8px
+            gap: $spacing-sm; // 8px - usando variável
         }
     }
 
@@ -91,11 +91,12 @@
     .modal-actions {
         display: flex;
         justify-content: flex-end;
-        gap: 16px;
-        margin-top: var(--spacing-md); // 16px
+        gap: $spacing-md; // 16px - usando variável
+        margin-top: $spacing-md; // 16px - usando variável
 
-        // Em mobile, botões ficam full width empilhados
+        // Em mobile, botões ficam empilhados
         @media (max-width: 480px) {
+            // Pode manter breakpoint
             flex-direction: column;
 
             ds-button {
@@ -108,41 +109,41 @@
     // RESPONSIVE GENERAL
     // ============================================
     @media (max-width: 768px) {
-        padding: var(--spacing-sm); // 8px
-        gap: var(--spacing-md); // 16px
+        padding: $spacing-sm; // 8px - usando variável
+        gap: $spacing-md; // 16px - usando variável
 
         .form-section {
-            gap: var(--spacing-sm); // 8px
+            gap: $spacing-sm; // 8px - usando variável
         }
 
         .section-title {
-            font-size: var(--font-size-md);
+            font-size: $font-md; // 16px - usando variável de tipografia
         }
     }
 
     @media (max-width: 480px) {
-        padding: var(--spacing-xs); // 4px
-        gap: var(--spacing-sm); // 8px
+        padding: $spacing-xs; // 4px - usando variável
+        gap: $spacing-sm; // 8px - usando variável
     }
 
     // ============================================
     // SCROLLBAR STYLING
     // ============================================
     &::-webkit-scrollbar {
-        width: var(--spacing-xs); // 4px
+        width: $spacing-xs; // 4px - usando variável
     }
 
     &::-webkit-scrollbar-track {
-        background: var(--neutral-light);
-        border-radius: var(--border-radius-sm);
+        background: var(--stroke); // Usando variável de cor do sistema
+        border-radius: $border-radius-sm; // 8px - usando variável
     }
 
     &::-webkit-scrollbar-thumb {
-        background: var(--neutral-medium);
-        border-radius: var(--border-radius-sm);
+        background: var(--label); // Usando variável de cor do sistema
+        border-radius: $border-radius-sm; // 8px - usando variável
 
         &:hover {
-            background: var(--primary-medium);
+            background: var(--primary-medium); // Usando variável de cor do sistema
         }
     }
 }

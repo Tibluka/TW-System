@@ -23,7 +23,8 @@
                     <ds-file-upload label="Imagem da Peça" placeholder="Clique ou arraste uma imagem aqui"
                         helperText="Imagem (JPG, JPEG, PNG) de até 5MB" [multiple]="false" [fullWidth]="true"
                         (filesChanged)="onImageChanged($event)" (fileAdded)="onImageAdded($event)"
-                        (fileRemoved)="onImageRemoved($event)" (uploadError)="onUploadError($event)" />
+                        [existingFile]="existingFile" (fileRemoved)="onImageRemoved($event)"
+                        (uploadError)="onUploadError($event)" />
                 </div>
 
                 <!-- Descrição -->

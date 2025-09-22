@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { IconComponent } from '../../atoms/icon/icon.component';
+import { PieceImage } from '../../../../models/developments/developments';
 
 export interface UploadedFile {
   id: string;
@@ -16,7 +17,8 @@ export interface UploadedFile {
   templateUrl: './file-upload.component.html',
   styleUrl: './file-upload.component.scss'
 })
-export class FileUploadComponent {
+export class FileUploadComponent implements OnChanges {
+
   @Input() label: string = '';
   @Input() placeholder: string = 'Clique para selecionar ou arraste arquivos aqui';
   @Input() helperText: string = 'Apenas imagens (JPG, JPEG, PNG) são aceitas';
@@ -27,6 +29,7 @@ export class FileUploadComponent {
   @Input() required: boolean = false;
   @Input() fullWidth: boolean = false;
   @Input() width: string = 'fit-content';
+  @Input() existingFile: PieceImage | undefined;
 
   @Output() filesChanged = new EventEmitter<UploadedFile[]>();
   @Output() fileAdded = new EventEmitter<UploadedFile>();
@@ -39,6 +42,20 @@ export class FileUploadComponent {
 
   // ID único gerado uma só vez
   readonly inputId: string = this.generateId();
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['existingFile'] && changes['existingFile'].currentValue) {
+      const file = changes['existingFile'].currentValue as PieceImage;
+      const existingFile: UploadedFile = {
+        id: '',
+        file: undefined as any, // Não há File real, apenas referência
+        previewUrl: file.url || '',
+        name: file.filename || '',
+        size: 0
+      };
+      this.uploadedFiles = [existingFile];
+    }
+  }
 
   get labelClasses(): string {
     return this.required ? 'required' : '';

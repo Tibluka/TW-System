@@ -101,7 +101,7 @@
     </div>
 
     <!-- Modal de desenvolvimento -->
-    <ds-modal modalId="development-modal" (modalClosed)="onModalClosed($event)">
+    <ds-modal modalId="development-modal" *ngIf="isModalOpen" (modalClosed)="onModalClosed($event)">
         <app-development-modal [developmentId]="selectedDevelopmentId"></app-development-modal>
     </ds-modal>
 

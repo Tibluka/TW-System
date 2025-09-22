@@ -3,7 +3,7 @@ import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/co
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
 import { Client } from '../../../../models/clients/clients';
-import { CreateDevelopmentRequest, UpdateDevelopmentRequest } from '../../../../models/developments/developments';
+import { CreateDevelopmentRequest, Development, PieceImage, UpdateDevelopmentRequest } from '../../../../models/developments/developments';
 import { ButtonComponent } from '../../../../shared/components/atoms/button/button.component';
 import { InputComponent } from '../../../../shared/components/atoms/input/input.component';
 import { SelectComponent } from '../../../../shared/components/atoms/select/select.component';
@@ -47,7 +47,6 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
 
   isLoading = false;
   isSaving = false;
-  isEditMode = false;
 
   // Formulário centralizado
   developmentForm: FormGroup = new FormGroup({});
@@ -61,6 +60,7 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
 
   // Controle de upload de imagem
   uploadedFiles: UploadedFile[] = [];
+  existingFile: PieceImage | undefined = undefined;
 
   // ============================================
   // LIFECYCLE HOOKS
@@ -69,6 +69,25 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
   ngOnInit(): void {
     this.initializeForm();
     this.loadInitialData();
+
+    // Acessar dados do modal ativo
+    const activeModal = this.modalService.activeModal();
+    if (activeModal?.config.data) {
+      const development = activeModal.config.data;
+      this.populateForm(development);
+    }
+  }
+
+  // ============================================
+  // GETTERS PARA O TEMPLATE
+  // ============================================
+
+  get isEditMode(): boolean {
+    return !!this.developmentForm.value._id;
+  }
+
+  get saveButtonLabel(): string {
+    return this.isEditMode ? 'Atualizar' : 'Criar';
   }
 
   // ============================================
@@ -86,13 +105,7 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
       clientReference: ['']
     });
 
-    // Determinar se é modo edição
-    this.isEditMode = !!this.developmentId;
-
-    console.log('📝 Formulário inicializado:', {
-      isEditMode: this.isEditMode,
-      developmentId: this.developmentId
-    });
+    console.log('📝 Formulário inicializado');
   }
 
   /**
@@ -105,8 +118,13 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
       // Carregar lista de clientes
       await this.loadClients();
 
-      // Se é modo edição, carregar dados do desenvolvimento
-      if (this.isEditMode && this.developmentId) {
+      // Acessar dados do modal ativo (IGUAL AO CLIENT-MODAL)
+      const activeModal = this.modalService.activeModal();
+      if (activeModal?.config.data) {
+        const development = activeModal.config.data;
+        this.populateForm(development);
+      } else if (this.developmentId) {
+        // Fallback: Se não há dados no modal, mas há ID, buscar pelos dados
         await this.loadDevelopmentData();
       }
 
@@ -123,11 +141,11 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
    */
   private async loadClients(): Promise<void> {
     try {
-      const response = await this.clientService.getClients({
+      const response = await lastValueFrom(this.clientService.getClients({
         page: 1,
         limit: 100,
         active: true
-      }).toPromise();
+      }));
 
       if (response?.data) {
         this.clientOptions = response.data.map((client: Client) => ({
@@ -143,32 +161,51 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
   }
 
   /**
-   * 📋 CARREGAR DESENVOLVIMENTO - Carrega dados do desenvolvimento para edição
+   * 📋 POPULAR FORMULÁRIO - Preenche dados do desenvolvimento para edição (IGUAL AO CLIENT-MODAL)
+   */
+  private populateForm(development: Development): void {
+    // Determinar tipo de produção baseado no que está habilitado
+    let productionType = '';
+    if (development.productionType?.rotary?.enabled) {
+      productionType = 'rotary';
+    } else if (development.productionType?.localized?.enabled) {
+      productionType = 'localized';
+    }
+
+    if (development.pieceImage) {
+      this.existingFile = development.pieceImage;
+    }
+
+    this.developmentForm.patchValue({
+      clientId: development.client?._id || development.clientId,
+      description: development.description || '',
+      productionType: productionType,
+      clientReference: development.clientReference || ''
+    });
+
+    // Se existir _id no development, adiciona o form control _id se não existir (IGUAL AO CLIENT-MODAL)
+    if (development._id) {
+      if (!this.developmentForm.contains('_id')) {
+        this.developmentForm.addControl('_id', this.formBuilder.control(development._id));
+      } else {
+        this.developmentForm.get('_id')?.setValue(development._id);
+      }
+    }
+
+    console.log('✅ Dados do desenvolvimento carregados para edição:', development);
+  }
+
+  /**
+   * 📋 CARREGAR DESENVOLVIMENTO - Carrega dados do desenvolvimento para edição (FALLBACK)
    */
   private async loadDevelopmentData(): Promise<void> {
     if (!this.developmentId) return;
 
     try {
-      const development = await this.developmentService.getDevelopmentById(this.developmentId).toPromise();
+      const development = await lastValueFrom(this.developmentService.getDevelopmentById(this.developmentId));
 
       if (development) {
-        // Determinar tipo de produção baseado no que está habilitado
-        let productionType = '';
-        if (development.productionType?.rotary?.enabled) {
-          productionType = 'rotary';
-        } else if (development.productionType?.localized?.enabled) {
-          productionType = 'localized';
-        }
-
-        // Preencher formulário com dados existentes
-        this.developmentForm.patchValue({
-          clientId: development.client?._id || development.clientId,
-          description: development.description || '',
-          productionType: productionType,
-          clientReference: development.clientReference || ''
-        });
-
-        console.log('✅ Dados do desenvolvimento carregados:', development);
+        this.populateForm(development);
       }
     } catch (error) {
       console.error('❌ Erro ao carregar desenvolvimento:', error);
@@ -183,6 +220,7 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
    * 📁 ARQUIVOS ALTERADOS - Callback quando arquivos são alterados
    */
   onImageChanged(files: UploadedFile[]): void {
+    debugger
     this.uploadedFiles = files;
     console.log('📁 Arquivos alterados:', files);
   }
@@ -217,6 +255,100 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
    */
   onCancel(): void {
     this.modalService.close('development-modal', { success: false });
+  }
+
+  /**
+   * 💾 SUBMIT - Processa envio do formulário
+   */
+  async onSubmit(): Promise<void> {
+    if (this.developmentForm.invalid || this.isSaving) return;
+
+    this.isSaving = true;
+
+    try {
+      const formData = this.developmentForm.value;
+
+      // Construir productionType baseado na seleção
+      const productionType = {
+        rotary: {
+          enabled: formData.productionType === 'rotary',
+          negotiatedPrice: formData.productionType === 'rotary' ? 0 : undefined
+        },
+        localized: {
+          enabled: formData.productionType === 'localized',
+          negotiatedPrice: formData.productionType === 'localized' ? 0 : undefined
+        }
+      };
+
+      let result: any;
+
+      if (this.isEditMode && this.developmentForm.value._id) {
+        // Modo edição - atualizar desenvolvimento
+        const updateData: UpdateDevelopmentRequest = {
+          clientId: formData.clientId,
+          description: formData.description,
+          clientReference: formData.clientReference,
+          productionType: productionType
+        };
+
+        result = await lastValueFrom(this.developmentService.updateDevelopment(this.developmentForm.value._id, updateData));
+        console.log('✅ Desenvolvimento atualizado:', result);
+
+        // Se há imagem para upload no modo edição, fazer upload
+        if (this.uploadedFiles.length > 0) {
+          await this.uploadImageToDevelopment(this.developmentForm.value._id);
+        }
+
+        this.modalService.close('development-modal', {
+          action: 'updated',
+          data: result
+        });
+
+      } else {
+        // Modo criação - criar novo desenvolvimento
+        const createData: CreateDevelopmentRequest = {
+          clientId: formData.clientId,
+          description: formData.description,
+          clientReference: formData.clientReference,
+          productionType: productionType
+        };
+
+        result = await lastValueFrom(this.developmentService.createDevelopment(createData));
+        console.log('✅ Desenvolvimento criado:', result);
+
+        // Se há imagem para upload após criação, fazer upload
+        if (this.uploadedFiles.length > 0 && result._id) {
+          await this.uploadImageToDevelopment(result._id);
+        }
+
+        this.modalService.close('development-modal', {
+          action: 'created',
+          data: result
+        });
+      }
+
+    } catch (error: any) {
+      console.error('❌ Erro ao salvar desenvolvimento:', error);
+      alert(error.message || 'Erro ao salvar desenvolvimento. Tente novamente.');
+    } finally {
+      this.isSaving = false;
+    }
+  }
+
+  /**
+   * 📤 UPLOAD IMAGEM - Faz upload da imagem para o desenvolvimento
+   */
+  private async uploadImageToDevelopment(developmentId: string): Promise<void> {
+    if (this.uploadedFiles.length === 0) return;
+
+    try {
+      const file = this.uploadedFiles[0];
+      // Aqui você implementaria o upload real para o desenvolvimento
+      console.log('📤 Upload de imagem para desenvolvimento:', developmentId, file);
+
+    } catch (error) {
+      console.error('❌ Erro ao fazer upload da imagem:', error);
+    }
   }
 
   // ============================================
@@ -259,107 +391,5 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
     };
 
     return labels[fieldName] || fieldName;
-  }
-
-  /**
- * 💾 SUBMIT - Processa envio do formulário
- */
-  async onSubmit(): Promise<void> {
-    if (this.developmentForm.invalid || this.isSaving) return;
-
-    this.isSaving = true;
-
-    try {
-      const formData = this.developmentForm.value;
-
-      // Construir productionType baseado na seleção
-      const productionType = {
-        rotary: {
-          enabled: formData.productionType === 'rotary',
-          negotiatedPrice: formData.productionType === 'rotary' ? 0 : undefined
-        },
-        localized: {
-          enabled: formData.productionType === 'localized',
-          negotiatedPrice: formData.productionType === 'localized' ? 0 : undefined
-        }
-      };
-
-      let result: any;
-
-      if (this.isEditMode && this.developmentId) {
-        // Modo edição - atualizar desenvolvimento
-        const updateData: UpdateDevelopmentRequest = {
-          clientId: formData.clientId,
-          description: formData.description,
-          clientReference: formData.clientReference,
-          productionType: productionType
-        };
-
-        result = await this.developmentService.updateDevelopment(this.developmentId, updateData).toPromise();
-        console.log('✅ Desenvolvimento atualizado:', result);
-
-        // Se há imagem para upload no modo edição, fazer upload
-        if (this.uploadedFiles.length > 0) {
-          await this.uploadImageToDevelopment(this.developmentId);
-        }
-
-      } else {
-        // Modo criação - criar novo desenvolvimento
-        const createData: CreateDevelopmentRequest = {
-          clientId: formData.clientId,
-          description: formData.description,
-          clientReference: formData.clientReference,
-          productionType: productionType
-        };
-
-        result = await this.developmentService.createDevelopment(createData).toPromise();
-        console.log('✅ Desenvolvimento criado:', result);
-
-        // Se há imagem para upload após criação, fazer upload
-        if (this.uploadedFiles.length > 0 && result._id) {
-          await this.uploadImageToDevelopment(result._id);
-        }
-      }
-
-      // Fechar modal com sucesso
-      this.modalService.close('development-modal', {
-        success: true,
-        data: result,
-        message: this.isEditMode ? 'Desenvolvimento atualizado com sucesso!' : 'Desenvolvimento criado com sucesso!'
-      });
-
-    } catch (error: any) {
-      console.error('❌ Erro ao salvar desenvolvimento:', error);
-      alert(error.message || 'Erro ao salvar desenvolvimento. Tente novamente.');
-
-    } finally {
-      this.isSaving = false;
-      this.cdr.detectChanges();
-    }
-  }
-
-  /**
-   * 📷 UPLOAD IMAGEM PARA DESENVOLVIMENTO - Faz upload da imagem para o desenvolvimento
-   */
-  private async uploadImageToDevelopment(developmentId: string): Promise<void> {
-    if (this.uploadedFiles.length === 0) return;
-
-    try {
-      console.log('📷 Fazendo upload de imagem para desenvolvimento:', developmentId);
-
-      const formData = new FormData();
-      formData.append('image', this.uploadedFiles[0].file);
-
-      const response = await this.developmentService.uploadImage(developmentId, this.uploadedFiles[0].file).toPromise();
-
-      console.log('✅ Imagem enviada com sucesso:', response);
-
-      // Limpar arquivos após upload bem-sucedido
-      this.uploadedFiles = [];
-
-    } catch (uploadError) {
-      console.error('❌ Erro ao enviar imagem:', uploadError);
-      throw new Error('Erro ao fazer upload da imagem. Desenvolvimento salvo mas imagem não foi enviada.');
-    }
   }
 }

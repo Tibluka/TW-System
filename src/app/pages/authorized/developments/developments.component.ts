@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
 import { FormsModule, NgModel } from "@angular/forms";
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
 // Componentes
-import { Development, DevelopmentFilters, DevelopmentListResponse, PaginationInfo } from '../../../models/developments/developments';
+import { Development, DevelopmentFilters, DevelopmentListResponse, PaginationInfo, PieceImage } from '../../../models/developments/developments';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
 import { ModalComponent } from "../../../shared/components/organisms/modal/modal.component";
@@ -34,6 +34,8 @@ import { DevelopmentModalComponent } from "./development-modal/development-modal
   styleUrl: './developments.component.scss'
 })
 export class DevelopmentsComponent extends FormValidator implements OnInit, OnDestroy {
+
+  isModalOpen: boolean = false;
 
   private developmentService = inject(DevelopmentService);
   private modalService = inject(ModalService);
@@ -72,6 +74,15 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
    */
   get shouldShowSpinner(): boolean {
     return this.loading;
+  }
+
+  constructor() {
+    super();
+    // Effect para monitorar quando o modal está aberto
+    effect(() => {
+      const modalInstance = this.modalService.modals().find(m => m.id === 'development-modal');
+      this.isModalOpen = modalInstance ? modalInstance.isOpen : false;
+    });
   }
 
   // ============================================
@@ -141,47 +152,6 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
   }
 
   /**
-   * ➕ CRIAR - Abre modal para criar novo desenvolvimento
-   */
-  createDevelopment(): void {
-    // Limpar ID selecionado para modo criação
-    this.selectedDevelopmentId = undefined;
-
-    this.modalService.open({
-      id: 'development-modal',
-      title: 'Novo Desenvolvimento',
-      size: 'xl',
-      showHeader: true,
-      showCloseButton: true,
-      closeOnBackdropClick: false,
-      closeOnEscapeKey: true
-    }).subscribe(result => {
-      this.handleModalResult(result);
-    });
-  }
-
-  /**
-   * ✏️ EDITAR - Abre modal para editar desenvolvimento existente
-   */
-  editDevelopment(development: Development): void {
-    // Definir o development ID para edição
-    this.selectedDevelopmentId = development._id;
-
-    this.modalService.open({
-      id: 'development-modal',
-      title: `Editar Desenvolvimento - ${development.internalReference}`,
-      size: 'xl',
-      showHeader: true,
-      showCloseButton: true,
-      closeOnBackdropClick: false,
-      closeOnEscapeKey: true,
-      data: development
-    }).subscribe(result => {
-      this.handleModalResult(result);
-    });
-  }
-
-  /**
    * 👆 CLIQUE NA TABELA - Callback quando desenvolvimento é clicado na tabela
    */
   onDevelopmentClick(development: Development): void {
@@ -236,27 +206,6 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
   }
 
   /**
-   * 🔄 RESULTADO MODAL - Processa resultado do modal
-   */
-  private handleModalResult(result: any): void {
-    if (result?.success) {
-      console.log('✅ Operação realizada com sucesso:', result);
-      this.loadDevelopments(); // Recarrega lista
-
-      // Mostrar mensagem de sucesso se necessário
-      if (result.message) {
-        this.showSuccessMessage(result.message);
-      }
-    } else if (result?.error) {
-      console.error('❌ Erro na operação:', result.error);
-      this.showErrorMessage(result.error);
-    }
-
-    // Limpar seleção
-    this.selectedDevelopmentId = undefined;
-  }
-
-  /**
    * 🟢 SUCESSO - Mostra mensagem de sucesso
    */
   private showSuccessMessage(message: string): void {
@@ -282,5 +231,69 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
    */
   onModalClosed(result: any): void {
     this.handleModalResult(result);
+  }
+
+  // Apenas o método editDevelopment corrigido para seguir a mesma lógica do clients.component.ts
+
+  /**
+   * ✏️ EDITAR - Abre modal para editar desenvolvimento existente
+   */
+  editDevelopment(development: Development): void {
+    // Definir o development ID para edição
+    this.selectedDevelopmentId = development._id;
+
+    this.modalService.open({
+      id: 'development-modal',
+      title: `Editar Desenvolvimento - ${development.internalReference}`,
+      size: 'xl',
+      showHeader: true,
+      showCloseButton: true,
+      closeOnBackdropClick: false,
+      closeOnEscapeKey: true,
+      data: development // ← IMPORTANTE: Passando o objeto development completo
+    }).subscribe(result => {
+      this.handleModalResult(result);
+    });
+  }
+
+  /**
+   * ➕ CRIAR - Abre modal para criar novo desenvolvimento
+   */
+  createDevelopment(): void {
+    // Limpar ID selecionado para modo criação
+    this.selectedDevelopmentId = undefined;
+
+    this.modalService.open({
+      id: 'development-modal',
+      title: 'Novo Desenvolvimento',
+      size: 'xl',
+      showHeader: true,
+      showCloseButton: true,
+      closeOnBackdropClick: false,
+      closeOnEscapeKey: true
+      // NÃO passar data para criação
+    }).subscribe(result => {
+      this.handleModalResult(result);
+    });
+  }
+
+  /**
+   * 🏁 MODAL RESULT - Processa resultado do modal (IGUAL AO CLIENT)
+   */
+  private handleModalResult(result: any): void {
+    if (result && result.action) {
+      if (result.action === 'created') {
+        console.log('Desenvolvimento criado com sucesso:', result.data?.internalReference);
+        this.loadDevelopments(); // Recarregar lista
+        // TODO: Exibir toast de sucesso
+      } else if (result.action === 'updated') {
+        console.log('Desenvolvimento atualizado com sucesso:', result.data?.internalReference);
+        this.loadDevelopments(); // Recarregar lista
+        // TODO: Exibir toast de sucesso
+      }
+    }
+
+    // Sempre limpar o ID selecionado após fechar modal
+    this.selectedDevelopmentId = undefined;
   }
 }
