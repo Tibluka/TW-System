@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
 import { FormsModule, NgModel, ReactiveFormsModule } from "@angular/forms";
 import { MaskPipe } from 'mask-directive';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
@@ -77,9 +77,16 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
   // CONSTRUCTOR E LIFECYCLE
   // ============================================
 
+  // No constructor, adicione um effect para monitorar o modal
   constructor() {
     super();
     this.setupSearchDebounce();
+
+    // Effect para monitorar quando o modal está aberto
+    effect(() => {
+      const modalInstance = this.modalService.modals().find(m => m.id === 'client-modal');
+      this.isModalOpen = modalInstance ? modalInstance.isOpen : false;
+    });
   }
 
   ngOnInit(): void {

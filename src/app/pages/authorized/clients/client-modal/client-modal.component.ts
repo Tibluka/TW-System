@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TabConfig, TabsComponent } from '../../../../shared/components/molecules/tabs/tabs.component';
 import { ButtonComponent } from '../../../../shared/components/atoms/button/button.component';
@@ -30,11 +30,10 @@ import { SpinnerComponent } from '../../../../shared/components/atoms/spinner/sp
 })
 export class ClientModalComponent implements OnInit {
 
-  @Input() clientId?: string; // Se receber ID, é edição, senão é criação
-
-  private modalService = inject(ModalService);
+  modalService = inject(ModalService);
   private formBuilder = inject(FormBuilder);
   private clientService = inject(ClientService);
+  private cdr = inject(ChangeDetectorRef);
 
   currentTab = 'company';
   currentTabIndex = 0;
@@ -82,13 +81,12 @@ export class ClientModalComponent implements OnInit {
   ngOnInit(): void {
     this.initializeForm();
     this.updateCurrentTabIndex();
-    debugger
+
     // Acessar dados do modal ativo
     const activeModal = this.modalService.activeModal();
     if (activeModal?.config.data) {
       const client = activeModal.config.data;
-      this.clientId = client._id || client.id;
-      this.loadClientData();
+      this.populateForm(client);
     }
   }
 
@@ -97,35 +95,11 @@ export class ClientModalComponent implements OnInit {
   // ============================================
 
   get isEditMode(): boolean {
-    return !!this.clientId;
+    return !!this.clientForm.value._id;
   }
 
   get saveButtonLabel(): string {
     return this.isEditMode ? 'Atualizar' : 'Criar';
-  }
-
-  // ============================================
-  // CARREGAR DADOS PARA EDIÇÃO
-  // ============================================
-
-  private loadClientData(): void {
-    if (!this.clientId) return;
-
-    this.isLoading = true;
-
-    this.clientService.getClientById(this.clientId).subscribe({
-      next: (response) => {
-        if (response.success && response.data) {
-          this.populateForm(response.data);
-        }
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Erro ao carregar dados do cliente:', error);
-        this.isLoading = false;
-        // Exibir mensagem de erro para o usuário
-      }
-    });
   }
 
   private populateForm(client: Client): void {
@@ -370,7 +344,6 @@ export class ClientModalComponent implements OnInit {
 
     if (!this.isTabValid(currentTabId)) {
       // Aba atual inválida - não permite avançar
-      console.log('Aba atual inválida:', currentTabId);
       this.updateTabBadges();
       return;
     }
@@ -465,11 +438,11 @@ export class ClientModalComponent implements OnInit {
   }
 
   private updateClient(clientData: UpdateClientRequest): void {
-    if (!this.clientId) return;
+    if (!this.clientForm.value._id) return;
 
     this.isSaving = true;
 
-    this.clientService.updateClient(this.clientId, clientData).subscribe({
+    this.clientService.updateClient(this.clientForm.value._id, clientData).subscribe({
       next: (response) => {
         this.isSaving = false;
         console.log('Cliente atualizado com sucesso:', response.data);
