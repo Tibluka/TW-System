@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { InputComponent } from '../../../../../shared/components/atoms/input/input.component';
 
 @Component({
@@ -11,47 +11,23 @@ import { InputComponent } from '../../../../../shared/components/atoms/input/inp
 })
 export class CompanyDataComponent implements OnInit {
 
-  private formBuilder = inject(FormBuilder);
-
-  companyForm!: FormGroup;
+  @Input() parentForm!: FormGroup;
 
   ngOnInit(): void {
-    this.initializeForm();
+    if (!this.parentForm) {
+      console.error('parentForm is required for CompanyDataComponent');
+    }
   }
-
-  private initializeForm(): void {
-    this.companyForm = this.formBuilder.group({
-      companyName: ['', [
-        Validators.required,
-        Validators.minLength(2),
-        Validators.maxLength(200)
-      ]],
-      cnpj: ['', [
-        Validators.required,
-        Validators.pattern(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/)
-      ]],
-      acronym: ['', [
-        Validators.required,
-        Validators.minLength(2),
-        Validators.maxLength(10)
-      ]]
-    });
-  }
-
-  // Getters para validação
-  get companyName() { return this.companyForm.get('companyName'); }
-  get cnpj() { return this.companyForm.get('cnpj'); }
-  get acronym() { return this.companyForm.get('acronym'); }
 
   // Verifica se campo é inválido e foi tocado
   isFieldInvalid(fieldName: string): boolean {
-    const field = this.companyForm.get(fieldName);
+    const field = this.parentForm.get(fieldName);
     return !!(field && field.invalid && field.touched);
   }
 
   // Obtém mensagem de erro personalizada
   getErrorMessage(fieldName: string): string {
-    const field = this.companyForm.get(fieldName);
+    const field = this.parentForm.get(fieldName);
 
     if (field && field.errors && field.touched) {
       if (field.errors['required']) {
