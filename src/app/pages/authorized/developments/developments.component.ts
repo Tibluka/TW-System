@@ -2,18 +2,20 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule, NgModel } from "@angular/forms";
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
-import { PaginationInfo } from '../../../models/clients/clients';
-import { Development, DevelopmentFilters, DevelopmentListResponse } from '../../../models/developments/developments';
+
+// Componentes
+import { Development, DevelopmentFilters, DevelopmentListResponse, PaginationInfo } from '../../../models/developments/developments';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
-import { ModalComponent } from '../../../shared/components/organisms/modal/modal.component';
+import { ModalComponent } from "../../../shared/components/organisms/modal/modal.component";
 import { TableCellComponent } from '../../../shared/components/organisms/table/table-cell/table-cell.component';
 import { TableRowComponent } from '../../../shared/components/organisms/table/table-row/table-row.component';
 import { TableComponent } from '../../../shared/components/organisms/table/table.component';
 import { DevelopmentService } from '../../../shared/services/development/development.service';
 import { ModalService } from '../../../shared/services/modal/modal.service';
 import { FormValidator } from '../../../shared/utils/form';
-import { DevelopmentModalComponent } from './development-modal/development-modal.component';
+import { DevelopmentModalComponent } from "./development-modal/development-modal.component";
+
 @Component({
   selector: 'app-developments',
   imports: [
@@ -33,8 +35,6 @@ import { DevelopmentModalComponent } from './development-modal/development-modal
 })
 export class DevelopmentsComponent extends FormValidator implements OnInit, OnDestroy {
 
-  isModalOpen: boolean = false;
-
   private developmentService = inject(DevelopmentService);
   private modalService = inject(ModalService);
 
@@ -50,7 +50,7 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
 
   // Filtros atuais
   currentFilters: DevelopmentFilters = {
-    search: '',
+    search: undefined,
     page: 1,
     limit: 10,
     active: true
@@ -123,7 +123,7 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
       .subscribe({
         next: (response: DevelopmentListResponse) => {
           this.developments = response.data || [];
-          //this.pagination = response.pagination || null;
+          this.pagination = response.pagination || null;
 
           console.log('✅ Desenvolvimentos carregados:', {
             count: this.developments.length,
@@ -169,7 +169,7 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
 
     this.modalService.open({
       id: 'development-modal',
-      title: `Editar Desenvolvimento - ${development.name}`,
+      title: `Editar Desenvolvimento - ${development.internalReference}`,
       size: 'xl',
       showHeader: true,
       showCloseButton: true,
@@ -196,8 +196,7 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
    * 🔍 BUSCA - Dispara busca quando usuário digita
    */
   onSearchChange(): void {
-    if (!this.currentFilters.search) return;
-    this.searchSubject.next(this.currentFilters.search);
+    this.searchSubject.next(this.currentFilters.search || '');
   }
 
   /**
@@ -217,13 +216,10 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
    */
   getStatusLabel(status: string): string {
     const statusLabels: { [key: string]: string } = {
-      'draft': 'Rascunho',
-      'planning': 'Planejamento',
-      'in_progress': 'Em Progresso',
-      'testing': 'Teste',
-      'completed': 'Concluído',
-      'cancelled': 'Cancelado',
-      'on_hold': 'Pausado'
+      'CREATED': 'Criado',
+      'AWAITING_APPROVAL': 'Aguardando Aprovação',
+      'APPROVED': 'Aprovado',
+      'CANCELED': 'Cancelado'
     };
     return statusLabels[status] || status;
   }

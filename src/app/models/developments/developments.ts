@@ -7,13 +7,10 @@ import { Client } from '../clients/clients';
 // ============================================
 
 export type DevelopmentStatus =
-    | 'draft'
-    | 'planning'
-    | 'in_progress'
-    | 'testing'
-    | 'completed'
-    | 'cancelled'
-    | 'on_hold';
+    | 'CREATED'
+    | 'AWAITING_APPROVAL'
+    | 'APPROVED'
+    | 'CLOSED';
 
 // ============================================
 // INTERFACE PRINCIPAL
@@ -21,26 +18,98 @@ export type DevelopmentStatus =
 
 export interface Development {
     _id?: string;
-    name: string;
-    description?: string;
-    client?: Client; // Pode vir populado da API
-    clientId: string; // ID de referência
-    status: DevelopmentStatus;
-    progress?: number; // 0-100%
-    startDate: Date | string;
-    expectedEndDate?: Date | string;
-    actualEndDate?: Date | string;
-    totalValue?: number;
-    paidValue?: number;
-    technologies?: string; // Lista de tecnologias como string
-    observations?: string;
 
-    // Metadados
+    // IDENTIFIERS
+    clientReference?: string; // Referência fornecida pelo cliente
+    internalReference?: string; // Auto-gerado: formato 25ABC0001
+
+    // CLIENT REFERENCE
+    clientId: string; // ID de referência obrigatório
+    client?: Client; // Pode vir populado da API via populate
+
+    // BASIC DATA
+    description: string; // Obrigatório
+
+    // PIECE IMAGE
+    pieceImage?: {
+        url?: string;
+        publicId?: string;
+        filename?: string;
+        optimizedUrls?: {
+            thumbnail?: string;
+            small?: string;
+            medium?: string;
+            large?: string;
+            original?: string;
+        };
+        uploadedAt?: Date | string;
+    };
+
+    // STATUS
+    status: DevelopmentStatus;
+
+    // VARIANTS
+    variants?: {
+        color?: string;
+    };
+
+    // PRODUCTION TYPE
+    productionType: {
+        rotary: {
+            enabled: boolean;
+            negotiatedPrice?: number; // Obrigatório se enabled = true
+        };
+        localized: {
+            enabled: boolean;
+            negotiatedPrice?: number; // Obrigatório se enabled = true
+        };
+    };
+
+    // METADADOS
     active?: boolean;
     createdAt?: Date | string;
     updatedAt?: Date | string;
-    createdBy?: string;
-    updatedBy?: string;
+}
+
+// ============================================
+// INTERFACE PARA IMAGEM
+// ============================================
+
+export interface PieceImage {
+    url?: string;
+    publicId?: string;
+    filename?: string;
+    optimizedUrls?: {
+        thumbnail?: string;
+        small?: string;
+        medium?: string;
+        large?: string;
+        original?: string;
+    };
+    uploadedAt?: Date | string;
+}
+
+// ============================================
+// INTERFACE PARA TIPO DE PRODUÇÃO
+// ============================================
+
+export interface ProductionType {
+    rotary: {
+        enabled: boolean;
+        negotiatedPrice?: number;
+    };
+    localized: {
+        enabled: boolean;
+        negotiatedPrice?: number;
+    };
+}
+
+// ============================================
+// INTERFACE PARA VARIANTES
+// ============================================
+
+export interface DevelopmentVariants {
+    color?: string;
 }
 
 // ============================================
@@ -48,21 +117,27 @@ export interface Development {
 // ============================================
 
 export interface CreateDevelopmentRequest {
-    name: string;
-    description?: string;
     clientId: string;
-    status: DevelopmentStatus;
-    progress?: number;
-    startDate: Date;
-    expectedEndDate?: Date;
-    totalValue?: number;
-    paidValue?: number;
-    technologies?: string;
-    observations?: string;
+    description: string;
+    clientReference?: string;
+    status?: DevelopmentStatus;
+    variants?: {
+        color?: string;
+    };
+    productionType: {
+        rotary: {
+            enabled: boolean;
+            negotiatedPrice?: number;
+        };
+        localized: {
+            enabled: boolean;
+            negotiatedPrice?: number;
+        };
+    };
 }
 
 export interface UpdateDevelopmentRequest extends Partial<CreateDevelopmentRequest> {
-    actualEndDate?: Date;
+    internalReference?: string; // Não pode ser alterado após criação
 }
 
 // ============================================
@@ -70,14 +145,18 @@ export interface UpdateDevelopmentRequest extends Partial<CreateDevelopmentReque
 // ============================================
 
 export interface DevelopmentFilters {
-    search?: string;
+    search?: string; // Busca em clientReference e description
     clientId?: string;
     status?: DevelopmentStatus;
-    startDateFrom?: Date | string;
-    startDateTo?: Date | string;
-    expectedEndDateFrom?: Date | string;
-    expectedEndDateTo?: Date | string;
     active?: boolean;
+
+    // Filtros por tipo de produção
+    rotaryEnabled?: boolean;
+    localizedEnabled?: boolean;
+
+    // Filtros por data
+    createdFrom?: Date | string;
+    createdTo?: Date | string;
 
     // Paginação
     page?: number;
@@ -111,6 +190,18 @@ export interface PaginationInfo {
 }
 
 // ============================================
+// STATISTICS INTERFACE
+// ============================================
+
+export interface DevelopmentStatistics {
+    total: number;
+    started: number;
+    awaiting_approval: number;
+    approved: number;
+    refused: number;
+}
+
+// ============================================
 // HELPERS E UTILITÁRIOS
 // ============================================
 
@@ -121,13 +212,10 @@ export class DevelopmentUtils {
      */
     static getStatusLabel(status: DevelopmentStatus): string {
         const labels: Record<DevelopmentStatus, string> = {
-            'draft': 'Rascunho',
-            'planning': 'Planejamento',
-            'in_progress': 'Em Progresso',
-            'testing': 'Teste',
-            'completed': 'Concluído',
-            'cancelled': 'Cancelado',
-            'on_hold': 'Pausado'
+            'CREATED': 'Criado',
+            'AWAITING_APPROVAL': 'Aguardando Aprovação',
+            'APPROVED': 'Aprovado',
+            'CLOSED': 'Fechado'
         };
 
         return labels[status] || status;
@@ -137,72 +225,90 @@ export class DevelopmentUtils {
      * 🎨 Retorna classe CSS para status
      */
     static getStatusClass(status: DevelopmentStatus): string {
-        return `status-${status}`;
+        return `status-${status.toLowerCase()}`;
     }
 
     /**
-     * ⏰ Verifica se desenvolvimento está atrasado
+     * 💰 Valida se pelo menos um tipo de produção está habilitado
      */
-    static isOverdue(expectedEndDate: Date | string | undefined, status: DevelopmentStatus): boolean {
-        if (!expectedEndDate || status === 'completed' || status === 'cancelled') {
+    static validateProductionType(productionType: ProductionType): boolean {
+        return productionType.rotary.enabled || productionType.localized.enabled;
+    }
+
+    /**
+     * 💵 Valida se preço foi informado para tipos habilitados
+     */
+    static validateNegotiatedPrices(productionType: ProductionType): boolean {
+        if (productionType.rotary.enabled && !productionType.rotary.negotiatedPrice) {
             return false;
         }
-
-        const targetDate = new Date(expectedEndDate);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        return targetDate < today;
+        if (productionType.localized.enabled && !productionType.localized.negotiatedPrice) {
+            return false;
+        }
+        return true;
     }
 
     /**
-     * 💰 Calcula valor restante a ser pago
+     * 🖼️ Verifica se development tem imagem
      */
-    static getRemainingValue(totalValue?: number, paidValue?: number): number {
-        if (!totalValue) return 0;
-        return totalValue - (paidValue || 0);
+    static hasImage(development: Development): boolean {
+        return !!(development.pieceImage && development.pieceImage.url);
     }
 
     /**
-     * 📊 Calcula percentual pago
+     * 🔗 Retorna URL da imagem otimizada
      */
-    static getPaymentPercentage(totalValue?: number, paidValue?: number): number {
-        if (!totalValue || totalValue === 0) return 0;
-        return Math.round((paidValue || 0) / totalValue * 100);
+    static getImageUrl(development: Development, size: 'thumbnail' | 'small' | 'medium' | 'large' | 'original' = 'medium'): string | null {
+        if (!development.pieceImage || !development.pieceImage.optimizedUrls) {
+            return development.pieceImage?.url || null;
+        }
+
+        return development.pieceImage.optimizedUrls[size] || development.pieceImage.url || null;
     }
 
     /**
-     * 📅 Calcula dias restantes até deadline
+     * 🏭 Retorna tipos de produção habilitados
      */
-    static getDaysUntilDeadline(expectedEndDate: Date | string | undefined): number | null {
-        if (!expectedEndDate) return null;
+    static getEnabledProductionTypes(productionType: ProductionType): string[] {
+        const types: string[] = [];
 
-        const targetDate = new Date(expectedEndDate);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        targetDate.setHours(0, 0, 0, 0);
+        if (productionType.rotary.enabled) {
+            types.push('Rotativa');
+        }
 
-        const diffTime = targetDate.getTime() - today.getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (productionType.localized.enabled) {
+            types.push('Localizada');
+        }
 
-        return diffDays;
+        return types;
     }
 
     /**
-     * 🔍 Valida se desenvolvimento pode mudar para determinado status
+     * 📝 Valida se pode ser aprovado
      */
-    static canChangeToStatus(currentStatus: DevelopmentStatus, newStatus: DevelopmentStatus): boolean {
-        // Regras de transição de status
-        const allowedTransitions: Record<DevelopmentStatus, DevelopmentStatus[]> = {
-            'draft': ['planning', 'cancelled'],
-            'planning': ['in_progress', 'on_hold', 'cancelled'],
-            'in_progress': ['testing', 'completed', 'on_hold', 'cancelled'],
-            'testing': ['in_progress', 'completed', 'cancelled'],
-            'completed': [], // Não pode sair de completed
-            'cancelled': ['draft', 'planning'], // Pode reativar
-            'on_hold': ['in_progress', 'cancelled']
-        };
+    static canBeApproved(development: Development): boolean {
+        return development.status === 'AWAITING_APPROVAL';
+    }
 
-        return allowedTransitions[currentStatus]?.includes(newStatus) || false;
+    /**
+     * 🏭 Valida se pode criar ordem de produção
+     */
+    static canCreateProductionOrder(development: Development): boolean {
+        return development.status === 'APPROVED';
+    }
+
+    /**
+     * 🔍 Formata referência interna para exibição
+     */
+    static formatInternalReference(internalReference?: string): string {
+        if (!internalReference) return '-';
+
+        // Formato: 25ABC0001 -> 25-ABC-0001
+        const match = internalReference.match(/^(\d{2})([A-Z]{2,4})(\d{4})$/);
+        if (match) {
+            return `${match[1]}-${match[2]}-${match[3]}`;
+        }
+
+        return internalReference;
     }
 }

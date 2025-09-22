@@ -1,16 +1,19 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { lastValueFrom } from 'rxjs';
+import { Client } from '../../../../models/clients/clients';
+import { CreateDevelopmentRequest, UpdateDevelopmentRequest } from '../../../../models/developments/developments';
 import { ButtonComponent } from '../../../../shared/components/atoms/button/button.component';
 import { InputComponent } from '../../../../shared/components/atoms/input/input.component';
 import { SelectComponent } from '../../../../shared/components/atoms/select/select.component';
-import { TextareaComponent } from '../../../../shared/components/atoms/textarea/textarea.component';
 import { SpinnerComponent } from '../../../../shared/components/atoms/spinner/spinner.component';
-import { ModalService } from '../../../../shared/services/modal/modal.service';
+import { TextareaComponent } from '../../../../shared/components/atoms/textarea/textarea.component';
+import { FileUploadComponent, UploadedFile } from '../../../../shared/components/organisms/file-upload/file-upload.component';
 import { ClientService } from '../../../../shared/services/clients/clients.service';
-import { Development, CreateDevelopmentRequest, UpdateDevelopmentRequest } from '../../../../models/developments/developments';
-import { Client } from '../../../../models/clients/clients';
 import { DevelopmentService } from '../../../../shared/services/development/development.service';
+import { ModalService } from '../../../../shared/services/modal/modal.service';
+import { FormValidator } from '../../../../shared/utils/form';
 
 interface SelectOption {
   value: string;
@@ -26,12 +29,13 @@ interface SelectOption {
     InputComponent,
     SelectComponent,
     TextareaComponent,
-    SpinnerComponent
+    SpinnerComponent,
+    FileUploadComponent
   ],
   templateUrl: './development-modal.component.html',
   styleUrl: './development-modal.component.scss'
 })
-export class DevelopmentModalComponent implements OnInit {
+export class DevelopmentModalComponent extends FormValidator implements OnInit {
 
   @Input() developmentId?: string;
 
@@ -50,15 +54,13 @@ export class DevelopmentModalComponent implements OnInit {
 
   // Opções para selects
   clientOptions: SelectOption[] = [];
-  statusOptions: SelectOption[] = [
-    { value: 'draft', label: 'Rascunho' },
-    { value: 'planning', label: 'Planejamento' },
-    { value: 'in_progress', label: 'Em Progresso' },
-    { value: 'testing', label: 'Teste' },
-    { value: 'completed', label: 'Concluído' },
-    { value: 'cancelled', label: 'Cancelado' },
-    { value: 'on_hold', label: 'Pausado' }
+  productionTypeOptions: SelectOption[] = [
+    { value: 'rotary', label: 'Rotativo' },
+    { value: 'localized', label: 'Localizado' }
   ];
+
+  // Controle de upload de imagem
+  uploadedFiles: UploadedFile[] = [];
 
   // ============================================
   // LIFECYCLE HOOKS
@@ -78,17 +80,10 @@ export class DevelopmentModalComponent implements OnInit {
    */
   private initializeForm(): void {
     this.developmentForm = this.formBuilder.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
       clientId: ['', [Validators.required]],
-      status: ['draft', [Validators.required]],
-      progress: [0, [Validators.min(0), Validators.max(100)]],
       description: [''],
-      startDate: ['', [Validators.required]],
-      expectedEndDate: [''],
-      totalValue: [0, [Validators.min(0)]],
-      paidValue: [0, [Validators.min(0)]],
-      technologies: [''],
-      observations: ['']
+      productionType: ['', [Validators.required]],
+      clientReference: ['']
     });
 
     // Determinar se é modo edição
@@ -140,10 +135,10 @@ export class DevelopmentModalComponent implements OnInit {
           label: client.companyName || 'Cliente sem nome'
         }));
 
-        console.log('✅ Clientes carregados:', this.clientOptions.length);
+        console.log('✅ Clientes carregados para select:', this.clientOptions.length);
       }
     } catch (error) {
-      console.error('❌ Erro ao carregar clientes:', error);
+      console.error('❌ Erro ao carregar clientes para select:', error);
     }
   }
 
@@ -157,22 +152,23 @@ export class DevelopmentModalComponent implements OnInit {
       const development = await this.developmentService.getDevelopmentById(this.developmentId).toPromise();
 
       if (development) {
+        // Determinar tipo de produção baseado no que está habilitado
+        let productionType = '';
+        if (development.productionType?.rotary?.enabled) {
+          productionType = 'rotary';
+        } else if (development.productionType?.localized?.enabled) {
+          productionType = 'localized';
+        }
+
         // Preencher formulário com dados existentes
         this.developmentForm.patchValue({
-          name: development.name,
           clientId: development.client?._id || development.clientId,
-          status: development.status,
-          progress: development.progress || 0,
           description: development.description || '',
-          startDate: this.formatDateForInput(development.startDate),
-          expectedEndDate: this.formatDateForInput(development.expectedEndDate),
-          totalValue: development.totalValue || 0,
-          paidValue: development.paidValue || 0,
-          technologies: development.technologies || '',
-          observations: development.observations || ''
+          productionType: productionType,
+          clientReference: development.clientReference || ''
         });
 
-        console.log('✅ Dados do desenvolvimento carregados:', development.name);
+        console.log('✅ Dados do desenvolvimento carregados:', development);
       }
     } catch (error) {
       console.error('❌ Erro ao carregar desenvolvimento:', error);
@@ -180,63 +176,41 @@ export class DevelopmentModalComponent implements OnInit {
   }
 
   // ============================================
-  // FORM ACTIONS
+  // FILE UPLOAD HANDLERS
   // ============================================
 
   /**
-   * 💾 SUBMIT - Processa envio do formulário
+   * 📁 ARQUIVOS ALTERADOS - Callback quando arquivos são alterados
    */
-  async onSubmit(): Promise<void> {
-    if (this.developmentForm.invalid || this.isSaving) return;
-
-    this.isSaving = true;
-
-    try {
-      const formData = this.developmentForm.value;
-      let result;
-
-      if (this.isEditMode && this.developmentId) {
-        // Modo edição - atualizar desenvolvimento
-        const updateData: UpdateDevelopmentRequest = {
-          ...formData,
-          startDate: new Date(formData.startDate),
-          expectedEndDate: formData.expectedEndDate ? new Date(formData.expectedEndDate) : undefined
-        };
-
-        result = await this.developmentService.updateDevelopment(this.developmentId, updateData).toPromise();
-        console.log('✅ Desenvolvimento atualizado:', result);
-
-      } else {
-        // Modo criação - criar novo desenvolvimento
-        const createData: CreateDevelopmentRequest = {
-          ...formData,
-          startDate: new Date(formData.startDate),
-          expectedEndDate: formData.expectedEndDate ? new Date(formData.expectedEndDate) : undefined
-        };
-
-        result = await this.developmentService.createDevelopment(createData).toPromise();
-        console.log('✅ Desenvolvimento criado:', result);
-      }
-
-      // Fechar modal com sucesso
-      this.modalService.close('development-modal', {
-        success: true,
-        data: result,
-        message: this.isEditMode ? 'Desenvolvimento atualizado com sucesso!' : 'Desenvolvimento criado com sucesso!'
-      });
-
-    } catch (error: any) {
-      console.error('❌ Erro ao salvar desenvolvimento:', error);
-
-      // Não fechar modal em caso de erro, apenas mostrar mensagem
-      // TODO: Implementar sistema de notificações
-      alert(error.message || 'Erro ao salvar desenvolvimento. Tente novamente.');
-
-    } finally {
-      this.isSaving = false;
-      this.cdr.detectChanges();
-    }
+  onImageChanged(files: UploadedFile[]): void {
+    this.uploadedFiles = files;
+    console.log('📁 Arquivos alterados:', files);
   }
+
+  /**
+   * ➕ ARQUIVO ADICIONADO - Callback quando arquivo é adicionado
+   */
+  onImageAdded(file: UploadedFile): void {
+    console.log('➕ Arquivo adicionado:', file);
+  }
+
+  /**
+   * 🗑️ ARQUIVO REMOVIDO - Callback quando arquivo é removido
+   */
+  onImageRemoved(file: UploadedFile): void {
+    console.log('🗑️ Arquivo removido:', file);
+  }
+
+  /**
+   * ❌ ERRO UPLOAD - Callback para erros de upload
+   */
+  onUploadError(error: string): void {
+    console.error('❌ Erro no upload:', error);
+  }
+
+  // ============================================
+  // FORM ACTIONS
+  // ============================================
 
   /**
    * ❌ CANCELAR - Fecha modal sem salvar
@@ -261,7 +235,6 @@ export class DevelopmentModalComponent implements OnInit {
 
     const errors = field.errors;
 
-    // Mensagens de erro personalizadas
     if (errors['required']) {
       return `${this.getFieldLabel(fieldName)} é obrigatório.`;
     }
@@ -269,16 +242,6 @@ export class DevelopmentModalComponent implements OnInit {
     if (errors['minlength']) {
       const requiredLength = errors['minlength'].requiredLength;
       return `${this.getFieldLabel(fieldName)} deve ter pelo menos ${requiredLength} caracteres.`;
-    }
-
-    if (errors['min']) {
-      const min = errors['min'].min;
-      return `${this.getFieldLabel(fieldName)} deve ser maior ou igual a ${min}.`;
-    }
-
-    if (errors['max']) {
-      const max = errors['max'].max;
-      return `${this.getFieldLabel(fieldName)} deve ser menor ou igual a ${max}.`;
     }
 
     return 'Campo inválido.';
@@ -289,38 +252,114 @@ export class DevelopmentModalComponent implements OnInit {
    */
   private getFieldLabel(fieldName: string): string {
     const labels: { [key: string]: string } = {
-      'name': 'Nome do desenvolvimento',
       'clientId': 'Cliente',
-      'status': 'Status',
-      'progress': 'Progresso',
       'description': 'Descrição',
-      'startDate': 'Data de início',
-      'expectedEndDate': 'Data prevista de conclusão',
-      'totalValue': 'Valor total',
-      'paidValue': 'Valor pago',
-      'technologies': 'Tecnologias',
-      'observations': 'Observações'
+      'productionType': 'Tipo de produção',
+      'clientReference': 'Referência do cliente'
     };
 
     return labels[fieldName] || fieldName;
   }
 
-  // ============================================
-  // HELPERS
-  // ============================================
+  /**
+ * 💾 SUBMIT - Processa envio do formulário
+ */
+  async onSubmit(): Promise<void> {
+    if (this.developmentForm.invalid || this.isSaving) return;
+
+    this.isSaving = true;
+
+    try {
+      const formData = this.developmentForm.value;
+
+      // Construir productionType baseado na seleção
+      const productionType = {
+        rotary: {
+          enabled: formData.productionType === 'rotary',
+          negotiatedPrice: formData.productionType === 'rotary' ? 0 : undefined
+        },
+        localized: {
+          enabled: formData.productionType === 'localized',
+          negotiatedPrice: formData.productionType === 'localized' ? 0 : undefined
+        }
+      };
+
+      let result: any;
+
+      if (this.isEditMode && this.developmentId) {
+        // Modo edição - atualizar desenvolvimento
+        const updateData: UpdateDevelopmentRequest = {
+          clientId: formData.clientId,
+          description: formData.description,
+          clientReference: formData.clientReference,
+          productionType: productionType
+        };
+
+        result = await this.developmentService.updateDevelopment(this.developmentId, updateData).toPromise();
+        console.log('✅ Desenvolvimento atualizado:', result);
+
+        // Se há imagem para upload no modo edição, fazer upload
+        if (this.uploadedFiles.length > 0) {
+          await this.uploadImageToDevelopment(this.developmentId);
+        }
+
+      } else {
+        // Modo criação - criar novo desenvolvimento
+        const createData: CreateDevelopmentRequest = {
+          clientId: formData.clientId,
+          description: formData.description,
+          clientReference: formData.clientReference,
+          productionType: productionType
+        };
+
+        result = await this.developmentService.createDevelopment(createData).toPromise();
+        console.log('✅ Desenvolvimento criado:', result);
+
+        // Se há imagem para upload após criação, fazer upload
+        if (this.uploadedFiles.length > 0 && result._id) {
+          await this.uploadImageToDevelopment(result._id);
+        }
+      }
+
+      // Fechar modal com sucesso
+      this.modalService.close('development-modal', {
+        success: true,
+        data: result,
+        message: this.isEditMode ? 'Desenvolvimento atualizado com sucesso!' : 'Desenvolvimento criado com sucesso!'
+      });
+
+    } catch (error: any) {
+      console.error('❌ Erro ao salvar desenvolvimento:', error);
+      alert(error.message || 'Erro ao salvar desenvolvimento. Tente novamente.');
+
+    } finally {
+      this.isSaving = false;
+      this.cdr.detectChanges();
+    }
+  }
 
   /**
-   * 📅 FORMATAR DATA - Converte data para formato do input[type="date"]
+   * 📷 UPLOAD IMAGEM PARA DESENVOLVIMENTO - Faz upload da imagem para o desenvolvimento
    */
-  private formatDateForInput(date: string | Date | undefined): string {
-    if (!date) return '';
+  private async uploadImageToDevelopment(developmentId: string): Promise<void> {
+    if (this.uploadedFiles.length === 0) return;
 
-    const dateObj = new Date(date);
+    try {
+      console.log('📷 Fazendo upload de imagem para desenvolvimento:', developmentId);
 
-    // Verificar se a data é válida
-    if (isNaN(dateObj.getTime())) return '';
+      const formData = new FormData();
+      formData.append('image', this.uploadedFiles[0].file);
 
-    // Retornar no formato YYYY-MM-DD
-    return dateObj.toISOString().split('T')[0];
+      const response = await this.developmentService.uploadImage(developmentId, this.uploadedFiles[0].file).toPromise();
+
+      console.log('✅ Imagem enviada com sucesso:', response);
+
+      // Limpar arquivos após upload bem-sucedido
+      this.uploadedFiles = [];
+
+    } catch (uploadError) {
+      console.error('❌ Erro ao enviar imagem:', uploadError);
+      throw new Error('Erro ao fazer upload da imagem. Desenvolvimento salvo mas imagem não foi enviada.');
+    }
   }
 }

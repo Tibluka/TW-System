@@ -1,11 +1,12 @@
-// services/developments/developments.service.ts
+// services/development/development.service.ts
 
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
-import { DevelopmentFilters, DevelopmentListResponse, Development, DevelopmentResponse, CreateDevelopmentRequest, UpdateDevelopmentRequest } from '../../../models/developments/developments';
+import { DevelopmentFilters, DevelopmentListResponse, Development, DevelopmentResponse, CreateDevelopmentRequest, UpdateDevelopmentRequest, DevelopmentStatistics } from '../../../models/developments/developments';
+
 
 @Injectable({
   providedIn: 'root'
@@ -38,24 +39,26 @@ export class DevelopmentService {
       params = params.set('status', filters.status);
     }
 
-    if (filters.startDateFrom) {
-      params = params.set('startDateFrom', this.formatDate(filters.startDateFrom));
-    }
-
-    if (filters.startDateTo) {
-      params = params.set('startDateTo', this.formatDate(filters.startDateTo));
-    }
-
-    if (filters.expectedEndDateFrom) {
-      params = params.set('expectedEndDateFrom', this.formatDate(filters.expectedEndDateFrom));
-    }
-
-    if (filters.expectedEndDateTo) {
-      params = params.set('expectedEndDateTo', this.formatDate(filters.expectedEndDateTo));
-    }
-
     if (filters.active !== undefined) {
       params = params.set('active', filters.active.toString());
+    }
+
+    // Filtros específicos para tipo de produção
+    if (filters.rotaryEnabled !== undefined) {
+      params = params.set('rotaryEnabled', filters.rotaryEnabled.toString());
+    }
+
+    if (filters.localizedEnabled !== undefined) {
+      params = params.set('localizedEnabled', filters.localizedEnabled.toString());
+    }
+
+    // Filtros por data de criação
+    if (filters.createdFrom) {
+      params = params.set('createdFrom', this.formatDate(filters.createdFrom));
+    }
+
+    if (filters.createdTo) {
+      params = params.set('createdTo', this.formatDate(filters.createdTo));
     }
 
     // Paginação
@@ -170,12 +173,31 @@ export class DevelopmentService {
   }
 
   /**
+   * 🔄 ALTERAR STATUS - Atualiza apenas o status do desenvolvimento
+   */
+  updateDevelopmentStatus(id: string, status: string): Observable<Development> {
+    console.log(`🔄 Alterando status do desenvolvimento ${id} para:`, status);
+
+    return this.http.patch<DevelopmentResponse>(`${this.baseUrl}/${id}/status`, { status })
+      .pipe(
+        map(response => {
+          console.log('✅ Status do desenvolvimento alterado:', response.data);
+          return response.data;
+        }),
+        catchError(error => {
+          console.error('❌ Erro ao alterar status do desenvolvimento:', error);
+          return throwError(() => this.handleError(error));
+        })
+      );
+  }
+
+  /**
    * 🔄 ATIVAR/DESATIVAR - Alterna status ativo do desenvolvimento
    */
   toggleDevelopmentStatus(id: string, active: boolean): Observable<Development> {
     console.log(`🔄 ${active ? 'Ativando' : 'Desativando'} desenvolvimento:`, id);
 
-    return this.http.patch<DevelopmentResponse>(`${this.baseUrl}/${id}/toggle-status`, { active })
+    return this.http.post<DevelopmentResponse>(`${this.baseUrl}/${id}/${active ? 'activate' : 'deactivate'}`, {})
       .pipe(
         map(response => {
           console.log('✅ Status do desenvolvimento alterado:', response.data);
@@ -195,7 +217,7 @@ export class DevelopmentService {
   /**
    * 📊 ESTATÍSTICAS - Busca estatísticas dos desenvolvimentos
    */
-  getDevelopmentStats(filters?: Partial<DevelopmentFilters>): Observable<any> {
+  getDevelopmentStats(filters?: Partial<DevelopmentFilters>): Observable<DevelopmentStatistics> {
     let params = new HttpParams();
 
     if (filters?.clientId) {
@@ -206,7 +228,7 @@ export class DevelopmentService {
       params = params.set('status', filters.status);
     }
 
-    return this.http.get<any>(`${this.baseUrl}/stats`, { params })
+    return this.http.get<DevelopmentStatistics>(`${this.baseUrl}/stats`, { params })
       .pipe(
         catchError(error => {
           console.error('❌ Erro ao buscar estatísticas:', error);
@@ -227,29 +249,61 @@ export class DevelopmentService {
     return this.listDevelopments(clientFilters);
   }
 
+  // ============================================
+  // MÉTODOS DE IMAGEM
+  // ============================================
+
   /**
-   * 📅 ATRASADOS - Busca desenvolvimentos atrasados
+   * 📷 UPLOAD IMAGEM - Faz upload da imagem da peça
    */
-  getOverdueDevelopments(filters?: Partial<DevelopmentFilters>): Observable<DevelopmentListResponse> {
-    let params = new HttpParams();
+  uploadImage(developmentId: string, file: File): Observable<any> {
+    console.log('📷 Fazendo upload de imagem para desenvolvimento:', developmentId);
 
-    // Filtros opcionais
-    if (filters?.clientId) {
-      params = params.set('clientId', filters.clientId);
-    }
+    const formData = new FormData();
+    formData.append('image', file);
 
-    if (filters?.page) {
-      params = params.set('page', filters.page.toString());
-    }
+    return this.http.post<any>(`${this.baseUrl}/${developmentId}/image`, formData)
+      .pipe(
+        map(response => {
+          console.log('✅ Imagem enviada com sucesso:', response);
+          return response;
+        }),
+        catchError(error => {
+          console.error('❌ Erro ao fazer upload da imagem:', error);
+          return throwError(() => this.handleError(error));
+        })
+      );
+  }
 
-    if (filters?.limit) {
-      params = params.set('limit', filters.limit.toString());
-    }
+  /**
+   * 🗑️ REMOVER IMAGEM - Remove imagem da peça
+   */
+  removeImage(developmentId: string): Observable<any> {
+    console.log('🗑️ Removendo imagem do desenvolvimento:', developmentId);
 
-    return this.http.get<DevelopmentListResponse>(`${this.baseUrl}/overdue`, { params })
+    return this.http.delete<any>(`${this.baseUrl}/${developmentId}/image`)
+      .pipe(
+        map(response => {
+          console.log('✅ Imagem removida com sucesso:', response);
+          return response;
+        }),
+        catchError(error => {
+          console.error('❌ Erro ao remover imagem:', error);
+          return throwError(() => this.handleError(error));
+        })
+      );
+  }
+
+  /**
+   * 👁️ OBTER IMAGEM - Busca informações da imagem
+   */
+  getImage(developmentId: string): Observable<any> {
+    console.log('👁️ Buscando imagem do desenvolvimento:', developmentId);
+
+    return this.http.get<any>(`${this.baseUrl}/${developmentId}/image`)
       .pipe(
         catchError(error => {
-          console.error('❌ Erro ao buscar desenvolvimentos atrasados:', error);
+          console.error('❌ Erro ao buscar imagem:', error);
           return throwError(() => this.handleError(error));
         })
       );
