@@ -1,22 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule, NgModel, ReactiveFormsModule } from "@angular/forms";
 import { MaskPipe } from 'mask-directive';
-import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
 // Componentes
+import { Client, ClientFilters, ClientListResponse, PaginationInfo } from '../../../models/clients/clients';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
-import { IconComponent } from '../../../shared/components/atoms/icon/icon.component';
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
-import { SpinnerComponent } from '../../../shared/components/atoms/spinner/spinner.component';
+import { ModalComponent } from "../../../shared/components/organisms/modal/modal.component";
 import { TableCellComponent } from '../../../shared/components/organisms/table/table-cell/table-cell.component';
 import { TableRowComponent } from '../../../shared/components/organisms/table/table-row/table-row.component';
 import { TableComponent } from '../../../shared/components/organisms/table/table.component';
-import { FormValidator } from '../../../shared/utils/form';
-import { Client, PaginationInfo, ClientFilters, ClientListResponse } from '../../../models/clients/clients';
 import { ClientService } from '../../../shared/services/clients/clients.service';
 import { ModalService } from '../../../shared/services/modal/modal.service';
-import { ModalComponent } from "../../../shared/components/organisms/modal/modal.component";
+import { FormValidator } from '../../../shared/utils/form';
 import { ClientModalComponent } from "./client-modal/client-modal.component";
 
 @Component({
@@ -30,8 +28,6 @@ import { ClientModalComponent } from "./client-modal/client-modal.component";
     TableComponent,
     TableRowComponent,
     TableCellComponent,
-    IconComponent,
-    SpinnerComponent,
     MaskPipe,
     ModalComponent,
     ClientModalComponent
@@ -55,6 +51,7 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
   clients: Client[] = [];
   pagination: PaginationInfo | null = null;
   loading = false;
+  shouldShowTable = false;
 
   // Estados para UI
   errorMessage: string = '';
@@ -101,6 +98,8 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
     console.log('📡 Carregando clientes com filtros:', filters);
 
     this.loading = true;
+    this.shouldShowTable = true;
+
     this.clearError();
     this.currentFilters = { ...this.currentFilters, ...filters };
 
@@ -280,10 +279,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
 
   get hasClients(): boolean {
     return this.clients && this.clients.length > 0;
-  }
-
-  get shouldShowTable(): boolean {
-    return !this.loading;
   }
 
   get shouldShowSpinner(): boolean {
