@@ -32,11 +32,13 @@ import { ClientModalComponent } from "./client-modal/client-modal.component";
     ModalComponent,
     ClientModalComponent
   ],
-  providers: [NgModel],
+  providers: [NgModel], // NgModel é necessário para MaskDirective
   templateUrl: './clients.component.html',
   styleUrl: './clients.component.scss'
 })
 export class ClientsComponent extends FormValidator implements OnInit, OnDestroy {
+
+  isModalOpen: boolean = false;
 
   private clientService = inject(ClientService);
   private modalService = inject(ModalService);
@@ -60,9 +62,12 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
   // Filtros atuais
   currentFilters: ClientFilters = {
     page: 1,
-    limit: 1,
+    limit: 10,
     active: true
   };
+
+  // Propriedade para armazenar ID do cliente selecionado para edição
+  selectedClientId?: string;
 
   // RxJS para cleanup e debounce
   private destroy$ = new Subject<void>();
@@ -88,13 +93,27 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
   }
 
   // ============================================
+  // SETUP DE DEBOUNCE PARA BUSCA
+  // ============================================
+
+  private setupSearchDebounce(): void {
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(searchTerm => {
+      this.performSearch(searchTerm);
+    });
+  }
+
+  // ============================================
   // MÉTODOS PRINCIPAIS - CRUD
   // ============================================
 
   /**
    * 📋 LISTAR - Carrega lista de clientes da API
    */
-  loadClients(filters: ClientFilters = this.currentFilters): void {
+  private loadClients(filters: ClientFilters = this.currentFilters): void {
     console.log('📡 Carregando clientes com filtros:', filters);
 
     this.loading = true;
@@ -114,259 +133,198 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
             this.pagination = response.pagination;
 
             console.log(`📊 ${this.clients.length} clientes carregados:`, this.clients);
+            this.shouldShowTable = this.clients.length > 0;
           } else {
             console.warn('⚠️ Resposta da API não contém dados válidos:', response);
             this.clients = [];
+            this.shouldShowTable = false;
             this.showErrorMessage('Nenhum dado foi retornado da API.');
           }
+          this.loading = false;
         },
         error: (error) => {
           console.error('❌ Erro ao carregar clientes:', error);
-          this.showErrorMessage(error.message || 'Erro ao carregar clientes.');
-          this.clients = [];
-        },
-        complete: () => {
-          console.log('🏁 Carregamento de clientes finalizado');
           this.loading = false;
+          this.shouldShowTable = false;
+          this.showErrorMessage(error.message || 'Erro ao carregar clientes.');
         }
       });
   }
 
   /**
-   * 🔍 BUSCAR - Busca clientes por texto
+   * ➕ CRIAR - Abre modal para criar novo cliente
    */
-  searchClients(searchTerm: string): void {
-    console.log('🔍 Buscando clientes com termo:', searchTerm);
-
-    const filters: ClientFilters = {
-      ...this.currentFilters,
-      search: searchTerm.trim(),
-      page: 1
-    };
-
-    this.loadClients(filters);
-  }
-
-  /**
-   * ✏️ EDITAR - Método para clique na linha (navegar para edição)
-   */
-
-
-  onModalClosed(result: any) {
-    console.log("Modal fechado:", result);
-  }
-
-  /**
-   * 🗑️ DELETAR - Deleta cliente (soft delete)
-   */
-  deleteClient(clientId: string, clientName: string): void {
-    if (confirm(`Tem certeza que deseja desativar o cliente "${clientName}"?`)) {
-
-      this.clientService.deleteClient(clientId)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (response) => {
-            if (response.success) {
-              this.loadClients(); // Recarrega a lista
-            }
-          },
-          error: (error) => {
-            this.showErrorMessage(error.message || 'Erro ao deletar cliente.');
-          }
-        });
-    }
-  }
-
-  // ============================================
-  // ✨ MÉTODO DE PAGINAÇÃO (APENAS ESTE)
-  // ============================================
-
-  /**
-   * 📄 Mudança de página - chamado pelo evento (pageChanged) do ds-table
-   */
-  onPageChange(page: number): void {
-    console.log(`📄 Mudando para página ${page}`);
-
-    if (this.pagination && page !== this.pagination.currentPage) {
-      this.loadClients({ ...this.currentFilters, page });
-    }
-  }
-
-  // ============================================
-  // MÉTODOS DE INTERAÇÃO E FILTROS
-  // ============================================
-
-  /**
-   * Configura debounce para busca em tempo real
-   */
-  private setupSearchDebounce(): void {
-    this.searchSubject
-      .pipe(
-        debounceTime(500),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(searchTerm => {
-        this.searchClients(searchTerm);
-      });
-  }
-
-  /**
-   * Método chamado quando o input de busca muda
-   */
-  onSearchChange(): void {
-    this.searchSubject.next(this.searchInput);
-  }
-
-  /**
-   * Mudança de página na paginação
-   */
-  onPageChange_old(page: number): void {
-    if (this.pagination && page !== this.pagination.currentPage) {
-      this.loadClients({ ...this.currentFilters, page });
-    }
-  }
-
-  /**
-   * Alterna entre clientes ativos e inativos
-   */
-  toggleActiveFilter(): void {
-    const newActive = this.currentFilters.active ? false : true;
-    this.loadClients({ ...this.currentFilters, active: newActive, page: 1 });
-  }
-
-  /**
-   * Limpa todos os filtros
-   */
-  clearFilters(): void {
-    this.searchInput = '';
-    this.currentFilters = { page: 1, limit: 10, active: true };
-    this.loadClients();
-  }
-
-  // ============================================
-  // MÉTODOS PARA TRATAMENTO DE MENSAGENS
-  // ============================================
-
-  private showErrorMessage(message: string): void {
-    this.errorMessage = message;
-    this.showError = true;
-
-    setTimeout(() => {
-      this.clearError();
-    }, 5000);
-  }
-
-  private showSuccessMessage(message: string): void {
-    console.log('✅ Sucesso:', message);
-  }
-
-  clearError(): void {
-    this.showError = false;
-    this.errorMessage = '';
-  }
-
-  get hasClients(): boolean {
-    return this.clients && this.clients.length > 0;
-  }
-
-  get shouldShowSpinner(): boolean {
-    return this.loading;
-  }
-
-  get shouldShowEmptyState(): boolean {
-    return !this.loading && (!this.clients || this.clients.length === 0);
-  }
-
-  get filterStatusText(): string {
-    return this.currentFilters.active ? 'Mostrando Ativos' : 'Mostrando Inativos';
-  }
-
-  get isSearching(): boolean {
-    return this.searchInput.length > 0;
-  }
-
-  // Método para criar novo cliente
   createClient(): void {
+    // Limpar ID selecionado para modo criação
+    this.selectedClientId = undefined;
+
     this.modalService.open({
       id: 'client-modal',
-      title: '', // Título será definido pelo próprio componente
+      title: 'Novo Cliente',
       size: 'xl',
-      showHeader: false, // Usar header personalizado do componente
-      showCloseButton: false,
+      showHeader: true,
+      showCloseButton: true,
       closeOnBackdropClick: false,
-      closeOnEscapeKey: false
+      closeOnEscapeKey: true
     }).subscribe(result => {
-      if (result && result.action) {
-        if (result.action === 'created') {
-          console.log('Cliente criado:', result.data);
-          // Recarregar lista de clientes
-          this.loadClients();
-          // Exibir mensagem de sucesso
-          // TODO: Implementar toast/notification
-        }
-      }
+      this.handleModalResult(result);
     });
   }
 
-  // Método para editar cliente existente
+  /**
+   * ✏️ EDITAR - Abre modal para editar cliente existente
+   */
   editClient(client: Client): void {
     // Definir o client ID para edição
     this.selectedClientId = client._id;
 
     this.modalService.open({
       id: 'client-modal',
-      title: '', // Título será definido pelo próprio componente
+      title: `Editar Cliente - ${client.companyName}`,
       size: 'xl',
-      showHeader: false, // Usar header personalizado do componente
-      showCloseButton: false,
+      showHeader: true,
+      showCloseButton: true,
       closeOnBackdropClick: false,
-      closeOnEscapeKey: false
+      closeOnEscapeKey: true,
+      data: client
     }).subscribe(result => {
-      if (result && result.action) {
-        if (result.action === 'updated') {
-          console.log('Cliente atualizado:', result.data);
-          // Recarregar lista de clientes
-          this.loadClients();
-          // Exibir mensagem de sucesso
-          // TODO: Implementar toast/notification
-        }
-      }
-      // Limpar ID selecionado após fechar modal
-      this.selectedClientId = undefined;
+      this.handleModalResult(result);
     });
   }
 
-  // Callback quando cliente é clicado na tabela
+  /**
+   * 👆 CLIQUE NA TABELA - Callback quando cliente é clicado na tabela
+   */
   onClienteClick(client: Client): void {
     this.editClient(client);
   }
 
-  // Propriedade para armazenar ID do cliente selecionado
-  selectedClientId?: string;
-
   // ============================================
-  // MÉTODO AUXILIAR PARA RECARREGAR LISTA
+  // MÉTODOS DE BUSCA E FILTROS
   // ============================================
 
-  private loadClients(): void {
-    this.loading = true;
-
-    this.clientService.getClients(this.currentFilters).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.clients = response.data;
-          this.pagination = response.pagination;
-          this.shouldShowTable = this.clients.length > 0;
-        }
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Erro ao carregar clientes:', error);
-        this.loading = false;
-        this.shouldShowTable = false;
-      }
-    });
+  /**
+   * 🔍 BUSCA - Dispara busca quando usuário digita
+   */
+  onSearchChange(): void {
+    this.searchSubject.next(this.searchInput.trim());
   }
 
+  /**
+   * 🎯 PERFORM SEARCH - Executa a busca de fato
+   */
+  private performSearch(searchTerm: string): void {
+    console.log('🔍 Buscando por:', searchTerm);
+
+    const searchFilters: ClientFilters = {
+      ...this.currentFilters,
+      search: searchTerm || undefined,
+      page: 1 // Resetar para primeira página
+    };
+
+    this.loadClients(searchFilters);
+  }
+
+  // ============================================
+  // MÉTODOS DE PAGINAÇÃO
+  // ============================================
+
+  /**
+   * 📄 PAGINAÇÃO - Navegar entre páginas
+   */
+  onPageChange(page: number): void {
+    if (page !== this.currentFilters.page) {
+      console.log('📄 Mudando para página:', page);
+      this.loadClients({ ...this.currentFilters, page });
+    }
+  }
+
+  // ============================================
+  // CALLBACKS DO MODAL
+  // ============================================
+
+  /**
+   * 🏁 MODAL RESULT - Processa resultado do modal
+   */
+  private handleModalResult(result: any): void {
+    if (result && result.action) {
+      if (result.action === 'created') {
+        console.log('Cliente criado com sucesso:', result.data?.companyName);
+        this.loadClients(); // Recarregar lista
+        // TODO: Exibir toast de sucesso
+      } else if (result.action === 'updated') {
+        console.log('Cliente atualizado com sucesso:', result.data?.companyName);
+        this.loadClients(); // Recarregar lista
+        // TODO: Exibir toast de sucesso
+      }
+    }
+
+    // Sempre limpar o ID selecionado após fechar modal
+    this.selectedClientId = undefined;
+  }
+
+  /**
+   * 🚪 MODAL CLOSED - Callback para quando modal é fechado
+   */
+  onModalClosed(result: any): void {
+    console.log('Modal fechado:', result);
+    this.handleModalResult(result);
+  }
+
+  // ============================================
+  // MÉTODOS DE UI E ESTADOS
+  // ============================================
+
+  /**
+   * 🧹 CLEAR ERROR - Limpa mensagens de erro
+   */
+  private clearError(): void {
+    this.errorMessage = '';
+    this.showError = false;
+  }
+
+  /**
+   * ⚠️ SHOW ERROR - Exibe mensagem de erro
+   */
+  private showErrorMessage(message: string): void {
+    this.errorMessage = message;
+    this.showError = true;
+
+    // Auto-limpar erro após 5 segundos
+    setTimeout(() => {
+      this.clearError();
+    }, 5000);
+  }
+
+  // ============================================
+  // GETTERS PARA TEMPLATE
+  // ============================================
+
+  /**
+   * 📊 GET SHOULD SHOW SPINNER - Mostra spinner quando necessário
+   */
+  get shouldShowSpinner(): boolean {
+    return this.loading;
+  }
+
+  /**
+   * 📋 GET SHOULD SHOW TABLE - Mostra tabela quando há dados
+   */
+  get shouldShowTableGetter(): boolean {
+    return this.shouldShowTable && !this.loading && this.clients.length > 0;
+  }
+
+  /**
+   * 📄 GET CURRENT PAGE - Página atual para template
+   */
+  get currentPage(): number {
+    return this.pagination?.currentPage || 1;
+  }
+
+  /**
+   * 📊 GET TOTAL PAGES - Total de páginas para template
+   */
+  get totalPages(): number {
+    return this.pagination?.totalPages || 0;
+  }
 }

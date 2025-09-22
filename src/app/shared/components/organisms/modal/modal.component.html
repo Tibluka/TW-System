@@ -13,15 +13,14 @@
                     {{ modalConfig?.title }}
                 </h4>
 
-
                 <ds-icon (click)="closeModal()" cursorType="pointer" *ngIf="modalConfig?.showCloseButton"
                     aria-label="Fechar modal" icon="fa-solid fa-xmark" fontSize="24px" color="white">
                 </ds-icon>
 
             </div>
 
-            <!-- Corpo do Modal -->
-            <div class="modal-body">
+            <!-- Corpo do Modal - SÓ RENDERIZA QUANDO MODAL ESTÁ VISÍVEL E ABERTO -->
+            <div class="modal-body" *ngIf="isVisible && animationState === 'in'">
                 <ng-content></ng-content>
             </div>
         </div>

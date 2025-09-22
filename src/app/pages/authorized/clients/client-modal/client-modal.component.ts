@@ -82,9 +82,12 @@ export class ClientModalComponent implements OnInit {
   ngOnInit(): void {
     this.initializeForm();
     this.updateCurrentTabIndex();
-
-    // Se há clientId, buscar dados para edição
-    if (this.clientId) {
+    debugger
+    // Acessar dados do modal ativo
+    const activeModal = this.modalService.activeModal();
+    if (activeModal?.config.data) {
+      const client = activeModal.config.data;
+      this.clientId = client._id || client.id;
       this.loadClientData();
     }
   }
@@ -95,10 +98,6 @@ export class ClientModalComponent implements OnInit {
 
   get isEditMode(): boolean {
     return !!this.clientId;
-  }
-
-  get modalTitle(): string {
-    return this.isEditMode ? 'Editar Cliente' : 'Novo Cliente';
   }
 
   get saveButtonLabel(): string {
