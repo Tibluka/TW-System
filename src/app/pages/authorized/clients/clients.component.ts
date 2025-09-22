@@ -150,18 +150,7 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
   /**
    * ✏️ EDITAR - Método para clique na linha (navegar para edição)
    */
-  onClienteClick(cliente: Client): void {
-    console.log('👆 Cliente selecionado para edição:', cliente);
-    this.modalService.open({
-      id: 'client-modal',
-      closeOnBackdropClick: true,
-      closeOnEscapeKey: true,
-      size: 'lg',
-      title: "Editar modal"
-    })
-    // TODO: Implementar navegação para página de edição
-    // this.router.navigate(['/clients/edit', cliente._id]);
-  }
+
 
   onModalClosed(result: any) {
     console.log("Modal fechado:", result);
@@ -297,8 +286,87 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
     return this.searchInput.length > 0;
   }
 
-  createClient() {
+  // Método para criar novo cliente
+  createClient(): void {
+    this.modalService.open({
+      id: 'client-modal',
+      title: '', // Título será definido pelo próprio componente
+      size: 'xl',
+      showHeader: false, // Usar header personalizado do componente
+      showCloseButton: false,
+      closeOnBackdropClick: false,
+      closeOnEscapeKey: false
+    }).subscribe(result => {
+      if (result && result.action) {
+        if (result.action === 'created') {
+          console.log('Cliente criado:', result.data);
+          // Recarregar lista de clientes
+          this.loadClients();
+          // Exibir mensagem de sucesso
+          // TODO: Implementar toast/notification
+        }
+      }
+    });
+  }
 
+  // Método para editar cliente existente
+  editClient(client: Client): void {
+    // Definir o client ID para edição
+    this.selectedClientId = client._id;
+
+    this.modalService.open({
+      id: 'client-modal',
+      title: '', // Título será definido pelo próprio componente
+      size: 'xl',
+      showHeader: false, // Usar header personalizado do componente
+      showCloseButton: false,
+      closeOnBackdropClick: false,
+      closeOnEscapeKey: false
+    }).subscribe(result => {
+      if (result && result.action) {
+        if (result.action === 'updated') {
+          console.log('Cliente atualizado:', result.data);
+          // Recarregar lista de clientes
+          this.loadClients();
+          // Exibir mensagem de sucesso
+          // TODO: Implementar toast/notification
+        }
+      }
+      // Limpar ID selecionado após fechar modal
+      this.selectedClientId = undefined;
+    });
+  }
+
+  // Callback quando cliente é clicado na tabela
+  onClienteClick(client: Client): void {
+    this.editClient(client);
+  }
+
+  // Propriedade para armazenar ID do cliente selecionado
+  selectedClientId?: string;
+
+  // ============================================
+  // MÉTODO AUXILIAR PARA RECARREGAR LISTA
+  // ============================================
+
+  private loadClients(): void {
+    this.loading = true;
+
+    this.clientService.getClients(this.currentFilters).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.clients = response.data;
+          this.pagination = response.pagination;
+          this.shouldShowTable = this.clients.length > 0;
+        }
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Erro ao carregar clientes:', error);
+        this.loading = false;
+        this.shouldShowTable = false;
+      }
+    });
   }
 
 }

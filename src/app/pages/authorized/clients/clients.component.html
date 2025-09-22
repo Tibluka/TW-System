@@ -90,5 +90,5 @@
 
 
 <ds-modal modalId="client-modal" (modalClosed)="onModalClosed($event)">
-    <app-client-modal></app-client-modal>
+    <app-client-modal [clientId]="selectedClientId"></app-client-modal>
 </ds-modal>

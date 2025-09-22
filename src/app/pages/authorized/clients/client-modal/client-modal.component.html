@@ -1,48 +1,68 @@
 <!-- client-modal.component.html -->
 <div class="client-modal-container">
 
-    <!-- Tabs do formulário -->
-    <ds-tabs [tabs]="advancedTabs" [activeTabId]="currentTab" size="large" (tabChange)="handleTabChange($event)"
-        (tabClick)="handleTabClick($event)">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-overlay">
+        <div class="loading-content">
+            <ds-spinner size="48px" variant="outline"></ds-spinner>
+            <p class="body label mt-16">Carregando dados do cliente...</p>
+        </div>
+    </div>
 
-        <!-- Conteúdo das tabs usando ng-container com ngSwitch -->
-        <ng-container [ngSwitch]="currentTab">
+    <!-- Título do Modal -->
+    <div class="modal-header-custom">
+        <h2 class="title-modal primary-dark">{{ modalTitle }}</h2>
+    </div>
 
-            <div *ngSwitchCase="'company'">
-                <app-company-data [parentForm]="clientForm"></app-company-data>
-            </div>
+    <!-- Conteúdo do Modal -->
+    <div class="modal-content-wrapper" [class.is-loading]="isLoading">
 
-            <div *ngSwitchCase="'contact'">
-                <app-contact-data [parentForm]="clientForm"></app-contact-data>
-            </div>
+        <!-- Tabs do formulário -->
+        <ds-tabs [tabs]="advancedTabs" [activeTabId]="currentTab" size="large" (tabChange)="handleTabChange($event)"
+            (tabClick)="handleTabClick($event)">
 
-            <div *ngSwitchCase="'address'">
-                <app-address-data [parentForm]="clientForm"></app-address-data>
-            </div>
+            <!-- Conteúdo das tabs usando ng-container com ngSwitch -->
+            <ng-container [ngSwitch]="currentTab">
 
-            <div *ngSwitchCase="'values'">
-                <app-values-data [parentForm]="clientForm"></app-values-data>
-            </div>
+                <div *ngSwitchCase="'company'">
+                    <app-company-data [parentForm]="clientForm"></app-company-data>
+                </div>
 
-        </ng-container>
+                <div *ngSwitchCase="'contact'">
+                    <app-contact-data [parentForm]="clientForm"></app-contact-data>
+                </div>
 
-    </ds-tabs>
+                <div *ngSwitchCase="'address'">
+                    <app-address-data [parentForm]="clientForm"></app-address-data>
+                </div>
 
-    <!-- Botões alinhados à direita -->
-    <div class="footer-actions">
+                <div *ngSwitchCase="'values'">
+                    <app-values-data [parentForm]="clientForm"></app-values-data>
+                </div>
 
-        <!-- Botão Cancelar (sempre visível) -->
-        <ds-button label="Cancelar" variant="ghost" (onClickEmitter)="onCancelClick()">
-        </ds-button>
+            </ng-container>
 
-        <!-- Botão Voltar (visível quando não é o primeiro passo) -->
-        <ds-button *ngIf="showBackButton" label="Voltar" variant="outline" icon="fa-solid fa-arrow-left"
-            (onClickEmitter)="onBackClick()">
-        </ds-button>
+        </ds-tabs>
 
-        <!-- Botão Próximo/Salvar -->
-        <ds-button [label]="nextButtonLabel" [icon]="nextButtonIcon" variant="fill" (onClickEmitter)="onNextClick()">
-        </ds-button>
+        <!-- Botões alinhados à direita -->
+        <div class="footer-actions">
+
+            <!-- Botão Cancelar (sempre visível) -->
+            <ds-button label="Cancelar" variant="ghost" [disabled]="isSaving" (onClickEmitter)="onCancelClick()">
+            </ds-button>
+
+            <!-- Botão Voltar (visível quando não é o primeiro passo) -->
+            <ds-button *ngIf="showBackButton" label="Voltar" variant="outline" icon="fa-solid fa-arrow-left"
+                [disabled]="isSaving" (onClickEmitter)="onBackClick()">
+            </ds-button>
+
+            <!-- Botão Próximo/Salvar -->
+            <ds-button [label]="isSaving ? 'Salvando...' : nextButtonLabel" [icon]="isSaving ? '' : nextButtonIcon"
+                variant="fill" [isLoading]="isSaving" [disabled]="isNextButtonDisabled"
+                (onClickEmitter)="onNextClick()">
+            </ds-button>
+
+        </div>
 
     </div>
 

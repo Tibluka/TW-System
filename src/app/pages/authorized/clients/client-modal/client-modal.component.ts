@@ -1,37 +1,45 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TabConfig, TabsComponent } from '../../../../shared/components/molecules/tabs/tabs.component';
 import { ButtonComponent } from '../../../../shared/components/atoms/button/button.component';
 import { ModalService } from '../../../../shared/services/modal/modal.service';
-import { BrazilianState } from '../../../../models/clients/clients';
+import { ClientService } from '../../../../shared/services/clients/clients.service';
+import { BrazilianState, Client, CreateClientRequest, UpdateClientRequest } from '../../../../models/clients/clients';
 import { CompanyDataComponent } from "./company-data/company-data.component";
 import { ContactDataComponent } from "./contact-data/contact-data.component";
 import { AddressDataComponent } from "./address-data/address-data.component";
 import { ValuesDataComponent } from "./values-data/values-data.component";
+import { SpinnerComponent } from '../../../../shared/components/atoms/spinner/spinner.component';
 
 @Component({
   selector: 'app-client-modal',
   imports: [
     CommonModule,
-    ReactiveFormsModule, // Adicionar ReactiveFormsModule aqui também
+    ReactiveFormsModule,
     TabsComponent,
     ButtonComponent,
     CompanyDataComponent,
     ContactDataComponent,
     AddressDataComponent,
-    ValuesDataComponent
+    ValuesDataComponent,
+    SpinnerComponent
   ],
   templateUrl: './client-modal.component.html',
   styleUrl: './client-modal.component.scss'
 })
 export class ClientModalComponent implements OnInit {
 
+  @Input() clientId?: string; // Se receber ID, é edição, senão é criação
+
   private modalService = inject(ModalService);
   private formBuilder = inject(FormBuilder);
+  private clientService = inject(ClientService);
 
   currentTab = 'company';
   currentTabIndex = 0;
+  isLoading = false;
+  isSaving = false;
 
   // Formulário centralizado
   clientForm: FormGroup = new FormGroup({});
@@ -74,6 +82,86 @@ export class ClientModalComponent implements OnInit {
   ngOnInit(): void {
     this.initializeForm();
     this.updateCurrentTabIndex();
+
+    // Se há clientId, buscar dados para edição
+    if (this.clientId) {
+      this.loadClientData();
+    }
+  }
+
+  // ============================================
+  // GETTERS PARA O TEMPLATE
+  // ============================================
+
+  get isEditMode(): boolean {
+    return !!this.clientId;
+  }
+
+  get modalTitle(): string {
+    return this.isEditMode ? 'Editar Cliente' : 'Novo Cliente';
+  }
+
+  get saveButtonLabel(): string {
+    return this.isEditMode ? 'Atualizar' : 'Criar';
+  }
+
+  // ============================================
+  // CARREGAR DADOS PARA EDIÇÃO
+  // ============================================
+
+  private loadClientData(): void {
+    if (!this.clientId) return;
+
+    this.isLoading = true;
+
+    this.clientService.getClientById(this.clientId).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.populateForm(response.data);
+        }
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Erro ao carregar dados do cliente:', error);
+        this.isLoading = false;
+        // Exibir mensagem de erro para o usuário
+      }
+    });
+  }
+
+  private populateForm(client: Client): void {
+    this.clientForm.patchValue({
+      // Company fields
+      companyName: client.companyName,
+      cnpj: this.formatCNPJ(client.cnpj),
+      acronym: client.acronym,
+
+      // Contact fields  
+      responsibleName: client.contact.responsibleName,
+      email: client.contact.email,
+      phone: client.contact.phone,
+
+      // Address fields
+      zipcode: client.address.zipcode,
+      street: client.address.street,
+      number: client.address.number,
+      complement: client.address.complement || '',
+      neighborhood: client.address.neighborhood,
+      city: client.address.city,
+      state: client.address.state,
+
+      // Values fields
+      valuePerMeter: client.values.valuePerMeter,
+      valuePerPiece: client.values.valuePerPiece
+    });
+  }
+
+  private formatCNPJ(cnpj: string): string {
+    // Se CNPJ vem apenas com números, formatar para exibição
+    if (cnpj && cnpj.length === 14) {
+      return cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+    }
+    return cnpj;
   }
 
   // ============================================
@@ -305,12 +393,14 @@ export class ClientModalComponent implements OnInit {
     });
 
     if (this.clientForm.valid) {
-      // Formulário válido - salvar
-      console.log('Salvando cliente...', this.clientForm.value);
-      this.modalService.close('client-modal', {
-        saved: true,
-        data: this.clientForm.value
-      });
+      // Formulário válido - preparar dados e salvar
+      const formData = this.prepareFormData();
+
+      if (this.isEditMode) {
+        this.updateClient(formData);
+      } else {
+        this.createClient(formData);
+      }
     } else {
       // Formulário inválido - ir para a primeira aba com erro
       const invalidTab = this.getFirstInvalidTab();
@@ -320,6 +410,82 @@ export class ClientModalComponent implements OnInit {
         this.updateTabBadges();
       }
     }
+  }
+
+  // ============================================
+  // CRIAR/ATUALIZAR CLIENTE
+  // ============================================
+
+  private prepareFormData(): CreateClientRequest | UpdateClientRequest {
+    const formValues = this.clientForm.value;
+
+    return {
+      acronym: formValues.acronym,
+      companyName: formValues.companyName,
+      cnpj: formValues.cnpj,
+      contact: {
+        responsibleName: formValues.responsibleName,
+        phone: formValues.phone,
+        email: formValues.email
+      },
+      address: {
+        street: formValues.street,
+        number: formValues.number,
+        complement: formValues.complement || undefined,
+        neighborhood: formValues.neighborhood,
+        city: formValues.city,
+        state: formValues.state.toUpperCase(),
+        zipcode: formValues.zipcode
+      },
+      values: {
+        valuePerMeter: parseFloat(formValues.valuePerMeter),
+        valuePerPiece: parseFloat(formValues.valuePerPiece)
+      }
+    };
+  }
+
+  private createClient(clientData: CreateClientRequest | any): void {
+    this.isSaving = true;
+
+    this.clientService.createClient(clientData).subscribe({
+      next: (response) => {
+        this.isSaving = false;
+        console.log('Cliente criado com sucesso:', response.data);
+
+        this.modalService.close('client-modal', {
+          action: 'created',
+          data: response.data
+        });
+      },
+      error: (error) => {
+        this.isSaving = false;
+        console.error('Erro ao criar cliente:', error);
+        // TODO: Exibir mensagem de erro para o usuário
+      }
+    });
+  }
+
+  private updateClient(clientData: UpdateClientRequest): void {
+    if (!this.clientId) return;
+
+    this.isSaving = true;
+
+    this.clientService.updateClient(this.clientId, clientData).subscribe({
+      next: (response) => {
+        this.isSaving = false;
+        console.log('Cliente atualizado com sucesso:', response.data);
+
+        this.modalService.close('client-modal', {
+          action: 'updated',
+          data: response.data
+        });
+      },
+      error: (error) => {
+        this.isSaving = false;
+        console.error('Erro ao atualizar cliente:', error);
+        // TODO: Exibir mensagem de erro para o usuário
+      }
+    });
   }
 
   // ============================================
@@ -339,11 +505,15 @@ export class ClientModalComponent implements OnInit {
   }
 
   get nextButtonLabel(): string {
-    return this.isLastStep ? 'Salvar' : 'Próximo';
+    return this.isLastStep ? this.saveButtonLabel : 'Próximo';
   }
 
   get nextButtonIcon(): string {
     return this.isLastStep ? 'fa-solid fa-check' : 'fa-solid fa-arrow-right';
+  }
+
+  get isNextButtonDisabled(): boolean {
+    return this.isSaving || this.isLoading;
   }
 
   // ============================================
