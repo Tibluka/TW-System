@@ -1,0 +1,246 @@
+// development-modal.component.scss
+@use "abstracts/variables" as *;
+@use "abstracts/spacing" as *;
+
+.development-modal-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg); // 24px
+    padding: var(--spacing-md); // 16px
+    max-height: 80vh;
+    overflow-y: auto;
+
+    // ============================================
+    // LOADING STATE
+    // ============================================
+    .loading-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 200px;
+    }
+
+    // ============================================
+    // FORM SECTIONS
+    // ============================================
+    .form-section {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md); // 16px
+
+        .section-title {
+            color: var(--primary-dark);
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-medium);
+            margin: 0;
+            padding-bottom: var(--spacing-xs); // 4px
+            border-bottom: 1px solid var(--neutral-light);
+        }
+    }
+
+    // ============================================
+    // GRID LAYOUTS
+    // ============================================
+
+    // Grid das informações básicas
+    .basic-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+            "name client"
+            "status progress";
+        gap: var(--spacing-md); // 16px
+
+        .name-field {
+            grid-area: name;
+        }
+
+        .client-field {
+            grid-area: client;
+        }
+
+        .status-field {
+            grid-area: status;
+        }
+
+        .progress-field {
+            grid-area: progress;
+        }
+
+        // Responsive
+        @media (max-width: 768px) {
+            grid-template-columns: 1fr;
+            grid-template-areas:
+                "name"
+                "client"
+                "status"
+                "progress";
+            gap: var(--spacing-sm); // 8px
+        }
+    }
+
+    // Campo de descrição (full width)
+    .description-field {
+        width: 100%;
+    }
+
+    // Grid das datas e valores
+    .dates-values-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+            "start-date end-date"
+            "total-value paid-value";
+        gap: var(--spacing-md); // 16px
+
+        .start-date-field {
+            grid-area: start-date;
+        }
+
+        .end-date-field {
+            grid-area: end-date;
+        }
+
+        .total-value-field {
+            grid-area: total-value;
+        }
+
+        .paid-value-field {
+            grid-area: paid-value;
+        }
+
+        // Responsive
+        @media (max-width: 768px) {
+            grid-template-columns: 1fr;
+            grid-template-areas:
+                "start-date"
+                "end-date"
+                "total-value"
+                "paid-value";
+            gap: var(--spacing-sm); // 8px
+        }
+    }
+
+    // Grid das tecnologias e observações
+    .tech-obs-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md); // 16px
+
+        .technologies-field {
+            width: 100%;
+        }
+
+        .observations-field {
+            width: 100%;
+        }
+    }
+
+    // ============================================
+    // FIELD GROUPS
+    // ============================================
+    .field-group {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+        // Garantir que os inputs preencham toda a largura
+        ds-input,
+        ds-select,
+        ds-textarea {
+            display: block;
+            width: 100%;
+        }
+    }
+
+    // ============================================
+    // ÍCONES COLORIDOS POR TIPO DE CAMPO
+    // ============================================
+    .name-field ds-input {
+        ::ng-deep .icon-left {
+            color: var(--primary-medium);
+        }
+    }
+
+    .progress-field ds-input {
+        ::ng-deep .icon-left {
+            color: var(--success);
+        }
+    }
+
+    .total-value-field ds-input,
+    .paid-value-field ds-input {
+        ::ng-deep .icon-left {
+            color: var(--secondary-medium);
+        }
+    }
+
+    .technologies-field ds-input {
+        ::ng-deep .icon-left {
+            color: var(--info);
+        }
+    }
+
+    // ============================================
+    // MODAL ACTIONS
+    // ============================================
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--spacing-sm); // 8px
+        padding-top: var(--spacing-md); // 16px
+        border-top: 1px solid var(--neutral-light);
+        margin-top: var(--spacing-md); // 16px
+
+        // Em mobile, botões ficam full width empilhados
+        @media (max-width: 480px) {
+            flex-direction: column;
+
+            ds-button {
+                width: 100%;
+            }
+        }
+    }
+
+    // ============================================
+    // RESPONSIVE GENERAL
+    // ============================================
+    @media (max-width: 768px) {
+        padding: var(--spacing-sm); // 8px
+        gap: var(--spacing-md); // 16px
+
+        .form-section {
+            gap: var(--spacing-sm); // 8px
+        }
+
+        .section-title {
+            font-size: var(--font-size-md);
+        }
+    }
+
+    @media (max-width: 480px) {
+        padding: var(--spacing-xs); // 4px
+        gap: var(--spacing-sm); // 8px
+    }
+
+    // ============================================
+    // SCROLLBAR STYLING
+    // ============================================
+    &::-webkit-scrollbar {
+        width: var(--spacing-xs); // 4px
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--neutral-light);
+        border-radius: var(--border-radius-sm);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--neutral-medium);
+        border-radius: var(--border-radius-sm);
+
+        &:hover {
+            background: var(--primary-medium);
+        }
+    }
+}

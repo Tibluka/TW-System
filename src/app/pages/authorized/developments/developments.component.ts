@@ -1,68 +1,290 @@
-// developments.component.ts - Atualizado com componente de upload
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
-import { FormsModule, NgModel, ReactiveFormsModule } from '@angular/forms';
-import { environment } from '../../../../environments/environment';
-import { ModalComponent } from "../../../shared/components/organisms/modal/modal.component";
-import { ModalService } from '../../../shared/services/modal/modal.service';
-
-// Importa o componente que vai dentro do modal
-import { lastValueFrom } from 'rxjs';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { FormsModule, NgModel } from "@angular/forms";
+import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { PaginationInfo } from '../../../models/clients/clients';
+import { Development, DevelopmentFilters, DevelopmentListResponse } from '../../../models/developments/developments';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
-import { UploadedFile } from '../../../shared/components/organisms/file-upload/file-upload.component';
-
+import { InputComponent } from '../../../shared/components/atoms/input/input.component';
+import { ModalComponent } from '../../../shared/components/organisms/modal/modal.component';
+import { TableCellComponent } from '../../../shared/components/organisms/table/table-cell/table-cell.component';
+import { TableRowComponent } from '../../../shared/components/organisms/table/table-row/table-row.component';
+import { TableComponent } from '../../../shared/components/organisms/table/table.component';
+import { DevelopmentService } from '../../../shared/services/development/development.service';
+import { ModalService } from '../../../shared/services/modal/modal.service';
+import { FormValidator } from '../../../shared/utils/form';
+import { DevelopmentModalComponent } from './development-modal/development-modal.component';
 @Component({
   selector: 'app-developments',
-  templateUrl: './developments.component.html',
-  standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
-    ModalComponent,
     ButtonComponent,
-    FormsModule
+    InputComponent,
+    FormsModule,
+    TableComponent,
+    TableRowComponent,
+    TableCellComponent,
+    ModalComponent,
+    DevelopmentModalComponent
   ],
-  providers: [
-    NgModel
-  ],
-  styleUrls: ['./developments.component.scss']
+  providers: [NgModel],
+  templateUrl: './developments.component.html',
+  styleUrl: './developments.component.scss'
 })
-export class DevelopmentsComponent {
+export class DevelopmentsComponent extends FormValidator implements OnInit, OnDestroy {
+
+  isModalOpen: boolean = false;
+
+  private developmentService = inject(DevelopmentService);
   private modalService = inject(ModalService);
 
+  // Lista de desenvolvimentos e paginação
+  developments: Development[] = [];
+  pagination: PaginationInfo | null = null;
+  loading = false;
+  shouldShowTable = false;
 
+  // Estados para UI
+  errorMessage: string = '';
+  showError = false;
 
-  constructor(private http: HttpClient) { }
+  // Filtros atuais
+  currentFilters: DevelopmentFilters = {
+    search: '',
+    page: 1,
+    limit: 10,
+    active: true
+  };
 
+  // Propriedade para armazenar ID do desenvolvimento selecionado para edição
+  selectedDevelopmentId?: string;
 
-  // Método para abrir o modal com o componente filho
-  openModalWithComponent() {
-    this.modalService.open({
-      id: 'developments-component',
-      title: '',
-      size: 'lg', // Modal maior para acomodar a lista de clientes
-      showHeader: true,
-      showCloseButton: true,
-      closeOnBackdropClick: false, // Desabilita fechar clicando fora
-      closeOnEscapeKey: false      // Desabilita fechar com ESC
-    }).subscribe(result => {
-      console.log('Modal fechado pelo componente filho:', result);
+  // Subject para debounce da busca
+  private searchSubject = new Subject<string>();
+  private destroy$ = new Subject<void>();
 
-      if (result?.action === 'saved') {
-        this.message = `Cliente salvo com sucesso!`;
-      } else if (result?.action === 'canceled') {
-        console.log('Operação cancelada');
-      } else if (result?.action === 'selected') {
-        this.message = `Cliente selecionado: ${result.data?.name || 'Cliente'}`;
-      }
+  // ============================================
+  // COMPUTED PROPERTIES
+  // ============================================
+
+  /**
+   * 🔄 SPINNER - Determina se deve mostrar spinner
+   */
+  get shouldShowSpinner(): boolean {
+    return this.loading;
+  }
+
+  // ============================================
+  // LIFECYCLE HOOKS
+  // ============================================
+
+  ngOnInit(): void {
+    this.setupSearchDebounce();
+    this.loadDevelopments();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // ============================================
+  // SETUP METHODS
+  // ============================================
+
+  /**
+   * ⏱️ DEBOUNCE - Configura debounce para busca
+   */
+  private setupSearchDebounce(): void {
+    this.searchSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(searchTerm => {
+      this.currentFilters.search = searchTerm;
+      this.currentFilters.page = 1; // Reset para primeira página
+      this.loadDevelopments();
     });
   }
 
-  // Handlers para os eventos do componente filho
-  onClientAction(data: any) {
-    console.log('Ação do cliente recebida:', data);
-    // Aqui você pode processar as ações do componente de clientes
+  // ============================================
+  // MÉTODOS DE DADOS
+  // ============================================
+
+  /**
+   * 📋 CARREGAR - Busca desenvolvimentos do servidor
+   */
+  private loadDevelopments(): void {
+    this.loading = true;
+    this.shouldShowTable = true;
+
+    this.developmentService.listDevelopments(this.currentFilters)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: DevelopmentListResponse) => {
+          this.developments = response.data || [];
+          //this.pagination = response.pagination || null;
+
+          console.log('✅ Desenvolvimentos carregados:', {
+            count: this.developments.length,
+            pagination: this.pagination
+          });
+
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('❌ Erro ao carregar desenvolvimentos:', error);
+          this.loading = false;
+          this.showErrorMessage(error.message || 'Erro ao carregar desenvolvimentos.');
+        }
+      });
   }
 
+  /**
+   * ➕ CRIAR - Abre modal para criar novo desenvolvimento
+   */
+  createDevelopment(): void {
+    // Limpar ID selecionado para modo criação
+    this.selectedDevelopmentId = undefined;
+
+    this.modalService.open({
+      id: 'development-modal',
+      title: 'Novo Desenvolvimento',
+      size: 'xl',
+      showHeader: true,
+      showCloseButton: true,
+      closeOnBackdropClick: false,
+      closeOnEscapeKey: true
+    }).subscribe(result => {
+      this.handleModalResult(result);
+    });
+  }
+
+  /**
+   * ✏️ EDITAR - Abre modal para editar desenvolvimento existente
+   */
+  editDevelopment(development: Development): void {
+    // Definir o development ID para edição
+    this.selectedDevelopmentId = development._id;
+
+    this.modalService.open({
+      id: 'development-modal',
+      title: `Editar Desenvolvimento - ${development.name}`,
+      size: 'xl',
+      showHeader: true,
+      showCloseButton: true,
+      closeOnBackdropClick: false,
+      closeOnEscapeKey: true,
+      data: development
+    }).subscribe(result => {
+      this.handleModalResult(result);
+    });
+  }
+
+  /**
+   * 👆 CLIQUE NA TABELA - Callback quando desenvolvimento é clicado na tabela
+   */
+  onDevelopmentClick(development: Development): void {
+    this.editDevelopment(development);
+  }
+
+  // ============================================
+  // MÉTODOS DE BUSCA E FILTROS
+  // ============================================
+
+  /**
+   * 🔍 BUSCA - Dispara busca quando usuário digita
+   */
+  onSearchChange(): void {
+    if (!this.currentFilters.search) return;
+    this.searchSubject.next(this.currentFilters.search);
+  }
+
+  /**
+   * 📄 PAGINAÇÃO - Muda página
+   */
+  onPageChange(page: number): void {
+    this.currentFilters.page = page;
+    this.loadDevelopments();
+  }
+
+  // ============================================
+  // HELPERS
+  // ============================================
+
+  /**
+   * 🏷️ STATUS LABEL - Retorna label do status
+   */
+  getStatusLabel(status: string): string {
+    const statusLabels: { [key: string]: string } = {
+      'draft': 'Rascunho',
+      'planning': 'Planejamento',
+      'in_progress': 'Em Progresso',
+      'testing': 'Teste',
+      'completed': 'Concluído',
+      'cancelled': 'Cancelado',
+      'on_hold': 'Pausado'
+    };
+    return statusLabels[status] || status;
+  }
+
+  /**
+   * ⏰ VERIFICAR ATRASO - Verifica se data está atrasada
+   */
+  isOverdue(date: string | Date): boolean {
+    if (!date) return false;
+    const targetDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Remove horas para comparar apenas data
+    return targetDate < today;
+  }
+
+  /**
+   * 🔄 RESULTADO MODAL - Processa resultado do modal
+   */
+  private handleModalResult(result: any): void {
+    if (result?.success) {
+      console.log('✅ Operação realizada com sucesso:', result);
+      this.loadDevelopments(); // Recarrega lista
+
+      // Mostrar mensagem de sucesso se necessário
+      if (result.message) {
+        this.showSuccessMessage(result.message);
+      }
+    } else if (result?.error) {
+      console.error('❌ Erro na operação:', result.error);
+      this.showErrorMessage(result.error);
+    }
+
+    // Limpar seleção
+    this.selectedDevelopmentId = undefined;
+  }
+
+  /**
+   * 🟢 SUCESSO - Mostra mensagem de sucesso
+   */
+  private showSuccessMessage(message: string): void {
+    // Implementar toast/notificação de sucesso
+    console.log('SUCCESS:', message);
+  }
+
+  /**
+   * 🔴 ERRO - Mostra mensagem de erro
+   */
+  private showErrorMessage(message: string): void {
+    this.errorMessage = message;
+    this.showError = true;
+
+    // Auto-hide após 5 segundos
+    setTimeout(() => {
+      this.showError = false;
+    }, 5000);
+  }
+
+  /**
+   * 📋 MODAL FECHADO - Callback quando modal é fechado
+   */
+  onModalClosed(result: any): void {
+    this.handleModalResult(result);
+  }
 }

@@ -1,8 +1,117 @@
-<ds-file-upload label="Galeria de Imagens" placeholder="Clique ou arraste múltiplas imagens aqui"
-    helperText="Múltiplas imagens (JPG, JPEG, PNG) de até 5MB cada" [multiple]="true" [fullWidth]="true"
-    (filesChanged)="onMultipleFilesChanged($event)" (fileAdded)="onMultipleFileAdded($event)"
-    (fileRemoved)="onMultipleFileRemoved($event)" (uploadError)="onUploadError($event)">
-</ds-file-upload>
+<div class="development-modal-container">
 
-<ds-button label="Upload images" variant="outline" [disabled]="isUploading" [isLoading]="isUploading"
-    (onClickEmitter)="uploadToServer()" />
+    <!-- Loading state -->
+    <div *ngIf="isLoading" class="loading-container">
+        <ds-spinner size="lg" message="Carregando desenvolvimento..."></ds-spinner>
+    </div>
+
+    <!-- Formulário principal -->
+    <form [formGroup]="developmentForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+
+        <!-- Informações básicas -->
+        <div class="form-section">
+            <h3 class="section-title">Informações Básicas</h3>
+
+            <div class="basic-info-grid">
+                <!-- Nome do desenvolvimento -->
+                <div class="field-group name-field">
+                    <ds-input label="Nome do Desenvolvimento" placeholder="Digite o nome do desenvolvimento"
+                        formControlName="name" icon="fa-solid fa-code" iconPosition="left" [required]="true"
+                        [error]="getFieldError('name')" width="100%" />
+                </div>
+
+                <!-- Cliente -->
+                <div class="field-group client-field">
+                    <ds-select label="Cliente" placeholder="Selecione o cliente" formControlName="clientId"
+                        [options]="clientOptions" [required]="true" [error]="getFieldError('clientId')" width="100%" />
+                </div>
+
+                <!-- Status -->
+                <div class="field-group status-field">
+                    <ds-select label="Status" placeholder="Selecione o status" formControlName="status"
+                        [options]="statusOptions" [required]="true" [error]="getFieldError('status')" width="100%" />
+                </div>
+
+                <!-- Progresso -->
+                <div class="field-group progress-field">
+                    <ds-input label="Progresso (%)" placeholder="0" formControlName="progress" type="number" min="0"
+                        max="100" icon="fa-solid fa-chart-line" iconPosition="left" [error]="getFieldError('progress')"
+                        width="100%" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Descrição -->
+        <div class="form-section">
+            <h3 class="section-title">Descrição</h3>
+
+            <div class="description-field">
+                <ds-textarea label="Descrição do Projeto" placeholder="Descreva os detalhes do desenvolvimento..."
+                    formControlName="description" rows="4" [error]="getFieldError('description')" width="100%" />
+            </div>
+        </div>
+
+        <!-- Datas e valores -->
+        <div class="form-section">
+            <h3 class="section-title">Cronograma e Valores</h3>
+
+            <div class="dates-values-grid">
+                <!-- Data de início -->
+                <div class="field-group start-date-field">
+                    <ds-input label="Data de Início" formControlName="startDate" type="date" [required]="true"
+                        [error]="getFieldError('startDate')" width="100%" />
+                </div>
+
+                <!-- Data prevista de fim -->
+                <div class="field-group end-date-field">
+                    <ds-input label="Data Prevista de Conclusão" formControlName="expectedEndDate" type="date"
+                        [error]="getFieldError('expectedEndDate')" width="100%" />
+                </div>
+
+                <!-- Valor total -->
+                <div class="field-group total-value-field">
+                    <ds-input label="Valor Total" placeholder="R$ 0,00" formControlName="totalValue" type="number"
+                        step="0.01" min="0" icon="fa-solid fa-dollar-sign" iconPosition="left"
+                        [error]="getFieldError('totalValue')" width="100%" />
+                </div>
+
+                <!-- Valor pago -->
+                <div class="field-group paid-value-field">
+                    <ds-input label="Valor Pago" placeholder="R$ 0,00" formControlName="paidValue" type="number"
+                        step="0.01" min="0" icon="fa-solid fa-money-check" iconPosition="left"
+                        [error]="getFieldError('paidValue')" width="100%" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Tecnologias e observações -->
+        <div class="form-section">
+            <h3 class="section-title">Detalhes Técnicos</h3>
+
+            <div class="tech-obs-grid">
+                <!-- Tecnologias -->
+                <div class="field-group technologies-field">
+                    <ds-input label="Tecnologias Utilizadas" placeholder="React, Node.js, MongoDB..."
+                        formControlName="technologies" icon="fa-solid fa-microchip" iconPosition="left"
+                        [errorMessage]="getFieldError('technologies')" width="100%" />
+                </div>
+
+                <!-- Observações -->
+                <div class="field-group observations-field">
+                    <ds-textarea label="Observações" placeholder="Observações adicionais sobre o desenvolvimento..."
+                        formControlName="observations" rows="3" [error]="getFieldError('observations')" width="100%" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Botões de ação -->
+        <div class="modal-actions">
+            <ds-button label="Cancelar" variant="secondary" (onClickEmitter)="onCancel()" [disabled]="isSaving" />
+
+            <ds-button label="{{ isEditMode ? 'Atualizar' : 'Criar' }} Desenvolvimento" type="submit"
+                [loading]="isSaving" [disabled]="developmentForm.invalid || isSaving" />
+        </div>
+
+    </form>
+
+</div>
