@@ -5,7 +5,11 @@ import { InputComponent } from '../../../../../shared/components/atoms/input/inp
 
 @Component({
   selector: 'app-company-data',
-  imports: [CommonModule, ReactiveFormsModule, InputComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    InputComponent
+  ],
   templateUrl: './company-data.component.html',
   styleUrl: './company-data.component.scss'
 })

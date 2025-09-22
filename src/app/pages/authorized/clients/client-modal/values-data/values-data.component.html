@@ -4,18 +4,16 @@
     <!-- Valor por Metro - 50% da largura -->
     <div class="value-per-meter-field">
         <ds-input label="Valor por Metro" placeholder="0,00" formControlName="valuePerMeter" type="number"
-            [fullWidth]="true" [required]="true" [invalid]="isFieldInvalid('valuePerMeter')"
-            [errorMessage]="getErrorMessage('valuePerMeter')" icon="fa-solid fa-ruler-horizontal" iconPosition="left"
-            (blur)="onCurrencyBlur('valuePerMeter')">
+            [fullWidth]="true" [required]="true" [invalid]="isFormControlInvalid(parentForm.get('valuePerMeter'))"
+            [errorMessage]="getErrorMessage('valuePerMeter')" icon="fa-solid fa-ruler-horizontal" iconPosition="left">
         </ds-input>
     </div>
 
     <!-- Valor por Peça - 50% da largura -->
     <div class="value-per-piece-field">
         <ds-input label="Valor por Peça" placeholder="0,00" formControlName="valuePerPiece" type="number"
-            [fullWidth]="true" [required]="true" [invalid]="isFieldInvalid('valuePerPiece')"
-            [errorMessage]="getErrorMessage('valuePerPiece')" icon="fa-solid fa-tags" iconPosition="left"
-            (blur)="onCurrencyBlur('valuePerPiece')">
+            [fullWidth]="true" [required]="true" [invalid]="isFormControlInvalid(parentForm.get('valuePerPiece'))"
+            [errorMessage]="getErrorMessage('valuePerPiece')" icon="fa-solid fa-tags" iconPosition="left">
         </ds-input>
     </div>
 

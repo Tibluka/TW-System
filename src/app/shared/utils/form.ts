@@ -1,7 +1,6 @@
-import { FormControl } from "@angular/forms";
 
 export class FormValidator {
-    isFormControlInvalid(formControl: FormControl) {
+    isFormControlInvalid(formControl: any) {
         return formControl?.invalid && formControl?.touched;
     }
 }

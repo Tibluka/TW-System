@@ -127,6 +127,15 @@ export class ClientModalComponent implements OnInit {
       valuePerMeter: client.values.valuePerMeter,
       valuePerPiece: client.values.valuePerPiece
     });
+
+    // Se existir _id no client, adiciona o form control _id se não existir
+    if (client._id) {
+      if (!this.clientForm.contains('_id')) {
+        this.clientForm.addControl('_id', this.formBuilder.control(client._id));
+      } else {
+        this.clientForm.get('_id')?.setValue(client._id);
+      }
+    }
   }
 
   private formatCNPJ(cnpj: string): string {
@@ -366,8 +375,7 @@ export class ClientModalComponent implements OnInit {
 
     if (this.clientForm.valid) {
       // Formulário válido - preparar dados e salvar
-      const formData = this.prepareFormData();
-
+      const formData = this.clientForm.value;
       if (this.isEditMode) {
         this.updateClient(formData);
       } else {
@@ -388,33 +396,6 @@ export class ClientModalComponent implements OnInit {
   // CRIAR/ATUALIZAR CLIENTE
   // ============================================
 
-  private prepareFormData(): CreateClientRequest | UpdateClientRequest {
-    const formValues = this.clientForm.value;
-
-    return {
-      acronym: formValues.acronym,
-      companyName: formValues.companyName,
-      cnpj: formValues.cnpj,
-      contact: {
-        responsibleName: formValues.responsibleName,
-        phone: formValues.phone,
-        email: formValues.email
-      },
-      address: {
-        street: formValues.street,
-        number: formValues.number,
-        complement: formValues.complement || undefined,
-        neighborhood: formValues.neighborhood,
-        city: formValues.city,
-        state: formValues.state.toUpperCase(),
-        zipcode: formValues.zipcode
-      },
-      values: {
-        valuePerMeter: parseFloat(formValues.valuePerMeter),
-        valuePerPiece: parseFloat(formValues.valuePerPiece)
-      }
-    };
-  }
 
   private createClient(clientData: CreateClientRequest | any): void {
     this.isSaving = true;

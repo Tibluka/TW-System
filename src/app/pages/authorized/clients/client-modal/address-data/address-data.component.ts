@@ -2,11 +2,16 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { InputComponent } from '../../../../../shared/components/atoms/input/input.component';
-import { BrazilianState } from '../../../../../models/clients/clients';
+import { SelectComponent, SelectOption } from '../../../../../shared/components/atoms/select/select.component';
 
 @Component({
   selector: 'app-address-data',
-  imports: [CommonModule, ReactiveFormsModule, InputComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    InputComponent,
+    SelectComponent
+  ],
   templateUrl: './address-data.component.html',
   styleUrl: './address-data.component.scss'
 })
@@ -14,11 +19,34 @@ export class AddressDataComponent implements OnInit {
 
   @Input() parentForm!: FormGroup;
 
-  // Estados brasileiros para validação
-  brazilianStates: BrazilianState[] = [
-    'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO',
-    'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI',
-    'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
+  brazilianStates: SelectOption[] = [
+    { value: 'AC', label: 'AC' },
+    { value: 'AL', label: 'AL' },
+    { value: 'AP', label: 'AP' },
+    { value: 'AM', label: 'AM' },
+    { value: 'BA', label: 'BA' },
+    { value: 'CE', label: 'CE' },
+    { value: 'DF', label: 'DF' },
+    { value: 'ES', label: 'ES' },
+    { value: 'GO', label: 'GO' },
+    { value: 'MA', label: 'MA' },
+    { value: 'MT', label: 'MT' },
+    { value: 'MS', label: 'MS' },
+    { value: 'MG', label: 'MG' },
+    { value: 'PA', label: 'PA' },
+    { value: 'PB', label: 'PB' },
+    { value: 'PR', label: 'PR' },
+    { value: 'PE', label: 'PE' },
+    { value: 'PI', label: 'PI' },
+    { value: 'RJ', label: 'RJ' },
+    { value: 'RN', label: 'RN' },
+    { value: 'RS', label: 'RS' },
+    { value: 'RO', label: 'RO' },
+    { value: 'RR', label: 'RR' },
+    { value: 'SC', label: 'SC' },
+    { value: 'SP', label: 'SP' },
+    { value: 'SE', label: 'SE' },
+    { value: 'TO', label: 'TO' }
   ];
 
   ngOnInit(): void {

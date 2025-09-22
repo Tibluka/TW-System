@@ -8,12 +8,12 @@ export interface SelectOption {
   label: string;
   disabled?: boolean;
   group?: string;
-  [key: string]: any; // ← Adicionar assinatura de índice
+  [key: string]: any;
 }
 
 @Component({
   selector: 'ds-select',
-  imports: [CommonModule, IconComponent, FormsModule], // ← Adicionar FormsModule
+  imports: [CommonModule, IconComponent, FormsModule],
   templateUrl: './select.component.html',
   styleUrls: ['./select.component.scss'],
   providers: [
@@ -46,6 +46,7 @@ export class SelectComponent implements OnInit, OnDestroy, ControlValueAccessor 
   @Input() loadingText: string = 'Carregando...';
   @Input() noOptionsText: string = 'Nenhuma opção encontrada';
   @Input() loading: boolean = false;
+  @Input() placement: 'top' | 'bottom' = 'bottom';
 
   // Eventos
   @Output() selectionChanged = new EventEmitter<any>();
@@ -62,9 +63,9 @@ export class SelectComponent implements OnInit, OnDestroy, ControlValueAccessor 
   searchTerm: string = '';
   filteredOptions: SelectOption[] = [];
 
-  // Callbacks do ControlValueAccessor - tornar público o onTouched
+  // Callbacks do ControlValueAccessor
   private onChange = (value: any) => { };
-  public onTouched = () => { }; // ← Tornar público
+  public onTouched = () => { };
 
   ngOnInit() {
     this.uniqueId = `ds-select-${Math.random().toString(36).substr(2, 9)}`;
@@ -262,6 +263,12 @@ export class SelectComponent implements OnInit, OnDestroy, ControlValueAccessor 
   get labelClasses(): string {
     const classes = ['select-label'];
     if (this.required) classes.push('required');
+    return classes.join(' ');
+  }
+
+  get dropdownClasses(): string {
+    const classes = ['select-dropdown'];
+    classes.push(`placement-${this.placement}`);
     return classes.join(' ');
   }
 

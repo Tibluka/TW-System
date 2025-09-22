@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { InputComponent } from '../../../../../shared/components/atoms/input/input.component';
+import { FormValidator } from '../../../../../shared/utils/form';
 
 @Component({
   selector: 'app-values-data',
@@ -9,7 +10,7 @@ import { InputComponent } from '../../../../../shared/components/atoms/input/inp
   templateUrl: './values-data.component.html',
   styleUrl: './values-data.component.scss'
 })
-export class ValuesDataComponent implements OnInit {
+export class ValuesDataComponent extends FormValidator implements OnInit {
 
   @Input() parentForm!: FormGroup;
 

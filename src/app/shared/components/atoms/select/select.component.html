@@ -55,7 +55,7 @@
         </div>
 
         <!-- Dropdown Options -->
-        <div *ngIf="isOpen" class="select-dropdown">
+        <div *ngIf="isOpen" [class]="dropdownClasses">
 
             <!-- Campo de busca -->
             <div *ngIf="searchable" class="search-container">

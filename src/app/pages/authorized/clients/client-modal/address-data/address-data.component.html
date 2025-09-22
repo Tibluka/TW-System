@@ -20,8 +20,7 @@
     <!-- Número -->
     <div class="number-field">
         <ds-input label="Número" placeholder="123" formControlName="number" [fullWidth]="true" [required]="true"
-            [invalid]="isFieldInvalid('number')" [errorMessage]="getErrorMessage('number')" icon="fa-solid fa-hashtag"
-            iconPosition="left">
+            [invalid]="isFieldInvalid('number')" [errorMessage]="getErrorMessage('number')">
         </ds-input>
     </div>
 
@@ -51,10 +50,9 @@
 
     <!-- Estado -->
     <div class="state-field">
-        <ds-input label="Estado" placeholder="SP, RJ, MG..." formControlName="state" [fullWidth]="true"
-            [required]="true" [invalid]="isFieldInvalid('state')" [errorMessage]="getErrorMessage('state')"
-            [maxlength]="2" icon="fa-solid fa-flag" iconPosition="left">
-        </ds-input>
+        <ds-select label="Status" placement="top" [fullWidth]="true" placeholder="Selecione o status"
+            [options]="brazilianStates" formControlName="state">
+        </ds-select>
     </div>
 
 </form>
