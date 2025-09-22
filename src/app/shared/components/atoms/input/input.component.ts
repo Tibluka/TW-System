@@ -1,4 +1,4 @@
-// input.component.ts - CORREÇÃO COMPLETA DO ERRO REPLACE
+// input.component.ts - CORREÇÃO COMPLETA E DEFINITIVA
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, forwardRef, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -73,7 +73,7 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
     if (value === null || value === undefined) {
       this.value = '';
     } else {
-      // 🔧 CORREÇÃO: Sempre converter para string antes de usar
+      // 🔧 CORREÇÃO: Sempre converter para string
       this.value = String(value);
     }
   }
@@ -96,6 +96,16 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
 
     // Garantir que newValue é sempre string
     let newValue = String(target.value || '');
+
+    // 🔧 CORREÇÃO: Para campos numéricos, não aplicar máscara
+    if (this.type === 'number') {
+      // Para campos numéricos, usar o valor diretamente
+      this.value = newValue;
+      this.onChange(newValue);
+      this.ngModelChange.emit(newValue);
+      this.valueChanged.emit(newValue);
+      return;
+    }
 
     // Se tem máscara E dropSpecialCharacters ativo, processar manualmente
     if (this.mask && this.dropSpecialCharacters && newValue) {
@@ -164,15 +174,25 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
     return !this.showError && !!this.helperText;
   }
 
+  // 🔧 CORREÇÃO: Não aplicar máscara em campos numéricos
   get hasMask(): boolean {
-    return !!this.mask;
+    return !!this.mask && this.type !== 'number';
   }
 
-  // 🔧 CORREÇÃO: Getter seguro para o valor
+  // 🔧 CORREÇÃO CRÍTICA: Getter seguro para o valor (DEVE EXISTIR)
   get safeValue(): string {
     if (this.value === null || this.value === undefined) {
       return '';
     }
     return String(this.value);
+  }
+
+  // 🔧 CORREÇÃO: Getters seguros para atributos
+  get safeMaxlength(): number | null {
+    return this.maxlength;
+  }
+
+  get safeMinlength(): number | null {
+    return this.minlength;
   }
 }

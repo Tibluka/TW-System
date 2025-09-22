@@ -1,11 +1,15 @@
-// menu.service.ts - Versão retrátil
-import { computed, Injectable, signal } from '@angular/core';
+// menu.service.ts - CORREÇÃO COM ROUTER AWARENESS
+import { computed, Injectable, signal, inject } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { MenuItem } from '../../../models/menu/menu';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MenuService {
+  private readonly router = inject(Router);
+
   private readonly _isCollapsed = signal(false);
   private readonly _isAnimating = signal(false);
   private readonly _menuItems = signal<MenuItem[]>([]);
@@ -28,6 +32,57 @@ export class MenuService {
   constructor() {
     this.initializeDefaultItems();
     this.loadCollapsedState();
+    this.setupRouterListener();
+    this.setActiveItemFromCurrentRoute(); // 🔧 CORREÇÃO: Definir item ativo na inicialização
+  }
+
+  /**
+   * 🔧 CORREÇÃO: Configura listener para mudanças de rota
+   */
+  private setupRouterListener(): void {
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.setActiveItemFromRoute(event.url);
+      });
+  }
+
+  /**
+   * 🔧 CORREÇÃO: Define item ativo baseado na rota atual (para F5)
+   */
+  private setActiveItemFromCurrentRoute(): void {
+    const currentUrl = this.router.url;
+    this.setActiveItemFromRoute(currentUrl);
+  }
+
+  /**
+   * 🔧 CORREÇÃO: Define item ativo baseado na URL
+   */
+  private setActiveItemFromRoute(url: string): void {
+    console.log('🔍 Verificando rota atual:', url);
+
+    const menuItems = this._menuItems();
+    const activeItem = menuItems.find(item => {
+      if (!item.route) return false;
+
+      // Verificação exata da rota
+      if (item.route === url) return true;
+
+      // Verificação se a URL atual começa com a rota do item (para sub-rotas)
+      if (url.startsWith(item.route) && url.charAt(item.route.length) === '/') {
+        return true;
+      }
+
+      return false;
+    });
+
+    if (activeItem) {
+      console.log('✅ Item ativo encontrado:', activeItem.label, `(${activeItem.id})`);
+      this._activeItem.set(activeItem.id);
+    } else {
+      console.log('❌ Nenhum item ativo encontrado para:', url);
+      this._activeItem.set(null);
+    }
   }
 
   /**
@@ -77,6 +132,8 @@ export class MenuService {
    */
   setMenuItems(items: MenuItem[]): void {
     this._menuItems.set(items);
+    // 🔧 CORREÇÃO: Quando itens mudam, re-verificar rota ativa
+    this.setActiveItemFromCurrentRoute();
   }
 
   /**
@@ -84,6 +141,8 @@ export class MenuService {
    */
   addMenuItem(item: MenuItem): void {
     this._menuItems.update(items => [...items, item]);
+    // 🔧 CORREÇÃO: Re-verificar rota ativa após adicionar item
+    this.setActiveItemFromCurrentRoute();
   }
 
   /**
@@ -96,9 +155,10 @@ export class MenuService {
   }
 
   /**
-   * Define o item ativo
+   * Define o item ativo (para cliques manuais)
    */
   setActiveItem(id: string | null): void {
+    console.log('🎯 Definindo item ativo manualmente:', id);
     this._activeItem.set(id);
   }
 
@@ -108,11 +168,19 @@ export class MenuService {
   executeMenuItem(item: MenuItem): void {
     if (item.disabled) return;
 
-    this.setActiveItem(item.id);
+    // 🔧 CORREÇÃO: Não definir ativo aqui, deixar o router fazer isso
+    // this.setActiveItem(item.id); // Removido para evitar conflito
 
     if (item.action) {
       item.action();
     }
+  }
+
+  /**
+   * 🔧 CORREÇÃO: Método público para forçar atualização baseada na rota
+   */
+  updateActiveItemFromCurrentRoute(): void {
+    this.setActiveItemFromCurrentRoute();
   }
 
   /**

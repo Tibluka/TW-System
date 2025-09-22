@@ -43,8 +43,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
   private clientService = inject(ClientService);
   private modalService = inject(ModalService);
 
-  searchInput: string = '';
-
   // Máscaras usando variáveis do sistema
   cnpjMask: string = '00.000.000/0000-00';
   phoneMask: string = '(00) 0000-0000||(00) 00000-0000';
@@ -61,6 +59,7 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
 
   // Filtros atuais
   currentFilters: ClientFilters = {
+    search: '',
     page: 1,
     limit: 10,
     active: true
@@ -140,11 +139,9 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
             this.pagination = response.pagination;
 
             console.log(`📊 ${this.clients.length} clientes carregados:`, this.clients);
-            this.shouldShowTable = this.clients.length > 0;
           } else {
             console.warn('⚠️ Resposta da API não contém dados válidos:', response);
             this.clients = [];
-            this.shouldShowTable = false;
             this.showErrorMessage('Nenhum dado foi retornado da API.');
           }
           this.loading = false;
@@ -152,7 +149,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
         error: (error) => {
           console.error('❌ Erro ao carregar clientes:', error);
           this.loading = false;
-          this.shouldShowTable = false;
           this.showErrorMessage(error.message || 'Erro ao carregar clientes.');
         }
       });
@@ -214,7 +210,8 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
    * 🔍 BUSCA - Dispara busca quando usuário digita
    */
   onSearchChange(): void {
-    this.searchSubject.next(this.searchInput.trim());
+    if (!this.currentFilters.search) return;
+    this.searchSubject.next(this.currentFilters.search.trim());
   }
 
   /**
@@ -312,13 +309,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
    */
   get shouldShowSpinner(): boolean {
     return this.loading;
-  }
-
-  /**
-   * 📋 GET SHOULD SHOW TABLE - Mostra tabela quando há dados
-   */
-  get shouldShowTableGetter(): boolean {
-    return this.shouldShowTable && !this.loading && this.clients.length > 0;
   }
 
   /**

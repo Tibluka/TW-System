@@ -4,8 +4,9 @@
 
     <!-- Barra de busca com espaçamento usando variáveis -->
     <div class="search-input">
-        <ds-input width="400px" label="Buscar" placeholder="Digite o nome, CNPJ, etc." [(ngModel)]="searchInput"
-            (ngModelChange)="onSearchChange()" icon="fa-solid fa-search" iconPosition="left" />
+        <ds-input width="400px" label="Buscar" placeholder="Digite o nome, CNPJ, etc."
+            [(ngModel)]="currentFilters.search" (ngModelChange)="onSearchChange()" icon="fa-solid fa-search"
+            iconPosition="left" />
 
         <ds-button label="Novo cliente" icon="fa-solid fa-circle-plus" (onClickEmitter)="createClient()" />
     </div>

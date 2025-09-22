@@ -375,7 +375,7 @@ export class ClientModalComponent implements OnInit {
 
     if (this.clientForm.valid) {
       // Formulário válido - preparar dados e salvar
-      const formData = this.clientForm.value;
+      const formData = this.prepareFormData();
       if (this.isEditMode) {
         this.updateClient(formData);
       } else {
@@ -396,6 +396,39 @@ export class ClientModalComponent implements OnInit {
   // CRIAR/ATUALIZAR CLIENTE
   // ============================================
 
+  private prepareFormData(): CreateClientRequest | UpdateClientRequest {
+    const formValues = this.clientForm.value;
+    const payload = {
+      _id: formValues?._id,
+      acronym: formValues.acronym,
+      companyName: formValues.companyName,
+      cnpj: formValues.cnpj,
+      contact: {
+        responsibleName: formValues.responsibleName,
+        phone: formValues.phone,
+        email: formValues.email
+      },
+      address: {
+        street: formValues.street,
+        number: formValues.number,
+        complement: formValues.complement || undefined,
+        neighborhood: formValues.neighborhood,
+        city: formValues.city,
+        state: formValues.state.toUpperCase(),
+        zipcode: formValues.zipcode
+      },
+      values: {
+        valuePerMeter: parseFloat(formValues.valuePerMeter),
+        valuePerPiece: parseFloat(formValues.valuePerPiece)
+      }
+    };
+
+    if (!payload._id) {
+      delete payload._id;
+    }
+
+    return payload;
+  }
 
   private createClient(clientData: CreateClientRequest | any): void {
     this.isSaving = true;

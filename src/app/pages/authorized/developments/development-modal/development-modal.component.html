@@ -1,0 +1,8 @@
+<ds-file-upload label="Galeria de Imagens" placeholder="Clique ou arraste múltiplas imagens aqui"
+    helperText="Múltiplas imagens (JPG, JPEG, PNG) de até 5MB cada" [multiple]="true" [fullWidth]="true"
+    (filesChanged)="onMultipleFilesChanged($event)" (fileAdded)="onMultipleFileAdded($event)"
+    (fileRemoved)="onMultipleFileRemoved($event)" (uploadError)="onUploadError($event)">
+</ds-file-upload>
+
+<ds-button label="Upload images" variant="outline" [disabled]="isUploading" [isLoading]="isUploading"
+    (onClickEmitter)="uploadToServer()" />
