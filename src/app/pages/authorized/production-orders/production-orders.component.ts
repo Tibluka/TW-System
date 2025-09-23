@@ -6,20 +6,20 @@ import { FormsModule, NgModel } from "@angular/forms";
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
 // Componentes
-import { ProductionOrder, ProductionOrderFilters, ProductionOrderListResponse, PaginationInfo, ProductionOrderUtils } from '../../../models/production-orders/production-orders';
+import { PaginationInfo, ProductionOrder, ProductionOrderFilters } from '../../../models/production-orders/production-orders';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
 import { SelectComponent, SelectOption } from '../../../shared/components/atoms/select/select.component';
-import { IconComponent } from '../../../shared/components/atoms/icon/icon.component';
 import { SpinnerComponent } from '../../../shared/components/atoms/spinner/spinner.component';
 import { ModalComponent } from "../../../shared/components/organisms/modal/modal.component";
 import { TableCellComponent } from '../../../shared/components/organisms/table/table-cell/table-cell.component';
 import { TableRowComponent } from '../../../shared/components/organisms/table/table-row/table-row.component';
 import { TableComponent } from '../../../shared/components/organisms/table/table.component';
 import { ModalService } from '../../../shared/services/modal/modal.service';
+import { ProductionOrderService } from '../../../shared/services/production-order/production-order.service';
 import { FormValidator } from '../../../shared/utils/form';
 import { ProductionOrderModalComponent } from "./production-order-modal/production-order-modal.component";
-import { ProductionOrderService } from '../../../shared/services/production-order/production-order.service';
+import { IconComponent } from "../../../shared/components/atoms/icon/icon.component";
 
 @Component({
   selector: 'app-production-orders',
@@ -34,8 +34,8 @@ import { ProductionOrderService } from '../../../shared/services/production-orde
     ModalComponent,
     ProductionOrderModalComponent,
     SelectComponent,
-    IconComponent,
-    SpinnerComponent
+    SpinnerComponent,
+    IconComponent
   ],
   providers: [NgModel],
   templateUrl: './production-orders.component.html',
@@ -99,7 +99,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
   }
 
   ngOnInit(): void {
-    this.initializeSearchDebounce();
+    this.setupSearchDebounce();
     this.loadProductionOrders();
   }
 
@@ -109,13 +109,13 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
   }
 
   // ============================================
-  // MÉTODOS DE INICIALIZAÇÃO
+  // CONFIGURAÇÃO DE BUSCA COM DEBOUNCE
   // ============================================
 
   /**
-   * 🔍 DEBOUNCE - Configura debounce para busca
+   * 🔍 SETUP SEARCH DEBOUNCE - Configura debounce para busca
    */
-  private initializeSearchDebounce(): void {
+  private setupSearchDebounce(): void {
     this.searchSubject
       .pipe(
         debounceTime(300),
@@ -130,39 +130,81 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
   }
 
   // ============================================
-  // MÉTODOS DE CARREGAMENTO
+  // MÉTODOS DE CARREGAMENTO DE DADOS
   // ============================================
 
   /**
-   * 📋 CARREGAR ORDENS DE PRODUÇÃO - Busca dados da API com filtros atuais
+   * 📋 CARREGAR ORDENS DE PRODUÇÃO - Carrega lista com filtros
    */
-  private loadProductionOrders(): void {
+  async loadProductionOrders(): Promise<void> {
     this.loading = true;
-    this.shouldShowTable = false;
+    this.showError = false;
 
-    this.productionOrderService.getProductionOrders(this.currentFilters)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (response: ProductionOrderListResponse) => {
-          if (response.data) {
-            this.productionOrders = response.data;
-            this.pagination = response.pagination || null;
-            this.shouldShowTable = true;
-            console.log('✅ Ordens de produção carregadas:', this.productionOrders.length);
-          }
-          this.loading = false;
-        },
-        error: (error) => {
-          console.error('❌ Erro ao carregar ordens de produção:', error);
-          this.loading = false;
-          this.showErrorMessage(error.message || 'Erro ao carregar ordens de produção.');
-        }
-      });
+    try {
+      const response = await this.productionOrderService.getProductionOrders(this.currentFilters).toPromise();
+
+      if (response) {
+        this.productionOrders = response.data || [];
+        this.pagination = response.pagination || null;
+        this.shouldShowTable = true;
+
+        console.log('✅ Ordens de produção carregadas:', this.productionOrders.length);
+      }
+    } catch (error) {
+      console.error('❌ Erro ao carregar ordens de produção:', error);
+      this.errorMessage = 'Erro ao carregar ordens de produção. Tente novamente.';
+      this.showError = true;
+      this.shouldShowTable = false;
+    } finally {
+      this.loading = false;
+    }
   }
 
   // ============================================
-  // MÉTODOS DE AÇÃO DOS BOTÕES
+  // MÉTODOS DE EVENTOS DE FILTROS
   // ============================================
+
+  /**
+   * 🔍 BUSCA - Evento de mudança no campo de busca
+   */
+  onSearchChange(): void {
+    const searchTerm = this.currentFilters.search?.trim() || '';
+    this.searchSubject.next(searchTerm);
+  }
+
+  /**
+   * 📂 FILTRO STATUS - Evento de mudança no filtro de status
+   */
+  onStatusFilterChange(): void {
+    this.currentFilters.page = 1; // Reset para primeira página
+    this.loadProductionOrders();
+  }
+
+  // ============================================
+  // MÉTODOS DE INTERAÇÃO COM TABELA
+  // ============================================
+
+  /**
+   * 👆 CLICK NA ORDEM - Abre modal para editar ordem
+   */
+  onProductionOrderClick(productionOrder: ProductionOrder): void {
+    if (!productionOrder._id) return;
+
+    this.selectedProductionOrderId = productionOrder._id;
+
+    this.modalService.open({
+      id: 'production-order-modal',
+      title: `Editar Ordem de Produção - ${productionOrder.internalReference || 'S/N'}`,
+      size: 'xl',
+      showHeader: true,
+      showCloseButton: true,
+      closeOnBackdropClick: false,
+      closeOnEscapeKey: true,
+      data: productionOrder // Passar dados para o modal
+    }).subscribe(result => {
+      this.handleModalResult(result);
+    });
+  }
 
   /**
    * ➕ CRIAR - Abre modal para criar nova ordem de produção
@@ -171,7 +213,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
     // Limpar ID selecionado para modo criação
     this.selectedProductionOrderId = undefined;
 
-    this.openModal({
+    this.modalService.open({
       id: 'production-order-modal',
       title: 'Nova Ordem de Produção',
       size: 'xl',
@@ -179,149 +221,132 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
       showCloseButton: true,
       closeOnBackdropClick: false,
       closeOnEscapeKey: true
-    });
-  }
-
-  /**
-   * ✏️ EDITAR - Abre modal para editar ordem de produção existente
-   */
-  editProductionOrder(productionOrder: ProductionOrder): void {
-    // Definir o ID da ordem para edição
-    this.selectedProductionOrderId = productionOrder._id;
-
-    this.openModal({
-      id: 'production-order-modal',
-      title: `Editar Ordem - ${productionOrder.internalReference || 'Sem Referência'}`,
-      size: 'xl',
-      showHeader: true,
-      showCloseButton: true,
-      closeOnBackdropClick: false,
-      closeOnEscapeKey: true,
-      data: productionOrder
-    });
-  }
-
-  /**
-   * 👆 CLIQUE NA TABELA - Callback quando ordem é clicada na tabela
-   */
-  onProductionOrderClick(productionOrder: ProductionOrder): void {
-    this.editProductionOrder(productionOrder);
-  }
-
-  // ============================================
-  // MÉTODOS DE BUSCA E FILTROS
-  // ============================================
-
-  /**
-   * 🔍 BUSCA - Dispara busca quando usuário digita
-   */
-  onSearchChange(): void {
-    if (!this.currentFilters.search) return;
-    this.searchSubject.next(this.currentFilters.search);
-  }
-
-  /**
-   * 📂 FILTRO STATUS - Aplica filtro de status
-   */
-  onStatusFilterChange(): void {
-    this.currentFilters.page = 1; // Reset para primeira página
-    this.loadProductionOrders();
-  }
-
-  /**
-   * 🧹 LIMPAR FILTROS - Remove todos os filtros
-   */
-  clearFilters(): void {
-    this.currentFilters = {
-      search: undefined,
-      status: undefined,
-      page: 1,
-      limit: 10,
-      active: true
-    };
-    this.loadProductionOrders();
-  }
-
-  // ============================================
-  // MÉTODOS DE MODAL
-  // ============================================
-
-  /**
-   * 📤 ABRIR MODAL - Configura modal e define isModalOpen = true
-   */
-  private openModal(config: any): void {
-    this.isModalOpen = true;
-
-    this.modalService.open(config).subscribe(result => {
+      // NÃO passar data para criação
+    }).subscribe(result => {
       this.handleModalResult(result);
     });
   }
 
   /**
-   * 🔧 RESULTADO DO MODAL - Manipula resultado do modal
+   * 🏁 MODAL RESULT - Processa resultado do modal
    */
   private handleModalResult(result: any): void {
-    console.log('📋 Resultado do modal:', result);
-
-    if (result?.action === 'created' || result?.action === 'updated') {
-      // Recarregar lista após criar/editar
-      this.loadProductionOrders();
+    if (result && result.action) {
+      if (result.action === 'created') {
+        console.log('Ordem de produção criada com sucesso:', result.data?.internalReference);
+        this.loadProductionOrders(); // Recarregar lista
+        // TODO: Exibir toast de sucesso
+      } else if (result.action === 'updated') {
+        console.log('Ordem de produção atualizada com sucesso:', result.data?.internalReference);
+        this.loadProductionOrders(); // Recarregar lista
+        // TODO: Exibir toast de sucesso
+      }
     }
 
-    // Resetar estado do modal
+    // Sempre limpar o ID selecionado após fechar modal
     this.selectedProductionOrderId = undefined;
   }
 
   /**
-   * ❌ MODAL FECHADO - Callback quando modal é fechado
+   * 🎭 MODAL CLOSED - Evento quando modal é fechado
    */
   onModalClosed(result: any): void {
-    this.isModalOpen = false;
     this.handleModalResult(result);
   }
 
   // ============================================
-  // MÉTODOS HELPER
+  // MÉTODOS UTILITÁRIOS PARA TEMPLATE
   // ============================================
-
-  /**
-   * 🏷️ LABEL DO STATUS - Retorna texto amigável para status
-   */
-  getStatusLabel(status: string): string {
-    return ProductionOrderUtils.getStatusLabel(status as any);
-  }
-
-  /**
-   * 🚨 LABEL DA PRIORIDADE - Retorna texto amigável para prioridade
-   */
-  getPriorityLabel(priority: string): string {
-    return ProductionOrderUtils.getPriorityLabel(priority as any);
-  }
-
-  /**
-   * 🧪 TEXTO PILOTO - Retorna texto para tipo piloto
-   */
-  getPilotText(pilot: boolean): string {
-    return ProductionOrderUtils.getPilotText(pilot);
-  }
 
   /**
    * 📅 FORMATAR DATA - Formata data para exibição
    */
   formatDate(date: Date | string | undefined): string {
-    return ProductionOrderUtils.formatDate(date);
+    if (!date) return '-';
+
+    try {
+      const dateObj = typeof date === 'string' ? new Date(date) : date;
+      return dateObj.toLocaleDateString('pt-BR');
+    } catch {
+      return '-';
+    }
   }
 
   /**
-   * ⚠️ MOSTRAR ERRO - Exibe mensagem de erro
+   * 🎯 LABEL STATUS - Retorna label amigável para status
    */
-  private showErrorMessage(message: string): void {
-    this.errorMessage = message;
-    this.showError = true;
+  getStatusLabel(status: string): string {
+    const statusMap: { [key: string]: string } = {
+      'CREATED': 'Criado',
+      'PILOT_PRODUCTION': 'Produção Piloto',
+      'PILOT_SENT': 'Piloto Enviado',
+      'PILOT_APPROVED': 'Piloto Aprovado',
+      'PRODUCTION_STARTED': 'Produção Iniciada',
+      'FINALIZED': 'Finalizado'
+    };
+    return statusMap[status] || status;
+  }
 
-    // Auto-hide após 5 segundos
-    setTimeout(() => {
-      this.showError = false;
-    }, 5000);
+  /**
+   * 🚨 LABEL PRIORIDADE - Retorna label amigável para prioridade
+   */
+  getPriorityLabel(priority: string): string {
+    const priorityMap: { [key: string]: string } = {
+      'green': 'Normal',
+      'yellow': 'Média',
+      'red': 'Alta'
+    };
+    return priorityMap[priority] || priority;
+  }
+
+  /**
+   * 🧪 TEXTO PILOTO - Retorna texto para piloto
+   */
+  getPilotText(pilot: boolean): string {
+    return pilot ? 'Sim' : 'Não';
+  }
+
+  // ============================================
+  // MÉTODOS DE PAGINAÇÃO
+  // ============================================
+
+  /**
+   * 📄 PÁGINA ANTERIOR - Navega para página anterior
+   */
+  previousPage(): void {
+    if (this.pagination && this.pagination.currentPage > 1) {
+      this.currentFilters.page = this.pagination.currentPage - 1;
+      this.loadProductionOrders();
+    }
+  }
+
+  /**
+   * 📄 PRÓXIMA PÁGINA - Navega para próxima página
+   */
+  nextPage(): void {
+    if (this.pagination && this.pagination.currentPage < this.pagination.totalPages) {
+      this.currentFilters.page = this.pagination.currentPage + 1;
+      this.loadProductionOrders();
+    }
+  }
+
+  /**
+   * 📄 IR PARA PÁGINA - Navega para página específica
+   */
+  goToPage(page: number): void {
+    if (this.pagination && page >= 1 && page <= this.pagination.totalPages) {
+      this.currentFilters.page = page;
+      this.loadProductionOrders();
+    }
+  }
+
+
+  onPageChange(page: number): void {
+    this.currentFilters.page = page;
+    this.loadProductionOrders();
+  }
+
+  clearFilters() {
+
   }
 }

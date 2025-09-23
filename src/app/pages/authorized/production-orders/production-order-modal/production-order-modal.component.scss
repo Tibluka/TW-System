@@ -6,6 +6,47 @@
 @use 'base/typography' as *;
 
 // ========================================
+// CONTAINER PRINCIPAL COM ALTURA FIXA
+// ========================================
+.production-order-modal-container {
+    height: 80vh; // Altura fixa para forçar scroll
+    max-height: 700px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+// ========================================
+// WRAPPER DE CONTEÚDO COM SCROLL
+// ========================================
+.modal-content-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 $spacing-md; // 16px lateral
+    padding-bottom: 100px; // Espaço para botões fixos
+
+    // Scroll customizado
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--background-secondary);
+        border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--stroke);
+        border-radius: 3px;
+
+        &:hover {
+            background: var(--label);
+        }
+    }
+}
+
+// ========================================
 // CONTAINER DE LOADING
 // ========================================
 .loading-container {
@@ -13,11 +54,12 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: $spacing-xxl; // 48px
+    height: 100%;
     text-align: center;
 
     p {
         @include body();
+        color: var(--label);
     }
 }
 
@@ -26,18 +68,20 @@
 // ========================================
 .production-order-form {
     width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
+    max-width: none;
 
     // ========================================
     // SEÇÕES DO FORMULÁRIO
     // ========================================
     .form-section {
+        margin-bottom: $spacing-xl; // 32px
+
         .section-title {
             @include title-modal();
             color: var(--primary-dark);
             padding-bottom: $spacing-sm; // 8px
             border-bottom: 1px solid $stroke;
+            margin-bottom: $spacing-lg; // 24px
         }
     }
 
@@ -48,6 +92,7 @@
         display: grid;
         grid-template-columns: 1fr;
         gap: $spacing-md; // 16px
+        margin-bottom: $spacing-lg; // 24px
 
         // Layout com duas colunas
         &.two-columns {
@@ -89,314 +134,179 @@
                 flex-direction: column;
                 gap: $spacing-xs; // 4px
                 cursor: pointer;
-                position: relative;
                 padding: $spacing-md; // 16px
                 border: 1px solid $stroke;
-                border-radius: $border-radius-sm; // 8px
-                background-color: var(--white);
+                border-radius: $border-radius-md;
+                background: var(--background-secondary);
                 transition: all 0.2s ease;
 
                 &:hover {
-                    border-color: var(--primary-medium);
-                    background-color: rgba($primary-medium, 0.02);
-                }
-
-                &:has(.checkbox-input:checked) {
-                    border-color: var(--primary-medium);
-                    background-color: rgba($primary-medium, 0.05);
+                    border-color: var(--primary);
+                    background: var(--white);
                 }
 
                 .checkbox-input {
-                    position: absolute;
-                    top: $spacing-md; // 16px
-                    right: $spacing-md; // 16px
-                    width: 20px;
-                    height: 20px;
-                    accent-color: var(--primary-medium);
+                    margin: 0;
+                    margin-right: $spacing-sm; // 8px
+                    width: 16px;
+                    height: 16px;
                     cursor: pointer;
                 }
 
                 .checkbox-label {
                     @include input-label();
-                    color: var(--primary-dark);
+                    cursor: pointer;
                     margin: 0;
-                    padding-right: $spacing-lg; // 24px
                 }
 
                 .checkbox-description {
                     @include placeholder();
+                    font-size: 12px;
                     margin: 0;
-                    padding-right: $spacing-lg; // 24px
+                    cursor: pointer;
                 }
             }
         }
     }
 
     // ========================================
-    // ESTADO DA BUSCA DE DESENVOLVIMENTO
+    // ESTADOS DE BUSCA
     // ========================================
     .search-status {
-        margin-top: $spacing-sm; // 8px
+        margin-top: $spacing-md; // 16px
 
         .search-loading,
         .search-not-found {
             display: flex;
             align-items: center;
-            padding: $spacing-sm; // 8px
-            border-radius: $border-radius-sm; // 8px
+            padding: $spacing-md; // 16px
+            border-radius: $border-radius-md;
+
+            span {
+                @include body();
+            }
         }
 
         .search-loading {
-            background-color: rgba($secondary-medium, 0.05);
-            border: 1px solid rgba($secondary-medium, 0.2);
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
         }
 
         .search-not-found {
-            background-color: rgba($tertiary, 0.05);
-            border: 1px solid rgba($tertiary, 0.2);
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
-    }
 
-    // ========================================
-    // CARD DO DESENVOLVIMENTO ENCONTRADO
-    // ========================================
-    .development-found {
-        margin-top: $spacing-sm; // 8px
+        // ========================================
+        // CARD DO DESENVOLVIMENTO ENCONTRADO
+        // ========================================
+        .development-found {
+            margin-top: 24px;
 
-        .development-card {
-            background-color: rgba($primary-medium, 0.03);
-            border: 1px solid rgba($primary-medium, 0.2);
-            border-radius: $border-radius-md; // 12px
-            padding: $spacing-md; // 16px
-
-            .development-header {
-                display: flex;
-                align-items: flex-start;
-                gap: $spacing-sm; // 8px
-                margin-bottom: $spacing-md; // 16px
-
-                .development-info {
-                    flex: 1;
-
-                    h4 {
-                        @include input-label();
-                        color: var(--primary-dark);
-                        margin: 0 0 $spacing-xs 0; // 0 0 4px 0
-                    }
-
-                    p {
-                        @include placeholder();
-                        margin: 0;
-                    }
-                }
-            }
-
-            .development-details {
+            .development-card {
+                border: 1px solid var(--stroke);
+                border-radius: $border-radius-md;
+                background: var(--background);
+                padding: $spacing-md $spacing-lg; // 24px
+                margin-top: $spacing-md; // 16px
                 display: grid;
-                gap: $spacing-sm; // 8px
+                grid-template-columns: 1fr 1fr; // 50% para imagem, 50% para detalhes
+                gap: $spacing-lg;
+                align-items: start; // Alinha ao topo
 
-                .detail-item {
+                .image {
                     display: flex;
-                    align-items: flex-start;
-                    gap: $spacing-sm; // 8px
+                    align-items: center;
+                    justify-content: center;
+                    width: 100%; // Ocupa toda a largura da coluna (50%)
+                    height: 182px; // Altura fixa para manter proporção
 
-                    .detail-label {
-                        @include input-label();
-                        color: var(--label);
-                        min-width: 80px;
-                        flex-shrink: 0;
-                    }
-
-                    .detail-value {
-                        @include body();
-                        color: var(--primary-dark);
-                        flex: 1;
-                    }
-
-                    // ========================================
-                    // BADGES DE TIPO DE PRODUÇÃO
-                    // ========================================
-                    .production-types {
-                        display: flex;
-                        flex-wrap: wrap;
-                        gap: $spacing-xs; // 4px
-
-                        .production-badge {
-                            @include input-label();
-                            padding: $spacing-xs $spacing-sm; // 4px 8px
-                            border-radius: $border-radius-max; // 99px
-                            font-size: 12px;
-
-                            &.rotary {
-                                background-color: rgba($secondary-medium, 0.1);
-                                color: $secondary-medium;
-                            }
-
-                            &.localized {
-                                background-color: rgba($primary-medium, 0.1);
-                                color: $primary-medium;
-                            }
-                        }
-                    }
-
-                    // ========================================
-                    // BADGE DE STATUS
-                    // ========================================
-                    .status-badge {
-                        @include input-label();
-                        padding: $spacing-xs $spacing-sm; // 4px 8px
-                        border-radius: $border-radius-max; // 99px
-                        font-size: 12px;
-                        text-transform: uppercase;
-
-                        &.status-created {
-                            background-color: rgba($label, 0.1);
-                            color: $label;
-                        }
-
-                        &.status-awaiting_approval,
-                        &.status-awaiting-approval {
-                            background-color: rgba($tertiary, 0.1);
-                            color: $tertiary;
-                        }
-
-                        &.status-approved {
-                            background-color: rgba(#10b981, 0.1);
-                            color: #10b981;
-                        }
-
-                        &.status-canceled,
-                        &.status-cancelled {
-                            background-color: rgba(#ef4444, 0.1);
-                            color: #ef4444;
-                        }
-
-                        &.status-closed {
-                            background-color: rgba($secondary, 0.1);
-                            color: $secondary;
-                        }
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover; // Mantém proporção sem distorcer
+                        border-radius: $border-radius-sm;
+                        border: 1px solid var(--stroke);
                     }
                 }
-            }
-        }
-    }
 
-    // ========================================
-    // AÇÕES DO FORMULÁRIO
-    // ========================================
-    .form-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: $spacing-md; // 16px
-        padding-top: $spacing-lg; // 24px
-        border-top: 1px solid $stroke;
-
-        @media (max-width: 480px) {
-            flex-direction: column-reverse;
-
-            ds-button {
-                width: 100%;
-            }
-        }
-    }
-
-    // ========================================
-    // ESTADOS DE VALIDAÇÃO
-    // ========================================
-    .form-field {
-        &.has-error {
-            .checkbox-container {
-                border-color: var(--tertiary);
-                background-color: rgba($tertiary, 0.05);
-            }
-        }
-    }
-
-    // ========================================
-    // UTILITÁRIOS
-    // ========================================
-    .ml-8 {
-        margin-left: $spacing-sm; // 8px
-    }
-
-    .mt-16 {
-        margin-top: $spacing-md; // 16px
-    }
-
-    // ========================================
-    // RESPONSIVIDADE
-    // ========================================
-    @media (max-width: 768px) {
-        max-width: 100%;
-
-        .form-section {
-            margin-bottom: $spacing-lg; // 24px
-
-            .section-title {
-                font-size: 18px;
-                margin-bottom: $spacing-md; // 16px
-            }
-        }
-
-        .form-row {
-            margin-bottom: $spacing-md; // 16px
-
-            &.two-columns,
-            &.three-columns {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .form-field.checkbox-field {
-            .checkbox-container {
-                padding: $spacing-sm; // 8px
-
-                .checkbox-input {
-                    top: $spacing-sm; // 8px
-                    right: $spacing-sm; // 8px
-                    width: 18px;
-                    height: 18px;
-                }
-
-                .checkbox-label,
-                .checkbox-description {
-                    padding-right: $spacing-md; // 16px
-                }
-            }
-        }
-
-        .development-card {
-            .development-details {
-                .detail-item {
+                .development-details {
+                    display: flex;
                     flex-direction: column;
-                    align-items: flex-start;
-                    gap: $spacing-xs; // 4px
 
-                    .detail-label {
-                        min-width: auto;
+                    .title-modal {
+                        font-size: 24px;
+                    }
+
+                    .subtitle-section {
+                        font-size: 16px;
+                    }
+
+                    .card-small {
+                        font-size: 12px;
+                    }
+
+                    .body,
+                    .body-regular {
+                        font-size: 14px;
+                    }
+
+
+                }
+
+                // Responsividade para mobile - stack verticalmente
+                @media (max-width: 768px) {
+                    grid-template-columns: 1fr;
+                    gap: $spacing-md;
+
+                    .image {
+                        width: 100%;
+                        height: 150px; // Altura menor no mobile
+                        justify-self: center;
+
+                        img {
+                            width: 100%;
+                            height: 100%;
+                        }
                     }
                 }
             }
         }
     }
+}
 
-    @media (max-width: 480px) {
-        .form-section {
-            margin-bottom: $spacing-md; // 16px
+// ========================================
+// AÇÕES FIXAS NO RODAPÉ
+// ========================================
+.form-actions {
+    padding: $spacing-lg $spacing-md; // 24px 16px
+    display: flex;
+    gap: $spacing-sm; // 8px
+    justify-content: flex-end;
 
-            .section-title {
-                font-size: 16px;
-                margin-bottom: $spacing-sm; // 8px
-            }
+    @media (max-width: 768px) {
+        flex-direction: column-reverse;
+        gap: $spacing-sm; // 8px
+
+        ds-button {
+            width: 100%;
         }
+    }
+}
 
-        .development-card {
-            padding: $spacing-sm; // 8px
+// ========================================
+// RESPONSIVIDADE
+// ========================================
+@media (max-width: 768px) {
+    .production-order-modal-container {
+        height: 90vh;
+    }
 
-            .development-header {
-                margin-bottom: $spacing-sm; // 8px
-            }
-        }
+    .modal-content-wrapper {
+        padding: 0 $spacing-sm; // 8px lateral
+    }
+
+    .form-actions-fixed {
+        padding: $spacing-md $spacing-sm; // 16px 8px
     }
 }

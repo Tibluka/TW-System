@@ -300,6 +300,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
    * 💾 SALVAR - Cria ou atualiza ordem de produção
    */
   async onSave(): Promise<void> {
+    this.productionOrderForm.markAllAsTouched();
     if (this.productionOrderForm.invalid) {
       //this.markFormGroupTouched(this.productionOrderForm);
       return;

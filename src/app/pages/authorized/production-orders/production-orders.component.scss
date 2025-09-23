@@ -1,4 +1,4 @@
-// pages/authorized/production-orders/production-order-modal/production-order-modal.component.scss
+// pages/authorized/production-orders/production-orders.component.scss
 
 @use 'abstracts/variables' as *;
 @use 'abstracts/spacing' as *;
@@ -6,191 +6,39 @@
 @use 'base/typography' as *;
 
 // ========================================
-// CONTAINER DE LOADING
+// CONTAINER PRINCIPAL
 // ========================================
-.loading-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: $spacing-xxl; // 48px
-    text-align: center;
+.production-orders-container {
 
-    p {
-        @include body();
-    }
-}
-
-// ========================================
-// FORMULÁRIO PRINCIPAL
-// ========================================
-.production-order-form {
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-
-    // ========================================
-    // SEÇÕES DO FORMULÁRIO
-    // ========================================
-    .form-section {
-        .section-title {
-            @include title-modal();
-            color: var(--primary-dark);
-            padding-bottom: $spacing-sm; // 8px
-            border-bottom: 1px solid $stroke;
-        }
-    }
-
-    // ========================================
-    // LINHAS E CAMPOS DO FORMULÁRIO
-    // ========================================
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: $spacing-md; // 16px
-
-        // Para layouts com múltiplas colunas (se necessário no futuro)
-        &.two-columns {
-            grid-template-columns: 1fr 1fr;
-
-            @media (max-width: 768px) {
-                grid-template-columns: 1fr;
-            }
-        }
-    }
-
-    .form-field {
-        width: 100%;
-
-        // ========================================
-        // CAMPO CHECKBOX PERSONALIZADO
-        // ========================================
-        &.checkbox-field {
-            .checkbox-container {
-                display: flex;
-                flex-direction: column;
-                gap: $spacing-xs; // 4px
-                cursor: pointer;
-                position: relative;
-                padding: $spacing-md; // 16px
-                border: 1px solid $stroke;
-                border-radius: $border-radius-sm; // 8px
-                background-color: var(--white);
-                transition: all 0.2s ease;
-
-                &:hover {
-                    border-color: var(--primary-medium);
-                    background-color: rgba($primary-medium, 0.02);
-                }
-
-                &:has(.checkbox-input:checked) {
-                    border-color: var(--primary-medium);
-                    background-color: rgba($primary-medium, 0.05);
-                }
-
-                .checkbox-input {
-                    position: absolute;
-                    top: $spacing-md; // 16px
-                    right: $spacing-md; // 16px
-                    width: 20px;
-                    height: 20px;
-                    accent-color: var(--primary-medium);
-                    cursor: pointer;
-                }
-
-                .checkbox-label {
-                    @include input-label();
-                    color: var(--primary-dark);
-                    margin: 0;
-                    padding-right: $spacing-lg; // 24px - espaço para o checkbox
-                }
-
-                .checkbox-description {
-                    @include placeholder();
-                    margin: 0;
-                    padding-right: $spacing-lg; // 24px - espaço para o checkbox
-                }
-            }
-        }
-    }
-
-    // ========================================
-    // AÇÕES DO FORMULÁRIO
-    // ========================================
-    .form-actions {
+    .search-input {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: $spacing-md; // 16px
-        padding-top: $spacing-lg; // 24px
-        border-top: 1px solid $stroke;
+        align-items: flex-end;
+        gap: 16px; // 16px
 
-        @media (max-width: 480px) {
-            flex-direction: column-reverse;
+        // Responsive
+        @media (max-width: 768px) {
+            flex-direction: column;
+            align-items: stretch;
+            gap: var(--spacing-sm); // 8px
 
-            ds-button {
+            ds-input {
+                min-width: unset;
+                width: 100%;
+            }
+
+            ds-select {
+                min-width: unset;
                 width: 100%;
             }
         }
     }
 
-    // ========================================
-    // ESTADOS DE VALIDAÇÃO
-    // ========================================
-    .form-field {
-
-        // Estado de erro para campos personalizados
-        &.has-error {
-            .checkbox-container {
-                border-color: var(--tertiary);
-                background-color: rgba($tertiary, 0.05);
-            }
-        }
+    .development-image {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid var(--neutral-light);
     }
 
-    // ========================================
-    // RESPONSIVIDADE
-    // ========================================
-    @media (max-width: 768px) {
-        .form-section {
-            .section-title {
-                font-size: 18px;
-            }
-        }
-
-        .form-field.checkbox-field {
-            .checkbox-container {
-                padding: $spacing-sm; // 8px
-
-                .checkbox-input {
-                    top: $spacing-sm; // 8px
-                    right: $spacing-sm; // 8px
-                    width: 18px;
-                    height: 18px;
-                }
-
-                .checkbox-label,
-                .checkbox-description {
-                    padding-right: $spacing-md; // 16px
-                }
-            }
-        }
-    }
-
-    @media (max-width: 480px) {
-        max-width: 100%;
-
-        .form-section {
-            margin-bottom: $spacing-lg; // 24px
-
-            .section-title {
-                font-size: 16px;
-                margin-bottom: $spacing-md; // 16px
-            }
-        }
-
-        .form-row {
-            margin-bottom: $spacing-md; // 16px
-        }
-    }
 }
