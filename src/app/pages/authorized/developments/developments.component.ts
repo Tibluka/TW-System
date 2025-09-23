@@ -15,6 +15,7 @@ import { DevelopmentService } from '../../../shared/services/development/develop
 import { ModalService } from '../../../shared/services/modal/modal.service';
 import { FormValidator } from '../../../shared/utils/form';
 import { DevelopmentModalComponent } from "./development-modal/development-modal.component";
+import { SelectComponent, SelectOption } from "../../../shared/components/atoms/select/select.component";
 
 @Component({
   selector: 'app-developments',
@@ -27,7 +28,8 @@ import { DevelopmentModalComponent } from "./development-modal/development-modal
     TableRowComponent,
     TableCellComponent,
     ModalComponent,
-    DevelopmentModalComponent
+    DevelopmentModalComponent,
+    SelectComponent
   ],
   providers: [NgModel],
   templateUrl: './developments.component.html',
@@ -53,16 +55,25 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
   // Filtros atuais
   currentFilters: DevelopmentFilters = {
     search: undefined,
+    status: undefined,
     page: 1,
     limit: 10,
     active: true
   };
 
+  statusOption: SelectOption[] = [
+    { value: undefined, label: 'Todos' },
+    { value: 'CREATED', label: 'Criado' },
+    { value: 'AWAITING_APPROVAL', label: 'Aguardando Aprovação' },
+    { value: 'APPROVED', label: 'Aprovado' },
+    { value: 'CANCELED', label: 'Cancelado' }
+  ];
+
   // Propriedade para armazenar ID do desenvolvimento selecionado para edição
   selectedDevelopmentId?: string;
 
   // Subject para debounce da busca
-  private searchSubject = new Subject<string>();
+  private searchSubject = new Subject<DevelopmentFilters>();
   private destroy$ = new Subject<void>();
 
   // ============================================
@@ -109,10 +120,9 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
   private setupSearchDebounce(): void {
     this.searchSubject.pipe(
       debounceTime(500),
-      distinctUntilChanged(),
       takeUntil(this.destroy$)
     ).subscribe(searchTerm => {
-      this.currentFilters.search = searchTerm;
+      this.currentFilters = searchTerm;
       this.currentFilters.page = 1; // Reset para primeira página
       this.loadDevelopments();
     });
@@ -166,7 +176,7 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
    * 🔍 BUSCA - Dispara busca quando usuário digita
    */
   onSearchChange(): void {
-    this.searchSubject.next(this.currentFilters.search || '');
+    this.searchSubject.next(this.currentFilters);
   }
 
   /**

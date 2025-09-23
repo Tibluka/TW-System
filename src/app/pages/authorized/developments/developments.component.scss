@@ -14,20 +14,7 @@
     .search-input {
         display: flex;
         align-items: flex-end;
-        gap: var(--spacing-md); // 16px
-        margin-bottom: var(--spacing-lg); // 24px
-        flex-wrap: wrap;
-
-        // Input de busca
-        ds-input {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        // Botão novo desenvolvimento
-        ds-button {
-            flex-shrink: 0;
-        }
+        gap: 16px; // 16px
 
         // Responsive
         @media (max-width: 768px) {
@@ -36,6 +23,11 @@
             gap: var(--spacing-sm); // 8px
 
             ds-input {
+                min-width: unset;
+                width: 100%;
+            }
+
+            ds-select {
                 min-width: unset;
                 width: 100%;
             }

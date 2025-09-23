@@ -172,7 +172,7 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
       productionType = 'localized';
     }
 
-    if (development.pieceImage) {
+    if (development.pieceImage?.url) {
       this.existingFile = development.pieceImage;
     }
 
@@ -220,7 +220,6 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
    * 📁 ARQUIVOS ALTERADOS - Callback quando arquivos são alterados
    */
   onImageChanged(files: UploadedFile[]): void {
-    debugger
     this.uploadedFiles = files;
     console.log('📁 Arquivos alterados:', files);
   }
@@ -294,9 +293,9 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
         result = await lastValueFrom(this.developmentService.updateDevelopment(this.developmentForm.value._id, updateData));
         console.log('✅ Desenvolvimento atualizado:', result);
 
-        // Se há imagem para upload no modo edição, fazer upload
-        if (this.uploadedFiles.length > 0) {
-          await this.uploadImageToDevelopment(this.developmentForm.value._id);
+        // Se há imagem para upload após criação, fazer upload
+        if (this.uploadedFiles.length > 0 && result._id) {
+          await this.uploadImageToDevelopment(result._id);
         }
 
         this.modalService.close('development-modal', {
@@ -335,19 +334,29 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
     }
   }
 
+
   /**
-   * 📤 UPLOAD IMAGEM - Faz upload da imagem para o desenvolvimento
+   * 📷 UPLOAD IMAGEM PARA DESENVOLVIMENTO - Faz upload da imagem para o desenvolvimento
    */
   private async uploadImageToDevelopment(developmentId: string): Promise<void> {
     if (this.uploadedFiles.length === 0) return;
 
     try {
-      const file = this.uploadedFiles[0];
-      // Aqui você implementaria o upload real para o desenvolvimento
-      console.log('📤 Upload de imagem para desenvolvimento:', developmentId, file);
+      console.log('📷 Fazendo upload de imagem para desenvolvimento:', developmentId);
 
-    } catch (error) {
-      console.error('❌ Erro ao fazer upload da imagem:', error);
+      const formData = new FormData();
+      formData.append('image', this.uploadedFiles[0].file);
+
+      const response = await this.developmentService.uploadImage(developmentId, this.uploadedFiles[0].file).toPromise();
+
+      console.log('✅ Imagem enviada com sucesso:', response);
+
+      // Limpar arquivos após upload bem-sucedido
+      this.uploadedFiles = [];
+
+    } catch (uploadError) {
+      console.error('❌ Erro ao enviar imagem:', uploadError);
+      throw new Error('Erro ao fazer upload da imagem. Desenvolvimento salvo mas imagem não foi enviada.');
     }
   }
 

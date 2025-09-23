@@ -104,7 +104,7 @@
     </div>
 
     <!-- Mensagens de feedback -->
-    <div class="form-feedback">
+    <div class="form-feedback" *ngIf="showError || showHelper">
         <!-- Mensagem de Erro -->
         <div *ngIf="showError" class="error-message">
             {{ errorMessage }}
