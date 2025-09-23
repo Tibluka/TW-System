@@ -1,0 +1,402 @@
+// pages/authorized/production-orders/production-order-modal/production-order-modal.component.scss
+
+@use 'abstracts/variables' as *;
+@use 'abstracts/spacing' as *;
+@use 'abstracts/typography' as *;
+@use 'base/typography' as *;
+
+// ========================================
+// CONTAINER DE LOADING
+// ========================================
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-xxl; // 48px
+    text-align: center;
+
+    p {
+        @include body();
+    }
+}
+
+// ========================================
+// FORMULÁRIO PRINCIPAL
+// ========================================
+.production-order-form {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+
+    // ========================================
+    // SEÇÕES DO FORMULÁRIO
+    // ========================================
+    .form-section {
+        .section-title {
+            @include title-modal();
+            color: var(--primary-dark);
+            padding-bottom: $spacing-sm; // 8px
+            border-bottom: 1px solid $stroke;
+        }
+    }
+
+    // ========================================
+    // LINHAS E CAMPOS DO FORMULÁRIO
+    // ========================================
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: $spacing-md; // 16px
+
+        // Layout com duas colunas
+        &.two-columns {
+            grid-template-columns: 1fr 1fr;
+
+            @media (max-width: 768px) {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        // Layout com três colunas
+        &.three-columns {
+            grid-template-columns: 1fr 1fr 1fr;
+
+            @media (max-width: 1024px) {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            @media (max-width: 768px) {
+                grid-template-columns: 1fr;
+            }
+        }
+    }
+
+    .form-field {
+        width: 100%;
+
+        // Campo que ocupa largura total
+        &.full-width {
+            grid-column: 1 / -1;
+        }
+
+        // ========================================
+        // CAMPO CHECKBOX PERSONALIZADO
+        // ========================================
+        &.checkbox-field {
+            .checkbox-container {
+                display: flex;
+                flex-direction: column;
+                gap: $spacing-xs; // 4px
+                cursor: pointer;
+                position: relative;
+                padding: $spacing-md; // 16px
+                border: 1px solid $stroke;
+                border-radius: $border-radius-sm; // 8px
+                background-color: var(--white);
+                transition: all 0.2s ease;
+
+                &:hover {
+                    border-color: var(--primary-medium);
+                    background-color: rgba($primary-medium, 0.02);
+                }
+
+                &:has(.checkbox-input:checked) {
+                    border-color: var(--primary-medium);
+                    background-color: rgba($primary-medium, 0.05);
+                }
+
+                .checkbox-input {
+                    position: absolute;
+                    top: $spacing-md; // 16px
+                    right: $spacing-md; // 16px
+                    width: 20px;
+                    height: 20px;
+                    accent-color: var(--primary-medium);
+                    cursor: pointer;
+                }
+
+                .checkbox-label {
+                    @include input-label();
+                    color: var(--primary-dark);
+                    margin: 0;
+                    padding-right: $spacing-lg; // 24px
+                }
+
+                .checkbox-description {
+                    @include placeholder();
+                    margin: 0;
+                    padding-right: $spacing-lg; // 24px
+                }
+            }
+        }
+    }
+
+    // ========================================
+    // ESTADO DA BUSCA DE DESENVOLVIMENTO
+    // ========================================
+    .search-status {
+        margin-top: $spacing-sm; // 8px
+
+        .search-loading,
+        .search-not-found {
+            display: flex;
+            align-items: center;
+            padding: $spacing-sm; // 8px
+            border-radius: $border-radius-sm; // 8px
+        }
+
+        .search-loading {
+            background-color: rgba($secondary-medium, 0.05);
+            border: 1px solid rgba($secondary-medium, 0.2);
+        }
+
+        .search-not-found {
+            background-color: rgba($tertiary, 0.05);
+            border: 1px solid rgba($tertiary, 0.2);
+        }
+    }
+
+    // ========================================
+    // CARD DO DESENVOLVIMENTO ENCONTRADO
+    // ========================================
+    .development-found {
+        margin-top: $spacing-sm; // 8px
+
+        .development-card {
+            background-color: rgba($primary-medium, 0.03);
+            border: 1px solid rgba($primary-medium, 0.2);
+            border-radius: $border-radius-md; // 12px
+            padding: $spacing-md; // 16px
+
+            .development-header {
+                display: flex;
+                align-items: flex-start;
+                gap: $spacing-sm; // 8px
+                margin-bottom: $spacing-md; // 16px
+
+                .development-info {
+                    flex: 1;
+
+                    h4 {
+                        @include input-label();
+                        color: var(--primary-dark);
+                        margin: 0 0 $spacing-xs 0; // 0 0 4px 0
+                    }
+
+                    p {
+                        @include placeholder();
+                        margin: 0;
+                    }
+                }
+            }
+
+            .development-details {
+                display: grid;
+                gap: $spacing-sm; // 8px
+
+                .detail-item {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: $spacing-sm; // 8px
+
+                    .detail-label {
+                        @include input-label();
+                        color: var(--label);
+                        min-width: 80px;
+                        flex-shrink: 0;
+                    }
+
+                    .detail-value {
+                        @include body();
+                        color: var(--primary-dark);
+                        flex: 1;
+                    }
+
+                    // ========================================
+                    // BADGES DE TIPO DE PRODUÇÃO
+                    // ========================================
+                    .production-types {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: $spacing-xs; // 4px
+
+                        .production-badge {
+                            @include input-label();
+                            padding: $spacing-xs $spacing-sm; // 4px 8px
+                            border-radius: $border-radius-max; // 99px
+                            font-size: 12px;
+
+                            &.rotary {
+                                background-color: rgba($secondary-medium, 0.1);
+                                color: $secondary-medium;
+                            }
+
+                            &.localized {
+                                background-color: rgba($primary-medium, 0.1);
+                                color: $primary-medium;
+                            }
+                        }
+                    }
+
+                    // ========================================
+                    // BADGE DE STATUS
+                    // ========================================
+                    .status-badge {
+                        @include input-label();
+                        padding: $spacing-xs $spacing-sm; // 4px 8px
+                        border-radius: $border-radius-max; // 99px
+                        font-size: 12px;
+                        text-transform: uppercase;
+
+                        &.status-created {
+                            background-color: rgba($label, 0.1);
+                            color: $label;
+                        }
+
+                        &.status-awaiting_approval,
+                        &.status-awaiting-approval {
+                            background-color: rgba($tertiary, 0.1);
+                            color: $tertiary;
+                        }
+
+                        &.status-approved {
+                            background-color: rgba(#10b981, 0.1);
+                            color: #10b981;
+                        }
+
+                        &.status-canceled,
+                        &.status-cancelled {
+                            background-color: rgba(#ef4444, 0.1);
+                            color: #ef4444;
+                        }
+
+                        &.status-closed {
+                            background-color: rgba($secondary, 0.1);
+                            color: $secondary;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // ========================================
+    // AÇÕES DO FORMULÁRIO
+    // ========================================
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: $spacing-md; // 16px
+        padding-top: $spacing-lg; // 24px
+        border-top: 1px solid $stroke;
+
+        @media (max-width: 480px) {
+            flex-direction: column-reverse;
+
+            ds-button {
+                width: 100%;
+            }
+        }
+    }
+
+    // ========================================
+    // ESTADOS DE VALIDAÇÃO
+    // ========================================
+    .form-field {
+        &.has-error {
+            .checkbox-container {
+                border-color: var(--tertiary);
+                background-color: rgba($tertiary, 0.05);
+            }
+        }
+    }
+
+    // ========================================
+    // UTILITÁRIOS
+    // ========================================
+    .ml-8 {
+        margin-left: $spacing-sm; // 8px
+    }
+
+    .mt-16 {
+        margin-top: $spacing-md; // 16px
+    }
+
+    // ========================================
+    // RESPONSIVIDADE
+    // ========================================
+    @media (max-width: 768px) {
+        max-width: 100%;
+
+        .form-section {
+            margin-bottom: $spacing-lg; // 24px
+
+            .section-title {
+                font-size: 18px;
+                margin-bottom: $spacing-md; // 16px
+            }
+        }
+
+        .form-row {
+            margin-bottom: $spacing-md; // 16px
+
+            &.two-columns,
+            &.three-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-field.checkbox-field {
+            .checkbox-container {
+                padding: $spacing-sm; // 8px
+
+                .checkbox-input {
+                    top: $spacing-sm; // 8px
+                    right: $spacing-sm; // 8px
+                    width: 18px;
+                    height: 18px;
+                }
+
+                .checkbox-label,
+                .checkbox-description {
+                    padding-right: $spacing-md; // 16px
+                }
+            }
+        }
+
+        .development-card {
+            .development-details {
+                .detail-item {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: $spacing-xs; // 4px
+
+                    .detail-label {
+                        min-width: auto;
+                    }
+                }
+            }
+        }
+    }
+
+    @media (max-width: 480px) {
+        .form-section {
+            margin-bottom: $spacing-md; // 16px
+
+            .section-title {
+                font-size: 16px;
+                margin-bottom: $spacing-sm; // 8px
+            }
+        }
+
+        .development-card {
+            padding: $spacing-sm; // 8px
+
+            .development-header {
+                margin-bottom: $spacing-sm; // 8px
+            }
+        }
+    }
+}

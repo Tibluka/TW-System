@@ -1,1 +1,181 @@
-<p>production-orders works!</p>
+<!-- pages/authorized/production-orders/production-orders.component.html -->
+
+<div class="production-orders-container p-24">
+
+    <!-- ✨ CABEÇALHO DA PÁGINA -->
+    <div class="page-header mb-32">
+        <h1 class="title-page primary-dark">Ordens de Produção</h1>
+        <p class="body label">Gerencie todas as ordens de produção do sistema</p>
+    </div>
+
+    <!-- ⚠️ MENSAGEM DE ERRO -->
+    <div *ngIf="showError" class="error-message mb-24">
+        <span class="body white">{{ errorMessage }}</span>
+    </div>
+
+    <!-- 🔧 CONTROLES E FILTROS -->
+    <div class="controls-section mb-24">
+
+        <!-- Linha superior: Busca, Filtro Status e Botão Novo -->
+        <div class="controls-row mb-16">
+
+            <!-- 🔍 CAMPO DE BUSCA -->
+            <div class="search-container">
+                <ds-input label="Buscar ordem de produção"
+                    placeholder="Digite referência, tipo de tecido ou observações..."
+                    icon="fa-solid fa-magnifying-glass" iconPosition="left" [(ngModel)]="currentFilters.search"
+                    (input)="onSearchChange()" [fullWidth]="true">
+                </ds-input>
+            </div>
+
+            <!-- 📂 FILTRO POR STATUS -->
+            <div class="filter-container">
+                <ds-select label="Filtrar por Status" [options]="statusOptions" [(ngModel)]="currentFilters.status"
+                    (ngModelChange)="onStatusFilterChange()" [fullWidth]="true">
+                </ds-select>
+            </div>
+
+            <!-- ➕ BOTÃO NOVA ORDEM -->
+            <div class="action-container">
+                <ds-button label="Nova Ordem de Produção" variant="fill" icon="fa-solid fa-plus"
+                    (onClick)="createProductionOrder()">
+                </ds-button>
+            </div>
+        </div>
+
+        <!-- Linha inferior: Botão limpar filtros (se houver filtros ativos) -->
+        <div class="filter-actions" *ngIf="currentFilters.search || currentFilters.status">
+            <ds-button label="Limpar Filtros" variant="ghost" icon="fa-solid fa-filter-circle-xmark"
+                (onClick)="clearFilters()">
+            </ds-button>
+        </div>
+    </div>
+
+    <!-- 📊 TABELA DE ORDENS DE PRODUÇÃO -->
+    <div class="table-container" *ngIf="shouldShowTable && !loading">
+
+        <!-- 📋 CABEÇALHO DA TABELA -->
+        <ds-table>
+            <ds-table-row [isHeader]="true">
+                <ds-table-cell align="left">Referência</ds-table-cell>
+                <ds-table-cell align="left">Desenvolvimento</ds-table-cell>
+                <ds-table-cell align="left">Cliente</ds-table-cell>
+                <ds-table-cell align="left">Tipo de Tecido</ds-table-cell>
+                <ds-table-cell align="center">Piloto</ds-table-cell>
+                <ds-table-cell align="center">Prioridade</ds-table-cell>
+                <ds-table-cell align="center">Status</ds-table-cell>
+                <ds-table-cell align="center">Data Criação</ds-table-cell>
+            </ds-table-row>
+
+            <!-- ✨ DADOS DAS ORDENS DE PRODUÇÃO -->
+            <ds-table-row *ngFor="let productionOrder of productionOrders" [clickable]="true" [data]="productionOrder"
+                (rowClick)="onProductionOrderClick(productionOrder)">
+
+                <!-- Referência Interna -->
+                <ds-table-cell align="left">
+                    <div class="reference-cell">
+                        <span class="body primary-dark">
+                            {{ productionOrder.internalReference || 'Sem Referência' }}
+                        </span>
+                    </div>
+                </ds-table-cell>
+
+                <!-- Desenvolvimento -->
+                <ds-table-cell align="left">
+                    <div class="development-cell">
+                        <div class="body primary-dark">
+                            {{ productionOrder.development?.description || 'Desenvolvimento não encontrado' }}
+                        </div>
+                        <div class="placeholder" *ngIf="productionOrder.development?.clientReference">
+                            Ref: {{ productionOrder.development?.clientReference }}
+                        </div>
+                    </div>
+                </ds-table-cell>
+
+                <!-- Cliente -->
+                <ds-table-cell align="left">
+                    <div class="client-cell" *ngIf="productionOrder.development?.client">
+                        <div class="body primary-dark">
+                            {{ productionOrder.development?.client?.companyName }}
+                        </div>
+                        <div class="placeholder" *ngIf="productionOrder.development?.client?.acronym">
+                            {{ productionOrder.development?.client?.acronym }}
+                        </div>
+                    </div>
+                    <span class="body label" *ngIf="!productionOrder.development?.client">
+                        Cliente não encontrado
+                    </span>
+                </ds-table-cell>
+
+                <!-- Tipo de Tecido -->
+                <ds-table-cell align="left">
+                    <span class="body primary-dark">{{ productionOrder.fabricType }}</span>
+                </ds-table-cell>
+
+                <!-- Piloto -->
+                <ds-table-cell align="center">
+                    <span class="pilot-badge" [ngClass]="productionOrder.pilot ? 'pilot-yes' : 'pilot-no'">
+                        {{ getPilotText(productionOrder.pilot) }}
+                    </span>
+                </ds-table-cell>
+
+                <!-- Prioridade -->
+                <ds-table-cell align="center">
+                    <span class="priority-badge" [ngClass]="'priority-' + productionOrder.priority">
+                        {{ getPriorityLabel(productionOrder.priority) }}
+                    </span>
+                </ds-table-cell>
+
+                <!-- Status -->
+                <ds-table-cell align="center">
+                    <span class="status-badge"
+                        [ngClass]="'status-' + productionOrder.status.toLowerCase().replace('_', '-')">
+                        {{ getStatusLabel(productionOrder.status) }}
+                    </span>
+                </ds-table-cell>
+
+                <!-- Data de Criação -->
+                <ds-table-cell align="center">
+                    <span class="body label">
+                        {{ formatDate(productionOrder.createdAt) }}
+                    </span>
+                </ds-table-cell>
+
+            </ds-table-row>
+        </ds-table>
+    </div>
+
+    <!-- 📂 ESTADO VAZIO -->
+    <div class="empty-state" *ngIf="shouldShowTable && productionOrders.length === 0 && !loading">
+        <div class="empty-content">
+            <ds-icon icon="fa-solid fa-clipboard-list" fontSize="48px" color="label"></ds-icon>
+            <h3 class="title-modal label mb-16">Nenhuma ordem de produção encontrada</h3>
+            <p class="body label mb-24">
+                <span *ngIf="currentFilters.search || currentFilters.status">
+                    Nenhuma ordem corresponde aos filtros aplicados.
+                </span>
+                <span *ngIf="!currentFilters.search && !currentFilters.status">
+                    Crie sua primeira ordem de produção para começar.
+                </span>
+            </p>
+            <ds-button label="Nova Ordem de Produção" variant="fill" icon="fa-solid fa-plus"
+                (onClick)="createProductionOrder()">
+            </ds-button>
+        </div>
+    </div>
+
+    <!-- 📊 LOADING -->
+    <div class="loading-container" *ngIf="loading">
+        <div class="loading-content">
+            <ds-spinner size="32px"></ds-spinner>
+            <span class="body label mt-16">Carregando ordens de produção...</span>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal só renderiza o conteúdo quando estiver visível -->
+<ds-modal *ngIf="isModalOpen" modalId="production-order-modal" (modalClosed)="onModalClosed($event)">
+    <!-- Só renderiza app-production-order-modal quando o modal está realmente aberto -->
+    <app-production-order-modal [productionOrderId]="selectedProductionOrderId"></app-production-order-modal>
+</ds-modal>

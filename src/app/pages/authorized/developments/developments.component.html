@@ -5,7 +5,7 @@
     <!-- Barra de busca com espaçamento usando variáveis -->
     <div class="search-input">
         <div class="w-100">
-            <ds-input width="400px" label="Buscar" placeholder="Digite o nome do desenvolvimento, cliente, etc."
+            <ds-input [fullWidth]="true" label="Buscar" placeholder="Digite o nome do desenvolvimento, cliente, etc."
                 [(ngModel)]="currentFilters.search" (ngModelChange)="onSearchChange()" icon="fa-solid fa-search"
                 iconPosition="left" />
         </div>

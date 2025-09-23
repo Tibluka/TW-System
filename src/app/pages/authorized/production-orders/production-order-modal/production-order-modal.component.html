@@ -1,0 +1,204 @@
+<!-- pages/authorized/production-orders/production-order-modal/production-order-modal.component.html -->
+
+<!-- 📊 LOADING INICIAL -->
+<div *ngIf="isLoading" class="loading-container">
+    <ds-spinner size="32px"></ds-spinner>
+    <p class="body label mt-16">Carregando dados...</p>
+</div>
+
+<!-- 📝 FORMULÁRIO PRINCIPAL -->
+<form *ngIf="!isLoading" [formGroup]="productionOrderForm" (ngSubmit)="onSave()" class="production-order-form">
+
+    <!-- ============================================ -->
+    <!-- SEÇÃO: BUSCA DO DESENVOLVIMENTO -->
+    <!-- ============================================ -->
+    <div class="form-section mb-32">
+        <h3 class="section-title mb-24">Desenvolvimento</h3>
+
+        <div class="form-row mb-16">
+            <!-- 🔍 REFERÊNCIA INTERNA -->
+            <div class="form-field">
+                <ds-input label="Referência Interna do Desenvolvimento *" placeholder="Ex: 25ABC0001"
+                    formControlName="internalReference" [invalid]="isFieldInvalid('internalReference')"
+                    [errorMessage]="getFieldErrorMessage('internalReference')" [fullWidth]="true" [required]="true"
+                    [disabled]="isEditMode" (input)="onInternalReferenceChange()">
+                </ds-input>
+            </div>
+        </div>
+
+        <!-- 🔍 ESTADO DA BUSCA -->
+        <div class="search-status" *ngIf="!isEditMode">
+
+            <!-- Loading da busca -->
+            <div class="search-loading" *ngIf="searchingDevelopment">
+                <ds-spinner size="16px"></ds-spinner>
+                <span class="body label ml-8">Buscando desenvolvimento...</span>
+            </div>
+
+            <!-- Desenvolvimento não encontrado -->
+            <div class="search-not-found" *ngIf="developmentNotFound && !searchingDevelopment">
+                <ds-icon icon="fa-solid fa-triangle-exclamation" color="tertiary" fontSize="16px"></ds-icon>
+                <span class="body tertiary ml-8">Desenvolvimento não encontrado</span>
+            </div>
+
+            <!-- Desenvolvimento encontrado -->
+            <div class="development-found" *ngIf="developmentFound && !searchingDevelopment">
+                <div class="development-card">
+                    <div class="development-header">
+                        <ds-icon icon="fa-solid fa-check-circle" color="primary" fontSize="20px"></ds-icon>
+                        <div class="development-info">
+                            <h4 class="input-label primary-dark">{{ developmentFound.internalReference }}</h4>
+                            <p class="placeholder">{{ developmentFound.description }}</p>
+                        </div>
+                    </div>
+
+                    <div class="development-details">
+                        <!-- Cliente -->
+                        <div class="detail-item">
+                            <span class="detail-label">Cliente:</span>
+                            <span class="detail-value">{{ developmentFound.client?.companyName || 'N/A' }}</span>
+                        </div>
+
+                        <!-- Referência do Cliente -->
+                        <div class="detail-item" *ngIf="developmentFound.clientReference">
+                            <span class="detail-label">Ref. Cliente:</span>
+                            <span class="detail-value">{{ developmentFound.clientReference }}</span>
+                        </div>
+
+                        <!-- Tipos de Produção -->
+                        <div class="detail-item">
+                            <span class="detail-label">Produção:</span>
+                            <div class="production-types">
+                                <span class="production-badge rotary"
+                                    *ngIf="developmentFound.productionType?.rotary?.enabled">
+                                    Rotativa ({{ formatCurrency(developmentFound.productionType.rotary.negotiatedPrice
+                                    || 0) }})
+                                </span>
+                                <span class="production-badge localized"
+                                    *ngIf="developmentFound.productionType?.localized?.enabled">
+                                    Localizada ({{
+                                    formatCurrency(developmentFound.productionType.localized.negotiatedPrice || 0) }})
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="detail-item">
+                            <span class="detail-label">Status:</span>
+                            <span class="status-badge" [ngClass]="'status-' + developmentFound.status">
+                                {{ developmentFound.status }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SEÇÃO: INFORMAÇÕES DA PRODUÇÃO -->
+    <!-- ============================================ -->
+    <div class="form-section mb-32" *ngIf="developmentFound || isEditMode">
+        <h3 class="section-title mb-24">Informações da Produção</h3>
+
+        <!-- Linha: Tipo de Produção, Quantidade, Tipo de Tecido -->
+        <div class="form-row three-columns mb-24">
+
+            <!-- 🏭 TIPO DE PRODUÇÃO -->
+            <div class="form-field">
+                <ds-select label="Tipo de Produção *" formControlName="productionType" [options]="productionTypeOptions"
+                    [invalid]="isFieldInvalid('productionType')" [errorMessage]="getFieldErrorMessage('productionType')"
+                    [fullWidth]="true" [required]="true">
+                </ds-select>
+            </div>
+
+            <!-- 📏 QUANTIDADE DE METROS -->
+            <div class="form-field">
+                <ds-input label="Quantidade (metros) *" placeholder="Ex: 100.5" type="number" step="0.1" min="0.1"
+                    formControlName="quantity" [invalid]="isFieldInvalid('quantity')"
+                    [errorMessage]="getFieldErrorMessage('quantity')" [fullWidth]="true" [required]="true">
+                </ds-input>
+            </div>
+
+            <!-- 🧵 TIPO DE TECIDO -->
+            <div class="form-field">
+                <ds-input label="Tipo de Tecido *" placeholder="Ex: Algodão, Poliéster..." formControlName="fabricType"
+                    [invalid]="isFieldInvalid('fabricType')" [errorMessage]="getFieldErrorMessage('fabricType')"
+                    [fullWidth]="true" [required]="true">
+                </ds-input>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SEÇÃO: CONFIGURAÇÕES ADICIONAIS -->
+    <!-- ============================================ -->
+    <div class="form-section mb-32" *ngIf="developmentFound || isEditMode">
+        <h3 class="section-title mb-24">Configurações</h3>
+
+        <div class="form-row two-columns mb-24">
+
+            <!-- 🧪 PILOTO -->
+            <div class="form-field checkbox-field">
+                <label class="checkbox-container">
+                    <input type="checkbox" formControlName="pilot" class="checkbox-input">
+                    <span class="checkbox-label input-label primary-dark">
+                        Esta é uma produção piloto
+                    </span>
+                    <span class="checkbox-description placeholder">
+                        Marque se esta ordem é para produção de amostra/piloto
+                    </span>
+                </label>
+            </div>
+
+            <!-- 🚨 PRIORIDADE -->
+            <div class="form-field">
+                <ds-select label="Prioridade *" formControlName="priority" [options]="priorityOptions"
+                    [invalid]="isFieldInvalid('priority')" [errorMessage]="getFieldErrorMessage('priority')"
+                    [fullWidth]="true" [required]="true">
+                </ds-select>
+            </div>
+        </div>
+
+        <!-- 📊 STATUS (apenas em modo edição) -->
+        <div class="form-row mb-24" *ngIf="isEditMode">
+            <div class="form-field">
+                <ds-select label="Status" formControlName="status" [options]="statusOptions" [fullWidth]="true">
+                </ds-select>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SEÇÃO: OBSERVAÇÕES -->
+    <!-- ============================================ -->
+    <div class="form-section mb-32" *ngIf="developmentFound || isEditMode">
+        <h3 class="section-title mb-24">Observações</h3>
+
+        <div class="form-row mb-24">
+            <!-- 📝 OBSERVAÇÕES -->
+            <div class="form-field full-width">
+                <ds-textarea label="Observações"
+                    placeholder="Adicione observações sobre a produção, instruções especiais, etc..."
+                    formControlName="observations" [rows]="4" [fullWidth]="true">
+                </ds-textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- AÇÕES DO FORMULÁRIO -->
+    <!-- ============================================ -->
+    <div class="form-actions" *ngIf="developmentFound || isEditMode">
+        <!-- ❌ BOTÃO CANCELAR -->
+        <ds-button label="Cancelar" variant="ghost" type="button" (onClick)="onCancel()" [disabled]="isSaving">
+        </ds-button>
+
+        <!-- 💾 BOTÃO SALVAR -->
+        <ds-button [label]="saveButtonLabel" variant="fill" type="submit" icon="fa-solid fa-floppy-disk"
+            [isLoading]="isSaving"
+            [disabled]="productionOrderForm.invalid || isSaving || (!developmentFound && !isEditMode)">
+        </ds-button>
+    </div>
+
+</form>
