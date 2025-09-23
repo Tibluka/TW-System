@@ -10,7 +10,9 @@ export type DevelopmentStatus =
     | 'CREATED'
     | 'AWAITING_APPROVAL'
     | 'APPROVED'
-    | 'CLOSED';
+    | 'CANCELED';
+
+export type ProductionTypeEnum = 'rotary' | 'localized';
 
 // ============================================
 // INTERFACE PRINCIPAL
@@ -28,7 +30,7 @@ export interface Development {
     client?: Client; // Pode vir populado da API via populate
 
     // BASIC DATA
-    description: string; // Obrigatório
+    description?: string;
 
     // PIECE IMAGE
     pieceImage?: {
@@ -53,17 +55,8 @@ export interface Development {
         color?: string;
     };
 
-    // PRODUCTION TYPE
-    productionType: {
-        rotary: {
-            enabled: boolean;
-            negotiatedPrice?: number; // Obrigatório se enabled = true
-        };
-        localized: {
-            enabled: boolean;
-            negotiatedPrice?: number; // Obrigatório se enabled = true
-        };
-    };
+    // ✅ NOVA ESTRUTURA SIMPLES - APENAS O TIPO
+    productionType: ProductionTypeEnum;
 
     // METADADOS
     active?: boolean;
@@ -90,21 +83,6 @@ export interface PieceImage {
 }
 
 // ============================================
-// INTERFACE PARA TIPO DE PRODUÇÃO
-// ============================================
-
-export interface ProductionType {
-    rotary: {
-        enabled: boolean;
-        negotiatedPrice?: number;
-    };
-    localized: {
-        enabled: boolean;
-        negotiatedPrice?: number;
-    };
-}
-
-// ============================================
 // INTERFACE PARA VARIANTES
 // ============================================
 
@@ -118,22 +96,14 @@ export interface DevelopmentVariants {
 
 export interface CreateDevelopmentRequest {
     clientId: string;
-    description: string;
+    description?: string;
     clientReference?: string;
     status?: DevelopmentStatus;
     variants?: {
         color?: string;
     };
-    productionType: {
-        rotary: {
-            enabled: boolean;
-            negotiatedPrice?: number;
-        };
-        localized: {
-            enabled: boolean;
-            negotiatedPrice?: number;
-        };
-    };
+    // ✅ NOVA ESTRUTURA SIMPLES
+    productionType: ProductionTypeEnum;
 }
 
 export interface UpdateDevelopmentRequest extends Partial<CreateDevelopmentRequest> {
@@ -150,9 +120,8 @@ export interface DevelopmentFilters {
     status?: DevelopmentStatus;
     active?: boolean;
 
-    // Filtros por tipo de produção
-    rotaryEnabled?: boolean;
-    localizedEnabled?: boolean;
+    // ✅ FILTRO SIMPLIFICADO
+    productionType?: ProductionTypeEnum;
 
     // Filtros por data
     createdFrom?: Date | string;
@@ -195,10 +164,14 @@ export interface PaginationInfo {
 
 export interface DevelopmentStatistics {
     total: number;
-    started: number;
-    awaiting_approval: number;
-    approved: number;
-    refused: number;
+    CREATED: number;
+    AWAITING_APPROVAL: number;
+    APPROVED: number;
+    CANCELED: number;
+    productionType: {
+        rotary: number;
+        localized: number;
+    };
 }
 
 // ============================================
@@ -215,7 +188,7 @@ export class DevelopmentUtils {
             'CREATED': 'Criado',
             'AWAITING_APPROVAL': 'Aguardando Aprovação',
             'APPROVED': 'Aprovado',
-            'CLOSED': 'Fechado'
+            'CANCELED': 'Cancelado'
         };
 
         return labels[status] || status;
@@ -225,27 +198,26 @@ export class DevelopmentUtils {
      * 🎨 Retorna classe CSS para status
      */
     static getStatusClass(status: DevelopmentStatus): string {
-        return `status-${status.toLowerCase()}`;
+        return `status-${status.toLowerCase().replace('_', '-')}`;
     }
 
     /**
-     * 💰 Valida se pelo menos um tipo de produção está habilitado
+     * 🏭 Retorna label do tipo de produção
      */
-    static validateProductionType(productionType: ProductionType): boolean {
-        return productionType.rotary.enabled || productionType.localized.enabled;
+    static getProductionTypeLabel(type: ProductionTypeEnum): string {
+        const labels: Record<ProductionTypeEnum, string> = {
+            'rotary': 'Rotativa',
+            'localized': 'Localizada'
+        };
+
+        return labels[type] || type;
     }
 
     /**
-     * 💵 Valida se preço foi informado para tipos habilitados
+     * 🎯 Retorna classe CSS para tipo de produção
      */
-    static validateNegotiatedPrices(productionType: ProductionType): boolean {
-        if (productionType.rotary.enabled && !productionType.rotary.negotiatedPrice) {
-            return false;
-        }
-        if (productionType.localized.enabled && !productionType.localized.negotiatedPrice) {
-            return false;
-        }
-        return true;
+    static getProductionTypeClass(type: ProductionTypeEnum): string {
+        return `production-type-${type}`;
     }
 
     /**
@@ -264,23 +236,6 @@ export class DevelopmentUtils {
         }
 
         return development.pieceImage.optimizedUrls[size] || development.pieceImage.url || null;
-    }
-
-    /**
-     * 🏭 Retorna tipos de produção habilitados
-     */
-    static getEnabledProductionTypes(productionType: ProductionType): string[] {
-        const types: string[] = [];
-
-        if (productionType.rotary.enabled) {
-            types.push('Rotativa');
-        }
-
-        if (productionType.localized.enabled) {
-            types.push('Localizada');
-        }
-
-        return types;
     }
 
     /**
@@ -310,5 +265,127 @@ export class DevelopmentUtils {
         }
 
         return internalReference;
+    }
+
+    /**
+     * 📅 Formata data para exibição
+     */
+    static formatDate(date: Date | string | undefined): string {
+        if (!date) return '-';
+        return new Date(date).toLocaleDateString('pt-BR');
+    }
+
+    /**
+     * 📅 Formata data e hora para exibição
+     */
+    static formatDateTime(date: Date | string | undefined): string {
+        if (!date) return '-';
+        return new Date(date).toLocaleDateString('pt-BR') + ' ' +
+            new Date(date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    /**
+     * ✅ Valida se dados do development são válidos
+     */
+    static validateDevelopment(development: Partial<CreateDevelopmentRequest>): { valid: boolean; errors: string[] } {
+        const errors: string[] = [];
+
+        if (!development.clientId) {
+            errors.push('Cliente é obrigatório');
+        }
+
+        if (!development.productionType) {
+            errors.push('Tipo de produção é obrigatório');
+        } else if (!['rotary', 'localized'].includes(development.productionType)) {
+            errors.push('Tipo de produção deve ser rotativo ou localizado');
+        }
+
+        return {
+            valid: errors.length === 0,
+            errors
+        };
+    }
+
+    /**
+     * 🔄 Converte status para progresso (0-100)
+     */
+    static getStatusProgress(status: DevelopmentStatus): number {
+        const progressMap: Record<DevelopmentStatus, number> = {
+            'CREATED': 25,
+            'AWAITING_APPROVAL': 50,
+            'APPROVED': 100,
+            'CANCELED': 0
+        };
+
+        return progressMap[status] || 0;
+    }
+
+    /**
+     * 🏷️ Retorna badge colorido para status
+     */
+    static getStatusBadge(status: DevelopmentStatus): { label: string; class: string; color: string } {
+        const badges: Record<DevelopmentStatus, { label: string; class: string; color: string }> = {
+            'CREATED': { label: 'Criado', class: 'status-created', color: 'blue' },
+            'AWAITING_APPROVAL': { label: 'Aguardando', class: 'status-awaiting', color: 'yellow' },
+            'APPROVED': { label: 'Aprovado', class: 'status-approved', color: 'green' },
+            'CANCELED': { label: 'Cancelado', class: 'status-canceled', color: 'red' }
+        };
+
+        return badges[status] || { label: status, class: 'status-unknown', color: 'gray' };
+    }
+
+    /**
+     * 🏷️ Retorna badge colorido para tipo de produção
+     */
+    static getProductionTypeBadge(type: ProductionTypeEnum): { label: string; class: string; color: string } {
+        const badges: Record<ProductionTypeEnum, { label: string; class: string; color: string }> = {
+            'rotary': { label: 'Rotativa', class: 'production-rotary', color: 'blue' },
+            'localized': { label: 'Localizada', class: 'production-localized', color: 'purple' }
+        };
+
+        return badges[type] || { label: type, class: 'production-unknown', color: 'gray' };
+    }
+
+    /**
+     * 📊 Calcula estatísticas resumidas
+     */
+    static calculateSummary(developments: Development[]): {
+        total: number;
+        byStatus: Record<DevelopmentStatus, number>;
+        byProductionType: Record<ProductionTypeEnum, number>;
+        recentCount: number;
+    } {
+        const summary = {
+            total: developments.length,
+            byStatus: {
+                'CREATED': 0,
+                'AWAITING_APPROVAL': 0,
+                'APPROVED': 0,
+                'CANCELED': 0
+            } as Record<DevelopmentStatus, number>,
+            byProductionType: {
+                'rotary': 0,
+                'localized': 0
+            } as Record<ProductionTypeEnum, number>,
+            recentCount: 0
+        };
+
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+        developments.forEach(dev => {
+            // Contar por status
+            summary.byStatus[dev.status]++;
+
+            // Contar por tipo de produção
+            summary.byProductionType[dev.productionType]++;
+
+            // Contar recentes (última semana)
+            if (dev.createdAt && new Date(dev.createdAt) > oneWeekAgo) {
+                summary.recentCount++;
+            }
+        });
+
+        return summary;
     }
 }

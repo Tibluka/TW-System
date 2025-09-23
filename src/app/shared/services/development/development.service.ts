@@ -5,8 +5,16 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
-import { DevelopmentFilters, DevelopmentListResponse, Development, DevelopmentResponse, CreateDevelopmentRequest, UpdateDevelopmentRequest, DevelopmentStatistics } from '../../../models/developments/developments';
-
+import {
+  DevelopmentFilters,
+  DevelopmentListResponse,
+  Development,
+  DevelopmentResponse,
+  CreateDevelopmentRequest,
+  UpdateDevelopmentRequest,
+  DevelopmentStatistics,
+  ProductionTypeEnum
+} from '../../../models/developments/developments';
 
 @Injectable({
   providedIn: 'root'
@@ -43,13 +51,9 @@ export class DevelopmentService {
       params = params.set('active', filters.active.toString());
     }
 
-    // Filtros específicos para tipo de produção
-    if (filters.rotaryEnabled !== undefined) {
-      params = params.set('rotaryEnabled', filters.rotaryEnabled.toString());
-    }
-
-    if (filters.localizedEnabled !== undefined) {
-      params = params.set('localizedEnabled', filters.localizedEnabled.toString());
+    // ✅ FILTRO SIMPLIFICADO - productionType como string
+    if (filters.productionType) {
+      params = params.set('productionType', filters.productionType);
     }
 
     // Filtros por data de criação
@@ -111,6 +115,25 @@ export class DevelopmentService {
         }),
         catchError(error => {
           console.error('❌ Erro ao buscar desenvolvimento:', error);
+          return throwError(() => this.handleError(error));
+        })
+      );
+  }
+
+  /**
+   * 🔍 BUSCAR POR REFERÊNCIA INTERNA - Retorna desenvolvimento por internal reference
+   */
+  getDevelopmentByInternalReference(internalReference: string): Observable<DevelopmentResponse> {
+    console.log('🔍 Buscando desenvolvimento por referência interna:', internalReference);
+
+    return this.http.get<DevelopmentResponse>(`${this.baseUrl}/by-internal-reference/${internalReference}`)
+      .pipe(
+        map(response => {
+          console.log('✅ Desenvolvimento encontrado por referência:', response.data);
+          return response;
+        }),
+        catchError(error => {
+          console.error('❌ Erro ao buscar desenvolvimento por referência:', error);
           return throwError(() => this.handleError(error));
         })
       );
@@ -192,19 +215,19 @@ export class DevelopmentService {
   }
 
   /**
-   * 🔄 ATIVAR/DESATIVAR - Alterna status ativo do desenvolvimento
+   * ♻️ ATIVAR - Reativa desenvolvimento
    */
-  toggleDevelopmentStatus(id: string, active: boolean): Observable<Development> {
-    console.log(`🔄 ${active ? 'Ativando' : 'Desativando'} desenvolvimento:`, id);
+  activateDevelopment(id: string): Observable<Development> {
+    console.log('♻️ Ativando desenvolvimento:', id);
 
-    return this.http.post<DevelopmentResponse>(`${this.baseUrl}/${id}/${active ? 'activate' : 'deactivate'}`, {})
+    return this.http.post<DevelopmentResponse>(`${this.baseUrl}/${id}/activate`, {})
       .pipe(
         map(response => {
-          console.log('✅ Status do desenvolvimento alterado:', response.data);
+          console.log('✅ Desenvolvimento ativado:', response.data);
           return response.data;
         }),
         catchError(error => {
-          console.error('❌ Erro ao alterar status do desenvolvimento:', error);
+          console.error('❌ Erro ao ativar desenvolvimento:', error);
           return throwError(() => this.handleError(error));
         })
       );
@@ -228,8 +251,19 @@ export class DevelopmentService {
       params = params.set('status', filters.status);
     }
 
-    return this.http.get<DevelopmentStatistics>(`${this.baseUrl}/stats`, { params })
+    // ✅ FILTRO ATUALIZADO
+    if (filters?.productionType) {
+      params = params.set('productionType', filters.productionType);
+    }
+
+    console.log('📊 Buscando estatísticas de desenvolvimentos');
+
+    return this.http.get<{ success: boolean; data: DevelopmentStatistics }>(`${this.baseUrl}/stats`, { params })
       .pipe(
+        map(response => {
+          console.log('✅ Estatísticas recebidas:', response.data);
+          return response.data;
+        }),
         catchError(error => {
           console.error('❌ Erro ao buscar estatísticas:', error);
           return throwError(() => this.handleError(error));
@@ -241,12 +275,46 @@ export class DevelopmentService {
    * 📋 POR CLIENTE - Busca desenvolvimentos de um cliente específico
    */
   getDevelopmentsByClient(clientId: string, filters?: Partial<DevelopmentFilters>): Observable<DevelopmentListResponse> {
-    const clientFilters: DevelopmentFilters = {
+    console.log('📋 Buscando desenvolvimentos do cliente:', clientId);
+
+    return this.http.get<DevelopmentListResponse>(`${this.baseUrl}/by-client/${clientId}`)
+      .pipe(
+        map(response => {
+          console.log('✅ Desenvolvimentos do cliente recebidos:', response);
+          return response;
+        }),
+        catchError(error => {
+          console.error('❌ Erro ao buscar desenvolvimentos do cliente:', error);
+          return throwError(() => this.handleError(error));
+        })
+      );
+  }
+
+  /**
+   * 🔍 FILTRAR POR TIPO DE PRODUÇÃO - Busca desenvolvimentos por tipo específico
+   */
+  getDevelopmentsByProductionType(type: ProductionTypeEnum, filters?: Partial<DevelopmentFilters>): Observable<DevelopmentListResponse> {
+    const productionTypeFilters: DevelopmentFilters = {
       ...filters,
-      clientId
+      productionType: type
     };
 
-    return this.listDevelopments(clientFilters);
+    console.log(`🔍 Buscando desenvolvimentos do tipo ${type}:`, productionTypeFilters);
+    return this.listDevelopments(productionTypeFilters);
+  }
+
+  /**
+   * ✅ BUSCAR APROVADOS - Retorna apenas desenvolvimentos aprovados (para criar ordens de produção)
+   */
+  getApprovedDevelopments(filters?: Partial<DevelopmentFilters>): Observable<DevelopmentListResponse> {
+    const approvedFilters: DevelopmentFilters = {
+      ...filters,
+      status: 'APPROVED',
+      active: true
+    };
+
+    console.log('✅ Buscando desenvolvimentos aprovados para ordens de produção');
+    return this.listDevelopments(approvedFilters);
   }
 
   // ============================================
@@ -307,6 +375,105 @@ export class DevelopmentService {
           return throwError(() => this.handleError(error));
         })
       );
+  }
+
+  // ============================================
+  // MÉTODOS DE EXPORT (NOVOS)
+  // ============================================
+
+  /**
+   * 📄 EXPORTAR CSV - Exporta desenvolvimentos em CSV
+   */
+  exportToCsv(filters: DevelopmentFilters = {}): Observable<Blob> {
+    let params = new HttpParams();
+
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params = params.set(key, value.toString());
+      }
+    });
+
+    console.log('📄 Exportando desenvolvimentos para CSV');
+
+    return this.http.get(`${this.baseUrl}/export/csv`, {
+      params,
+      responseType: 'blob'
+    }).pipe(
+      catchError(error => {
+        console.error('❌ Erro ao exportar CSV:', error);
+        return throwError(() => this.handleError(error));
+      })
+    );
+  }
+
+  /**
+   * 📊 EXPORTAR EXCEL - Exporta desenvolvimentos em Excel
+   */
+  exportToExcel(filters: DevelopmentFilters = {}): Observable<Blob> {
+    let params = new HttpParams();
+
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params = params.set(key, value.toString());
+      }
+    });
+
+    console.log('📊 Exportando desenvolvimentos para Excel');
+
+    return this.http.get(`${this.baseUrl}/export/excel`, {
+      params,
+      responseType: 'blob'
+    }).pipe(
+      catchError(error => {
+        console.error('❌ Erro ao exportar Excel:', error);
+        return throwError(() => this.handleError(error));
+      })
+    );
+  }
+
+  // ============================================
+  // MÉTODOS DE VALIDAÇÃO (NOVOS)
+  // ============================================
+
+  /**
+   * ✨ VALIDAR REFERÊNCIA INTERNA - Verifica se referência interna existe
+   */
+  validateInternalReference(internalReference: string): Observable<{ exists: boolean; development?: Development }> {
+    console.log('✨ Validando referência interna:', internalReference);
+
+    return this.http.get<{ success: boolean; data: { exists: boolean; development?: Development } }>(
+      `${this.baseUrl}/validate/internal-reference/${internalReference}`
+    ).pipe(
+      map(response => {
+        console.log('✅ Validação da referência interna:', response.data);
+        return response.data;
+      }),
+      catchError(error => {
+        console.error('❌ Erro ao validar referência interna:', error);
+        return throwError(() => this.handleError(error));
+      })
+    );
+  }
+
+  /**
+   * ✨ VALIDAR REFERÊNCIA DO CLIENTE - Verifica se referência do cliente já existe
+   */
+  validateClientReference(clientId: string, clientReference: string): Observable<{ exists: boolean }> {
+    console.log('✨ Validando referência do cliente:', { clientId, clientReference });
+
+    return this.http.post<{ success: boolean; data: { exists: boolean } }>(
+      `${this.baseUrl}/validate/client-reference`,
+      { clientId, clientReference }
+    ).pipe(
+      map(response => {
+        console.log('✅ Validação da referência do cliente:', response.data);
+        return response.data;
+      }),
+      catchError(error => {
+        console.error('❌ Erro ao validar referência do cliente:', error);
+        return throwError(() => this.handleError(error));
+      })
+    );
   }
 
   // ============================================

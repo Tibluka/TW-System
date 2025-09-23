@@ -81,13 +81,6 @@ export class ProductionOrderService {
   }
 
   /**
-   * 🧪 TOGGLE PILOTO - Alterna status de piloto da ordem
-   */
-  togglePilot(id: string, pilot: boolean): Observable<ProductionOrderResponse> {
-    return this.http.patch<ProductionOrderResponse>(`${this.API_URL}/${id}/pilot`, { pilot });
-  }
-
-  /**
    * 📝 ATUALIZAR OBSERVAÇÕES - Atualiza apenas as observações
    */
   updateObservations(id: string, observations: string): Observable<ProductionOrderResponse> {
