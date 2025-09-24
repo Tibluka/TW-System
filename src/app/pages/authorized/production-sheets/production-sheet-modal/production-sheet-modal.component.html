@@ -18,8 +18,45 @@
                     [errorMessage]="getFieldError('internalReference')"
                     [invalid]="isFormControlInvalid(productionSheetForm.get('internalReference'))" width="100%" />
             </div>
+            <div class="search-status">
 
-            <div class="d-grid column-3" *ngIf="productionOrderFound">
+                <!-- Loading da busca -->
+                <div class="text-center p-48" *ngIf="searchingProductionOrder">
+                    <ds-spinner size="48px" variant="outline"></ds-spinner>
+                </div>
+
+                <!-- Referência não encontrado -->
+                <div class="search-not-found" *ngIf="productionOrderNotFound">
+                    <ds-icon icon="fa-solid fa-triangle-exclamation" color="tertiary" fontSize="16px"></ds-icon>
+                    <span class="body tertiary ml-8">Referência não encontrada</span>
+                </div>
+
+                <!-- Desenvolvimento encontrado -->
+                <div class="development-found" *ngIf="productionOrderFound && !searchingProductionOrder">
+                    <p class="input-label">Resumo do desenvolvimento</p>
+                    <div class="development-card">
+                        <div class="image">
+                            <img [src]="productionOrderFound.development?.pieceImage?.url" alt="">
+                        </div>
+                        <div class="development-details">
+                            <h1 class="title-modal mb-6 secondary">
+                                {{productionOrderFound.development?.internalReference}}
+                            </h1>
+                            <p class="subtitle-section secondary mb-0">
+                                {{productionOrderFound.development?.client?.companyName}}</p>
+                            <p class="card-small secondary mb-4">{{productionOrderFound.development?.clientReference}}
+                            </p>
+                            <hr>
+                            <p class="body secondary mt-4 mb-0">
+                                {{productionOrderFound.development?.productionType?.type}}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="d-grid columns-3 gap-24" *ngIf="productionOrderFound">
 
                 <!-- Máquina -->
                 <div class="field-group machine-field">
@@ -87,42 +124,42 @@
             <div class="order-details-grid">
                 <div class="detail-item">
                     <span class="label">Referência Interna:</span>
-                    <span class="value">{{ productionOrderFound.internalReference || 'S/N' }}</span>
+                    <span class="value">{{ productionOrderFound?.internalReference || 'S/N' }}</span>
                 </div>
 
                 <div class="detail-item">
                     <span class="label">Cliente:</span>
-                    <span class="value">{{ productionOrderFound.development?.client?.companyName || 'N/A' }}</span>
+                    <span class="value">{{ productionOrderFound?.development?.client?.companyName || 'N/A' }}</span>
                 </div>
 
                 <div class="detail-item">
                     <span class="label">Tipo de Tecido:</span>
-                    <span class="value">{{ productionOrderFound.fabricType || 'N/A' }}</span>
+                    <span class="value">{{ productionOrderFound?.fabricType || 'N/A' }}</span>
                 </div>
 
                 <div class="detail-item">
                     <span class="label">Status:</span>
                     <span class="value status-badge"
-                        [ngClass]="'status-' + productionOrderFound.status.toLowerCase().replace('_', '-')">
-                        {{ getProductionOrderStatusLabel(productionOrderFound.status) }}
+                        [ngClass]="'status-' + productionOrderFound?.status!.toLowerCase().replace('_', '-')">
+                        {{ getProductionOrderStatusLabel(productionOrderFound!.status) }}
                     </span>
                 </div>
 
-                <div class="detail-item" *ngIf="productionOrderFound.productionType">
+                <div class="detail-item" *ngIf="productionOrderFound?.productionType">
                     <span class="label">Tipo de Produção:</span>
                     <span class="value">
-                        <span *ngIf="productionOrderFound.productionType.type === 'rotary'">
-                            Rotativo ({{ productionOrderFound.productionType.meters }}m)
+                        <span *ngIf="productionOrderFound?.productionType?.type === 'rotary'">
+                            Rotativo ({{ productionOrderFound?.productionType?.meters }}m)
                         </span>
-                        <span *ngIf="productionOrderFound.productionType.type === 'localized'">
+                        <span *ngIf="productionOrderFound?.productionType?.type === 'localized'">
                             Localizado
                         </span>
                     </span>
                 </div>
 
-                <div class="detail-item" *ngIf="productionOrderFound.observations">
+                <div class="detail-item" *ngIf="productionOrderFound?.observations">
                     <span class="label">Observações:</span>
-                    <span class="value">{{ productionOrderFound.observations }}</span>
+                    <span class="value">{{ productionOrderFound?.observations }}</span>
                 </div>
             </div>
         </div>
