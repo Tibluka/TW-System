@@ -1,0 +1,181 @@
+<div class="production-sheet-modal-container">
+
+    <!-- Loading state -->
+    <div *ngIf="isLoading" class="loading-container">
+        <ds-spinner size="lg" message="Carregando ficha de produção..."></ds-spinner>
+    </div>
+
+    <!-- Formulário principal -->
+    <form [formGroup]="productionSheetForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+
+        <!-- Seção do formulário -->
+        <div class="form-section">
+            <div class="production-sheet-form-grid">
+
+                <!-- Referência Interna da Ordem de Produção -->
+                <div class="field-group internal-reference-field">
+                    <ds-input label="Referência Interna da Ordem" placeholder="Digite a referência interna (ex: DEV001)"
+                        formControlName="internalReference" icon="fa-solid fa-search" iconPosition="left"
+                        [required]="true" [errorMessage]="getFieldError('internalReference')"
+                        [invalid]="isFormControlInvalid(productionSheetForm.get('internalReference'))" width="100%" />
+
+                    <!-- Estados da busca -->
+                    <div class="search-feedback" *ngIf="!isEditMode">
+                        <!-- Loading -->
+                        <div class="search-loading" *ngIf="searchingProductionOrder">
+                            <ds-spinner size="16px"></ds-spinner>
+                            <span class="body label">Buscando ordem de produção...</span>
+                        </div>
+
+                        <!-- Não encontrado -->
+                        <div class="search-not-found" *ngIf="productionOrderNotFound && !searchingProductionOrder">
+                            <ds-icon icon="fa-solid fa-exclamation-triangle" color="error" fontSize="16px"></ds-icon>
+                            <span class="body error">Ordem de produção não encontrada</span>
+                        </div>
+
+                        <!-- Encontrado -->
+                        <div class="search-found" *ngIf="productionOrderFound && !searchingProductionOrder">
+                            <ds-icon icon="fa-solid fa-check-circle" color="success" fontSize="16px"></ds-icon>
+                            <span class="body success">Ordem encontrada: {{ productionOrderFound.internalReference
+                                }}</span>
+                        </div>
+                    </div>
+
+                    <span class="helper-text" *ngIf="!isEditMode">
+                        Digite a referência interna da ordem de produção
+                    </span>
+                    <span class="helper-text" *ngIf="isEditMode">
+                        A ordem de produção não pode ser alterada após criação
+                    </span>
+                </div>
+
+                <!-- Máquina -->
+                <div class="field-group machine-field">
+                    <ds-select label="Máquina" placeholder="Selecione a máquina" formControlName="machine"
+                        [options]="machineOptions" [required]="true" [errorMessage]="getFieldError('machine')"
+                        [invalid]="isFormControlInvalid(productionSheetForm.get('machine'))" width="100%" />
+                    <span class="helper-text">
+                        Máquina onde será realizada a produção
+                    </span>
+                </div>
+
+                <!-- Data de Entrada -->
+                <div class="field-group entry-date-field">
+                    <ds-input label="Data de Entrada" placeholder="Data de início da produção"
+                        formControlName="entryDate" type="date" icon="fa-solid fa-calendar" iconPosition="left"
+                        [errorMessage]="getFieldError('entryDate')"
+                        [invalid]="isFormControlInvalid(productionSheetForm.get('entryDate'))" width="100%" />
+                    <span class="helper-text">
+                        Data em que a produção será iniciada (padrão: hoje)
+                    </span>
+                </div>
+
+                <!-- Data de Saída Prevista -->
+                <div class="field-group expected-exit-date-field">
+                    <ds-input label="Data de Saída Prevista" placeholder="Data prevista para conclusão"
+                        formControlName="expectedExitDate" type="date" icon="fa-solid fa-calendar-check"
+                        iconPosition="left" [required]="true" [errorMessage]="getFieldError('expectedExitDate')"
+                        [invalid]="isFormControlInvalid(productionSheetForm.get('expectedExitDate'))" width="100%" />
+                    <span class="helper-text">
+                        Data prevista para finalização da produção
+                    </span>
+                </div>
+
+                <!-- Estágio (apenas no modo edição) -->
+                <div class="field-group stage-field" *ngIf="isEditMode">
+                    <ds-select label="Estágio da Produção" placeholder="Selecione o estágio" formControlName="stage"
+                        [options]="stageOptions" [errorMessage]="getFieldError('stage')"
+                        [invalid]="isFormControlInvalid(productionSheetForm.get('stage'))" width="100%" />
+                    <span class="helper-text">
+                        Estágio atual do processo produtivo
+                    </span>
+                </div>
+
+                <!-- Observações de Produção -->
+                <div class="field-group production-notes-field">
+                    <ds-textarea label="Observações de Produção"
+                        placeholder="Digite observações específicas da produção (opcional)..."
+                        formControlName="productionNotes" [rows]="4" [errorMessage]="getFieldError('productionNotes')"
+                        [invalid]="isFormControlInvalid(productionSheetForm.get('productionNotes'))" width="100%" />
+                    <span class="helper-text">
+                        Observações técnicas, configurações especiais, etc. (máximo 1000 caracteres)
+                    </span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Informações da Ordem de Produção (quando encontrada) -->
+        <div class="production-order-info" *ngIf="productionOrderFound">
+            <h3 class="section-title">
+                <ds-icon icon="fa-solid fa-info-circle" color="info"></ds-icon>
+                Informações da Ordem de Produção
+            </h3>
+
+            <div class="order-details-grid">
+                <div class="detail-item">
+                    <span class="label">Referência Interna:</span>
+                    <span class="value">{{ productionOrderFound.internalReference || 'S/N' }}</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="label">Cliente:</span>
+                    <span class="value">{{ productionOrderFound.development?.client?.companyName || 'N/A' }}</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="label">Tipo de Tecido:</span>
+                    <span class="value">{{ productionOrderFound.fabricType || 'N/A' }}</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="label">Status:</span>
+                    <span class="value status-badge"
+                        [ngClass]="'status-' + productionOrderFound.status.toLowerCase().replace('_', '-')">
+                        {{ getProductionOrderStatusLabel(productionOrderFound.status) }}
+                    </span>
+                </div>
+
+                <div class="detail-item" *ngIf="productionOrderFound.productionType">
+                    <span class="label">Tipo de Produção:</span>
+                    <span class="value">
+                        <span *ngIf="productionOrderFound.productionType.type === 'rotary'">
+                            Rotativo ({{ productionOrderFound.productionType.meters }}m)
+                        </span>
+                        <span *ngIf="productionOrderFound.productionType.type === 'localized'">
+                            Localizado
+                        </span>
+                    </span>
+                </div>
+
+                <div class="detail-item" *ngIf="productionOrderFound.observations">
+                    <span class="label">Observações:</span>
+                    <span class="value">{{ productionOrderFound.observations }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerta de disponibilidade da máquina (se houver conflito) -->
+        <div class="machine-availability-alert" *ngIf="machineConflictWarning">
+
+            <p>{{ machineConflictWarning }}</p>
+            <p><strong>Deseja continuar mesmo assim?</strong></p>
+
+        </div>
+
+        <!-- Botões de ação -->
+        <div class="modal-actions">
+            <ds-button label="Cancelar" variant="ghost" (onClickEmitter)="onCancel()" [disabled]="isSaving" />
+
+            <!-- Botão especial para avançar estágio (modo edição) -->
+            <ds-button *ngIf="isEditMode && canAdvanceStage()" label="Avançar Estágio" variant="outline"
+                icon="fa-solid fa-arrow-right" (onClickEmitter)="onAdvanceStage()" [disabled]="isSaving"
+                class="advance-stage-btn" />
+
+            <ds-button label="{{ isEditMode ? 'Atualizar' : 'Criar' }} Ficha" type="submit" [isLoading]="isSaving"
+                [disabled]="isSaving || productionSheetForm.invalid" />
+        </div>
+
+    </form>
+
+</div>

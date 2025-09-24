@@ -1,0 +1,242 @@
+// pages/authorized/production-sheets/production-sheets.component.scss
+
+@use 'abstracts/variables' as *;
+@use 'abstracts/spacing' as *;
+@use 'abstracts/typography' as *;
+@use 'base/typography' as *;
+
+// ========================================
+// CONTAINER PRINCIPAL
+// ========================================
+.production-sheets-container {
+
+    // ========================================
+    // ÁREA DE FILTROS E BUSCA
+    // ========================================
+    .search-input {
+        display: flex;
+        align-items: flex-end;
+        gap: 16px; // 16px
+
+        // Responsive
+        @media (max-width: 768px) {
+            flex-direction: column;
+            align-items: stretch;
+            gap: var(--spacing-sm); // 8px
+
+            ds-input,
+            ds-select {
+                min-width: unset;
+                width: 100%;
+            }
+        }
+    }
+
+    // ========================================
+    // CÉLULAS DA TABELA
+    // ========================================
+
+    // Imagem do desenvolvimento
+    .image-cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+
+        .development-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--neutral-light);
+        }
+
+        .no-image {
+            width: 50px;
+            height: 50px;
+            background-color: var(--neutral-lighter);
+            border: 1px solid var(--neutral-light);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+
+    // Cliente
+    .client-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .placeholder {
+            color: var(--text-label);
+            font-size: 0.875rem;
+        }
+    }
+
+    // Máquina
+    .machine-cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    // Status badges com cores específicas para estágios
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+
+        // Estágio: Impressão
+        &.status-printing {
+            background-color: #FEF3C7; // yellow-100
+            color: #D97706; // yellow-600
+        }
+
+        // Estágio: Calandra
+        &.status-calendering {
+            background-color: #DBEAFE; // blue-100
+            color: #2563EB; // blue-600
+        }
+
+        // Estágio: Finalizado
+        &.status-finished {
+            background-color: #D1FAE5; // green-100
+            color: #059669; // green-600
+        }
+    }
+
+    // ========================================
+    // ESTADOS DE LOADING E ERRO
+    // ========================================
+
+    .loading-container,
+    .error-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 300px;
+        padding: 32px;
+
+        .loading-content,
+        .error-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 16px;
+        }
+    }
+
+    // ========================================
+    // RESPONSIVIDADE
+    // ========================================
+
+    @media (max-width: 1024px) {
+
+        // Em telas menores, esconder algumas colunas menos importantes
+        ds-table-cell:nth-child(3),
+        // Ref. do Cliente
+        ds-table-row [isHeader]:nth-child(3) {
+            display: none;
+        }
+    }
+
+    @media (max-width: 768px) {
+
+        // Em mobile, mostrar apenas as colunas essenciais
+        ds-table-cell:nth-child(2),
+        // Ref. Interna 
+        ds-table-cell:nth-child(4),
+        // Cliente
+        ds-table-cell:nth-child(6),
+        // Data de Entrada
+        ds-table-row [isHeader]:nth-child(2),
+        ds-table-row [isHeader]:nth-child(4),
+        ds-table-row [isHeader]:nth-child(6) {
+            display: none;
+        }
+
+        // Ajustar largura da imagem em mobile
+        .image-cell {
+            width: 40px;
+            height: 40px;
+
+            .development-image,
+            .no-image {
+                width: 35px;
+                height: 35px;
+            }
+        }
+
+        // Status badge menor em mobile
+        .status-badge {
+            padding: 2px 8px;
+            font-size: 0.625rem;
+        }
+    }
+
+    // ========================================
+    // UTILITÁRIOS
+    // ========================================
+
+    // Margem esquerda para ícones
+    .ml-8 {
+        margin-left: 8px;
+    }
+
+    // Margin top para elementos
+    .mt-16 {
+        margin-top: 16px;
+    }
+
+    .mt-32 {
+        margin-top: 32px;
+    }
+
+    // Hover effects para linhas da tabela
+    ds-table-row[clickable="true"]:hover {
+        cursor: pointer;
+        background-color: var(--neutral-lighter);
+        transition: background-color 0.2s ease;
+    }
+
+    // ========================================
+    // DARK MODE SUPPORT (caso necessário)
+    // ========================================
+
+    @media (prefers-color-scheme: dark) {
+        .status-badge {
+            &.status-printing {
+                background-color: rgba(217, 119, 6, 0.2);
+                color: #FBBF24;
+            }
+
+            &.status-calendering {
+                background-color: rgba(37, 99, 235, 0.2);
+                color: #60A5FA;
+            }
+
+            &.status-finished {
+                background-color: rgba(5, 150, 105, 0.2);
+                color: #34D399;
+            }
+        }
+
+        .development-image,
+        .no-image {
+            border-color: var(--neutral-dark);
+        }
+
+        .no-image {
+            background-color: var(--neutral-dark);
+        }
+    }
+}

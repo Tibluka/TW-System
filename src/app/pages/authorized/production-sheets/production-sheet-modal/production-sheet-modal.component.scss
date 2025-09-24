@@ -1,0 +1,322 @@
+// pages/authorized/production-sheets/production-sheet-modal/production-sheet-modal.component.scss
+
+@use 'abstracts/variables' as *;
+@use 'abstracts/spacing' as *;
+@use 'abstracts/typography' as *;
+@use 'base/typography' as *;
+
+// ========================================
+// CONTAINER PRINCIPAL
+// ========================================
+.production-sheet-modal-container {
+    padding: 0;
+    max-height: 80vh;
+    overflow-y: auto;
+
+    // ========================================
+    // LOADING STATE
+    // ========================================
+    .loading-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 300px;
+        padding: 32px;
+    }
+
+    // ========================================
+    // SEÇÃO DO FORMULÁRIO
+    // ========================================
+    .form-section {
+        padding: 24px;
+    }
+
+    .production-sheet-form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+
+        // Campos que ocupam largura total
+        .production-order-field,
+        .production-notes-field {
+            grid-column: 1 / -1;
+        }
+
+        // Responsive
+        @media (max-width: 768px) {
+            grid-template-columns: 1fr;
+            gap: 16px;
+
+            .field-group {
+                grid-column: 1;
+            }
+        }
+    }
+
+    // ========================================
+    // FIELD GROUPS
+    // ========================================
+    .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .helper-text {
+            font-size: 0.875rem;
+            color: var(--text-label);
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+    }
+
+    // ========================================
+    // INFORMAÇÕES DA ORDEM DE PRODUÇÃO
+    // ========================================
+    .production-order-info {
+        background-color: var(--neutral-lighter);
+        border-radius: 12px;
+        padding: 20px;
+        margin: 0 24px 24px;
+
+        .section-title {
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .order-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+
+            @media (max-width: 768px) {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-item {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+
+                .label {
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                    color: var(--text-label);
+                }
+
+                .value {
+                    @extend .body;
+                    color: var(--text-primary);
+                    word-break: break-word;
+
+                    &.status-badge {
+                        padding: 4px 8px;
+                        border-radius: 8px;
+                        font-size: 0.75rem;
+                        font-weight: 500;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        width: fit-content;
+
+                        // Status específicos da ordem de produção
+                        &.status-created {
+                            background-color: #E5E7EB;
+                            color: #374151;
+                        }
+
+                        &.status-pilot-production {
+                            background-color: #FEF3C7;
+                            color: #D97706;
+                        }
+
+                        &.status-pilot-sent {
+                            background-color: #DBEAFE;
+                            color: #2563EB;
+                        }
+
+                        &.status-pilot-approved {
+                            background-color: #D1FAE5;
+                            color: #059669;
+                        }
+
+                        &.status-production-started {
+                            background-color: #EDE9FE;
+                            color: #7C3AED;
+                        }
+
+                        &.status-finalized {
+                            background-color: #D1FAE5;
+                            color: #059669;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // ========================================
+    // ALERTA DE DISPONIBILIDADE DA MÁQUINA
+    // ========================================
+    .machine-availability-alert {
+        margin: 0 24px 24px;
+    }
+
+    // ========================================
+    // AÇÕES DO MODAL
+    // ========================================
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+        padding: 20px 24px;
+        border-top: 1px solid var(--neutral-light);
+        background-color: var(--background-secondary);
+        border-radius: 0 0 12px 12px;
+
+        .advance-stage-btn {
+            margin-right: auto; // Empurra o botão para a esquerda
+        }
+
+        @media (max-width: 768px) {
+            flex-direction: column-reverse;
+            gap: 12px;
+
+            ds-button {
+                width: 100%;
+            }
+
+            .advance-stage-btn {
+                margin-right: 0;
+                order: 2;
+            }
+        }
+    }
+
+    // ========================================
+    // ESTADOS DOS CAMPOS
+    // ========================================
+
+    // Campo desabilitado (ordem de produção no modo edição)
+    ds-select[disabled] {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    // Destaque para campos obrigatórios
+    .field-group[required="true"] {
+
+        ds-input,
+        ds-select,
+        ds-textarea {
+            &::after {
+                content: ' *';
+                color: var(--color-error);
+                font-weight: bold;
+            }
+        }
+    }
+
+    // ========================================
+    // ANIMAÇÕES E TRANSIÇÕES
+    // ========================================
+    .production-order-info {
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    // ========================================
+    // SCROLL CUSTOMIZADO
+    // ========================================
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--neutral-lighter);
+        border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--neutral-light);
+        border-radius: 3px;
+
+        &:hover {
+            background: var(--neutral);
+        }
+    }
+
+    // ========================================
+    // DARK MODE SUPPORT
+    // ========================================
+    @media (prefers-color-scheme: dark) {
+        .production-order-info {
+            background-color: var(--neutral-dark);
+        }
+
+        .modal-actions {
+            background-color: var(--background-tertiary);
+            border-top-color: var(--neutral-dark);
+        }
+
+        .order-details-grid .detail-item .value.status-badge {
+            &.status-created {
+                background-color: rgba(55, 65, 81, 0.3);
+                color: #9CA3AF;
+            }
+
+            &.status-pilot-production {
+                background-color: rgba(217, 119, 6, 0.2);
+                color: #FBBF24;
+            }
+
+            &.status-pilot-sent {
+                background-color: rgba(37, 99, 235, 0.2);
+                color: #60A5FA;
+            }
+
+            &.status-pilot-approved {
+                background-color: rgba(5, 150, 105, 0.2);
+                color: #34D399;
+            }
+
+            &.status-production-started {
+                background-color: rgba(124, 58, 237, 0.2);
+                color: #A78BFA;
+            }
+
+            &.status-finalized {
+                background-color: rgba(5, 150, 105, 0.2);
+                color: #34D399;
+            }
+        }
+    }
+
+    // ========================================
+    // UTILITÁRIOS
+    // ========================================
+    .ml-8 {
+        margin-left: 8px;
+    }
+
+    .mt-4 {
+        margin-top: 4px;
+    }
+
+    .mb-16 {
+        margin-bottom: 16px;
+    }
+}
