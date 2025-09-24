@@ -7,7 +7,6 @@ import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { DevelopmentFilters, DevelopmentListResponse, Development, DevelopmentResponse, CreateDevelopmentRequest, UpdateDevelopmentRequest, DevelopmentStatistics } from '../../../models/developments/developments';
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -43,13 +42,9 @@ export class DevelopmentService {
       params = params.set('active', filters.active.toString());
     }
 
-    // Filtros específicos para tipo de produção
-    if (filters.rotaryEnabled !== undefined) {
-      params = params.set('rotaryEnabled', filters.rotaryEnabled.toString());
-    }
-
-    if (filters.localizedEnabled !== undefined) {
-      params = params.set('localizedEnabled', filters.localizedEnabled.toString());
+    // NOVO FILTRO - tipo de produção simplificado
+    if (filters.productionType) {
+      params = params.set('productionType', filters.productionType);
     }
 
     // Filtros por data de criação

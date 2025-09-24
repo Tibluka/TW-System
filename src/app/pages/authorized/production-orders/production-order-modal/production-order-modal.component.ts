@@ -321,6 +321,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
           developmentId: this.developmentFound!._id!,
           fabricType: formData.fabricType,
           observations: formData.observations,
+          productionType: formData.productionType
         };
 
         const response = await lastValueFrom(
@@ -403,11 +404,11 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
    * 📊 CALCULAR TOTAL DE PEÇAS - Soma todos os valores dos tamanhos
    */
   getTotalPieces(): number {
-    if (!this.developmentFound?.productionType?.sizes) {
+    if (!this.developmentFound?.productionType?.additionalInfo?.sizes) {
       return 0;
     }
 
-    return this.developmentFound.productionType.sizes.reduce((total, sizeItem) => {
+    return this.developmentFound.productionType.additionalInfo?.sizes.reduce((total, sizeItem) => {
       return total + (sizeItem.value || 0);
     }, 0);
   }

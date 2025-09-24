@@ -64,8 +64,6 @@
             <!-- SEÇÃO: INFORMAÇÕES DA PRODUÇÃO -->
             <!-- ============================================ -->
             <div class="form-section mb-32" *ngIf="developmentFound || isEditMode">
-                <h3 class="section-title mb-24">Informações da Produção</h3>
-
                 <!-- Linha: Tipo de Produção, Quantidade, Tipo de Tecido -->
                 <div class="form-row three-columns mb-24">
 
@@ -77,49 +75,6 @@
                         </ds-input>
                     </div>
 
-                    <!-- Tabela para tipo de produção localizada -->
-                    <div *ngIf="developmentFound?.productionType?.type === 'localized'"
-                        class="localized-production-section">
-                        <h3 class="section-title">Quantidades por Tamanho</h3>
-
-                        <div class="table-container"
-                            *ngIf="developmentFound?.productionType?.sizes && developmentFound?.productionType?.sizes!.length > 0; else noSizes">
-                            <table class="production-table">
-                                <!-- Cabeçalho com os tamanhos -->
-                                <thead>
-                                    <tr>
-                                        <th class="size-header"
-                                            *ngFor="let sizeItem of developmentFound?.productionType?.sizes">
-                                            {{ sizeItem.size }}
-                                        </th>
-                                        <th class="total-header">Total</th>
-                                    </tr>
-                                </thead>
-
-                                <!-- Corpo com os valores -->
-                                <tbody>
-                                    <tr>
-                                        <td class="size-value"
-                                            *ngFor="let sizeItem of developmentFound?.productionType?.sizes">
-                                            {{ sizeItem.value }}
-                                        </td>
-                                        <td class="total-value">
-                                            {{ getTotalPieces() }}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Estado vazio -->
-                        <ng-template #noSizes>
-                            <div class="empty-state">
-                                <i class="fa-solid fa-table"></i>
-                                <p>Nenhum tamanho definido para este desenvolvimento</p>
-                            </div>
-                        </ng-template>
-                    </div>
-
                     <!-- 🧵 TIPO DE TECIDO -->
                     <div class="form-field">
                         <ds-input label="Tipo de Tecido" placeholder="Ex: Algodão, Poliéster..."
@@ -128,14 +83,55 @@
                         </ds-input>
                     </div>
                 </div>
+
+                <!-- Tabela para tipo de produção localizada -->
+                <div *ngIf="developmentFound?.productionType?.type === 'localized'">
+                    <div class="table-container"
+                        *ngIf="developmentFound?.productionType?.additionalInfo?.sizes && developmentFound?.productionType?.additionalInfo?.sizes!.length > 0; else noSizes">
+                        <table class="production-table">
+                            <!-- Cabeçalho com os tamanhos -->
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Variante
+                                        <ds-icon icon="fa-solid fa-circle-plus" cursorType="pointer" color="tertiary"
+                                            fontSize="16px" />
+                                    </th>
+                                    <th class="size-header"
+                                        *ngFor="let sizeItem of developmentFound?.productionType?.additionalInfo?.sizes">
+                                        {{ sizeItem.size }}
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <!-- Corpo com os valores -->
+                            <tbody>
+                                <tr>
+                                    <td>{{developmentFound?.variants?.color}}</td>
+                                    <td class="size-value"
+                                        *ngFor="let sizeItem of developmentFound?.productionType?.additionalInfo?.sizes">
+                                        {{ sizeItem.value }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Estado vazio -->
+                    <ng-template #noSizes>
+                        <div class="empty-state">
+                            <i class="fa-solid fa-table"></i>
+                            <p>Nenhum tamanho definido para este desenvolvimento</p>
+                        </div>
+                    </ng-template>
+                </div>
+
             </div>
 
             <!-- ============================================ -->
             <!-- SEÇÃO: OBSERVAÇÕES -->
             <!-- ============================================ -->
             <div class="form-section mb-32" *ngIf="developmentFound || isEditMode">
-                <h3 class="section-title mb-24">Observações</h3>
-
                 <div class="form-row mb-24">
                     <!-- 📝 OBSERVAÇÕES -->
                     <div class="form-field full-width">

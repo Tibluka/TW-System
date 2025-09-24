@@ -336,70 +336,25 @@
     width: 100%;
     border-collapse: collapse;
     background-color: white;
-    border-radius: 6px;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .production-table th,
 .production-table td {
     padding: 12px 16px;
     text-align: center;
-    border-bottom: 1px solid #e9ecef;
+    border: 1px solid var(--stroke);
 }
 
 .production-table th {
-    background-color: #6c757d;
-    color: white;
     font-weight: 600;
     font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-.size-header {
-    background-color: #495057;
-}
-
-.total-header {
-    background-color: #28a745;
-    min-width: 80px;
-}
 
 .production-table td {
     font-size: 16px;
     font-weight: 500;
-    color: #2d3748;
-}
-
-.size-value {
-    background-color: #f8f9fa;
-}
-
-.total-value {
-    background-color: #d4edda;
-    font-weight: 700;
-    color: #155724;
-}
-
-.production-table tr:last-child td {
-    border-bottom: none;
-}
-
-/* Estado vazio */
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: #6c757d;
-}
-
-.empty-state i {
-    font-size: 48px;
-    margin-bottom: 16px;
-    opacity: 0.5;
-}
-
-.empty-state p {
-    font-size: 16px;
-    margin: 0;
 }

@@ -10,30 +10,76 @@ export type DevelopmentStatus =
     | 'CREATED'
     | 'AWAITING_APPROVAL'
     | 'APPROVED'
-    | 'CLOSED';
+    | 'CANCELED';
+
+export type ProductionTypeEnum = 'rotary' | 'localized';
+
+// ============================================
+// NOVA INTERFACE PRODUCTIONTYPE
+// ============================================
+
+export interface ProductionType {
+    type: 'rotary' | 'localized';
+    meters?: number;
+    additionalInfo?: {
+        variant: string;
+        sizes: {
+            size: string;
+            value: number;
+        }[];
+    };
+}
 
 // ============================================
 // INTERFACE PRINCIPAL
 // ============================================
 
-// E certifique-se que Development usa ProductionType como objeto:
 export interface Development {
     _id?: string;
-    clientId: string;
-    client?: Client;
-    internalReference: string;
+
+    // IDENTIFIERS
+    clientReference?: string; // Referência fornecida pelo cliente
+    internalReference: string; // Auto-gerado: formato 25ABC0001
+
+    // CLIENT REFERENCE
+    clientId: string; // ID de referência obrigatório
+    client?: Client; // Pode vir populado da API via populate
+
+    // BASIC DATA
     description?: string;
-    clientReference?: string;
-    pieceImage?: PieceImage;
+
+    // PIECE IMAGE
+    pieceImage?: {
+        url?: string;
+        publicId?: string;
+        filename?: string;
+        optimizedUrls?: {
+            thumbnail?: string;
+            small?: string;
+            medium?: string;
+            large?: string;
+            original?: string;
+        };
+        uploadedAt?: Date | string;
+    };
+
+    // STATUS
+    status: DevelopmentStatus;
+
+    // VARIANTS
     variants?: {
         color?: string;
     };
-    productionType: ProductionType; // ✅ Como objeto, não string
-    status: DevelopmentStatus;
+
+    // ✅ NOVA ESTRUTURA COM OBJETO COMPLETO
+    productionType: ProductionType;
+
+    // METADADOS
     active?: boolean;
-    createdAt?: string;
-    updatedAt?: string;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
 }
+
 // ============================================
 // INTERFACE PARA IMAGEM
 // ============================================
@@ -53,19 +99,6 @@ export interface PieceImage {
 }
 
 // ============================================
-// INTERFACE PARA TIPO DE PRODUÇÃO
-// ============================================
-
-export interface ProductionType {
-    type: 'rotary' | 'localized',
-    meters?: number,
-    sizes?: {
-        size: string,
-        value: number
-    }[]
-}
-
-// ============================================
 // INTERFACE PARA VARIANTES
 // ============================================
 
@@ -77,20 +110,22 @@ export interface DevelopmentVariants {
 // REQUEST INTERFACES
 // ============================================
 
-// Para as requisições:
 export interface CreateDevelopmentRequest {
     clientId: string;
     description?: string;
     clientReference?: string;
-    productionType: ProductionType; // ✅ Como objeto
+    status?: DevelopmentStatus;
+    variants?: {
+        color?: string;
+    };
+    // ✅ NOVA ESTRUTURA COM OBJETO COMPLETO
+    productionType: ProductionType;
 }
 
-export interface UpdateDevelopmentRequest {
-    clientId?: string;
-    description?: string;
-    clientReference?: string;
-    productionType?: ProductionType; // ✅ Como objeto
+export interface UpdateDevelopmentRequest extends Partial<CreateDevelopmentRequest> {
+    internalReference?: string; // Não pode ser alterado após criação
 }
+
 // ============================================
 // FILTER INTERFACE
 // ============================================
@@ -101,9 +136,9 @@ export interface DevelopmentFilters {
     status?: DevelopmentStatus;
     active?: boolean;
 
-    // Filtros por tipo de produção
-    rotaryEnabled?: boolean;
-    localizedEnabled?: boolean;
+    // ✅ FILTRO PODE SER POR TIPO OU OBJETO COMPLETO
+    productionType?: ProductionTypeEnum; // Para filtros simples por tipo
+    productionTypeFilter?: ProductionType; // Para filtros complexos
 
     // Filtros por data
     createdFrom?: Date | string;
@@ -146,10 +181,14 @@ export interface PaginationInfo {
 
 export interface DevelopmentStatistics {
     total: number;
-    started: number;
-    awaiting_approval: number;
-    approved: number;
-    refused: number;
+    CREATED: number;
+    AWAITING_APPROVAL: number;
+    APPROVED: number;
+    CANCELED: number;
+    productionType: {
+        rotary: number;
+        localized: number;
+    };
 }
 
 // ============================================
@@ -166,7 +205,7 @@ export class DevelopmentUtils {
             'CREATED': 'Criado',
             'AWAITING_APPROVAL': 'Aguardando Aprovação',
             'APPROVED': 'Aprovado',
-            'CLOSED': 'Fechado'
+            'CANCELED': 'Cancelado'
         };
 
         return labels[status] || status;
@@ -176,69 +215,71 @@ export class DevelopmentUtils {
      * 🎨 Retorna classe CSS para status
      */
     static getStatusClass(status: DevelopmentStatus): string {
-        return `status-${status.toLowerCase()}`;
+        return `status-${status.toLowerCase().replace('_', '-')}`;
     }
 
     /**
-     * 💰 Valida se pelo menos um tipo de produção está habilitado
+     * 🏭 Retorna label do tipo de produção
      */
-    static validateProductionType(productionType: ProductionType): boolean {
-        return productionType.type !== null;
+    static getProductionTypeLabel(type: ProductionTypeEnum): string {
+        const labels: Record<ProductionTypeEnum, string> = {
+            'rotary': 'Rotativa',
+            'localized': 'Localizada'
+        };
+
+        return labels[type] || type;
     }
 
-
+    /**
+     * 🎯 Retorna classe CSS para tipo de produção
+     */
+    static getProductionTypeClass(type: ProductionTypeEnum): string {
+        return `production-type-${type}`;
+    }
 
     /**
      * 🖼️ Verifica se development tem imagem
      */
     static hasImage(development: Development): boolean {
-        return !!(development.pieceImage && development.pieceImage.url);
+        return !!development.pieceImage?.url;
     }
 
     /**
-     * 🔗 Retorna URL da imagem otimizada
+     * ✅ NOVA FUNÇÃO - Extrai apenas o tipo do productionType
      */
-    static getImageUrl(development: Development, size: 'thumbnail' | 'small' | 'medium' | 'large' | 'original' = 'medium'): string | null {
-        if (!development.pieceImage || !development.pieceImage.optimizedUrls) {
-            return development.pieceImage?.url || null;
+    static getProductionTypeEnum(development: Development): ProductionTypeEnum {
+        return development.productionType.type;
+    }
+
+    /**
+     * ✅ NOVA FUNÇÃO - Verifica se tem informações adicionais
+     */
+    static hasAdditionalInfo(development: Development): boolean {
+        return !!development.productionType.additionalInfo;
+    }
+
+    /**
+     * ✅ NOVA FUNÇÃO - Calcula total de peças para localized
+     */
+    static getTotalPieces(development: Development): number {
+        if (development.productionType.type !== 'localized' || !development.productionType.additionalInfo?.sizes) {
+            return 0;
         }
 
-        return development.pieceImage.optimizedUrls[size] || development.pieceImage.url || null;
+        return development.productionType.additionalInfo.sizes.reduce((total, item) => {
+            return total + (item.value || 0);
+        }, 0);
     }
 
     /**
-     * 🏭 Retorna tipos de produção habilitados
+     * ✅ NOVA FUNÇÃO - Retorna string formatada da quantidade
      */
-    static getEnabledProductionType(productionType: ProductionType): string {
-        return productionType.type;
-    }
-
-    /**
-     * 📝 Valida se pode ser aprovado
-     */
-    static canBeApproved(development: Development): boolean {
-        return development.status === 'AWAITING_APPROVAL';
-    }
-
-    /**
-     * 🏭 Valida se pode criar ordem de produção
-     */
-    static canCreateProductionOrder(development: Development): boolean {
-        return development.status === 'APPROVED';
-    }
-
-    /**
-     * 🔍 Formata referência interna para exibição
-     */
-    static formatInternalReference(internalReference?: string): string {
-        if (!internalReference) return '-';
-
-        // Formato: 25ABC0001 -> 25-ABC-0001
-        const match = internalReference.match(/^(\d{2})([A-Z]{2,4})(\d{4})$/);
-        if (match) {
-            return `${match[1]}-${match[2]}-${match[3]}`;
+    static getQuantityDisplay(development: Development): string {
+        if (development.productionType.type === 'rotary') {
+            return development.productionType.meters ? `${development.productionType.meters}m` : '0m';
         }
 
-        return internalReference;
+        const totalPieces = this.getTotalPieces(development);
+        return `${totalPieces} pç${totalPieces !== 1 ? 's' : ''}`;
     }
 }
