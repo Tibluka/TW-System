@@ -57,7 +57,7 @@ export interface PieceImage {
 // ============================================
 
 export interface ProductionType {
-    type: string,
+    type: 'rotary' | 'localized',
     meters?: number,
     sizes?: {
         size: string,

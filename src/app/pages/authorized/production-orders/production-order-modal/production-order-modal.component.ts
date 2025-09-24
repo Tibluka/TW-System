@@ -7,15 +7,14 @@ import { debounceTime, distinctUntilChanged, lastValueFrom, Subject, takeUntil }
 import { Development } from '../../../../models/developments/developments';
 import { CreateProductionOrderRequest, ProductionOrder, UpdateProductionOrderRequest } from '../../../../models/production-orders/production-orders';
 import { ButtonComponent } from '../../../../shared/components/atoms/button/button.component';
+import { IconComponent } from "../../../../shared/components/atoms/icon/icon.component";
 import { InputComponent } from '../../../../shared/components/atoms/input/input.component';
-import { SelectComponent } from '../../../../shared/components/atoms/select/select.component';
 import { SpinnerComponent } from '../../../../shared/components/atoms/spinner/spinner.component';
 import { TextareaComponent } from '../../../../shared/components/atoms/textarea/textarea.component';
 import { DevelopmentService } from '../../../../shared/services/development/development.service';
 import { ModalService } from '../../../../shared/services/modal/modal.service';
 import { ProductionOrderService } from '../../../../shared/services/production-order/production-order.service';
 import { FormValidator } from '../../../../shared/utils/form';
-import { IconComponent } from "../../../../shared/components/atoms/icon/icon.component";
 
 interface SelectOption {
   value: string;
@@ -29,7 +28,6 @@ interface SelectOption {
     ReactiveFormsModule,
     ButtonComponent,
     InputComponent,
-    SelectComponent,
     TextareaComponent,
     SpinnerComponent,
     IconComponent
@@ -396,5 +394,21 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
   formatDate(date: Date | string | undefined): string {
     if (!date) return '-';
     return new Date(date).toLocaleDateString('pt-BR');
+  }
+
+
+  // Adicione este método no seu componente
+
+  /**
+   * 📊 CALCULAR TOTAL DE PEÇAS - Soma todos os valores dos tamanhos
+   */
+  getTotalPieces(): number {
+    if (!this.developmentFound?.productionType?.sizes) {
+      return 0;
+    }
+
+    return this.developmentFound.productionType.sizes.reduce((total, sizeItem) => {
+      return total + (sizeItem.value || 0);
+    }, 0);
   }
 }
