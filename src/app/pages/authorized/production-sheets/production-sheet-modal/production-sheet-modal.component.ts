@@ -171,6 +171,9 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
         // ✅ Popular formulário
         this.populateForm(productionSheet);
 
+        // ✅ Configurar campo stage para modo edição após popular
+        this.addStageControlForEditMode();
+
         // ✅ Desabilitar campo de referência interna no modo edição
         this.productionSheetForm.get('internalReference')?.disable();
 
@@ -189,6 +192,15 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     } finally {
       this.isLoading = false;
       this.cdr.detectChanges();
+    }
+  }
+
+  /**
+   * 🔧 ADICIONAR CONTROLE STAGE - Adiciona campo stage após popular form
+   */
+  private addStageControlForEditMode(): void {
+    if (this.isEditMode && !this.productionSheetForm.contains('stage')) {
+      this.productionSheetForm.addControl('stage', this.formBuilder.control('PRINTING'));
     }
   }
 
@@ -212,16 +224,29 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     if (productionSheet.productionOrder) {
       this.productionOrderFound = productionSheet.productionOrder;
     }
+
+    // ✅ Configurar stage se for modo edição
+    if (this.isEditMode && productionSheet.stage) {
+      // Aguardar próximo ciclo para garantir que o controle foi adicionado
+      setTimeout(() => {
+        this.productionSheetForm.get('stage')?.setValue(productionSheet.stage);
+      });
+    }
+
     // ✅ Se existir _id na productionSheet, adicionar o form control _id se não existir
     if (productionSheet._id) {
-      this.productionSheetForm.addControl('stage', this.formBuilder.control(productionSheet.stage));
-
       if (!this.productionSheetForm.contains('_id')) {
         this.productionSheetForm.addControl('_id', this.formBuilder.control(productionSheet._id));
       } else {
         this.productionSheetForm.get('_id')?.setValue(productionSheet._id);
       }
     }
+
+    console.log('✅ Dados da ficha de produção carregados para edição:', {
+      productionSheet,
+      productionOrderFound: this.productionOrderFound,
+      formValue: this.productionSheetForm.value
+    });
   }
 
   /**
@@ -238,6 +263,7 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       if (productionSheet) {
         this.isEditMode = true;
         this.populateForm(productionSheet.data);
+        this.addStageControlForEditMode();
       }
     } catch (error) {
       console.error('❌ Erro ao carregar ficha de produção:', error);
@@ -246,15 +272,18 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
 
   private setupFormSubscriptions(): void {
     // Monitorar mudanças na referência interna para buscar ordem de produção
-    this.productionSheetForm.get('internalReference')?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(internalReference => {
-        if (internalReference) {
-          this.searchProductionOrderSubject.next(internalReference);
-        } else {
-          this.resetProductionOrderSearch();
-        }
-      });
+    // ✅ OTIMIZAÇÃO: Apenas no modo criação, pois no modo edição já temos os dados
+    if (!this.isEditMode) {
+      this.productionSheetForm.get('internalReference')?.valueChanges
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(internalReference => {
+          if (internalReference) {
+            this.searchProductionOrderSubject.next(internalReference);
+          } else {
+            this.resetProductionOrderSearch();
+          }
+        });
+    }
   }
 
   // ============================================

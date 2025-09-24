@@ -50,10 +50,11 @@
                             <p class="body secondary mt-4 mb-0">
                                 {{productionType(productionOrderFound!.development!.productionType!.type)}}
                             </p>
+                            <h2 class="subtitle-section secondary" Ordem de produção></h2>
                             <!-- Tabela para tipo de produção localizada -->
                             <div *ngIf="productionOrderFound?.productionType!.type === 'localized'">
                                 <div class="table-container"
-                                    *ngIf="productionOrderFound?.development?.productionType?.additionalInfo?.sizes && productionOrderFound.development?.productionType?.additionalInfo?.sizes!.length > 0; else noSizes">
+                                    *ngIf="productionOrderFound?.productionType?.additionalInfo?.sizes && productionOrderFound.development?.productionType?.additionalInfo?.sizes!.length > 0; else noSizes">
                                     <table class="production-table">
                                         <!-- Cabeçalho com os tamanhos -->
                                         <thead>
@@ -64,7 +65,7 @@
                                                         color="tertiary" fontSize="16px" />
                                                 </th>
                                                 <th class="size-header"
-                                                    *ngFor="let sizeItem of productionOrderFound.development?.productionType?.additionalInfo?.sizes">
+                                                    *ngFor="let sizeItem of productionOrderFound.productionType?.additionalInfo?.sizes">
                                                     {{ sizeItem.size }}
                                                 </th>
                                             </tr>
@@ -77,9 +78,8 @@
                                                     {{productionOrderFound.productionType.additionalInfo?.variant}}
                                                 </td>
                                                 <td class="size-value"
-                                                    *ngFor="let sizeItem of productionOrderFound.development?.productionType?.additionalInfo?.sizes">
-                                                    <ds-input [(ngModel)]="sizeItem.value"
-                                                        [ngModelOptions]="{standalone: true}"></ds-input>
+                                                    *ngFor="let sizeItem of productionOrderFound.productionType?.additionalInfo?.sizes">
+                                                    <p class="body secondary">{{sizeItem.value}}</p>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -151,7 +151,7 @@
         </div>
 
         <!-- Botões de ação -->
-        <div class="modal-actions" *ngIf="productionOrderFound || isEditMode">
+        <div class="modal-actions mt-32" *ngIf="productionOrderFound || isEditMode">
             <ds-button label="Cancelar" variant="ghost" (onClickEmitter)="onCancel()" [disabled]="isSaving" />
 
             <!-- Botão especial para avançar estágio (modo edição) -->
