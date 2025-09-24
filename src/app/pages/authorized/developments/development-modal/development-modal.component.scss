@@ -92,7 +92,7 @@
         display: flex;
         justify-content: flex-end;
         gap: $spacing-md; // 16px - usando variável
-        margin-top: $spacing-md; // 16px - usando variável
+        margin-top: $spacing-xl; // 16px - usando variável
 
         // Em mobile, botões ficam empilhados
         @media (max-width: 480px) {

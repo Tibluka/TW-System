@@ -2,7 +2,7 @@
 
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, lastValueFrom, Subject, takeUntil } from 'rxjs';
 import { Development } from '../../../../models/developments/developments';
 import { CreateProductionOrderRequest, ProductionOrder, UpdateProductionOrderRequest } from '../../../../models/production-orders/production-orders';
@@ -15,6 +15,7 @@ import { DevelopmentService } from '../../../../shared/services/development/deve
 import { ModalService } from '../../../../shared/services/modal/modal.service';
 import { ProductionOrderService } from '../../../../shared/services/production-order/production-order.service';
 import { FormValidator } from '../../../../shared/utils/form';
+import { SelectComponent } from "../../../../shared/components/atoms/select/select.component";
 
 interface SelectOption {
   value: string;
@@ -30,7 +31,9 @@ interface SelectOption {
     InputComponent,
     TextareaComponent,
     SpinnerComponent,
-    IconComponent
+    FormsModule,
+    IconComponent,
+    SelectComponent
   ],
   templateUrl: './production-order-modal.component.html',
   styleUrl: './production-order-modal.component.scss'
@@ -75,6 +78,10 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     { value: 'localized', label: 'Localizada' }
   ];
 
+  variantOptions: SelectOption[] = [
+    { value: 'COR123', label: 'Cor 1' }
+  ];
+
   // Subject para controlar debounce da busca de desenvolvimento
   private searchDevelopmentSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
@@ -116,8 +123,14 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
   private initializeForm(): void {
     this.productionOrderForm = this.formBuilder.group({
       internalReference: ['', [Validators.required]],
-      productionType: ['', [Validators.required]],
-      quantity: ['', [Validators.required, Validators.min(0.1)]],
+      productionType: this.formBuilder.group({
+        type: ['', [Validators.required]],
+        meters: [null],
+        additionalInfo: this.formBuilder.group({
+          variant: ['']
+          // sizes are managed from developmentFound for now
+        })
+      }),
       fabricType: ['', [Validators.required]],
       observations: [''],
       status: ['CREATED']
@@ -186,6 +199,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       if (response) {
         // Verificar se encontrou exatamente a referência pesquisada
         this.developmentFound = response;
+        this.productionOrderForm.get('productionType')!.patchValue(response.productionType || {});
       } else {
         this.developmentNotFound = true;
         this.developmentFound = null;
@@ -216,15 +230,12 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     // Se tem desenvolvimento vinculado, carregar e exibir
     if (productionOrder.development) {
       this.developmentFound = productionOrder.development;
+      this.developmentFound.productionType = productionOrder.productionType;
     }
 
-    // Determinar tipo de produção baseado no desenvolvimento
-    let productionType = productionOrder.development?.productionType.type;
-
     this.productionOrderForm.patchValue({
-      internalReference: productionOrder.development?.internalReference || '',
-      productionType: productionType,
-      quantity: 0, // Será implementado quando tiver no backend
+      internalReference: productionOrder?.internalReference || '',
+      productionType: productionOrder.productionType || {},
       fabricType: productionOrder.fabricType || '',
       observations: productionOrder.observations || '',
       status: productionOrder.status || 'CREATED',
@@ -239,7 +250,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       }
     }
 
-    console.log('✅ Dados da ordem de produção carregados para edição:', productionOrder);
   }
 
   /**
@@ -279,13 +289,45 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
   // MÉTODOS DE AÇÃO
   // ============================================
 
+  validate() {
+    const productionTypeControl = this.productionOrderForm.get('productionType');
+    const productionTypeValue = productionTypeControl?.value;
+
+    if (productionTypeValue?.type === 'rotary') {
+      // meters is required
+      const metersControl = productionTypeControl?.get('meters');
+      if (!metersControl || metersControl.value === null || metersControl.value === undefined || metersControl.value === '') {
+        metersControl?.setErrors({ required: true });
+        return false;
+      } else {
+        metersControl.setErrors(null);
+      }
+    }
+
+    if (productionTypeValue?.type === 'localized') {
+      // additionalInfo is required
+      const additionalInfoControl = productionTypeControl?.get('additionalInfo');
+      if (!additionalInfoControl || !additionalInfoControl.value) {
+        additionalInfoControl?.setErrors({ required: true });
+        return false;
+      } else {
+        additionalInfoControl.setErrors(null);
+      }
+    }
+
+    return true;
+  }
+
   /**
    * 💾 SALVAR - Cria ou atualiza ordem de produção
    */
   async onSave(): Promise<void> {
+    this.validate();
     this.productionOrderForm.markAllAsTouched();
+    console.log(this.productionOrderForm);
+
     if (this.productionOrderForm.invalid) {
-      //this.markFormGroupTouched(this.productionOrderForm);
+
       return;
     }
 

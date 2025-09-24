@@ -16,6 +16,17 @@
     padding: 0 0.5rem;
 }
 
+.d-grid {
+    display: grid;
+}
+
+// Gera classes dinâmicas para grid-template-columns de 1 a 12
+@for $i from 1 through 12 {
+    .columns-#{$i} {
+        grid-template-columns: repeat(#{$i}, 1fr);
+    }
+}
+
 // Grid responsivo
 @media (max-width: 768px) {
     .container {

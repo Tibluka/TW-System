@@ -89,10 +89,9 @@
 .modal-body {
     padding: $padding-md; // 24px
     flex: 1;
-    overflow-y: auto;
+    overflow-y: scroll;
     background-color: var(--white);
-
-    // Usando a scrollbar customizada do sistema
+    max-height: calc(100vh - 200px);
     scrollbar-width: thin;
     scrollbar-color: rgba(1, 48, 71, 0.3) transparent;
 
