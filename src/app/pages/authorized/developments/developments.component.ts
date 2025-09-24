@@ -16,6 +16,8 @@ import { ModalService } from '../../../shared/services/modal/modal.service';
 import { FormValidator } from '../../../shared/utils/form';
 import { DevelopmentModalComponent } from "./development-modal/development-modal.component";
 import { SelectComponent, SelectOption } from "../../../shared/components/atoms/select/select.component";
+import { IconComponent } from "../../../shared/components/atoms/icon/icon.component";
+import { copyToClipboard } from '../../../shared/utils/tools';
 
 @Component({
   selector: 'app-developments',
@@ -29,7 +31,8 @@ import { SelectComponent, SelectOption } from "../../../shared/components/atoms/
     TableCellComponent,
     ModalComponent,
     DevelopmentModalComponent,
-    SelectComponent
+    SelectComponent,
+    IconComponent
   ],
   providers: [NgModel],
   templateUrl: './developments.component.html',
@@ -305,5 +308,9 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
 
     // Sempre limpar o ID selecionado após fechar modal
     this.selectedDevelopmentId = undefined;
+  }
+
+  copy(event: MouseEvent, internalReference: string): void {
+    copyToClipboard(internalReference, event);
   }
 }

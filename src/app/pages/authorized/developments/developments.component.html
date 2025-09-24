@@ -55,6 +55,8 @@
                 <!-- Referência Interna -->
                 <ds-table-cell align="left">
                     <span class="body primary-dark font-weight-medium">{{ development.internalReference }}</span>
+                    <ds-icon (click)="copy($event, development.internalReference)" class="ml-4" cursorType="pointer"
+                        icon="fa-regular fa-clipboard" fontSize="16px" />
                 </ds-table-cell>
 
                 <!-- Referência Cliente -->

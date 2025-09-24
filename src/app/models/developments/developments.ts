@@ -21,7 +21,7 @@ export interface Development {
     _id?: string;
     clientId: string;
     client?: Client;
-    internalReference?: string;
+    internalReference: string;
     description?: string;
     clientReference?: string;
     pieceImage?: PieceImage;
