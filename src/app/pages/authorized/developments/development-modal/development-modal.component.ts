@@ -3,7 +3,7 @@ import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/co
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
 import { Client } from '../../../../models/clients/clients';
-import { CreateDevelopmentRequest, Development, PieceImage, UpdateDevelopmentRequest } from '../../../../models/developments/developments';
+import { CreateDevelopmentRequest, Development, PieceImage, ProductionType, UpdateDevelopmentRequest } from '../../../../models/developments/developments';
 import { ButtonComponent } from '../../../../shared/components/atoms/button/button.component';
 import { InputComponent } from '../../../../shared/components/atoms/input/input.component';
 import { SelectComponent } from '../../../../shared/components/atoms/select/select.component';
@@ -101,13 +101,14 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
     this.developmentForm = this.formBuilder.group({
       clientId: ['', [Validators.required]],
       description: [''],
-      productionType: ['', [Validators.required]],
+      productionType: this.formBuilder.group({
+        type: ['', [Validators.required]]
+      }),
       clientReference: ['']
     });
 
     console.log('📝 Formulário inicializado');
   }
-
   /**
    * 📊 CARREGAR DADOS INICIAIS - Carrega clientes e desenvolvimento (se edição)
    */
@@ -161,15 +162,21 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
   }
 
   /**
-   * 📋 POPULAR FORMULÁRIO - Preenche dados do desenvolvimento para edição (IGUAL AO CLIENT-MODAL)
-   */
+ * 📋 POPULAR FORMULÁRIO - Preenche dados do desenvolvimento para edição
+ */
   private populateForm(development: Development): void {
-    // Determinar tipo de produção baseado no que está habilitado
-    let productionType = '';
-    if (development.productionType?.rotary?.enabled) {
-      productionType = 'rotary';
-    } else if (development.productionType?.localized?.enabled) {
-      productionType = 'localized';
+    // ✅ CORREÇÃO: productionType agora é um objeto, não string
+    let productionTypeValue = '';
+
+    if (development.productionType) {
+      // Se productionType é um objeto com a propriedade type
+      if (typeof development.productionType === 'object' && development.productionType.type) {
+        productionTypeValue = development.productionType.type;
+      }
+      // Se ainda vier como string (compatibilidade)
+      else if (typeof development.productionType === 'string') {
+        productionTypeValue = development.productionType;
+      }
     }
 
     if (development.pieceImage?.url) {
@@ -179,11 +186,13 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
     this.developmentForm.patchValue({
       clientId: development.client?._id || development.clientId,
       description: development.description || '',
-      productionType: productionType,
+      productionType: {
+        type: productionTypeValue // ✅ Usar o valor extraído
+      },
       clientReference: development.clientReference || ''
     });
 
-    // Se existir _id no development, adiciona o form control _id se não existir (IGUAL AO CLIENT-MODAL)
+    // Se existir _id no development, adiciona o form control _id se não existir
     if (development._id) {
       if (!this.developmentForm.contains('_id')) {
         this.developmentForm.addControl('_id', this.formBuilder.control(development._id));
@@ -192,7 +201,11 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
       }
     }
 
-    console.log('✅ Dados do desenvolvimento carregados para edição:', development);
+    console.log('✅ Dados do desenvolvimento carregados para edição:', {
+      development,
+      productionTypeExtracted: productionTypeValue,
+      formValue: this.developmentForm.value
+    });
   }
 
   /**
@@ -256,8 +269,9 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
     this.modalService.close('development-modal', { success: false });
   }
 
+
   /**
-   * 💾 SUBMIT - Processa envio do formulário
+   * 💾 SUBMIT - Processa envio do formulário (ATUALIZADO)
    */
   async onSubmit(): Promise<void> {
     if (this.developmentForm.invalid || this.isSaving) return;
@@ -267,33 +281,18 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
     try {
       const formData = this.developmentForm.value;
 
-      // Construir productionType baseado na seleção
-      const productionType = {
-        rotary: {
-          enabled: formData.productionType === 'rotary',
-          negotiatedPrice: formData.productionType === 'rotary' ? 0 : undefined
-        },
-        localized: {
-          enabled: formData.productionType === 'localized',
-          negotiatedPrice: formData.productionType === 'localized' ? 0 : undefined
-        }
-      };
-
       let result: any;
 
       if (this.isEditMode && this.developmentForm.value._id) {
-        // Modo edição - atualizar desenvolvimento
         const updateData: UpdateDevelopmentRequest = {
           clientId: formData.clientId,
           description: formData.description,
           clientReference: formData.clientReference,
-          productionType: productionType
+          productionType: formData.productionType
         };
 
         result = await lastValueFrom(this.developmentService.updateDevelopment(this.developmentForm.value._id, updateData));
-        console.log('✅ Desenvolvimento atualizado:', result);
 
-        // Se há imagem para upload após criação, fazer upload
         if (this.uploadedFiles.length > 0 && result._id) {
           await this.uploadImageToDevelopment(result._id);
         }
@@ -304,18 +303,15 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
         });
 
       } else {
-        // Modo criação - criar novo desenvolvimento
         const createData: CreateDevelopmentRequest = {
           clientId: formData.clientId,
           description: formData.description,
           clientReference: formData.clientReference,
-          productionType: productionType
+          productionType: formData.productionType
         };
 
         result = await lastValueFrom(this.developmentService.createDevelopment(createData));
-        console.log('✅ Desenvolvimento criado:', result);
 
-        // Se há imagem para upload após criação, fazer upload
         if (this.uploadedFiles.length > 0 && result._id) {
           await this.uploadImageToDevelopment(result._id);
         }
@@ -333,6 +329,7 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
       this.isSaving = false;
     }
   }
+
 
 
   /**
@@ -364,11 +361,19 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
   // FORM VALIDATION
   // ============================================
 
+
   /**
-   * 🔍 ERRO DO CAMPO - Retorna mensagem de erro para um campo específico
+   * 🔍 ERRO DO CAMPO - Retorna mensagem de erro para um campo específico (ATUALIZADO)
    */
   getFieldError(fieldName: string): string {
-    const field = this.developmentForm.get(fieldName);
+    let field;
+
+    // ✅ MUDANÇA: Tratamento especial para productionType aninhado
+    if (fieldName === 'productionType') {
+      field = this.developmentForm.get('productionType.type');
+    } else {
+      field = this.developmentForm.get(fieldName);
+    }
 
     if (!field || !field.touched || !field.errors) {
       return '';

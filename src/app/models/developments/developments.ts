@@ -16,61 +16,24 @@ export type DevelopmentStatus =
 // INTERFACE PRINCIPAL
 // ============================================
 
+// E certifique-se que Development usa ProductionType como objeto:
 export interface Development {
     _id?: string;
-
-    // IDENTIFIERS
-    clientReference?: string; // Referência fornecida pelo cliente
-    internalReference?: string; // Auto-gerado: formato 25ABC0001
-
-    // CLIENT REFERENCE
-    clientId: string; // ID de referência obrigatório
-    client?: Client; // Pode vir populado da API via populate
-
-    // BASIC DATA
-    description: string; // Obrigatório
-
-    // PIECE IMAGE
-    pieceImage?: {
-        url?: string;
-        publicId?: string;
-        filename?: string;
-        optimizedUrls?: {
-            thumbnail?: string;
-            small?: string;
-            medium?: string;
-            large?: string;
-            original?: string;
-        };
-        uploadedAt?: Date | string;
-    };
-
-    // STATUS
-    status: DevelopmentStatus;
-
-    // VARIANTS
+    clientId: string;
+    client?: Client;
+    internalReference?: string;
+    description?: string;
+    clientReference?: string;
+    pieceImage?: PieceImage;
     variants?: {
         color?: string;
     };
-
-    // PRODUCTION TYPE
-    productionType: {
-        rotary: {
-            enabled: boolean;
-            negotiatedPrice?: number; // Obrigatório se enabled = true
-        };
-        localized: {
-            enabled: boolean;
-            negotiatedPrice?: number; // Obrigatório se enabled = true
-        };
-    };
-
-    // METADADOS
+    productionType: ProductionType; // ✅ Como objeto, não string
+    status: DevelopmentStatus;
     active?: boolean;
-    createdAt?: Date | string;
-    updatedAt?: Date | string;
+    createdAt?: string;
+    updatedAt?: string;
 }
-
 // ============================================
 // INTERFACE PARA IMAGEM
 // ============================================
@@ -94,14 +57,12 @@ export interface PieceImage {
 // ============================================
 
 export interface ProductionType {
-    rotary: {
-        enabled: boolean;
-        negotiatedPrice?: number;
-    };
-    localized: {
-        enabled: boolean;
-        negotiatedPrice?: number;
-    };
+    type: string,
+    meters?: number,
+    sizes?: {
+        size: string,
+        value: number
+    }[]
 }
 
 // ============================================
@@ -116,30 +77,20 @@ export interface DevelopmentVariants {
 // REQUEST INTERFACES
 // ============================================
 
+// Para as requisições:
 export interface CreateDevelopmentRequest {
     clientId: string;
-    description: string;
+    description?: string;
     clientReference?: string;
-    status?: DevelopmentStatus;
-    variants?: {
-        color?: string;
-    };
-    productionType: {
-        rotary: {
-            enabled: boolean;
-            negotiatedPrice?: number;
-        };
-        localized: {
-            enabled: boolean;
-            negotiatedPrice?: number;
-        };
-    };
+    productionType: ProductionType; // ✅ Como objeto
 }
 
-export interface UpdateDevelopmentRequest extends Partial<CreateDevelopmentRequest> {
-    internalReference?: string; // Não pode ser alterado após criação
+export interface UpdateDevelopmentRequest {
+    clientId?: string;
+    description?: string;
+    clientReference?: string;
+    productionType?: ProductionType; // ✅ Como objeto
 }
-
 // ============================================
 // FILTER INTERFACE
 // ============================================
@@ -232,21 +183,10 @@ export class DevelopmentUtils {
      * 💰 Valida se pelo menos um tipo de produção está habilitado
      */
     static validateProductionType(productionType: ProductionType): boolean {
-        return productionType.rotary.enabled || productionType.localized.enabled;
+        return productionType.type !== null;
     }
 
-    /**
-     * 💵 Valida se preço foi informado para tipos habilitados
-     */
-    static validateNegotiatedPrices(productionType: ProductionType): boolean {
-        if (productionType.rotary.enabled && !productionType.rotary.negotiatedPrice) {
-            return false;
-        }
-        if (productionType.localized.enabled && !productionType.localized.negotiatedPrice) {
-            return false;
-        }
-        return true;
-    }
+
 
     /**
      * 🖼️ Verifica se development tem imagem
@@ -269,18 +209,8 @@ export class DevelopmentUtils {
     /**
      * 🏭 Retorna tipos de produção habilitados
      */
-    static getEnabledProductionTypes(productionType: ProductionType): string[] {
-        const types: string[] = [];
-
-        if (productionType.rotary.enabled) {
-            types.push('Rotativa');
-        }
-
-        if (productionType.localized.enabled) {
-            types.push('Localizada');
-        }
-
-        return types;
+    static getEnabledProductionType(productionType: ProductionType): string {
+        return productionType.type;
     }
 
     /**

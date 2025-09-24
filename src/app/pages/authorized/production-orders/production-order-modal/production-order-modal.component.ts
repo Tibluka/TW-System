@@ -72,12 +72,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     { value: 'FINALIZED', label: 'Finalizado' }
   ];
 
-  priorityOptions: SelectOption[] = [
-    { value: 'green', label: 'Normal' },
-    { value: 'yellow', label: 'Média' },
-    { value: 'red', label: 'Alta' }
-  ];
-
   productionTypeOptions: SelectOption[] = [
     { value: 'rotary', label: 'Rotativa' },
     { value: 'localized', label: 'Localizada' }
@@ -128,9 +122,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       quantity: ['', [Validators.required, Validators.min(0.1)]],
       fabricType: ['', [Validators.required]],
       observations: [''],
-      priority: ['green', [Validators.required]],
-      status: ['CREATED'],
-      pilot: [false]
+      status: ['CREATED']
     });
 
     console.log('📝 Formulário da ordem de produção inicializado');
@@ -229,12 +221,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     }
 
     // Determinar tipo de produção baseado no desenvolvimento
-    let productionType = '';
-    if (productionOrder.development?.productionType?.rotary?.enabled) {
-      productionType = 'rotary';
-    } else if (productionOrder.development?.productionType?.localized?.enabled) {
-      productionType = 'localized';
-    }
+    let productionType = productionOrder.development?.productionType.type;
 
     this.productionOrderForm.patchValue({
       internalReference: productionOrder.development?.internalReference || '',
@@ -242,9 +229,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       quantity: 0, // Será implementado quando tiver no backend
       fabricType: productionOrder.fabricType || '',
       observations: productionOrder.observations || '',
-      priority: productionOrder.priority || 'green',
       status: productionOrder.status || 'CREATED',
-      pilot: productionOrder.pilot || false
     });
 
     // Se existir _id na ordem de produção, adiciona o form control _id
@@ -321,9 +306,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
         // ATUALIZAR ordem existente
         const updateData: UpdateProductionOrderRequest = {
           fabricType: formData.fabricType,
-          pilot: formData.pilot,
           observations: formData.observations,
-          priority: formData.priority,
           status: formData.status
         };
 
@@ -339,9 +322,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
         const createData: CreateProductionOrderRequest = {
           developmentId: this.developmentFound!._id!,
           fabricType: formData.fabricType,
-          pilot: formData.pilot,
           observations: formData.observations,
-          priority: formData.priority
         };
 
         const response = await lastValueFrom(
