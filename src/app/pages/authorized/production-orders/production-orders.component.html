@@ -57,8 +57,10 @@
                 <!-- Referência Interna -->
                 <ds-table-cell align="left">
                     <span class="body primary-dark">
-                        {{ productionOrder.internalReference || productionOrder.development?.internalReference || 'S/N'
-                        }}
+                        <span class="body primary-dark font-weight-medium">{{
+                            productionOrder.internalReference }}</span>
+                        <ds-icon (click)="copy($event, productionOrder.internalReference)" class="ml-4"
+                            cursorType="pointer" icon="fa-regular fa-clipboard" fontSize="16px" />
                     </span>
                 </ds-table-cell>
 

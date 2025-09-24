@@ -44,7 +44,7 @@ export interface ProductionOrder {
     development?: Development;
 
     // DADOS COPIADOS
-    internalReference?: string;
+    internalReference: string;
 
     // STATUS DA ORDEM DE PRODUÇÃO
     status: ProductionOrderStatus;

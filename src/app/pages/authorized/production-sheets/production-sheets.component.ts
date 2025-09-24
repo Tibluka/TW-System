@@ -2,22 +2,21 @@
 
 import { CommonModule } from '@angular/common';
 import { Component, effect, inject } from '@angular/core';
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
-import { SelectComponent, SelectOption } from '../../../shared/components/atoms/select/select.component';
-import { ModalService } from '../../../shared/services/modal/modal.service';
-import { SpinnerComponent } from '../../../shared/components/atoms/spinner/spinner.component';
-import { TableComponent } from '../../../shared/components/organisms/table/table.component';
-import { InputComponent } from '../../../shared/components/atoms/input/input.component';
-import { FormValidator } from '../../../shared/utils/form';
-import { TableCellComponent } from '../../../shared/components/organisms/table/table-cell/table-cell.component';
-import { IconComponent } from '../../../shared/components/atoms/icon/icon.component';
-import { TableRowComponent } from '../../../shared/components/organisms/table/table-row/table-row.component';
-import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { FormsModule, NgModel } from '@angular/forms';
+import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { PaginationInfo } from '../../../models/clients/clients';
-import { ProductionSheet, ProductionSheetFilters, ProductionSheetStage, MachineNumber } from '../../../models/production-sheet/production-sheet';
-import { ProductionSheetsService } from '../../../shared/services/production-sheets/production-sheets.service';
+import { MachineNumber, ProductionSheet, ProductionSheetFilters, ProductionSheetStage } from '../../../models/production-sheet/production-sheet';
+import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
+import { IconComponent } from '../../../shared/components/atoms/icon/icon.component';
+import { InputComponent } from '../../../shared/components/atoms/input/input.component';
+import { SelectComponent, SelectOption } from '../../../shared/components/atoms/select/select.component';
 import { ModalComponent } from '../../../shared/components/organisms/modal/modal.component';
+import { TableCellComponent } from '../../../shared/components/organisms/table/table-cell/table-cell.component';
+import { TableRowComponent } from '../../../shared/components/organisms/table/table-row/table-row.component';
+import { TableComponent } from '../../../shared/components/organisms/table/table.component';
+import { ModalService } from '../../../shared/services/modal/modal.service';
+import { ProductionSheetsService } from '../../../shared/services/production-sheets/production-sheets.service';
+import { FormValidator } from '../../../shared/utils/form';
 import { ProductionSheetModalComponent } from './production-sheet-modal/production-sheet-modal.component';
 
 @Component({
@@ -249,13 +248,13 @@ export class ProductionSheetsComponent extends FormValidator {
   private handleModalResult(result: any): void {
     if (result && result.action) {
       if (result.action === 'created') {
-        console.log('Ficha de produção criada com sucesso:', result.data?.internalReference);
         this.loadProductionSheets(); // Recarregar lista
         // TODO: Exibir toast de sucesso
       } else if (result.action === 'updated') {
-        console.log('Ficha de produção atualizada com sucesso:', result.data?.internalReference);
         this.loadProductionSheets(); // Recarregar lista
         // TODO: Exibir toast de sucesso
+      } else if (result.action === 'stage-updated') {
+        this.loadProductionSheets(); // Recarrega
       }
     }
 

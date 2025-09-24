@@ -54,25 +54,25 @@
 
                 <!-- Referência Interna -->
                 <ds-table-cell align="left">
-                    <span class="body primary-dark font-weight-medium">{{ development.internalReference }}</span>
+                    <span class="body secondary font-weight-medium">{{ development.internalReference }}</span>
                     <ds-icon (click)="copy($event, development.internalReference)" class="ml-4" cursorType="pointer"
                         icon="fa-regular fa-clipboard" fontSize="16px" />
                 </ds-table-cell>
 
                 <!-- Referência Cliente -->
                 <ds-table-cell align="left">
-                    <span class="body label">{{ development.clientReference || '-' }}</span>
+                    <span class="body secondary">{{ development.clientReference || '-' }}</span>
                 </ds-table-cell>
 
                 <!-- Variante -->
                 <ds-table-cell align="left">
-                    <span class="body primary-dark">{{ development.variants || '-' }}</span>
+                    <span class="body secondary">{{ development.variants || '-' }}</span>
                 </ds-table-cell>
 
                 <!-- Cliente -->
                 <ds-table-cell align="left">
                     <div class="client-info">
-                        <span class="body primary-dark font-weight-medium">
+                        <span class="body secondary">
                             {{ development.client?.companyName || 'Cliente não encontrado' }}
                         </span>
                         <div class="body-small label" *ngIf="development.client?.acronym">
@@ -84,19 +84,15 @@
                 <!-- Tipo Produção -->
                 <ds-table-cell align="left">
                     <div class="production-types">
-                        <span *ngIf="development.productionType?.type === 'rotary'" class="production-badge rotary">
-                            Rotativa
-                        </span>
-                        <span *ngIf="development.productionType?.type === 'localized'"
-                            class="production-badge localized">
-                            Localizada
+                        <span class="body secondary">
+                            {{productionType(development.productionType!.type)}}
                         </span>
                     </div>
                 </ds-table-cell>
 
                 <!-- Status -->
                 <ds-table-cell align="center">
-                    <span class="status-badge" [ngClass]="'status-' + development.status">
+                    <span class="body secondary">
                         {{ getStatusLabel(development.status) }}
                     </span>
                 </ds-table-cell>

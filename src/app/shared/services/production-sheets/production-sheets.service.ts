@@ -190,8 +190,8 @@ export class ProductionSheetsService {
   /**
    * ⏭️ AVANÇAR ESTÁGIO - Avança para o próximo estágio automaticamente
    */
-  advanceStage(id: string): Observable<ProductionSheetResponse> {
-    return this.http.patch<ProductionSheetResponse>(`${this.API_URL}/${id}/advance-stage`, {});
+  advanceStage(id: string, stage: string): Observable<ProductionSheetResponse> {
+    return this.http.patch<ProductionSheetResponse>(`${this.API_URL}/${id}/stage`, { stage: stage });
   }
 
   /**

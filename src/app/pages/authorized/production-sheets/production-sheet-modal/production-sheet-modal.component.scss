@@ -9,9 +9,6 @@
 // CONTAINER PRINCIPAL
 // ========================================
 .production-sheet-modal-container {
-    padding: 0;
-    max-height: 80vh;
-    overflow-y: auto;
 
     // ========================================
     // ESTADOS DE BUSCA
@@ -127,13 +124,6 @@
         justify-content: center;
         min-height: 300px;
         padding: 32px;
-    }
-
-    // ========================================
-    // SEÇÃO DO FORMULÁRIO
-    // ========================================
-    .form-section {
-        padding: 24px;
     }
 
     .production-sheet-form-grid {
@@ -276,14 +266,6 @@
         justify-content: flex-end;
         align-items: center;
         gap: 12px;
-        padding: 20px 24px;
-        border-top: 1px solid var(--neutral-light);
-        background-color: var(--background-secondary);
-        border-radius: 0 0 12px 12px;
-
-        .advance-stage-btn {
-            margin-right: auto; // Empurra o botão para a esquerda
-        }
 
         @media (max-width: 768px) {
             flex-direction: column-reverse;
@@ -293,10 +275,6 @@
                 width: 100%;
             }
 
-            .advance-stage-btn {
-                margin-right: 0;
-                order: 2;
-            }
         }
     }
 

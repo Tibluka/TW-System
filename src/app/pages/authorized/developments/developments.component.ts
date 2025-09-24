@@ -1,12 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
 import { FormsModule, NgModel } from "@angular/forms";
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { Subject, debounceTime, takeUntil } from 'rxjs';
 
 // Componentes
-import { Development, DevelopmentFilters, DevelopmentListResponse, PaginationInfo, PieceImage } from '../../../models/developments/developments';
+import { Development, DevelopmentFilters, DevelopmentListResponse, DevelopmentStatus, PaginationInfo, ProductionTypeEnum } from '../../../models/developments/developments';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
+import { IconComponent } from "../../../shared/components/atoms/icon/icon.component";
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
+import { SelectComponent, SelectOption } from "../../../shared/components/atoms/select/select.component";
 import { ModalComponent } from "../../../shared/components/organisms/modal/modal.component";
 import { TableCellComponent } from '../../../shared/components/organisms/table/table-cell/table-cell.component';
 import { TableRowComponent } from '../../../shared/components/organisms/table/table-row/table-row.component';
@@ -14,10 +16,8 @@ import { TableComponent } from '../../../shared/components/organisms/table/table
 import { DevelopmentService } from '../../../shared/services/development/development.service';
 import { ModalService } from '../../../shared/services/modal/modal.service';
 import { FormValidator } from '../../../shared/utils/form';
+import { copyToClipboard, translateDevelopmentStatus, translateProductionType } from '../../../shared/utils/tools';
 import { DevelopmentModalComponent } from "./development-modal/development-modal.component";
-import { SelectComponent, SelectOption } from "../../../shared/components/atoms/select/select.component";
-import { IconComponent } from "../../../shared/components/atoms/icon/icon.component";
-import { copyToClipboard } from '../../../shared/utils/tools';
 
 @Component({
   selector: 'app-developments',
@@ -197,14 +197,8 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
   /**
    * 🏷️ STATUS LABEL - Retorna label do status
    */
-  getStatusLabel(status: string): string {
-    const statusLabels: { [key: string]: string } = {
-      'CREATED': 'Criado',
-      'AWAITING_APPROVAL': 'Aguardando Aprovação',
-      'APPROVED': 'Aprovado',
-      'CANCELED': 'Cancelado'
-    };
-    return statusLabels[status] || status;
+  getStatusLabel(status: DevelopmentStatus) {
+    return translateDevelopmentStatus(status);
   }
 
   /**
@@ -312,5 +306,10 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
 
   copy(event: MouseEvent, internalReference: string): void {
     copyToClipboard(internalReference, event);
+  }
+
+
+  productionType(productionType: ProductionTypeEnum) {
+    return translateProductionType(productionType);
   }
 }

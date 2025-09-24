@@ -32,7 +32,7 @@
                 </div>
 
                 <!-- Desenvolvimento encontrado -->
-                <div class="development-found" *ngIf="productionOrderFound && !searchingProductionOrder">
+                <div class="development-found mb-24" *ngIf="productionOrderFound && !searchingProductionOrder">
                     <p class="input-label">Resumo do desenvolvimento</p>
                     <div class="development-card">
                         <div class="image">
@@ -40,16 +40,65 @@
                         </div>
                         <div class="development-details">
                             <h1 class="title-modal mb-6 secondary">
-                                {{productionOrderFound.development?.internalReference}}
+                                {{productionOrderFound.internalReference}}
                             </h1>
                             <p class="subtitle-section secondary mb-0">
-                                {{productionOrderFound.development?.client?.companyName}}</p>
-                            <p class="card-small secondary mb-4">{{productionOrderFound.development?.clientReference}}
+                                {{productionOrderFound.development!.client?.companyName}}</p>
+                            <p class="card-small secondary mb-4">{{productionOrderFound!.development?.clientReference}}
                             </p>
                             <hr>
                             <p class="body secondary mt-4 mb-0">
-                                {{productionOrderFound.development?.productionType?.type}}
+                                {{productionType(productionOrderFound!.development!.productionType!.type)}}
                             </p>
+                            <!-- Tabela para tipo de produção localizada -->
+                            <div *ngIf="productionOrderFound?.productionType!.type === 'localized'">
+                                <div class="table-container"
+                                    *ngIf="productionOrderFound?.development?.productionType?.additionalInfo?.sizes && productionOrderFound.development?.productionType?.additionalInfo?.sizes!.length > 0; else noSizes">
+                                    <table class="production-table">
+                                        <!-- Cabeçalho com os tamanhos -->
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    Variante
+                                                    <ds-icon icon="fa-solid fa-circle-plus" cursorType="pointer"
+                                                        color="tertiary" fontSize="16px" />
+                                                </th>
+                                                <th class="size-header"
+                                                    *ngFor="let sizeItem of productionOrderFound.development?.productionType?.additionalInfo?.sizes">
+                                                    {{ sizeItem.size }}
+                                                </th>
+                                            </tr>
+                                        </thead>
+
+                                        <!-- Corpo com os valores -->
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    {{productionOrderFound.productionType.additionalInfo?.variant}}
+                                                </td>
+                                                <td class="size-value"
+                                                    *ngFor="let sizeItem of productionOrderFound.development?.productionType?.additionalInfo?.sizes">
+                                                    <ds-input [(ngModel)]="sizeItem.value"
+                                                        [ngModelOptions]="{standalone: true}"></ds-input>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Estado vazio -->
+                                <ng-template #noSizes>
+                                    <div class="empty-state">
+                                        <i class="fa-solid fa-table"></i>
+                                        <p>Nenhum tamanho definido para este desenvolvimento</p>
+                                    </div>
+                                </ng-template>
+                            </div>
+                            <div class="form-field" *ngIf="productionOrderFound.productionType!.type === 'rotary'">
+                                <!-- 📏 QUANTIDADE DE METROS -->
+                                <p class="body secondary">{{productionOrderFound.productionType!.meters}}m
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -63,9 +112,6 @@
                     <ds-select label="Máquina" placeholder="Selecione a máquina" formControlName="machine"
                         [options]="machineOptions" [required]="true" [errorMessage]="getFieldError('machine')"
                         [invalid]="isFormControlInvalid(productionSheetForm.get('machine'))" width="100%" />
-                    <span class="helper-text">
-                        Máquina onde será realizada a produção
-                    </span>
                 </div>
 
                 <!-- Data de Entrada -->
@@ -74,9 +120,6 @@
                         formControlName="entryDate" type="date" icon="fa-solid fa-calendar" iconPosition="left"
                         [errorMessage]="getFieldError('entryDate')"
                         [invalid]="isFormControlInvalid(productionSheetForm.get('entryDate'))" width="100%" />
-                    <span class="helper-text">
-                        Data em que a produção será iniciada (padrão: hoje)
-                    </span>
                 </div>
 
                 <!-- Data de Saída Prevista -->
@@ -85,82 +128,25 @@
                         formControlName="expectedExitDate" type="date" icon="fa-solid fa-calendar-check"
                         iconPosition="left" [required]="true" [errorMessage]="getFieldError('expectedExitDate')"
                         [invalid]="isFormControlInvalid(productionSheetForm.get('expectedExitDate'))" width="100%" />
-                    <span class="helper-text">
-                        Data prevista para finalização da produção
-                    </span>
                 </div>
 
                 <!-- Estágio (apenas no modo edição) -->
-                <div class="field-group stage-field" *ngIf="isEditMode">
+                <div class="field mb-24" *ngIf="isEditMode">
                     <ds-select label="Estágio da Produção" placeholder="Selecione o estágio" formControlName="stage"
                         [options]="stageOptions" [errorMessage]="getFieldError('stage')"
                         [invalid]="isFormControlInvalid(productionSheetForm.get('stage'))" width="100%" />
-                    <span class="helper-text">
-                        Estágio atual do processo produtivo
-                    </span>
                 </div>
 
-                <!-- Observações de Produção -->
-                <div class="field-group production-notes-field">
-                    <ds-textarea label="Observações de Produção"
-                        placeholder="Digite observações específicas da produção (opcional)..."
-                        formControlName="productionNotes" [rows]="4" [errorMessage]="getFieldError('productionNotes')"
-                        [invalid]="isFormControlInvalid(productionSheetForm.get('productionNotes'))" width="100%" />
-                    <span class="helper-text">
-                        Observações técnicas, configurações especiais, etc. (máximo 1000 caracteres)
-                    </span>
-                </div>
+
 
             </div>
-        </div>
+            <!-- Observações de Produção -->
 
-        <!-- Informações da Ordem de Produção (quando encontrada) -->
-        <div class="production-order-info" *ngIf="productionOrderFound || isEditMode">
-            <h3 class="section-title">
-                <ds-icon icon="fa-solid fa-info-circle" color="info"></ds-icon>
-                Informações da Ordem de Produção
-            </h3>
-
-            <div class="order-details-grid">
-                <div class="detail-item">
-                    <span class="label">Referência Interna:</span>
-                    <span class="value">{{ productionOrderFound?.internalReference || 'S/N' }}</span>
-                </div>
-
-                <div class="detail-item">
-                    <span class="label">Cliente:</span>
-                    <span class="value">{{ productionOrderFound?.development?.client?.companyName || 'N/A' }}</span>
-                </div>
-
-                <div class="detail-item">
-                    <span class="label">Tipo de Tecido:</span>
-                    <span class="value">{{ productionOrderFound?.fabricType || 'N/A' }}</span>
-                </div>
-
-                <div class="detail-item">
-                    <span class="label">Status:</span>
-                    <span class="value status-badge"
-                        [ngClass]="'status-' + productionOrderFound?.status!.toLowerCase().replace('_', '-')">
-                        {{ getProductionOrderStatusLabel(productionOrderFound!.status) }}
-                    </span>
-                </div>
-
-                <div class="detail-item" *ngIf="productionOrderFound?.productionType">
-                    <span class="label">Tipo de Produção:</span>
-                    <span class="value">
-                        <span *ngIf="productionOrderFound?.productionType?.type === 'rotary'">
-                            Rotativo ({{ productionOrderFound?.productionType?.meters }}m)
-                        </span>
-                        <span *ngIf="productionOrderFound?.productionType?.type === 'localized'">
-                            Localizado
-                        </span>
-                    </span>
-                </div>
-
-                <div class="detail-item" *ngIf="productionOrderFound?.observations">
-                    <span class="label">Observações:</span>
-                    <span class="value">{{ productionOrderFound?.observations }}</span>
-                </div>
+            <div *ngIf="productionOrderFound || isEditMode">
+                <ds-textarea label="Observações de Produção"
+                    placeholder="Digite observações específicas da produção (opcional)..."
+                    formControlName="productionNotes" [rows]="4" [errorMessage]="getFieldError('productionNotes')"
+                    [invalid]="isFormControlInvalid(productionSheetForm.get('productionNotes'))" width="100%" />
             </div>
         </div>
 
@@ -169,12 +155,12 @@
             <ds-button label="Cancelar" variant="ghost" (onClickEmitter)="onCancel()" [disabled]="isSaving" />
 
             <!-- Botão especial para avançar estágio (modo edição) -->
-            <ds-button *ngIf="isEditMode && canAdvanceStage()" label="Avançar Estágio" variant="outline"
-                icon="fa-solid fa-arrow-right" (onClickEmitter)="onAdvanceStage()" [disabled]="isSaving"
+            <ds-button type="button" *ngIf="isEditMode && canAdvanceStage()" label="Avançar Estágio" variant="outline"
+                icon="fa-solid fa-arrow-right" (onClickEmitter)="onAdvanceStage($event)" [disabled]="isSaving"
                 class="advance-stage-btn" />
 
             <ds-button label="{{ isEditMode ? 'Atualizar' : 'Criar' }} Ficha" type="submit" [isLoading]="isSaving"
-                [disabled]="isSaving || productionSheetForm.invalid" />
+                [disabled]="isSaving" />
         </div>
 
     </form>

@@ -1,4 +1,4 @@
-<button [disabled]="disabled" class="btn {{variant}}" [ngStyle]="{
+<button [type]="type" [disabled]="disabled" class="btn {{variant}}" [ngStyle]="{
     'width': fullWidth ? '100%' : 'fit-content',
     'white-space': 'nowrap'
 }" [ngClass]="{'rounded': rounded}" (click)="emitAction()">

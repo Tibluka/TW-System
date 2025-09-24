@@ -1,8 +1,8 @@
 // pages/authorized/production-sheets/production-sheet-modal/production-sheet-modal.component.ts
 
 import { CommonModule } from '@angular/common';
-import { Component, inject, Input, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component, inject, Input, OnInit, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, lastValueFrom, Subject, takeUntil } from 'rxjs';
 
 // Services
@@ -22,7 +22,8 @@ import { IconComponent } from '../../../../shared/components/atoms/icon/icon.com
 import { FormValidator } from '../../../../shared/utils/form';
 
 // Models
-import { ProductionOrder } from '../../../../models/production-orders/production-orders';
+import { ProductionOrder, ProductionTypeEnum } from '../../../../models/production-orders/production-orders';
+import { translateProductionType } from '../../../../shared/utils/tools';
 
 @Component({
   selector: 'app-production-sheet-modal',
@@ -34,7 +35,11 @@ import { ProductionOrder } from '../../../../models/production-orders/production
     SelectComponent,
     TextareaComponent,
     SpinnerComponent,
-    IconComponent
+    IconComponent,
+    FormsModule
+  ],
+  providers: [
+    NgModel
   ],
   templateUrl: './production-sheet-modal.component.html',
   styleUrl: './production-sheet-modal.component.scss'
@@ -50,6 +55,7 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
   private productionSheetsService = inject(ProductionSheetsService);
   private productionOrderService = inject(ProductionOrderService);
   private modalService = inject(ModalService);
+  private cdr = inject(ChangeDetectorRef);
 
   // ============================================
   // PROPRIEDADES DO COMPONENTE
@@ -98,33 +104,11 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     super();
   }
 
-  ngOnInit(): void {
-    // Primeiro determinar o modo baseado nos dados do modal
-    const activeModal = this.modalService.activeModal();
-    this.isEditMode = !!(activeModal?.config.data);
-
-    if (this.isEditMode && activeModal?.config.data) {
-      this.productionSheetId = activeModal.config.data._id;
-      this.currentProductionSheet = activeModal.config.data;
-    }
-
-    // Inicializar formulário após determinar o modo
+  async ngOnInit(): Promise<void> {
     this.initializeForm();
-    this.setupFormSubscriptions();
     this.initializeProductionOrderSearch();
-
-    // Carregar dados conforme o modo
-    if (this.isEditMode && activeModal?.config.data) {
-      this.populateForm(activeModal.config.data);
-
-      // Desabilitar campo após popular o form
-      this.productionSheetForm.get('internalReference')?.disable();
-
-      // Carregar detalhes da ordem se necessário
-      if (activeModal.config.data.productionOrder) {
-        this.productionOrderFound = activeModal.config.data.productionOrder;
-      }
-    }
+    this.setupFormSubscriptions();
+    await this.loadInitialData();
   }
 
   ngOnDestroy(): void {
@@ -133,9 +117,20 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
   }
 
   // ============================================
+  // GETTERS PARA O TEMPLATE
+  // ============================================
+
+  get saveButtonLabel(): string {
+    return this.isEditMode ? 'Atualizar' : 'Criar';
+  }
+
+  // ============================================
   // INICIALIZAÇÃO
   // ============================================
 
+  /**
+   * 📝 INICIALIZAR FORM - Cria formulário reativo
+   */
   private initializeForm(): void {
     // Campos básicos sempre presentes
     const formConfig: any = {
@@ -152,6 +147,101 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     }
 
     this.productionSheetForm = this.formBuilder.group(formConfig);
+
+    console.log('📝 Formulário da ficha de produção inicializado');
+  }
+
+  /**
+   * 📊 CARREGAR DADOS INICIAIS - Carrega ficha de produção (se edição)
+   */
+  private async loadInitialData(): Promise<void> {
+    this.isLoading = true;
+
+    try {
+      // Acessar dados do modal ativo
+      const activeModal = this.modalService.activeModal();
+      if (activeModal?.config.data) {
+        const productionSheet = activeModal.config.data;
+
+        // ✅ Definir modo de edição e dados atuais
+        this.isEditMode = true;
+        this.productionSheetId = productionSheet._id;
+        this.currentProductionSheet = productionSheet;
+
+        // ✅ Popular formulário
+        this.populateForm(productionSheet);
+
+        // ✅ Desabilitar campo de referência interna no modo edição
+        this.productionSheetForm.get('internalReference')?.disable();
+
+        // ✅ Definir ordem de produção encontrada
+        if (productionSheet.productionOrder) {
+          this.productionOrderFound = productionSheet.productionOrder;
+        }
+
+      } else if (this.productionSheetId) {
+        // Fallback: Se não há dados no modal, mas há ID, buscar pelos dados
+        await this.loadProductionSheetData();
+      }
+
+    } catch (error) {
+      console.error('❌ Erro ao carregar dados iniciais:', error);
+    } finally {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  /**
+   * 📋 POPULAR FORMULÁRIO - Preenche dados da ficha de produção para edição
+   */
+  private populateForm(productionSheet: ProductionSheet): void {
+    // Buscar a referência interna da ordem de produção
+    const internalReference = productionSheet.productionOrder?.internalReference ||
+      productionSheet.internalReference || '';
+
+    this.productionSheetForm.patchValue({
+      internalReference: internalReference,
+      machine: productionSheet.machine,
+      entryDate: this.formatDateForInput(productionSheet.entryDate),
+      expectedExitDate: this.formatDateForInput(productionSheet.expectedExitDate),
+      productionNotes: productionSheet.productionNotes || ''
+    });
+
+    // ✅ Definir ordem de produção encontrada ANTES de configurar stage
+    if (productionSheet.productionOrder) {
+      this.productionOrderFound = productionSheet.productionOrder;
+    }
+    // ✅ Se existir _id na productionSheet, adicionar o form control _id se não existir
+    if (productionSheet._id) {
+      this.productionSheetForm.addControl('stage', this.formBuilder.control(productionSheet.stage));
+
+      if (!this.productionSheetForm.contains('_id')) {
+        this.productionSheetForm.addControl('_id', this.formBuilder.control(productionSheet._id));
+      } else {
+        this.productionSheetForm.get('_id')?.setValue(productionSheet._id);
+      }
+    }
+  }
+
+  /**
+   * 📋 CARREGAR FICHA PRODUÇÃO - Carrega dados da ficha para edição (FALLBACK)
+   */
+  private async loadProductionSheetData(): Promise<void> {
+    if (!this.productionSheetId) return;
+
+    try {
+      const productionSheet = await lastValueFrom(
+        this.productionSheetsService.getProductionSheetById(this.productionSheetId)
+      );
+
+      if (productionSheet) {
+        this.isEditMode = true;
+        this.populateForm(productionSheet.data);
+      }
+    } catch (error) {
+      console.error('❌ Erro ao carregar ficha de produção:', error);
+    }
   }
 
   private setupFormSubscriptions(): void {
@@ -164,26 +254,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
         } else {
           this.resetProductionOrderSearch();
         }
-      });
-
-    // Monitorar mudanças na máquina para verificar disponibilidade
-    this.productionSheetForm.get('machine')?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.checkMachineAvailability();
-      });
-
-    // Monitorar mudanças nas datas para verificar disponibilidade
-    this.productionSheetForm.get('entryDate')?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.checkMachineAvailability();
-      });
-
-    this.productionSheetForm.get('expectedExitDate')?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.checkMachineAvailability();
       });
   }
 
@@ -245,73 +315,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     this.productionOrderFound = null;
     this.productionOrderNotFound = false;
     this.searchingProductionOrder = false;
-  }
-
-  // ============================================
-  // MANIPULAÇÃO DO FORMULÁRIO
-  // ============================================
-
-  private populateForm(productionSheet: ProductionSheet): void {
-    // Buscar a referência interna da ordem de produção
-    const internalReference = productionSheet.productionOrder?.internalReference ||
-      productionSheet.internalReference || '';
-
-    this.productionSheetForm.patchValue({
-      internalReference: internalReference,
-      machine: productionSheet.machine,
-      entryDate: this.formatDateForInput(productionSheet.entryDate),
-      expectedExitDate: this.formatDateForInput(productionSheet.expectedExitDate),
-      stage: productionSheet.stage,
-      productionNotes: productionSheet.productionNotes || ''
-    });
-
-    // Se tem ordem de produção, definir como encontrada
-    if (productionSheet.productionOrder) {
-      this.productionOrderFound = productionSheet.productionOrder;
-    }
-  }
-
-  private async checkMachineAvailability(): Promise<void> {
-    const machine = this.productionSheetForm.get('machine')?.value;
-    const entryDate = this.productionSheetForm.get('entryDate')?.value;
-    const expectedExitDate = this.productionSheetForm.get('expectedExitDate')?.value;
-
-    // Limpar aviso anterior
-    this.machineConflictWarning = '';
-
-    if (!machine || !entryDate || !expectedExitDate) {
-      return;
-    }
-
-    try {
-      // Buscar fichas existentes na máquina no período
-      const response = await lastValueFrom(
-        this.productionSheetsService.getByMachine(machine)
-      );
-
-      if (response?.success && response.data) {
-        const conflictingSheets = response.data.filter(sheet => {
-          // Pular a própria ficha se estiver editando
-          if (this.isEditMode && sheet._id === this.productionSheetId) {
-            return false;
-          }
-
-          // Verificar sobreposição de datas
-          const sheetEntry = new Date(sheet.entryDate);
-          const sheetExit = new Date(sheet.expectedExitDate);
-          const formEntry = new Date(entryDate);
-          const formExit = new Date(expectedExitDate);
-
-          return (formEntry <= sheetExit && formExit >= sheetEntry);
-        });
-
-        if (conflictingSheets.length > 0) {
-          this.machineConflictWarning = `A Máquina ${machine} já possui ${conflictingSheets.length} ficha(s) agendada(s) no período selecionado.`;
-        }
-      }
-    } catch (error) {
-      console.error('Erro ao verificar disponibilidade da máquina:', error);
-    }
   }
 
   // ============================================
@@ -399,7 +402,12 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     this.closeModal('cancelled');
   }
 
-  async onAdvanceStage(): Promise<void> {
+  async onAdvanceStage(event: Event): Promise<void> {
+    // PREVENIR O SUBMIT DO FORM
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     if (!this.productionSheetId || !this.canAdvanceStage()) {
       return;
     }
@@ -407,23 +415,23 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     this.isSaving = true;
 
     try {
-      const response = await lastValueFrom(
-        this.productionSheetsService.advanceStage(this.productionSheetId)
-      );
+      const currentStage = this.productionSheetForm.value.stage;
 
-      if (response?.success) {
-        // Atualizar o formulário com o novo estágio
-        this.productionSheetForm.patchValue({
-          stage: response.data.stage
-        });
-
-        this.currentProductionSheet = response.data;
-
-        // TODO: Exibir toast de sucesso
-        console.log('Estágio avançado com sucesso:', response.data.stage);
-      } else {
-        throw new Error(response?.message || 'Erro ao avançar estágio');
+      const stageList = Object.keys({
+        'PRINTING': currentStage === 'PRINTING',
+        'CALENDERING': currentStage === 'CALENDERING',
+        'FINISHED': currentStage === 'FINISHED'
+      });
+      const nextStageIndex = stageList.findIndex(s => s === currentStage) + 1;
+      if (nextStageIndex >= stageList.length) {
+        alert('Já está no ultimo status');
+        return;
       }
+      await lastValueFrom(
+        this.productionSheetsService.advanceStage(this.productionSheetId, stageList[nextStageIndex]!)
+      );
+      this.modalService.close('production-sheet-modal', { action: 'stage-updated' });
+
     } catch (error: any) {
       console.error('Erro ao avançar estágio:', error);
       // TODO: Exibir toast de erro
@@ -514,5 +522,9 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     const firstErrorKey = Object.keys(errors)[0];
 
     return fieldErrors[firstErrorKey] || `Campo ${fieldName} inválido`;
+  }
+
+  productionType(productionType: ProductionTypeEnum) {
+    return translateProductionType(productionType);
   }
 }

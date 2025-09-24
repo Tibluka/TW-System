@@ -17,6 +17,7 @@ export class ButtonComponent {
   @Input() rounded: boolean = false;
   @Input() isLoading: boolean = false;
   @Input() disabled: boolean = false;
+  @Input() type: 'button' | 'submit' = 'button';
 
   @Output() onClickEmitter = new EventEmitter();
 

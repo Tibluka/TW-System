@@ -20,6 +20,7 @@ import { ProductionOrderService } from '../../../shared/services/production-orde
 import { FormValidator } from '../../../shared/utils/form';
 import { ProductionOrderModalComponent } from "./production-order-modal/production-order-modal.component";
 import { IconComponent } from "../../../shared/components/atoms/icon/icon.component";
+import { copyToClipboard } from '../../../shared/utils/tools';
 
 @Component({
   selector: 'app-production-orders',
@@ -348,5 +349,9 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
 
   clearFilters() {
 
+  }
+
+  copy(event: MouseEvent, internalReference: string): void {
+    copyToClipboard(internalReference, event);
   }
 }
