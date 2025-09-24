@@ -55,6 +55,8 @@
                 <!-- Referência Interna -->
                 <ds-table-cell align="left">
                     <span class="body primary-dark font-weight-medium">{{ development.internalReference }}</span>
+                    <ds-icon (click)="copy($event, development.internalReference)" class="ml-4" cursorType="pointer"
+                        icon="fa-regular fa-clipboard" fontSize="16px" />
                 </ds-table-cell>
 
                 <!-- Referência Cliente -->
@@ -82,16 +84,12 @@
                 <!-- Tipo Produção -->
                 <ds-table-cell align="left">
                     <div class="production-types">
-                        <span *ngIf="development.productionType?.rotary?.enabled" class="production-badge rotary">
+                        <span *ngIf="development.productionType?.type === 'rotary'" class="production-badge rotary">
                             Rotativa
                         </span>
-                        <span *ngIf="development.productionType?.localized?.enabled" class="production-badge localized">
+                        <span *ngIf="development.productionType?.type === 'localized'"
+                            class="production-badge localized">
                             Localizada
-                        </span>
-                        <span
-                            *ngIf="!development.productionType?.rotary?.enabled && !development.productionType?.localized?.enabled"
-                            class="body label">
-                            -
                         </span>
                     </div>
                 </ds-table-cell>

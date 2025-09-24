@@ -1,28 +1,21 @@
 // pages/authorized/production-orders/production-order-modal/production-order-modal.component.ts
 
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, inject, Input, OnInit, OnDestroy } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, lastValueFrom, Subject, takeUntil } from 'rxjs';
-import { Development, ProductionTypeEnum } from '../../../../models/developments/developments';
-import {
-  CreateProductionOrderRequest,
-  ProductionOrder,
-  UpdateProductionOrderRequest,
-  SizeItem,
-  ProductionTypeWithQuantities,
-  ProductionOrderUtils
-} from '../../../../models/production-orders/production-orders';
+import { Development } from '../../../../models/developments/developments';
+import { CreateProductionOrderRequest, ProductionOrder, UpdateProductionOrderRequest } from '../../../../models/production-orders/production-orders';
 import { ButtonComponent } from '../../../../shared/components/atoms/button/button.component';
+import { IconComponent } from "../../../../shared/components/atoms/icon/icon.component";
 import { InputComponent } from '../../../../shared/components/atoms/input/input.component';
-import { SelectComponent } from '../../../../shared/components/atoms/select/select.component';
 import { SpinnerComponent } from '../../../../shared/components/atoms/spinner/spinner.component';
 import { TextareaComponent } from '../../../../shared/components/atoms/textarea/textarea.component';
 import { DevelopmentService } from '../../../../shared/services/development/development.service';
 import { ModalService } from '../../../../shared/services/modal/modal.service';
 import { ProductionOrderService } from '../../../../shared/services/production-order/production-order.service';
 import { FormValidator } from '../../../../shared/utils/form';
-import { IconComponent } from "../../../../shared/components/atoms/icon/icon.component";
+import { SelectComponent } from "../../../../shared/components/atoms/select/select.component";
 
 interface SelectOption {
   value: string;
@@ -36,15 +29,16 @@ interface SelectOption {
     ReactiveFormsModule,
     ButtonComponent,
     InputComponent,
-    SelectComponent,
     TextareaComponent,
     SpinnerComponent,
-    IconComponent
+    FormsModule,
+    IconComponent,
+    SelectComponent
   ],
   templateUrl: './production-order-modal.component.html',
   styleUrl: './production-order-modal.component.scss'
 })
-export class ProductionOrderModalComponent extends FormValidator implements OnInit, OnDestroy {
+export class ProductionOrderModalComponent extends FormValidator implements OnInit {
 
   @Input() productionOrderId?: string;
 
@@ -69,10 +63,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
   developmentFound: Development | null = null;
   developmentNotFound = false;
 
-  // Controle de exibição de campos baseado no tipo de produção
-  showRotaryFields = false;
-  showLocalizedFields = false;
-
   // Opções para selects
   statusOptions: SelectOption[] = [
     { value: 'CREATED', label: 'Criado' },
@@ -81,6 +71,15 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     { value: 'PILOT_APPROVED', label: 'Piloto Aprovado' },
     { value: 'PRODUCTION_STARTED', label: 'Produção Iniciada' },
     { value: 'FINALIZED', label: 'Finalizado' }
+  ];
+
+  productionTypeOptions: SelectOption[] = [
+    { value: 'rotary', label: 'Rotativa' },
+    { value: 'localized', label: 'Localizada' }
+  ];
+
+  variantOptions: SelectOption[] = [
+    { value: 'COR123', label: 'Cor 1' }
   ];
 
   // Subject para controlar debounce da busca de desenvolvimento
@@ -114,10 +113,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     return this.isEditMode ? 'Atualizar' : 'Criar';
   }
 
-  get sizeInputs(): FormArray {
-    return this.productionOrderForm.get('sizeInputs') as FormArray;
-  }
-
   // ============================================
   // SETUP METHODS
   // ============================================
@@ -128,15 +123,17 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
   private initializeForm(): void {
     this.productionOrderForm = this.formBuilder.group({
       internalReference: ['', [Validators.required]],
+      productionType: this.formBuilder.group({
+        type: ['', [Validators.required]],
+        meters: [null],
+        additionalInfo: this.formBuilder.group({
+          variant: ['']
+          // sizes are managed from developmentFound for now
+        })
+      }),
       fabricType: ['', [Validators.required]],
       observations: [''],
-      status: ['CREATED'],
-
-      // Campos condicionais para rotary
-      rotaryMeters: [0],
-
-      // FormArray para tamanhos (localized)
-      sizeInputs: this.formBuilder.array([])
+      status: ['CREATED']
     });
 
     console.log('📝 Formulário da ordem de produção inicializado');
@@ -171,210 +168,60 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       // Acessar dados do modal ativo
       const activeModal = this.modalService.activeModal();
       if (activeModal?.config.data) {
-        const productionOrder = activeModal.config.data.productionOrder;
-        if (productionOrder) {
-          await this.populateForm(productionOrder);
-          console.log('✅ Dados carregados do modal ativo');
-          return;
-        }
-      }
-
-      // Se tem ID, buscar dados da ordem de produção
-      if (this.productionOrderId) {
-        const response = await lastValueFrom(
-          this.productionOrderService.getProductionOrderById(this.productionOrderId)
-        );
-
-        if (response?.data) {
-          await this.populateForm(response.data);
-          console.log('✅ Dados da ordem de produção carregados via API');
-        }
+        const productionOrder = activeModal.config.data;
+        await this.populateForm(productionOrder);
+      } else if (this.productionOrderId) {
+        // Fallback: Se não há dados no modal, mas há ID, buscar pelos dados
+        await this.loadProductionOrderData();
       }
 
     } catch (error) {
       console.error('❌ Erro ao carregar dados iniciais:', error);
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges();
     }
   }
 
-  // ============================================
-  // DEVELOPMENT SEARCH METHODS
-  // ============================================
-
   /**
    * 🔍 BUSCAR DESENVOLVIMENTO - Busca desenvolvimento por referência interna
-   */
-  onInternalReferenceChange(value: string): void {
-    this.searchDevelopmentSubject.next(value);
-  }
-
-  /**
-   * 🔍 EXECUTAR BUSCA - Executa busca do desenvolvimento
    */
   private async searchDevelopment(internalReference: string): Promise<void> {
     this.searchingDevelopment = true;
     this.developmentNotFound = false;
 
     try {
-      const response = await lastValueFrom(
-        this.developmentService.getDevelopmentByInternalReference(internalReference)
+      // Buscar desenvolvimento pela referência interna
+      const response: Development = await lastValueFrom(
+        this.developmentService.getDevelopmentById(internalReference)
       );
 
-      if (response?.data) {
-        this.developmentFound = response.data;
-        this.developmentNotFound = false;
-
-        // ✅ DETECTAR TIPO DE PRODUÇÃO (nova estrutura)
-        this.detectProductionTypes();
-        this.setupConditionalValidations();
-
-        console.log('✅ Desenvolvimento encontrado:', response.data);
+      if (response) {
+        // Verificar se encontrou exatamente a referência pesquisada
+        this.developmentFound = response;
+        this.productionOrderForm.get('productionType')!.patchValue(response.productionType || {});
       } else {
-        this.resetDevelopmentSearch();
         this.developmentNotFound = true;
+        this.developmentFound = null;
       }
 
     } catch (error) {
-      console.error('❌ Erro na busca de desenvolvimento:', error);
-      this.resetDevelopmentSearch();
       this.developmentNotFound = true;
+      this.developmentFound = null;
     } finally {
       this.searchingDevelopment = false;
+      this.cdr.detectChanges();
     }
   }
 
   /**
-   * 🔄 RESETAR BUSCA - Reseta estado da busca de desenvolvimento
+   * 🔄 RESETAR BUSCA - Limpa estado da busca de desenvolvimento
    */
   private resetDevelopmentSearch(): void {
     this.developmentFound = null;
     this.developmentNotFound = false;
-    this.showRotaryFields = false;
-    this.showLocalizedFields = false;
-    this.clearConditionalValidations();
+    this.searchingDevelopment = false;
   }
-
-  /**
-   * 🔍 DETECTAR TIPOS DE PRODUÇÃO - Detecta tipos habilitados no development
-   */
-  private detectProductionTypes(): void {
-    if (!this.developmentFound?.productionType) return;
-
-    // ✅ NOVA ESTRUTURA: productionType é string simples
-    this.showRotaryFields = this.developmentFound.productionType === 'rotary';
-    this.showLocalizedFields = this.developmentFound.productionType === 'localized';
-
-    console.log('🔍 Tipos detectados:', {
-      productionType: this.developmentFound.productionType,
-      showRotary: this.showRotaryFields,
-      showLocalized: this.showLocalizedFields
-    });
-  }
-
-  /**
-   * ⚙️ CONFIGURAR VALIDAÇÕES CONDICIONAIS
-   */
-  private setupConditionalValidations(): void {
-    if (this.showRotaryFields) {
-      this.productionOrderForm.get('rotaryMeters')?.setValidators([Validators.required, Validators.min(0.1)]);
-    } else {
-      this.productionOrderForm.get('rotaryMeters')?.clearValidators();
-    }
-
-    if (this.showLocalizedFields) {
-      // Validação customizada: pelo menos um tamanho deve ser > 0
-      this.productionOrderForm.setValidators([this.atLeastOneSizeValidator]);
-      // Adicionar pelo menos um campo de tamanho se não existe
-      if (this.sizeInputs.length === 0) {
-        this.addSizeInput();
-      }
-    } else {
-      this.productionOrderForm.clearValidators();
-      // Limpar array de tamanhos
-      while (this.sizeInputs.length !== 0) {
-        this.sizeInputs.removeAt(0);
-      }
-    }
-
-    this.productionOrderForm.updateValueAndValidity();
-  }
-
-  /**
-   * 🧹 LIMPAR VALIDAÇÕES CONDICIONAIS
-   */
-  private clearConditionalValidations(): void {
-    this.productionOrderForm.get('rotaryMeters')?.clearValidators();
-    this.productionOrderForm.clearValidators();
-    // Limpar array de tamanhos
-    while (this.sizeInputs.length !== 0) {
-      this.sizeInputs.removeAt(0);
-    }
-    this.productionOrderForm.updateValueAndValidity();
-  }
-
-  /**
-   * ✅ VALIDADOR CUSTOMIZADO - Pelo menos um tamanho deve ter quantidade
-   */
-  private atLeastOneSizeValidator = (form: AbstractControl): ValidationErrors | null => {
-    if (!this.showLocalizedFields) return null;
-
-    const sizeInputs = form.get('sizeInputs') as FormArray;
-    if (!sizeInputs || sizeInputs.length === 0) {
-      return { atLeastOneSize: true };
-    }
-
-    const hasValidSize = sizeInputs.controls.some(control => {
-      const size = control.get('size')?.value?.trim();
-      const value = control.get('value')?.value;
-      return size && value && value > 0;
-    });
-
-    return hasValidSize ? null : { atLeastOneSize: true };
-  };
-
-  // ============================================
-  // SIZE MANAGEMENT METHODS (LOCALIZED)
-  // ============================================
-
-  /**
-   * ➕ ADICIONAR CAMPO DE TAMANHO
-   */
-  addSizeInput(): void {
-    const sizeGroup = this.formBuilder.group({
-      size: ['', [Validators.required, Validators.maxLength(10)]],
-      value: [0, [Validators.required, Validators.min(1)]]
-    });
-
-    this.sizeInputs.push(sizeGroup);
-    console.log('➕ Campo de tamanho adicionado. Total:', this.sizeInputs.length);
-  }
-
-  /**
-   * ➖ REMOVER CAMPO DE TAMANHO
-   */
-  removeSizeInput(index: number): void {
-    if (this.sizeInputs.length > 1) {
-      this.sizeInputs.removeAt(index);
-      console.log('➖ Campo de tamanho removido. Total:', this.sizeInputs.length);
-    }
-  }
-
-  /**
-   * 📊 OBTER TAMANHOS DO FORMULÁRIO
-   */
-  private getSizesFromForm(): SizeItem[] {
-    return this.sizeInputs.controls
-      .map(control => ({
-        size: control.get('size')?.value?.trim() || '',
-        value: Number(control.get('value')?.value) || 0
-      }))
-      .filter(item => item.size && item.value > 0);
-  }
-
-  // ============================================
-  // FORM POPULATION METHODS
-  // ============================================
 
   /**
    * 📋 POPULAR FORMULÁRIO - Preenche dados da ordem de produção para edição
@@ -383,42 +230,16 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     // Se tem desenvolvimento vinculado, carregar e exibir
     if (productionOrder.development) {
       this.developmentFound = productionOrder.development;
-      this.detectProductionTypes();
-      this.setupConditionalValidations();
+      this.developmentFound.productionType = productionOrder.productionType;
     }
 
-    // Preencher campos básicos
     this.productionOrderForm.patchValue({
-      internalReference: productionOrder.development?.internalReference || '',
+      internalReference: productionOrder?.internalReference || '',
+      productionType: productionOrder.productionType || {},
       fabricType: productionOrder.fabricType || '',
       observations: productionOrder.observations || '',
-      status: productionOrder.status || 'CREATED'
+      status: productionOrder.status || 'CREATED',
     });
-
-    // ✅ PREENCHER DADOS DE PRODUÇÃO (nova estrutura)
-    if (productionOrder.productionType) {
-      if (productionOrder.productionType.type === 'rotary' && productionOrder.productionType.meters) {
-        this.productionOrderForm.patchValue({
-          rotaryMeters: productionOrder.productionType.meters
-        });
-      }
-
-      if (productionOrder.productionType.type === 'localized' && productionOrder.productionType.sizes) {
-        // Limpar array existente
-        while (this.sizeInputs.length !== 0) {
-          this.sizeInputs.removeAt(0);
-        }
-
-        // Adicionar tamanhos existentes
-        productionOrder.productionType.sizes.forEach(sizeItem => {
-          const sizeGroup = this.formBuilder.group({
-            size: [sizeItem.size, [Validators.required, Validators.maxLength(10)]],
-            value: [sizeItem.value, [Validators.required, Validators.min(1)]]
-          });
-          this.sizeInputs.push(sizeGroup);
-        });
-      }
-    }
 
     // Se existir _id na ordem de produção, adiciona o form control _id
     if (productionOrder._id) {
@@ -429,24 +250,88 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       }
     }
 
-    console.log('✅ Dados da ordem de produção carregados para edição:', productionOrder);
+  }
+
+  /**
+   * 📋 CARREGAR ORDEM DE PRODUÇÃO - Carrega dados da ordem para edição (FALLBACK)
+   */
+  private async loadProductionOrderData(): Promise<void> {
+    if (!this.productionOrderId) return;
+
+    try {
+      const response = await lastValueFrom(this.productionOrderService.getProductionOrderById(this.productionOrderId));
+
+      if (response?.data) {
+        await this.populateForm(response.data);
+      }
+    } catch (error) {
+      console.error('❌ Erro ao carregar dados da ordem de produção:', error);
+    }
   }
 
   // ============================================
-  // FORM ACTIONS
+  // MÉTODOS DE EVENTOS
   // ============================================
 
   /**
-   * 💾 SALVAR - Processa envio do formulário
+   * 🔍 BUSCA DE DESENVOLVIMENTO - Evento quando usuário digita referência
+   */
+  onInternalReferenceChange(): void {
+    const internalReference = this.productionOrderForm.get('internalReference')?.value;
+    if (internalReference) {
+      this.searchDevelopmentSubject.next(internalReference);
+    } else {
+      this.resetDevelopmentSearch();
+    }
+  }
+
+  // ============================================
+  // MÉTODOS DE AÇÃO
+  // ============================================
+
+  validate() {
+    const productionTypeControl = this.productionOrderForm.get('productionType');
+    const productionTypeValue = productionTypeControl?.value;
+
+    if (productionTypeValue?.type === 'rotary') {
+      // meters is required
+      const metersControl = productionTypeControl?.get('meters');
+      if (!metersControl || metersControl.value === null || metersControl.value === undefined || metersControl.value === '') {
+        metersControl?.setErrors({ required: true });
+        return false;
+      } else {
+        metersControl.setErrors(null);
+      }
+    }
+
+    if (productionTypeValue?.type === 'localized') {
+      // additionalInfo is required
+      const additionalInfoControl = productionTypeControl?.get('additionalInfo');
+      if (!additionalInfoControl || !additionalInfoControl.value) {
+        additionalInfoControl?.setErrors({ required: true });
+        return false;
+      } else {
+        additionalInfoControl.setErrors(null);
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * 💾 SALVAR - Cria ou atualiza ordem de produção
    */
   async onSave(): Promise<void> {
-    if (this.productionOrderForm.invalid || this.isSaving) {
-      this.markAllFieldsAsTouched();
-      console.warn('⚠️ Formulário inválido - validação falhou');
+    this.validate();
+    this.productionOrderForm.markAllAsTouched();
+    console.log(this.productionOrderForm);
+
+    if (this.productionOrderForm.invalid) {
+
       return;
     }
 
-    // Verificar se desenvolvimento foi encontrado (para criação)
+    // Verificar se desenvolvimento foi encontrado
     if (!this.developmentFound && !this.isEditMode) {
       alert('É necessário selecionar um desenvolvimento válido.');
       return;
@@ -462,8 +347,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
         const updateData: UpdateProductionOrderRequest = {
           fabricType: formData.fabricType,
           observations: formData.observations,
-          status: formData.status,
-          productionType: this.buildProductionTypeData(formData)
+          status: formData.status
         };
 
         const response = await lastValueFrom(
@@ -479,7 +363,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
           developmentId: this.developmentFound!._id!,
           fabricType: formData.fabricType,
           observations: formData.observations,
-          productionType: this.buildProductionTypeData(formData)
+          productionType: formData.productionType
         };
 
         const response = await lastValueFrom(
@@ -499,17 +383,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     } finally {
       this.isSaving = false;
     }
-  }
-
-  /**
-   * 🏗️ CONSTRUIR DADOS DE PRODUCTION TYPE
-   */
-  private buildProductionTypeData(formData: any): ProductionTypeWithQuantities {
-    return {
-      type: this.developmentFound!.productionType,
-      meters: this.showRotaryFields ? formData.rotaryMeters : undefined,
-      sizes: this.showLocalizedFields ? this.getSizesFromForm() : undefined
-    };
   }
 
   /**
@@ -542,71 +415,21 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     }
 
     if (field?.errors?.['min']) {
-      const minValue = field.errors['min'].min;
-      return `Valor mínimo: ${minValue}`;
+      return 'Valor deve ser maior que 0';
     }
 
-    if (field?.errors?.['max']) {
-      const maxValue = field.errors['max'].max;
-      return `Valor máximo: ${maxValue}`;
-    }
-
-    if (field?.errors?.['maxlength']) {
-      const maxLength = field.errors['maxlength'].requiredLength;
-      return `Máximo ${maxLength} caracteres`;
-    }
-
-    return 'Campo inválido';
-  }
-
-  /**
-   * 📝 MENSAGEM DE ERRO GERAL - Para validações de formulário
-   */
-  getFormErrorMessage(): string {
-    if (this.productionOrderForm.errors?.['atLeastOneSize']) {
-      return 'Pelo menos um tamanho deve ter quantidade maior que 0';
-    }
     return '';
   }
 
   /**
-   * 🔍 TEM ERRO GERAL - Verifica se há erros de formulário
+   * 💰 FORMATAR MOEDA - Formata valor monetário
    */
-  hasFormError(): boolean {
-    return !!(this.productionOrderForm.errors && this.productionOrderForm.touched);
+  formatCurrency(value: number): string {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
   }
-
-  /**
-   * 📊 CALCULAR TOTAL DE PEÇAS - Para produção localizada
-   */
-  getTotalPieces(): number {
-    if (!this.showLocalizedFields) return 0;
-
-    return this.sizeInputs.controls.reduce((total, control) => {
-      const value = Number(control.get('value')?.value) || 0;
-      return total + value;
-    }, 0);
-  }
-
-  /**
-   * 📋 MARCAR TODOS COMO TOUCHED - Para exibir erros de validação
-   */
-  private markAllFieldsAsTouched(): void {
-    Object.keys(this.productionOrderForm.controls).forEach(key => {
-      this.productionOrderForm.get(key)?.markAsTouched();
-    });
-
-    // Marcar campos do FormArray também
-    this.sizeInputs.controls.forEach(control => {
-      Object.keys(control.value).forEach(key => {
-        control.get(key)?.markAsTouched();
-      });
-    });
-  }
-
-  // ============================================
-  // UTILITY METHODS
-  // ============================================
 
   /**
    * 📅 FORMATAR DATA - Formata data para exibição
@@ -616,10 +439,19 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     return new Date(date).toLocaleDateString('pt-BR');
   }
 
+
+  // Adicione este método no seu componente
+
   /**
-   * 🏷️ OBTER LABEL DO TIPO DE PRODUÇÃO
+   * 📊 CALCULAR TOTAL DE PEÇAS - Soma todos os valores dos tamanhos
    */
-  getProductionTypeLabel(type: ProductionTypeEnum): string {
-    return type === 'rotary' ? 'Rotativa' : 'Localizada';
+  getTotalPieces(): number {
+    if (!this.developmentFound?.productionType?.additionalInfo?.sizes) {
+      return 0;
+    }
+
+    return this.developmentFound.productionType.additionalInfo?.sizes.reduce((total, sizeItem) => {
+      return total + (sizeItem.value || 0);
+    }, 0);
   }
 }

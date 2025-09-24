@@ -6,47 +6,6 @@
 @use 'base/typography' as *;
 
 // ========================================
-// CONTAINER PRINCIPAL COM ALTURA FIXA
-// ========================================
-.production-order-modal-container {
-    height: 80vh; // Altura fixa para forçar scroll
-    max-height: 700px;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
-// ========================================
-// WRAPPER DE CONTEÚDO COM SCROLL
-// ========================================
-.modal-content-wrapper {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 0 $spacing-md; // 16px lateral
-    padding-bottom: 100px; // Espaço para botões fixos
-
-    // Scroll customizado
-    &::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: var(--background-secondary);
-        border-radius: 3px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: var(--stroke);
-        border-radius: 3px;
-
-        &:hover {
-            background: var(--label);
-        }
-    }
-}
-
-// ========================================
 // CONTAINER DE LOADING
 // ========================================
 .loading-container {
@@ -279,7 +238,6 @@
 // AÇÕES FIXAS NO RODAPÉ
 // ========================================
 .form-actions {
-    padding: $spacing-lg $spacing-md; // 24px 16px
     display: flex;
     gap: $spacing-sm; // 8px
     justify-content: flex-end;
@@ -309,4 +267,52 @@
     .form-actions-fixed {
         padding: $spacing-md $spacing-sm; // 16px 8px
     }
+}
+
+/* Adicione este CSS ao seu arquivo de estilos */
+
+.localized-production-section {
+    margin-top: 24px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.section-title {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+.production-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    overflow: hidden;
+}
+
+.production-table th,
+.production-table td {
+    padding: 12px 16px;
+    text-align: center;
+    border: 1px solid var(--stroke);
+}
+
+.production-table th {
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+
+.production-table td {
+    font-size: 16px;
+    font-weight: 500;
 }

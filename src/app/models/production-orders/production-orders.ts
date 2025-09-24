@@ -1,6 +1,6 @@
 // models/production-orders/production-orders.ts
 
-import { Development } from '../developments/developments';
+import { Development, ProductionType, ProductionTypeEnum } from '../developments/developments';
 
 // ============================================
 // TYPES E ENUMS
@@ -14,7 +14,8 @@ export type ProductionOrderStatus =
     | 'PRODUCTION_STARTED'
     | 'FINALIZED';
 
-export type ProductionTypeEnum = 'rotary' | 'localized';
+// Reexportar para compatibilidade
+export type { ProductionTypeEnum } from '../developments/developments';
 
 // ============================================
 // INTERFACES DE PRODUCTION TYPE
@@ -25,10 +26,10 @@ export interface SizeItem {
     value: number;
 }
 
-export interface ProductionTypeWithQuantities {
-    type: ProductionTypeEnum;
-    meters?: number;
-    sizes?: SizeItem[];
+// ✅ ATUALIZADA - Agora usa a nova estrutura ProductionType
+export interface ProductionTypeWithQuantities extends ProductionType {
+    // Herda toda a estrutura de ProductionType
+    // Não precisa redefinir nada, apenas usar a estrutura existente
 }
 
 // ============================================
@@ -50,7 +51,7 @@ export interface ProductionOrder {
 
     // DADOS ESPECÍFICOS DA PRODUÇÃO
     fabricType: string;
-    productionType: ProductionTypeWithQuantities;
+    productionType: ProductionType; // ✅ MUDANÇA: Usa ProductionType diretamente
     observations?: string;
 
     // METADADOS
@@ -66,7 +67,7 @@ export interface ProductionOrder {
 export interface CreateProductionOrderRequest {
     developmentId: string;
     fabricType: string;
-    productionType: ProductionTypeWithQuantities;
+    productionType: ProductionType; // ✅ MUDANÇA: Usa ProductionType
     observations?: string;
 }
 
@@ -152,91 +153,18 @@ export class ProductionOrderUtils {
         return labels[type] || type;
     }
 
-    static getTotalQuantity(productionType: ProductionTypeWithQuantities): string {
+    // ✅ ATUALIZADA - Trabalha com nova estrutura
+    static getTotalQuantity(productionType: ProductionType): string {
         if (productionType.type === 'rotary' && productionType.meters) {
             return `${productionType.meters}m`;
         }
 
-        if (productionType.type === 'localized' && productionType.sizes) {
-            const total = productionType.sizes.reduce((sum, item) => sum + item.value, 0);
-            return `${total} peças`;
+        if (productionType.type === 'localized' && productionType.additionalInfo?.sizes) {
+            const total = productionType.additionalInfo.sizes.reduce((sum, item) => sum + item.value, 0);
+            return `${total} pç${total !== 1 ? 's' : ''}`;
         }
 
         return '0';
-    }
-
-    static getQuantityBreakdown(productionType: ProductionTypeWithQuantities): string {
-        if (productionType.type === 'rotary' && productionType.meters) {
-            return `${productionType.meters} metros`;
-        }
-
-        if (productionType.type === 'localized' && productionType.sizes) {
-            const totalPieces = productionType.sizes.reduce((sum, item) => sum + item.value, 0);
-            const breakdown = productionType.sizes.map(item => `${item.size}: ${item.value}`).join(', ');
-            return `${totalPieces} peças (${breakdown})`;
-        }
-
-        return 'Não definido';
-    }
-
-    static getSizesBreakdown(sizes: SizeItem[]): string {
-        if (!sizes || sizes.length === 0) return 'Nenhum tamanho definido';
-        return sizes.map(item => `${item.size}: ${item.value}`).join(', ');
-    }
-
-    static validateProductionType(productionType: ProductionTypeWithQuantities): { valid: boolean; errors: string[] } {
-        const errors: string[] = [];
-
-        if (!productionType.type) {
-            errors.push('Tipo de produção é obrigatório');
-            return { valid: false, errors };
-        }
-
-        if (productionType.type === 'rotary') {
-            if (!productionType.meters || productionType.meters < 0.1) {
-                errors.push('Quantidade de metros deve ser pelo menos 0.1 para produção rotativa');
-            }
-        }
-
-        if (productionType.type === 'localized') {
-            if (!productionType.sizes || productionType.sizes.length === 0) {
-                errors.push('Pelo menos um tamanho é obrigatório para produção localizada');
-            } else {
-                for (let i = 0; i < productionType.sizes.length; i++) {
-                    const sizeItem = productionType.sizes[i];
-                    if (!sizeItem.size?.trim()) {
-                        errors.push(`Nome do tamanho é obrigatório na posição ${i + 1}`);
-                    }
-                    if (!sizeItem.value || sizeItem.value < 1) {
-                        errors.push(`Quantidade deve ser pelo menos 1 para "${sizeItem.size}"`);
-                    }
-                }
-
-                const sizeNames = productionType.sizes.map(s => s.size.trim().toUpperCase());
-                const uniqueNames = [...new Set(sizeNames)];
-                if (sizeNames.length !== uniqueNames.length) {
-                    errors.push('Nomes dos tamanhos devem ser únicos');
-                }
-            }
-        }
-
-        return {
-            valid: errors.length === 0,
-            errors
-        };
-    }
-
-    static canEdit(status: ProductionOrderStatus): boolean {
-        return ['CREATED', 'PILOT_PRODUCTION'].includes(status);
-    }
-
-    static isFinalized(status: ProductionOrderStatus): boolean {
-        return status === 'FINALIZED';
-    }
-
-    static formatDate(date: Date | string | undefined): string {
-        if (!date) return '-';
-        return new Date(date).toLocaleDateString('pt-BR');
     }
 
     static getStatusBadge(status: ProductionOrderStatus): { label: string; class: string; color: string } {
@@ -268,31 +196,50 @@ export class ProductionOrderUtils {
 
 export class ProductionOrderFormUtils {
 
+    // ✅ ATUALIZADA - Trabalha com nova estrutura
     static initializeFromDevelopment(development: Development): Partial<CreateProductionOrderRequest> {
         return {
             developmentId: development._id!,
             productionType: {
-                type: development.productionType,
-                meters: development.productionType === 'rotary' ? 0 : undefined,
-                sizes: development.productionType === 'localized' ? [] : undefined
+                type: development.productionType.type,
+                meters: development.productionType.type === 'rotary' ? development.productionType.meters || 0 : undefined,
+                additionalInfo: development.productionType.type === 'localized' ? {
+                    variant: development.productionType.additionalInfo?.variant || '',
+                    sizes: development.productionType.additionalInfo?.sizes || []
+                } : undefined
             }
         };
     }
 
+    // ✅ NOVA FUNÇÃO - Constrói ProductionType a partir de dados do form
     static buildProductionTypeFromForm(
         type: ProductionTypeEnum,
         meters?: number,
+        variant?: string,
         sizes?: SizeItem[]
-    ): ProductionTypeWithQuantities {
-        return {
-            type,
-            meters: type === 'rotary' ? meters : undefined,
-            sizes: type === 'localized' ? sizes || [] : undefined
-        };
+    ): ProductionType {
+        const productionType: ProductionType = { type };
+
+        if (type === 'rotary') {
+            productionType.meters = meters;
+        }
+
+        if (type === 'localized') {
+            productionType.additionalInfo = {
+                variant: variant || '',
+                sizes: sizes || []
+            };
+        }
+
+        return productionType;
     }
 
-    static calculateTotalPieces(sizes: SizeItem[]): number {
-        return sizes.reduce((sum, item) => sum + (item.value || 0), 0);
+    // ✅ ATUALIZADA - Trabalha com nova estrutura
+    static calculateTotalPieces(productionType: ProductionType): number {
+        if (productionType.type === 'localized' && productionType.additionalInfo?.sizes) {
+            return productionType.additionalInfo.sizes.reduce((sum, item) => sum + (item.value || 0), 0);
+        }
+        return 0;
     }
 
     static createEmptySize(): SizeItem {
@@ -308,5 +255,20 @@ export class ProductionOrderFormUtils {
             index !== currentIndex &&
             item.size.trim().toUpperCase() === newSize.trim().toUpperCase()
         );
+    }
+
+    // ✅ NOVA FUNÇÃO - Extrai variant do productionType
+    static getVariant(productionType: ProductionType): string {
+        return productionType.additionalInfo?.variant || '';
+    }
+
+    // ✅ NOVA FUNÇÃO - Extrai sizes do productionType
+    static getSizes(productionType: ProductionType): SizeItem[] {
+        return productionType.additionalInfo?.sizes || [];
+    }
+
+    // ✅ NOVA FUNÇÃO - Verifica se tem informações adicionais
+    static hasAdditionalInfo(productionType: ProductionType): boolean {
+        return !!productionType.additionalInfo;
     }
 }

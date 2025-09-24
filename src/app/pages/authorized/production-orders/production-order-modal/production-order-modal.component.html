@@ -51,13 +51,9 @@
                             <div class="development-details">
                                 <h1 class="title-modal mb-6 secondary">{{developmentFound.internalReference}}</h1>
                                 <p class="subtitle-section secondary mb-0">{{developmentFound.client?.companyName}}</p>
-                                <p class="card-small secondary mb-12">{{developmentFound.clientReference}}</p>
+                                <p class="card-small secondary mb-4">{{developmentFound.clientReference}}</p>
                                 <hr>
-                                <h2 class="mt-12 subtitle-section secondary mb-0">Tipo de produção</h2>
-                                <p class="card-small secondary"
-                                    *ngIf="developmentFound.productionType.localized.enabled">Localizado</p>
-                                <p class="card-small secondary" *ngIf="developmentFound.productionType.rotary.enabled">
-                                    Rotativo</p>
+                                <p class="body secondary mt-4 mb-0">{{developmentFound.productionType.type}}</p>
                             </div>
                         </div>
                     </div>
@@ -68,25 +64,15 @@
             <!-- SEÇÃO: INFORMAÇÕES DA PRODUÇÃO -->
             <!-- ============================================ -->
             <div class="form-section mb-32" *ngIf="developmentFound || isEditMode">
-                <h3 class="section-title mb-24">Informações da Produção</h3>
-
                 <!-- Linha: Tipo de Produção, Quantidade, Tipo de Tecido -->
-                <div class="form-row three-columns mb-24">
-
-                    <!-- 🏭 TIPO DE PRODUÇÃO -->
-                    <div class="form-field">
-                        <ds-select label="Tipo de Produção" formControlName="productionType"
-                            [options]="productionTypeOptions" [invalid]="isFieldInvalid('productionType')"
-                            [errorMessage]="getFieldErrorMessage('productionType')" [fullWidth]="true"
-                            [required]="true">
-                        </ds-select>
-                    </div>
-
-                    <!-- 📏 QUANTIDADE DE METROS -->
-                    <div class="form-field">
+                <div class="d-grid columns-3 mb-24 gap-24">
+                    <div class="form-field" [formGroupName]="'productionType'"
+                        *ngIf="developmentFound?.productionType?.type === 'rotary'">
+                        <!-- 📏 QUANTIDADE DE METROS -->
                         <ds-input label="Quantidade (metros)" placeholder="Ex: 100.5" type="number" step="0.1" min="0.1"
-                            formControlName="quantity" [invalid]="isFieldInvalid('quantity')"
-                            [errorMessage]="getFieldErrorMessage('quantity')" [fullWidth]="true" [required]="true">
+                            formControlName="meters" [invalid]="isFieldInvalid('productionType.meters')"
+                            [errorMessage]="getFieldErrorMessage('productionType.meters')" [fullWidth]="true"
+                            [required]="true">
                         </ds-input>
                     </div>
 
@@ -98,14 +84,62 @@
                         </ds-input>
                     </div>
                 </div>
+
+                <!-- Tabela para tipo de produção localizada -->
+                <div *ngIf="developmentFound?.productionType?.type === 'localized'">
+                    <div class="table-container"
+                        *ngIf="developmentFound?.productionType?.additionalInfo?.sizes && developmentFound?.productionType?.additionalInfo?.sizes!.length > 0; else noSizes">
+                        <table class="production-table">
+                            <!-- Cabeçalho com os tamanhos -->
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Variante
+                                        <ds-icon icon="fa-solid fa-circle-plus" cursorType="pointer" color="tertiary"
+                                            fontSize="16px" />
+                                    </th>
+                                    <th class="size-header"
+                                        *ngFor="let sizeItem of developmentFound?.productionType?.additionalInfo?.sizes">
+                                        {{ sizeItem.size }}
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <!-- Corpo com os valores -->
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <ds-select placeholder="Selecione uma variante" formControlName="variant"
+                                            [options]="variantOptions" [required]="true"
+                                            [errorMessage]="getFieldErrorMessage('variant')"
+                                            [invalid]="isFormControlInvalid(productionOrderForm.get('variant'))"
+                                            width="100%" />
+                                    </td>
+                                    <td class="size-value"
+                                        *ngFor="let sizeItem of developmentFound?.productionType?.additionalInfo?.sizes">
+                                        <ds-input [(ngModel)]="sizeItem.value"
+                                            [ngModelOptions]="{standalone: true}"></ds-input>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Estado vazio -->
+                    <ng-template #noSizes>
+                        <div class="empty-state">
+                            <i class="fa-solid fa-table"></i>
+                            <p>Nenhum tamanho definido para este desenvolvimento</p>
+                        </div>
+                    </ng-template>
+                </div>
+
             </div>
 
             <!-- ============================================ -->
             <!-- SEÇÃO: OBSERVAÇÕES -->
             <!-- ============================================ -->
             <div class="form-section mb-32" *ngIf="developmentFound || isEditMode">
-                <h3 class="section-title mb-24">Observações</h3>
-
                 <div class="form-row mb-24">
                     <!-- 📝 OBSERVAÇÕES -->
                     <div class="form-field full-width">

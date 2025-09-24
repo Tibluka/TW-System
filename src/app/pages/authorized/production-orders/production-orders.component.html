@@ -34,7 +34,6 @@
                 <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="left">Tipo de Produção</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="left">Tecido</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="center">Metros</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
             </ds-table-row>
 
@@ -87,30 +86,19 @@
 
                 <!-- Tipo de Produção -->
                 <ds-table-cell align="left">
-                    <span class="body primary-dark"
-                        *ngIf="productionOrder.development?.productionType?.rotary?.enabled">
+                    <span class="body primary-dark" *ngIf="productionOrder.productionType.type === 'rotary'">
                         Rotativo
                     </span>
-                    <span class="body primary-dark"
-                        *ngIf="productionOrder.development?.productionType?.localized?.enabled">
+                    <span class="body primary-dark" *ngIf="productionOrder.productionType.type === 'localized'">
                         Localizado
                     </span>
-                    <span class="body label"
-                        *ngIf="!productionOrder.development?.productionType?.rotary?.enabled && !productionOrder.development?.productionType?.localized?.enabled">
-                        Não definido
-                    </span>
+                    <p class="body label" *ngIf="productionOrder.productionType.type === 'rotary'">
+                        {{productionOrder.productionType.meters}}m</p>
                 </ds-table-cell>
 
                 <!-- Tecido -->
                 <ds-table-cell align="left">
                     <span class="body primary-dark">{{ productionOrder.fabricType || '-' }}</span>
-                </ds-table-cell>
-
-                <!-- Metros -->
-                <ds-table-cell align="center">
-                    <span class="body primary-dark">
-                        m
-                    </span>
                 </ds-table-cell>
 
                 <!-- Status -->
