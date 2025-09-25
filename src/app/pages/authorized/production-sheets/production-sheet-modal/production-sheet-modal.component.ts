@@ -354,7 +354,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     this.productionSheetForm.markAllAsTouched();
 
     if (this.productionSheetForm.invalid) {
-      console.log('Formulário inválido:', this.productionSheetForm.errors);
       return;
     }
 
@@ -420,6 +419,8 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       } else if (error?.message) {
         errorMessage = error.message;
       }
+
+      alert(error.message)
 
       console.error('Mensagem de erro:', errorMessage);
     } finally {

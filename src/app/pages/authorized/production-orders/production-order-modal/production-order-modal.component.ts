@@ -32,8 +32,7 @@ interface SelectOption {
     TextareaComponent,
     SpinnerComponent,
     FormsModule,
-    IconComponent,
-    SelectComponent
+    IconComponent
   ],
   templateUrl: './production-order-modal.component.html',
   styleUrl: './production-order-modal.component.scss'
@@ -133,7 +132,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       }),
       fabricType: ['', [Validators.required]],
       observations: [''],
-      status: ['CREATED']
+      status: ['']
     });
 
     console.log('📝 Formulário da ordem de produção inicializado');
@@ -170,9 +169,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       if (activeModal?.config.data) {
         const productionOrder = activeModal.config.data;
         await this.populateForm(productionOrder);
-      } else if (this.productionOrderId) {
-        // Fallback: Se não há dados no modal, mas há ID, buscar pelos dados
-        await this.loadProductionOrderData();
       }
 
     } catch (error) {
@@ -230,7 +226,9 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     // Se tem desenvolvimento vinculado, carregar e exibir
     if (productionOrder.development) {
       this.developmentFound = productionOrder.development;
-      this.developmentFound.productionType = productionOrder.productionType;
+      if (productionOrder.productionType.additionalInfo && productionOrder.productionType.additionalInfo.sizes) {
+        this.developmentFound.productionType = productionOrder.productionType;
+      }
     }
 
     this.productionOrderForm.patchValue({
@@ -238,7 +236,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       productionType: productionOrder.productionType || {},
       fabricType: productionOrder.fabricType || '',
       observations: productionOrder.observations || '',
-      status: productionOrder.status || 'CREATED',
+      status: productionOrder.status
     });
 
     // Se existir _id na ordem de produção, adiciona o form control _id
@@ -248,25 +246,9 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       } else {
         this.productionOrderForm.get('_id')?.setValue(productionOrder._id);
       }
+      this.productionOrderForm.get('status')?.setValue(productionOrder.status);
     }
 
-  }
-
-  /**
-   * 📋 CARREGAR ORDEM DE PRODUÇÃO - Carrega dados da ordem para edição (FALLBACK)
-   */
-  private async loadProductionOrderData(): Promise<void> {
-    if (!this.productionOrderId) return;
-
-    try {
-      const response = await lastValueFrom(this.productionOrderService.getProductionOrderById(this.productionOrderId));
-
-      if (response?.data) {
-        await this.populateForm(response.data);
-      }
-    } catch (error) {
-      console.error('❌ Erro ao carregar dados da ordem de produção:', error);
-    }
   }
 
   // ============================================
@@ -347,6 +329,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
         const updateData: UpdateProductionOrderRequest = {
           fabricType: formData.fabricType,
           observations: formData.observations,
+          productionType: this.developmentFound!.productionType,
           status: formData.status
         };
 
@@ -363,7 +346,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
           developmentId: this.developmentFound!._id!,
           fabricType: formData.fabricType,
           observations: formData.observations,
-          productionType: formData.productionType
+          productionType: this.developmentFound!.productionType
         };
 
         const response = await lastValueFrom(

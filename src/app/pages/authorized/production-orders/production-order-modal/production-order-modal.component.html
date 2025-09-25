@@ -109,11 +109,9 @@
                             <tbody>
                                 <tr>
                                     <td>
-                                        <ds-select placeholder="Selecione uma variante" formControlName="variant"
-                                            [options]="variantOptions" [required]="true"
-                                            [errorMessage]="getFieldErrorMessage('variant')"
-                                            [invalid]="isFormControlInvalid(productionOrderForm.get('variant'))"
-                                            width="100%" />
+                                        <ds-input
+                                            [(ngModel)]="developmentFound!.productionType!.additionalInfo!.variant"
+                                            [ngModelOptions]="{standalone: true}"></ds-input>
                                     </td>
                                     <td class="size-value"
                                         *ngFor="let sizeItem of developmentFound?.productionType?.additionalInfo?.sizes">

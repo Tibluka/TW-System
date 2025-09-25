@@ -58,6 +58,14 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
     { value: 'localized', label: 'Localizado' }
   ];
 
+  statusOptions: SelectOption[] = [
+    { value: 'CREATED', label: 'Criado' },
+    { value: 'AWAITING_APPROVAL', label: 'Aguardando Aprovação' },
+    { value: 'APPROVED', label: 'Aprovado' },
+    { value: 'CANCELED', label: 'Cancelado' }
+  ];
+
+
   // Controle de upload de imagem
   uploadedFiles: UploadedFile[] = [];
   existingFile: PieceImage | undefined = undefined;
@@ -196,7 +204,9 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
     if (development._id) {
       if (!this.developmentForm.contains('_id')) {
         this.developmentForm.addControl('_id', this.formBuilder.control(development._id));
+        this.developmentForm.addControl('status', this.formBuilder.control(development.status));
       } else {
+        this.developmentForm.get('status')?.setValue(development.status);
         this.developmentForm.get('_id')?.setValue(development._id);
       }
     }
@@ -282,13 +292,16 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
       const formData = this.developmentForm.value;
 
       let result: any;
+      debugger
+      console.log(formData);
 
       if (this.isEditMode && this.developmentForm.value._id) {
         const updateData: UpdateDevelopmentRequest = {
           clientId: formData.clientId,
           description: formData.description,
           clientReference: formData.clientReference,
-          productionType: formData.productionType
+          productionType: formData.productionType,
+          status: formData.status
         };
 
         result = await lastValueFrom(this.developmentService.updateDevelopment(this.developmentForm.value._id, updateData));

@@ -49,6 +49,13 @@
                         [errorMessage]="getFieldError('clientReference')"
                         [invalid]="isFormControlInvalid(developmentForm.get('clientReference'))" width="100%" />
                 </div>
+
+                <!-- Estágio (apenas no modo edição) -->
+                <div class="field-group" *ngIf="isEditMode">
+                    <ds-select label="Estágio da Produção" placeholder="Selecione o estágio" formControlName="status"
+                        [options]="statusOptions" [errorMessage]="getFieldError('stage')" placement="top"
+                        [invalid]="isFormControlInvalid(developmentForm.get('status'))" width="100%" />
+                </div>
             </div>
         </div>
 
