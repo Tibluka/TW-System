@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, forwardRef, OnDestroy, EventEmitter, Output } from '@angular/core';
+import { Component, Input, OnInit, forwardRef, OnDestroy, EventEmitter, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/forms';
 import { IconComponent } from '../icon/icon.component';
 
@@ -24,7 +24,7 @@ export interface SelectOption {
     }
   ]
 })
-export class SelectComponent implements OnInit, OnDestroy, ControlValueAccessor {
+export class SelectComponent implements OnInit, OnDestroy, OnChanges, ControlValueAccessor {
   @Input() label: string = '';
   @Input() placeholder: string = 'Selecione uma opção';
   @Input() required: boolean = false;
@@ -79,6 +79,15 @@ export class SelectComponent implements OnInit, OnDestroy, ControlValueAccessor 
         formGroup.classList.add('has-select');
       }
     }, 0);
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Detecta mudanças nas opções
+    if (changes['options']) {
+      console.log('🔄 Select: Opções mudaram:', changes['options'].currentValue);
+      this.updateFilteredOptions();
+      this.updateSelectedOptions();
+    }
   }
 
   ngOnDestroy() {
@@ -227,15 +236,18 @@ export class SelectComponent implements OnInit, OnDestroy, ControlValueAccessor 
   }
 
   private updateFilteredOptions(): void {
+    console.log('🔄 Select: Atualizando opções filtradas. Total de opções:', this.options.length);
+
     if (!this.searchTerm) {
       this.filteredOptions = [...this.options];
-      return;
+    } else {
+      this.filteredOptions = this.options.filter(option => {
+        const label = option[this.optionLabel]?.toString().toLowerCase();
+        return label?.includes(this.searchTerm.toLowerCase());
+      });
     }
 
-    this.filteredOptions = this.options.filter(option => {
-      const label = option[this.optionLabel]?.toString().toLowerCase();
-      return label?.includes(this.searchTerm.toLowerCase());
-    });
+    console.log('🔄 Select: Opções filtradas atualizadas:', this.filteredOptions.length);
   }
 
   private updateSelectedOptions(): void {

@@ -81,7 +81,7 @@ export interface ProductionReceiptFilters {
     paymentStatus?: PaymentStatus;
     paymentMethod?: PaymentMethod;
     active?: boolean;
-
+    clientId?: string;
     // Filtros por data
     createdFrom?: Date | string;
     createdTo?: Date | string;

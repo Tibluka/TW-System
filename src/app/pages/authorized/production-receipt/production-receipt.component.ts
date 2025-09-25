@@ -1,16 +1,16 @@
 // pages/authorized/production-receipts/production-receipts.component.ts
 
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, lastValueFrom, takeUntil } from 'rxjs';
 
 // Componentes
 import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { IconComponent } from '../../../shared/components/atoms/icon/icon.component';
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
-import { SelectOption } from '../../../shared/components/atoms/select/select.component';
+import { SelectComponent, SelectOption } from '../../../shared/components/atoms/select/select.component';
 import { GeneralModalContentComponent } from '../../../shared/components/general/general-modal-content/general-modal-content.component';
 import { StatusOption } from '../../../shared/components/molecules/status-updater/status-updater.component';
 import { ModalComponent } from '../../../shared/components/organisms/modal/modal.component';
@@ -40,6 +40,8 @@ import {
   translateProductionOrderStatus,
   translateProductionType
 } from '../../../shared/utils/tools';
+import { Client } from '../../../models/clients/clients';
+import { ClientService } from '../../../shared/services/clients/clients.service';
 
 @Component({
   selector: 'app-production-receipts',
@@ -48,6 +50,7 @@ import {
     FormsModule,
     ButtonComponent,
     InputComponent,
+    SelectComponent,
     IconComponent,
     ActionMenuComponent,
     ModalComponent,
@@ -68,6 +71,8 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   // ============================================
   private productionReceiptService = inject(ProductionReceiptService);
   private modalService = inject(ModalService);
+  private clientService = inject(ClientService);
+  private cdr = inject(ChangeDetectorRef);
 
   // ============================================
   // PROPRIEDADES DO COMPONENTE
@@ -89,7 +94,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     page: 1,
     limit: 10,
     search: '',
-
+    clientId: '',
     // Filtros de status e método de pagamento
     paymentStatus: undefined,
     paymentMethod: undefined,
@@ -116,6 +121,8 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   // ============================================
   // OPTIONS PARA SELECTS - EXPANDIDO
   // ============================================
+
+  clientOptions: SelectOption[] = [];
 
   // Opções de status de pagamento
   paymentStatusOptions: SelectOption[] = [
@@ -165,11 +172,58 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     this.setupSearchDebounce();
     this.setupStatusOptions();
     this.loadProductionReceipts();
+    this.loadClients();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private async loadClients(): Promise<void> {
+    try {
+      const response = await lastValueFrom(this.clientService.getClients({
+        page: 1,
+        limit: 100,
+        active: true
+      }));
+
+      if (response?.data && Array.isArray(response.data)) {
+        const clientOptionsFromAPI = response.data.map((client: Client) => ({
+          value: client._id!,
+          label: client.companyName || 'Cliente sem nome'
+        }));
+
+        // Adiciona os clientes à opção padrão
+        this.clientOptions = [
+          { value: '', label: 'Todos os Clientes' },
+          ...clientOptionsFromAPI
+        ];
+
+        console.log('✅ Clientes carregados para select:', this.clientOptions.length);
+      } else {
+        console.warn('⚠️ Resposta da API não contém dados válidos:', response);
+        // Mantém apenas a opção padrão
+        this.clientOptions = [
+          { value: '', label: 'Todos os Clientes' }
+        ];
+      }
+
+      // 🔄 FORÇA DETECÇÃO DE MUDANÇAS
+      this.cdr.detectChanges();
+      console.log('🔄 Change detection forçada para clientOptions');
+
+    } catch (error) {
+      console.error('❌ Erro ao carregar clientes para select:', error);
+      // Mantém apenas a opção padrão em caso de erro
+      this.clientOptions = [
+        { value: '', label: 'Todos os Clientes' }
+      ];
+
+      // 🔄 FORÇA DETECÇÃO DE MUDANÇAS MESMO EM CASO DE ERRO
+      this.cdr.detectChanges();
+      console.log('🔄 Change detection forçada após erro');
+    }
   }
 
   // ============================================
@@ -219,10 +273,16 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
           this.productionReceipts = response.data || [];
           this.pagination = response.pagination;
           this.loading = false;
+
+          // 🔄 FORÇA DETECÇÃO DE MUDANÇAS
+          this.cdr.detectChanges();
         },
         error: (error: any) => {
           console.error('Erro ao carregar recebimentos:', error);
           this.loading = false;
+
+          // 🔄 FORÇA DETECÇÃO DE MUDANÇAS MESMO EM CASO DE ERRO
+          this.cdr.detectChanges();
           // TODO: Implementar toast de erro
         }
       });
@@ -261,6 +321,11 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   }
 
   onDateFilterChange(): void {
+    this.currentFilters.page = 1;
+    this.loadProductionReceipts();
+  }
+
+  onClientChange(): void {
     this.currentFilters.page = 1;
     this.loadProductionReceipts();
   }

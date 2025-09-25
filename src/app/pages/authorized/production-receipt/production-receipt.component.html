@@ -5,6 +5,12 @@
     <!-- FILTROS E BUSCA -->
     <div class="search-input">
         <!-- Campo de Busca -->
+        <!-- Cliente -->
+        <div class="w-100">
+            <ds-select label="Cliente" placeholder="Selecione o cliente" [(ngModel)]="currentFilters.clientId"
+                [fullWidth]="true" [options]="clientOptions" (ngModelChange)="onClientChange()" />
+        </div>
+        <!-- Campo de Busca -->
         <div class="w-100">
             <ds-input label="Buscar recebimento" placeholder="Digite referência interna, cliente, observações..."
                 icon="fa-solid fa-magnifying-glass" iconPosition="left" [(ngModel)]="currentFilters.search"
