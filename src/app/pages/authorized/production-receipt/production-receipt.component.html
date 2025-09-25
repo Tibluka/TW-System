@@ -1,1 +1,209 @@
-<p>production-receipt works!</p>
+<div class="production-receipts-container">
+    <!-- ✨ Usando variáveis do sistema: mb-48 ao invés de margin-bottom: 48px -->
+    <h1 class="title-semibold primary-dark mb-48">Recibos de Produção</h1>
+
+    <!-- FILTROS E BUSCA -->
+    <div class="search-input">
+        <!-- Campo de Busca -->
+        <div class="w-100">
+            <ds-input label="Buscar recebimento" placeholder="Digite referência interna, cliente, observações..."
+                icon="fa-solid fa-magnifying-glass" iconPosition="left" [(ngModel)]="currentFilters.search"
+                (input)="onSearchChange()" width="100%">
+            </ds-input>
+        </div>
+
+        <!-- Filtro de Data Inicial -->
+        <div class="w-100">
+            <ds-input label="Data inicial" type="date" [(ngModel)]="currentFilters.createdFrom"
+                (ngModelChange)="onDateFilterChange()" width="100%">
+            </ds-input>
+        </div>
+
+        <!-- Filtro de Data Final -->
+        <div class="w-100">
+            <ds-input label="Data final" type="date" [(ngModel)]="currentFilters.createdTo"
+                (ngModelChange)="onDateFilterChange()" width="100%">
+            </ds-input>
+        </div>
+
+        <!-- Filtro por Status -->
+        <!--   <div class="w-100">
+            <ds-select label="Filtrar por Status" [options]="statusOptions" [(ngModel)]="currentFilters.status"
+                (ngModelChange)="onStatusFilterChange()" width="100%">
+            </ds-select>
+        </div> -->
+
+        <!-- Botão de Novo Recebimento -->
+        <ds-button label="Novo Recebimento" variant="fill" icon="fa-solid fa-plus"
+            (onClickEmitter)="createProductionReceipt()">
+        </ds-button>
+    </div>
+
+    <!-- TABELA DE RESULTADOS -->
+    <div class="results mt-32">
+        <ds-table emptyMessage="Nenhum recebimento encontrado" *ngIf="shouldShowTable" [showPagination]="true"
+            [pageSize]="currentFilters.limit" [totalPages]="pagination?.totalPages"
+            [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)" [loadingData]="loading">
+
+            <!-- Cabeçalho da tabela -->
+            <ds-table-row [isHeader]="true">
+                <ds-table-cell [isHeader]="true" align="left">Ref. Interna</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="left">Ref. do Cliente</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="left">Ordem de Produção</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="center">Tipo Produção</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="left">Data Recebimento</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="center">Quantidade</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="right">Valor Total</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
+            </ds-table-row>
+
+            <!-- DADOS DOS RECEBIMENTOS -->
+            <ds-table-row *ngFor="let productionReceipt of productionReceipts" [clickable]="true"
+                [data]="productionReceipt" (rowClick)="onProductionReceiptClick(productionReceipt)">
+
+                <!-- Referência Interna -->
+                <ds-table-cell align="left">
+                    <div class="reference-cell">
+                        <span class="body primary-dark">
+                            {{ productionReceipt.internalReference || 'S/N' }}
+                        </span>
+                        <ds-icon icon="fa-solid fa-copy" color="label" fontSize="12px" class="copy-icon ml-8"
+                            title="Copiar referência"
+                            (click)="copyReference($event, productionReceipt.internalReference)">
+                        </ds-icon>
+                    </div>
+                </ds-table-cell>
+
+                <!-- Referência do Cliente -->
+                <ds-table-cell align="left">
+                    <span class="body primary-dark">
+                        {{ productionReceipt.productionOrder?.development?.clientReference || '-' }}
+                    </span>
+                </ds-table-cell>
+
+                <!-- Cliente -->
+                <ds-table-cell align="left">
+                    <div class="client-cell" *ngIf="productionReceipt.productionOrder?.development?.client">
+                        <div class="body primary-dark">
+                            {{ productionReceipt.productionOrder?.development?.client?.companyName }}
+                        </div>
+                        <div class="placeholder"
+                            *ngIf="productionReceipt.productionOrder?.development?.client?.acronym">
+                            {{ productionReceipt.productionOrder?.development?.client?.acronym }}
+                        </div>
+                    </div>
+                    <span class="body label" *ngIf="!productionReceipt.productionOrder?.development?.client">
+                        Cliente não encontrado
+                    </span>
+                </ds-table-cell>
+
+                <!-- Ordem de Produção -->
+                <ds-table-cell align="left">
+                    <div class="production-order-cell" *ngIf="productionReceipt.productionOrder">
+                        <div class="body primary-dark">
+                            {{ productionReceipt.productionOrder.internalReference }}
+                        </div>
+                        <div class="placeholder">
+                            {{ translateProductionOrderStatus(productionReceipt.productionOrder.status) }}
+                        </div>
+                    </div>
+                    <span class="body label" *ngIf="!productionReceipt.productionOrder">
+                        Ordem não encontrada
+                    </span>
+                </ds-table-cell>
+
+                <!-- Tipo de Produção -->
+                <ds-table-cell align="center">
+                    <div class="production-type-cell" *ngIf="productionReceipt.productionOrder?.productionType">
+                        <span class="production-type-badge"
+                            [ngClass]="'type-' + productionReceipt.productionOrder?.productionType!.type">
+                            {{ translateProductionType(productionReceipt.productionOrder?.productionType!.type) }}
+                        </span>
+                        <div class="production-details placeholder"
+                            *ngIf="productionReceipt.productionOrder?.productionType?.meters">
+                            {{ productionReceipt.productionOrder?.productionType?.meters }}m
+                        </div>
+                    </div>
+                    <span class="body label" *ngIf="!productionReceipt.productionOrder?.productionType">
+                        -
+                    </span>
+                </ds-table-cell>
+
+                <!-- Status -->
+                <ds-table-cell align="center">
+                    <span class="status-badge" [ngClass]="'status-' + productionReceipt.paymentStatus">
+                        {{ getReceiptStatusLabel(productionReceipt.paymentStatus) }}
+                    </span>
+                </ds-table-cell>
+
+                <!-- Data de Recebimento -->
+                <ds-table-cell align="left">
+                    <div class="date-cell">
+                        <span class="body primary-dark">
+                            {{ formatDate(productionReceipt.paymentDate) }}
+                        </span>
+                        <div class="placeholder">
+                            {{ formatTime(productionReceipt.paymentDate) }}
+                        </div>
+                    </div>
+                </ds-table-cell>
+
+                <!-- Quantidade -->
+                <ds-table-cell align="center">
+                    <div class="quantity-cell">
+                        <span class="body primary-dark">
+                            {{ productionReceipt.totalAmount }}
+                        </span>
+                        <div class="placeholder">
+                            {{ productionReceipt.paymentMethod || 'UN' }}
+                        </div>
+                    </div>
+                </ds-table-cell>
+
+                <!-- Valor Total -->
+                <ds-table-cell align="right">
+                    <div class="value-cell">
+                        <span class="body primary-dark">
+                            {{ formatCurrency(productionReceipt.totalAmount) }}
+                        </span>
+                        <div class="placeholder" *ngIf="productionReceipt.paymentMethod">
+                            {{ formatCurrency(productionReceipt!.paymentMethod) }}/{{ productionReceipt.paymentMethod ||
+                            'UN' }}
+                        </div>
+                    </div>
+                </ds-table-cell>
+
+                <!-- Ações -->
+                <ds-table-cell align="center">
+                    <ds-action-menu [items]="getActionMenuItems(productionReceipt)"
+                        (itemSelected)="onActionMenuSelect(productionReceipt, $event)">
+                    </ds-action-menu>
+                </ds-table-cell>
+
+            </ds-table-row>
+        </ds-table>
+    </div>
+
+    <!-- Modal de recebimento -->
+    <ds-modal modalId="production-receipt-modal" *ngIf="isModalOpen" (modalClosed)="onModalClosed($event)">
+        <app-production-receipt-modal></app-production-receipt-modal>
+    </ds-modal>
+
+    <!-- 
+    <ds-status-updater *ngIf="selectedProductionReceiptForStatusUpdate" #statusUpdaterRef
+        entityType="production-receipt" [entityId]="selectedProductionReceiptForStatusUpdate._id!"
+        [currentStatus]="selectedProductionReceiptForStatusUpdate.status"
+        [availableStatuses]="productionReceiptStatusOptions"
+        [entityReference]="selectedProductionReceiptForStatusUpdate.internalReference"
+        (statusUpdated)="onStatusUpdated($event); clearStatusUpdateSelection()"
+        (statusUpdateFailed)="onStatusUpdateFailed($event)">
+    </ds-status-updater>
+ -->
+    <!-- Modal geral para confirmações -->
+    <ds-modal modalId="general-modal">
+        <app-general-modal-content></app-general-modal-content>
+    </ds-modal>
+
+</div>
