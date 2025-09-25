@@ -21,6 +21,7 @@ import { ProductionSheetsService } from '../../../shared/services/production-she
 import { FormValidator } from '../../../shared/utils/form';
 import { ProductionSheetModalComponent } from './production-sheet-modal/production-sheet-modal.component';
 import { GeneralModalContentComponent } from '../../../shared/components/general/general-modal-content/general-modal-content.component';
+import { copyToClipboard } from '../../../shared/utils/tools';
 
 @Component({
   selector: 'app-production-sheets',
@@ -673,4 +674,10 @@ export class ProductionSheetsComponent extends FormValidator {
       this.showError = false;
     }, 5000);
   }
+
+
+  copy(event: MouseEvent, internalReference: string): void {
+    copyToClipboard(internalReference, event);
+  }
+
 }

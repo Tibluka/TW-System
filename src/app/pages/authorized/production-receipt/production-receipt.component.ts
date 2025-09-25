@@ -83,15 +83,28 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   productionReceiptStatusOptions: StatusOption[] = [];
 
   // ============================================
-  // FILTROS E BUSCA
+  // FILTROS E BUSCA - ATUALIZADO COM TODOS OS FILTROS DISPONÍVEIS
   // ============================================
   currentFilters: ProductionReceiptFilters = {
     page: 1,
     limit: 10,
     search: '',
+
+    // Filtros de status e método de pagamento
     paymentStatus: undefined,
+    paymentMethod: undefined,
+
+    // Filtros por data
     createdFrom: undefined,
     createdTo: undefined,
+
+    // Filtros por ordem de produção
+    productionOrderId: undefined,
+
+    // Filtros especiais
+    active: true,        // Por padrão, apenas ativos
+
+    // Ordenação
     sortBy: 'createdAt',
     sortOrder: 'desc'
   };
@@ -101,12 +114,48 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   private destroy$ = new Subject<void>();
 
   // ============================================
-  // OPTIONS PARA SELECTS
+  // OPTIONS PARA SELECTS - EXPANDIDO
   // ============================================
-  statusOptions: SelectOption[] = [
+
+  // Opções de status de pagamento
+  paymentStatusOptions: SelectOption[] = [
     { value: '', label: 'Todos os Status' },
     { value: 'PENDING', label: 'Pendente' },
     { value: 'PAID', label: 'Pago' }
+  ];
+
+  // Opções de método de pagamento
+  paymentMethodOptions: SelectOption[] = [
+    { value: '', label: 'Todos os Métodos' },
+    { value: 'CASH', label: 'Dinheiro' },
+    { value: 'CREDIT_CARD', label: 'Cartão de Crédito' },
+    { value: 'DEBIT_CARD', label: 'Cartão de Débito' },
+    { value: 'BANK_TRANSFER', label: 'Transferência Bancária' },
+    { value: 'PIX', label: 'PIX' },
+    { value: 'CHECK', label: 'Cheque' }
+  ];
+
+  // Opções de filtro por status ativo
+  activeStatusOptions: SelectOption[] = [
+    { value: 'true', label: 'Apenas Ativos' },
+    { value: 'false', label: 'Apenas Inativos' },
+    { value: 'all', label: 'Todos' }
+  ];
+
+  // Opções de ordenação
+  sortByOptions: SelectOption[] = [
+    { value: 'createdAt', label: 'Data de Criação' },
+    { value: 'issueDate', label: 'Data de Emissão' },
+    { value: 'dueDate', label: 'Data de Vencimento' },
+    { value: 'totalAmount', label: 'Valor Total' },
+    { value: 'paymentStatus', label: 'Status de Pagamento' },
+    { value: 'paymentMethod', label: 'Método de Pagamento' },
+    { value: 'internalReference', label: 'Referência Interna' }
+  ];
+
+  sortOrderOptions: SelectOption[] = [
+    { value: 'desc', label: 'Mais Recente Primeiro' },
+    { value: 'asc', label: 'Mais Antigo Primeiro' }
   ];
 
   // ============================================
@@ -153,13 +202,15 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
 
     const filters = { ...this.currentFilters };
 
-    // Limpar campos vazios
+    // Limpar campos vazios, mas preservar valores false e 0
     Object.keys(filters).forEach(key => {
       const value = (filters as any)[key];
       if (value === '' || value === null || value === undefined) {
         delete (filters as any)[key];
       }
     });
+
+    console.log('Filters being sent:', filters); // Debug
 
     this.productionReceiptService.getProductionReceipts(filters)
       .pipe(takeUntil(this.destroy$))
@@ -178,19 +229,72 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   }
 
   // ============================================
-  // EVENTOS DE FILTROS
+  // EVENTOS DE FILTROS - EXPANDIDO
   // ============================================
   onSearchChange(): void {
     this.searchSubject.next(this.currentFilters.search || '');
   }
 
-  onStatusFilterChange(): void {
+  onPaymentStatusFilterChange(): void {
+    this.currentFilters.page = 1;
+    this.loadProductionReceipts();
+  }
+
+  onPaymentMethodFilterChange(): void {
+    this.currentFilters.page = 1;
+    this.loadProductionReceipts();
+  }
+
+  onActiveStatusFilterChange(): void {
+    // Converter string para o tipo correto
+    const value = (this.currentFilters.active as any);
+    if (value === 'true') {
+      this.currentFilters.active = true;
+    } else if (value === 'false') {
+      this.currentFilters.active = false;
+    } else {
+      this.currentFilters.active = undefined; // Para 'all'
+    }
+
     this.currentFilters.page = 1;
     this.loadProductionReceipts();
   }
 
   onDateFilterChange(): void {
     this.currentFilters.page = 1;
+    this.loadProductionReceipts();
+  }
+
+  onSortChange(): void {
+    this.currentFilters.page = 1;
+    this.loadProductionReceipts();
+  }
+
+  // ============================================
+  // MÉTODOS DE FILTRO ESPECIAIS
+  // ============================================
+
+  // Filtrar apenas recibos vencidos
+  toggleOverdueFilter(): void {
+    this.currentFilters.page = 1;
+    this.loadProductionReceipts();
+  }
+
+  // Limpar todos os filtros
+  clearAllFilters(): void {
+    this.currentFilters = {
+      page: 1,
+      limit: 10,
+      search: '',
+      paymentStatus: undefined,
+      paymentMethod: undefined,
+      createdFrom: undefined,
+      createdTo: undefined,
+      productionOrderId: undefined,
+      active: true, // Manter apenas ativos como padrão
+      sortBy: 'createdAt',
+      sortOrder: 'desc'
+    };
     this.loadProductionReceipts();
   }
 
@@ -213,7 +317,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     this.modalService.open({
       id: 'production-receipt-modal',
       title: 'Novo Recebimento',
-      size: 'lg'
+      size: 'xl'
     });
   }
 
@@ -223,7 +327,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     this.modalService.open({
       id: 'production-receipt-modal',
       title: 'Editar Recebimento',
-      size: 'lg'
+      size: 'xl'
     });
   }
 
@@ -332,15 +436,8 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   }
 
   // ============================================
-  // UTILITÁRIOS E HELPERS
+  // HELPERS DE FORMATAÇÃO
   // ============================================
-  copyReference(event: Event, reference: string): void {
-    event.stopPropagation();
-    copyToClipboard(reference);
-    // TODO: Toast de sucesso
-    console.log('Referência copiada:', reference);
-  }
-
   formatDate(date: string | Date | undefined): string {
     if (!date) return '-';
     return new Date(date).toLocaleDateString('pt-BR');
@@ -378,8 +475,20 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     return statusMap[status] || status;
   }
 
+  getPaymentMethodLabel(method: PaymentMethod): string {
+    const methodMap: Record<PaymentMethod, string> = {
+      'CASH': 'Dinheiro',
+      'CREDIT_CARD': 'Cartão de Crédito',
+      'DEBIT_CARD': 'Cartão de Débito',
+      'BANK_TRANSFER': 'Transferência Bancária',
+      'PIX': 'PIX',
+      'CHECK': 'Cheque'
+    };
+    return methodMap[method] || method;
+  }
+
   // ============================================
-  // GETTERS PARA TEMPLATE
+  // GETTERS PARA TEMPLATE - EXPANDIDO
   // ============================================
   get shouldShowTable(): boolean {
     return !this.loading || this.productionReceipts.length > 0;
@@ -389,9 +498,23 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     return !!(
       this.currentFilters.search ||
       this.currentFilters.paymentStatus ||
+      this.currentFilters.paymentMethod ||
       this.currentFilters.createdFrom ||
-      this.currentFilters.createdTo
+      this.currentFilters.createdTo ||
+      this.currentFilters.productionOrderId ||
+      this.currentFilters.active === false // Consideramos false como filtro ativo
     );
+  }
+
+  get totalFiltersCount(): number {
+    let count = 0;
+    if (this.currentFilters.search) count++;
+    if (this.currentFilters.paymentStatus) count++;
+    if (this.currentFilters.paymentMethod) count++;
+    if (this.currentFilters.createdFrom || this.currentFilters.createdTo) count++;
+    if (this.currentFilters.productionOrderId) count++;
+    if (this.currentFilters.active === false) count++;
+    return count;
   }
 
   // ============================================
@@ -399,5 +522,9 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   // ============================================
   trackByReceiptId(index: number, receipt: ProductionReceipt): string {
     return receipt._id || index.toString();
+  }
+
+  copy(event: MouseEvent, internalReference: string): void {
+    copyToClipboard(internalReference, event);
   }
 }

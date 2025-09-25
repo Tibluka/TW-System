@@ -2,7 +2,7 @@
 
     <!-- Loading state -->
     <div *ngIf="isLoading" class="loading-container">
-        <ds-spinner size="lg" message="Carregando ficha de produção..."></ds-spinner>
+        <ds-spinner size="lg" message="Carregando recibo de produção..."></ds-spinner>
     </div>
 
     <!-- Formulário principal -->
@@ -10,7 +10,6 @@
 
         <!-- Seção do formulário -->
         <div class="form-section">
-
             <!-- Referência Interna da Ordem de Produção -->
             <div class="field-group mb-16">
                 <ds-input label="Referência Interna da Ordem" placeholder="Digite a referência interna (ex: DEV001)"
@@ -157,12 +156,7 @@
         <div class="modal-actions mt-32" *ngIf="productionOrderFound || isEditMode">
             <ds-button label="Cancelar" variant="ghost" (onClickEmitter)="onCancel()" [disabled]="isSaving" />
 
-            <!-- Botão especial para avançar estágio (modo edição) -->
-            <ds-button type="button" *ngIf="isEditMode && canAdvanceStage()" label="Avançar Estágio" variant="outline"
-                icon="fa-solid fa-arrow-right" (onClickEmitter)="onAdvanceStage($event)" [disabled]="isSaving"
-                class="advance-stage-btn" />
-
-            <ds-button label="{{ isEditMode ? 'Atualizar' : 'Criar' }} Ficha" type="submit" [isLoading]="isSaving"
+            <ds-button label="{{ isEditMode ? 'Atualizar' : 'Criar' }} Recibo" type="submit" [isLoading]="isSaving"
                 [disabled]="isSaving" />
         </div>
 

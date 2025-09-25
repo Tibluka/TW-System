@@ -66,9 +66,11 @@
 
                 <!-- Referência Interna -->
                 <ds-table-cell align="left">
-                    <span class="body primary-dark">
-                        {{ productionSheet.internalReference || 'S/N' }}
-                    </span>
+                    <span class="body primary-dark font-weight-medium">{{
+                        productionSheet.internalReference }}</span>
+                    <ds-icon (click)="copy($event, productionSheet.productionOrder!.internalReference)" class="ml-4"
+                        cursorType="pointer" icon="fa-regular fa-clipboard" fontSize="16px" />
+
                 </ds-table-cell>
 
                 <!-- Referência do Cliente -->

@@ -50,8 +50,6 @@
                 <ds-table-cell [isHeader]="true" align="left">Ref. Interna</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="left">Ref. do Cliente</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Ordem de Produção</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="center">Tipo Produção</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="left">Data Recebimento</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="center">Quantidade</ds-table-cell>
@@ -67,19 +65,19 @@
                 <ds-table-cell align="left">
                     <div class="reference-cell">
                         <span class="body primary-dark">
-                            {{ productionReceipt.internalReference || 'S/N' }}
+                            <span class="body primary-dark font-weight-medium">{{
+                                productionReceipt.internalReference }}</span>
+                            <ds-icon (click)="copy($event, productionReceipt.internalReference)" class="ml-4"
+                                cursorType="pointer" icon="fa-regular fa-clipboard" fontSize="16px" />
+
                         </span>
-                        <ds-icon icon="fa-solid fa-copy" color="label" fontSize="12px" class="copy-icon ml-8"
-                            title="Copiar referência"
-                            (click)="copyReference($event, productionReceipt.internalReference)">
-                        </ds-icon>
                     </div>
                 </ds-table-cell>
 
                 <!-- Referência do Cliente -->
                 <ds-table-cell align="left">
                     <span class="body primary-dark">
-                        {{ productionReceipt.productionOrder?.development?.clientReference || '-' }}
+                        {{ productionReceipt.productionOrder?.development?.clientReference}}
                     </span>
                 </ds-table-cell>
 
@@ -99,37 +97,6 @@
                     </span>
                 </ds-table-cell>
 
-                <!-- Ordem de Produção -->
-                <ds-table-cell align="left">
-                    <div class="production-order-cell" *ngIf="productionReceipt.productionOrder">
-                        <div class="body primary-dark">
-                            {{ productionReceipt.productionOrder.internalReference }}
-                        </div>
-                        <div class="placeholder">
-                            {{ translateProductionOrderStatus(productionReceipt.productionOrder.status) }}
-                        </div>
-                    </div>
-                    <span class="body label" *ngIf="!productionReceipt.productionOrder">
-                        Ordem não encontrada
-                    </span>
-                </ds-table-cell>
-
-                <!-- Tipo de Produção -->
-                <ds-table-cell align="center">
-                    <div class="production-type-cell" *ngIf="productionReceipt.productionOrder?.productionType">
-                        <span class="production-type-badge"
-                            [ngClass]="'type-' + productionReceipt.productionOrder?.productionType!.type">
-                            {{ translateProductionType(productionReceipt.productionOrder?.productionType!.type) }}
-                        </span>
-                        <div class="production-details placeholder"
-                            *ngIf="productionReceipt.productionOrder?.productionType?.meters">
-                            {{ productionReceipt.productionOrder?.productionType?.meters }}m
-                        </div>
-                    </div>
-                    <span class="body label" *ngIf="!productionReceipt.productionOrder?.productionType">
-                        -
-                    </span>
-                </ds-table-cell>
 
                 <!-- Status -->
                 <ds-table-cell align="center">
@@ -139,7 +106,7 @@
                 </ds-table-cell>
 
                 <!-- Data de Recebimento -->
-                <ds-table-cell align="left">
+                <ds-table-cell align="center">
                     <div class="date-cell">
                         <span class="body primary-dark">
                             {{ formatDate(productionReceipt.paymentDate) }}
@@ -157,7 +124,7 @@
                             {{ productionReceipt.totalAmount }}
                         </span>
                         <div class="placeholder">
-                            {{ productionReceipt.paymentMethod || 'UN' }}
+                            {{ productionReceipt.paymentMethod }}
                         </div>
                     </div>
                 </ds-table-cell>
@@ -169,7 +136,7 @@
                             {{ formatCurrency(productionReceipt.totalAmount) }}
                         </span>
                         <div class="placeholder" *ngIf="productionReceipt.paymentMethod">
-                            {{ formatCurrency(productionReceipt!.paymentMethod) }}/{{ productionReceipt.paymentMethod ||
+                            {{ formatCurrency(productionReceipt!.paidAmount) }}/{{ productionReceipt.paymentMethod ||
                             'UN' }}
                         </div>
                     </div>
