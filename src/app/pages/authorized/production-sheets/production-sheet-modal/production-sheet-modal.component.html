@@ -33,24 +33,29 @@
 
                 <!-- Desenvolvimento encontrado -->
                 <div class="development-found mb-24" *ngIf="productionOrderFound && !searchingProductionOrder">
-                    <p class="input-label">Resumo do desenvolvimento</p>
+                    <p class="input-label">Resumo da Ordem de Produção</p>
                     <div class="development-card">
                         <div class="image">
                             <img [src]="productionOrderFound.development?.pieceImage?.url" alt="">
                         </div>
                         <div class="development-details">
-                            <h1 class="title-modal mb-6 secondary">
-                                {{productionOrderFound.internalReference}}
-                            </h1>
+                            <div class="d-flex justify-content-between">
+                                <h1 class="title-modal mb-6 secondary">
+                                    {{productionOrderFound.internalReference}}
+                                </h1>
+                                <h1 class="subtitle-section tertiary align-items-center">
+                                    {{productionOrderStatus(productionOrderFound.status)}}
+                                </h1>
+                            </div>
                             <p class="subtitle-section secondary mb-0">
                                 {{productionOrderFound.development!.client?.companyName}}</p>
                             <p class="card-small secondary mb-4">{{productionOrderFound!.development?.clientReference}}
                             </p>
                             <hr>
-                            <p class="body secondary mt-4 mb-0">
+                            <p class="body secondary mt-4 mb-4">
+                                Tipo de produção:
                                 {{productionType(productionOrderFound!.development!.productionType!.type)}}
                             </p>
-                            <h2 class="subtitle-section secondary" Ordem de produção></h2>
                             <!-- Tabela para tipo de produção localizada -->
                             <div *ngIf="productionOrderFound?.productionType!.type === 'localized'">
                                 <div class="table-container"
@@ -61,8 +66,6 @@
                                             <tr>
                                                 <th>
                                                     Variante
-                                                    <ds-icon icon="fa-solid fa-circle-plus" cursorType="pointer"
-                                                        color="tertiary" fontSize="16px" />
                                                 </th>
                                                 <th class="size-header"
                                                     *ngFor="let sizeItem of productionOrderFound.productionType?.additionalInfo?.sizes">

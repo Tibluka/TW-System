@@ -33,6 +33,7 @@
                 <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="left">Tipo Produção</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
             </ds-table-row>
 
             <!-- ✨ DADOS DOS DESENVOLVIMENTOS -->
@@ -97,6 +98,12 @@
                     </span>
                 </ds-table-cell>
 
+                <!-- Ações -->
+                <ds-table-cell align="center">
+                    <ds-action-menu [items]="actionMenuItems" (itemSelected)="onActionMenuSelect(development, $event)">
+                    </ds-action-menu>
+                </ds-table-cell>
+
             </ds-table-row>
         </ds-table>
     </div>
@@ -105,5 +112,14 @@
     <ds-modal modalId="development-modal" *ngIf="isModalOpen" (modalClosed)="onModalClosed($event)">
         <app-development-modal [developmentId]="selectedDevelopmentId"></app-development-modal>
     </ds-modal>
+
+    <!-- Componente de atualização de status -->
+    <ds-status-updater *ngIf="selectedDevelopmentForStatusUpdate" #statusUpdaterRef entityType="development"
+        [entityId]="selectedDevelopmentForStatusUpdate._id!" [currentStatus]="selectedDevelopmentForStatusUpdate.status"
+        [availableStatuses]="developmentStatusOptions"
+        [entityReference]="selectedDevelopmentForStatusUpdate.internalReference"
+        (statusUpdated)="onStatusUpdated($event); clearStatusUpdateSelection()"
+        (statusUpdateFailed)="onStatusUpdateFailed($event)">
+    </ds-status-updater>
 
 </div>

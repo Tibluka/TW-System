@@ -35,6 +35,7 @@
                 <ds-table-cell [isHeader]="true" align="left">Tipo de Produção</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="left">Tecido</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
             </ds-table-row>
 
             <!-- ✨ DADOS DAS ORDENS DE PRODUÇÃO -->
@@ -111,6 +112,13 @@
                     </span>
                 </ds-table-cell>
 
+                <!-- Ações -->
+                <ds-table-cell align="center">
+                    <ds-action-menu [items]="actionMenuItems"
+                        (itemSelected)="onActionMenuSelect(productionOrder, $event)">
+                    </ds-action-menu>
+                </ds-table-cell>
+
             </ds-table-row>
         </ds-table>
     </div>
@@ -131,3 +139,12 @@
     <!-- Só renderiza app-production-order-modal quando o modal está realmente aberto -->
     <app-production-order-modal [productionOrderId]="selectedProductionOrderId"></app-production-order-modal>
 </ds-modal>
+
+<!-- Componente de atualização de status -->
+<ds-status-updater *ngIf="selectedProductionOrderForStatusUpdate" #statusUpdaterRef entityType="production-order"
+    [entityId]="selectedProductionOrderForStatusUpdate._id!"
+    [currentStatus]="selectedProductionOrderForStatusUpdate.status" [availableStatuses]="productionOrderStatusOptions"
+    [entityReference]="selectedProductionOrderForStatusUpdate.internalReference"
+    (statusUpdated)="onStatusUpdated($event); clearStatusUpdateSelection()"
+    (statusUpdateFailed)="onStatusUpdateFailed($event)">
+</ds-status-updater>

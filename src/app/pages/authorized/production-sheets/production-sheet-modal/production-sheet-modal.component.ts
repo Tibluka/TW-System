@@ -22,8 +22,8 @@ import { IconComponent } from '../../../../shared/components/atoms/icon/icon.com
 import { FormValidator } from '../../../../shared/utils/form';
 
 // Models
-import { ProductionOrder, ProductionTypeEnum } from '../../../../models/production-orders/production-orders';
-import { translateProductionType } from '../../../../shared/utils/tools';
+import { ProductionOrder, ProductionOrderStatus, ProductionTypeEnum } from '../../../../models/production-orders/production-orders';
+import { translateProductionOrderStatus, translateProductionType } from '../../../../shared/utils/tools';
 
 @Component({
   selector: 'app-production-sheet-modal',
@@ -556,5 +556,9 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
 
   productionType(productionType: ProductionTypeEnum) {
     return translateProductionType(productionType);
+  }
+
+  productionOrderStatus(status: ProductionOrderStatus): string {
+    return translateProductionOrderStatus(status);
   }
 }

@@ -1,0 +1,16 @@
+<div class="action-menu-container" [class.disabled]="disabled">
+    <button class="action-menu-trigger" [class.open]="isOpen" (click)="toggleMenu($event)" [disabled]="disabled"
+        type="button">
+        <i class="{{triggerIcon}}"></i>
+    </button>
+
+    <div class="action-menu-dropdown" *ngIf="isOpen">
+        <div class="dropdown-content">
+            <button *ngFor="let item of items" class="dropdown-item" [class.disabled]="item.disabled"
+                (click)="selectItem(item, $event)" type="button">
+                <i *ngIf="item.icon" class="{{item.icon}}"></i>
+                <span>{{item.label}}</span>
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, effect, inject, ViewChild } from '@angular/core';
 import { FormsModule, NgModel } from "@angular/forms";
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 
 // Componentes
 import { Development, DevelopmentFilters, DevelopmentListResponse, DevelopmentStatus, PaginationInfo, ProductionTypeEnum } from '../../../models/developments/developments';
+import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
+import { StatusUpdaterComponent, StatusOption } from '../../../shared/components/molecules/status-updater/status-updater.component';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { IconComponent } from "../../../shared/components/atoms/icon/icon.component";
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
@@ -32,7 +34,9 @@ import { DevelopmentModalComponent } from "./development-modal/development-modal
     ModalComponent,
     DevelopmentModalComponent,
     SelectComponent,
-    IconComponent
+    IconComponent,
+    ActionMenuComponent,
+    StatusUpdaterComponent
   ],
   providers: [NgModel],
   templateUrl: './developments.component.html',
@@ -74,6 +78,34 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
 
   // Propriedade para armazenar ID do desenvolvimento selecionado para edição
   selectedDevelopmentId?: string;
+
+  // Configuração do menu de ações
+  actionMenuItems: ActionMenuItem[] = [
+    {
+      label: 'Alterar Status',
+      value: 'change-status',
+      icon: 'fa-solid fa-arrow-right-arrow-left'
+    },
+    {
+      label: 'Excluir',
+      value: 'delete',
+      icon: 'fa-solid fa-trash'
+    }
+  ];
+
+  // Configuração das opções de status para o status-updater
+  developmentStatusOptions: StatusOption[] = [
+    { value: 'CREATED', label: 'Criado', icon: 'fa-solid fa-plus', color: 'info' },
+    { value: 'AWAITING_APPROVAL', label: 'Aguardando Aprovação', icon: 'fa-solid fa-clock', color: 'warning' },
+    { value: 'APPROVED', label: 'Aprovado', icon: 'fa-solid fa-check', color: 'success' },
+    { value: 'CANCELED', label: 'Cancelado', icon: 'fa-solid fa-times', color: 'error' }
+  ];
+
+  // Propriedades para o status-updater
+  selectedDevelopmentForStatusUpdate?: Development;
+
+  // Referência ao componente status-updater
+  @ViewChild('statusUpdaterRef') statusUpdaterComponent?: StatusUpdaterComponent;
 
   // Subject para debounce da busca
   private searchSubject = new Subject<DevelopmentFilters>();
@@ -311,5 +343,83 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
 
   productionType(productionType: ProductionTypeEnum) {
     return translateProductionType(productionType);
+  }
+
+  /**
+   * 🎯 MENU DE AÇÕES - Processa ação selecionada no menu
+   */
+  onActionMenuSelect(development: Development, action: ActionMenuItem): void {
+    switch (action.value) {
+      case 'change-status':
+        this.changeDevelopmentStatus(development);
+        break;
+      case 'delete':
+        this.deleteDevelopment(development);
+        break;
+      default:
+        console.warn('Ação não implementada:', action.value);
+    }
+  }
+
+  /**
+   * 🔄 ALTERAR STATUS - Altera status do desenvolvimento
+   */
+  private changeDevelopmentStatus(development: Development): void {
+    this.selectedDevelopmentForStatusUpdate = development;
+
+    setTimeout(() => {
+      if (this.statusUpdaterComponent) {
+        this.statusUpdaterComponent.openStatusModal();
+      }
+    }, 0);
+  }
+
+  /**
+   * 🎯 STATUS ATUALIZADO - Callback quando status é atualizado
+   */
+  onStatusUpdated(result: any): void {
+    if (result.success) {
+      this.showSuccessMessage(result.message);
+      this.loadDevelopments(); // Recarregar lista
+    }
+  }
+
+  /**
+   * ❌ STATUS UPDATE FALHOU - Callback quando atualização falha
+   */
+  onStatusUpdateFailed(result: any): void {
+    this.showErrorMessage(result.error || 'Erro ao atualizar status');
+  }
+
+  /**
+   * 🔄 LIMPAR SELEÇÃO - Limpa a seleção do desenvolvimento para atualização de status
+   */
+  clearStatusUpdateSelection(): void {
+    this.selectedDevelopmentForStatusUpdate = undefined;
+  }
+
+  /**
+   * 🗑️ EXCLUIR - Exclui desenvolvimento
+   */
+  private deleteDevelopment(development: Development): void {
+    if (!development._id) {
+      console.error('ID do desenvolvimento não encontrado');
+      return;
+    }
+
+    if (confirm(`Tem certeza que deseja excluir o desenvolvimento "${development.internalReference}"?`)) {
+      this.developmentService.deleteDevelopment(development._id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.showSuccessMessage(`Desenvolvimento ${development.internalReference} excluído com sucesso.`);
+            this.loadDevelopments(); // Recarregar lista
+          },
+          error: (error) => {
+            console.error('❌ Erro ao excluir desenvolvimento:', error);
+            this.showErrorMessage(error.message || 'Erro ao excluir desenvolvimento.');
+          }
+        });
+    }
   }
 }

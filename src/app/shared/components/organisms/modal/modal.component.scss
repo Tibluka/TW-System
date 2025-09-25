@@ -24,7 +24,7 @@
     max-height: 90vh;
     overflow: hidden;
     margin: 1rem;
-    border: 1px solid var(--stroke);
+    border: 2px solid var(--stroke);
     will-change: transform, opacity, filter; // Otimização para animações Angular
 
     // Hover effect sutil

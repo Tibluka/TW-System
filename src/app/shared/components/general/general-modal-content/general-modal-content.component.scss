@@ -1,0 +1,253 @@
+.general-modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    text-align: center;
+
+    // ============================================
+    // ÍCONE PRINCIPAL
+    // ============================================
+
+    .modal-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: var(--primary-50);
+        margin-bottom: 8px;
+
+        // Variações de cor para diferentes tipos de modal
+        &.icon-success {
+            background-color: var(--success-50);
+        }
+
+        &.icon-warning {
+            background-color: var(--warning-50);
+        }
+
+        &.icon-error {
+            background-color: var(--error-50);
+        }
+
+        &.icon-info {
+            background-color: var(--info-50);
+        }
+    }
+
+    // ============================================
+    // TEXTO PRINCIPAL
+    // ============================================
+
+    .modal-text {
+        font-size: 16px;
+        line-height: 1.6;
+        color: var(--secondary-dark);
+        max-width: 400px;
+        margin: 0;
+
+        &.text-left {
+            text-align: left;
+        }
+
+        &.text-center {
+            text-align: center;
+        }
+
+        &.text-right {
+            text-align: right;
+        }
+
+        // Quebra de linha preservada
+        white-space: pre-line;
+    }
+
+    // ============================================
+    // BOTÕES DE AÇÃO
+    // ============================================
+
+    .modal-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        margin-top: 8px;
+
+        // Para 2 botões
+        &:has(ds-button:nth-child(2):last-child) {
+            ds-button {
+                flex: 1;
+                max-width: 140px;
+            }
+        }
+
+        // Para 3 ou mais botões
+        &:has(ds-button:nth-child(3)) {
+            flex-wrap: wrap;
+
+            ds-button {
+                flex: 1;
+                min-width: 120px;
+                max-width: 160px;
+            }
+        }
+
+        // Botão único
+        &:has(ds-button:only-child) {
+            ds-button {
+                min-width: 140px;
+            }
+        }
+    }
+
+    // ============================================
+    // RESPONSIVIDADE
+    // ============================================
+
+    @media (max-width: 768px) {
+        padding: 20px;
+        gap: 20px;
+
+        .modal-icon {
+            width: 64px;
+            height: 64px;
+
+            ds-icon {
+                font-size: 32px !important;
+            }
+        }
+
+        .modal-text {
+            font-size: 15px;
+            max-width: 100%;
+        }
+
+        .modal-actions {
+            flex-direction: column;
+            width: 100%;
+
+            ds-button {
+                width: 100% !important;
+                max-width: none !important;
+                flex: none !important;
+            }
+        }
+    }
+
+    @media (max-width: 480px) {
+        padding: 16px;
+        gap: 16px;
+
+        .modal-text {
+            font-size: 14px;
+        }
+    }
+}
+
+// ============================================
+// VARIAÇÕES DE TIPO DE MODAL
+// ============================================
+
+.general-modal-content {
+
+    // Modal de confirmação
+    &.confirmation {
+        .modal-text {
+            font-weight: 500;
+        }
+
+        .modal-actions {
+            ds-button:first-child {
+                // Botão de cancelar geralmente é outline
+            }
+
+            ds-button:last-child {
+                // Botão de confirmar geralmente é fill
+            }
+        }
+    }
+
+    // Modal de aviso
+    &.warning {
+        .modal-icon {
+            background-color: var(--warning-100);
+        }
+    }
+
+    // Modal de erro
+    &.error {
+        .modal-icon {
+            background-color: var(--error-100);
+        }
+    }
+
+    // Modal de sucesso
+    &.success {
+        .modal-icon {
+            background-color: var(--success-100);
+        }
+    }
+}
+
+// ============================================
+// ANIMAÇÕES
+// ============================================
+
+.modal-icon {
+    animation: iconBounce 0.6s ease-out;
+}
+
+@keyframes iconBounce {
+    0% {
+        transform: scale(0.3) rotate(-15deg);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.1) rotate(5deg);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+// Botões aparecem em sequência
+.modal-actions {
+    ds-button {
+        animation: buttonSlideIn 0.4s ease-out backwards;
+
+        &:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        &:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        &:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        &:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+    }
+}
+
+@keyframes buttonSlideIn {
+    0% {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

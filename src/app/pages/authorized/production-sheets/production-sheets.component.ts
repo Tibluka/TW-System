@@ -1,11 +1,13 @@
 // pages/authorized/production-sheets/production-sheets.component.ts
 
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, ViewChild } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { PaginationInfo } from '../../../models/clients/clients';
 import { MachineNumber, ProductionSheet, ProductionSheetFilters, ProductionSheetStage } from '../../../models/production-sheet/production-sheet';
+import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
+import { StatusUpdaterComponent, StatusOption } from '../../../shared/components/molecules/status-updater/status-updater.component';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { IconComponent } from '../../../shared/components/atoms/icon/icon.component';
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
@@ -18,6 +20,7 @@ import { ModalService } from '../../../shared/services/modal/modal.service';
 import { ProductionSheetsService } from '../../../shared/services/production-sheets/production-sheets.service';
 import { FormValidator } from '../../../shared/utils/form';
 import { ProductionSheetModalComponent } from './production-sheet-modal/production-sheet-modal.component';
+import { GeneralModalContentComponent } from '../../../shared/components/general/general-modal-content/general-modal-content.component';
 
 @Component({
   selector: 'app-production-sheets',
@@ -32,7 +35,10 @@ import { ProductionSheetModalComponent } from './production-sheet-modal/producti
     ButtonComponent,
     FormsModule,
     ModalComponent,
-    ProductionSheetModalComponent
+    ProductionSheetModalComponent,
+    ActionMenuComponent,
+    StatusUpdaterComponent,
+    GeneralModalContentComponent
   ],
   providers: [
     NgModel
@@ -85,6 +91,22 @@ export class ProductionSheetsComponent extends FormValidator {
 
   // Propriedade para armazenar ID da ficha selecionada para edição
   selectedProductionSheetId?: string;
+
+  // Configuração do menu de ações
+  actionMenuItems: ActionMenuItem[] = [];
+
+  // Configuração das opções de estágio para o status-updater
+  productionSheetStageOptions: StatusOption[] = [
+    { value: 'PRINTING', label: 'Impressão', icon: 'fa-solid fa-print', color: 'primary' },
+    { value: 'CALENDERING', label: 'Calandra', icon: 'fa-solid fa-cogs', color: 'warning' },
+    { value: 'FINISHED', label: 'Finalizado', icon: 'fa-solid fa-check-circle', color: 'success' }
+  ];
+
+  // Propriedades para o status-updater
+  selectedProductionSheetForStatusUpdate?: ProductionSheet;
+
+  // Referência ao componente status-updater
+  @ViewChild('statusUpdaterRef') statusUpdaterComponent?: StatusUpdaterComponent;
 
   // Subject para controlar debounce da busca
   private searchSubject = new Subject<string>();
@@ -363,5 +385,292 @@ export class ProductionSheetsComponent extends FormValidator {
       active: true
     };
     this.loadProductionSheets();
+  }
+
+  /**
+   * 🎯 MENU DE AÇÕES - Processa ação selecionada no menu
+   */
+  onActionMenuSelect(productionSheet: ProductionSheet, action: ActionMenuItem): void {
+    switch (action.value) {
+      case 'change-stage':
+        this.changeProductionSheetStage(productionSheet);
+        break;
+      case 'delete':
+        this.deleteProductionSheet(productionSheet);
+        break;
+      case 'advance-stage':
+        this.advanceProductionSheetStage(productionSheet);
+        break;
+      case 'retrocede-stage':
+        this.retrocedeProductionSheetStage(productionSheet);
+        break;
+      default:
+        console.warn('Ação não implementada:', action.value);
+    }
+  }
+
+  /**
+   * 📋 ITENS DO MENU - Retorna itens do menu baseado no status da ficha
+   */
+  getActionMenuItems(productionSheet: ProductionSheet): ActionMenuItem[] {
+    const items: ActionMenuItem[] = [
+      {
+        label: 'Alterar Estágio',
+        value: 'change-stage',
+        icon: 'fa-solid fa-arrow-right-arrow-left'
+      }
+    ];
+
+    // Botão "Avançar" - só aparece se não estiver no último estágio
+    if (productionSheet.stage !== 'FINISHED') {
+      items.push({
+        label: 'Avançar Estágio',
+        value: 'advance-stage',
+        icon: 'fa-solid fa-arrow-right'
+      });
+    }
+
+    // Botão "Retroceder" - só aparece se não estiver no primeiro estágio
+    if (productionSheet.stage !== 'PRINTING') {
+      items.push({
+        label: 'Retroceder Estágio',
+        value: 'retrocede-stage',
+        icon: 'fa-solid fa-arrow-left'
+      });
+    }
+
+    // Botão "Excluir" sempre aparece
+    items.push({
+      label: 'Excluir',
+      value: 'delete',
+      icon: 'fa-solid fa-trash'
+    });
+
+    return items;
+  }
+  /**
+   * ⬆️ AVANÇAR ESTÁGIO - Avança para o próximo estágio da produção
+   */
+  private advanceProductionSheetStage(productionSheet: ProductionSheet): void {
+    const nextStage = this.getNextStage(productionSheet.stage);
+
+    if (!nextStage) {
+      this.showErrorMessage('Esta ficha já está no estágio final.');
+      return;
+    }
+
+    const nextStageLabel = this.getStageLabel(nextStage);
+
+    this.modalService.open({
+      id: 'general-modal',
+      title: 'Avançar Estágio',
+      size: 'md',
+      showHeader: true,
+      showCloseButton: true,
+      closeOnBackdropClick: true,
+      closeOnEscapeKey: true,
+      data: {
+        text: `Deseja avançar a ficha "${productionSheet.internalReference}" para o estágio "${nextStageLabel}"?`,
+        icon: 'fa-solid fa-exclamation-triangle',
+        iconColor: 'tertiary',
+        textAlign: 'center',
+        buttons: [
+          {
+            label: 'Cancelar',
+            action: false,
+            variant: 'outline'
+          },
+          {
+            label: 'Avançar',
+            action: true,
+            variant: 'fill',
+            icon: 'fa-solid fa-arrow-right'
+          }
+        ]
+      }
+    }).subscribe(result => {
+      if (result && result.action === true) {
+        this.updateProductionSheetStage(productionSheet, nextStage);
+      }
+    });
+  }
+
+  /**
+   * 🔄 ATUALIZAR ESTÁGIO - Atualiza estágio da ficha via API
+   */
+  private updateProductionSheetStage(productionSheet: ProductionSheet, newStage: ProductionSheetStage): void {
+    if (!productionSheet._id) return;
+
+    this.productionSheetsService.updateProductionSheet(productionSheet._id, { stage: newStage })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.showSuccessMessage(`Estágio avançado para "${this.getStageLabel(newStage)}" com sucesso.`);
+          this.loadProductionSheets();
+        },
+        error: (error) => {
+          console.error('❌ Erro ao avançar estágio:', error);
+          this.showErrorMessage(error.message || 'Erro ao avançar estágio.');
+        }
+      });
+  }
+
+  /**
+   * ➡️ PRÓXIMO ESTÁGIO - Retorna o próximo estágio na sequência
+   */
+  private getNextStage(currentStage: ProductionSheetStage): ProductionSheetStage | null {
+    const stageFlow: ProductionSheetStage[] = ['PRINTING', 'CALENDERING', 'FINISHED'];
+    const currentIndex = stageFlow.indexOf(currentStage);
+
+    if (currentIndex >= 0 && currentIndex < stageFlow.length - 1) {
+      return stageFlow[currentIndex + 1];
+    }
+
+    return null; // Já está no estágio final
+  }
+
+  /**
+   * ⬅️ ESTÁGIO ANTERIOR - Retorna o estágio anterior na sequência
+   */
+  private getPreviousStage(currentStage: ProductionSheetStage): ProductionSheetStage | null {
+    const stageFlow: ProductionSheetStage[] = ['PRINTING', 'CALENDERING', 'FINISHED'];
+    const currentIndex = stageFlow.indexOf(currentStage);
+
+    if (currentIndex > 0) {
+      return stageFlow[currentIndex - 1];
+    }
+
+    return null; // Já está no primeiro estágio
+  }
+
+  /**
+   * ⬇️ RETROCEDER ESTÁGIO - Retrocede para o estágio anterior da produção
+   */
+  private retrocedeProductionSheetStage(productionSheet: ProductionSheet): void {
+    const previousStage = this.getPreviousStage(productionSheet.stage);
+
+    if (!previousStage) {
+      this.showErrorMessage('Esta ficha já está no primeiro estágio.');
+      return;
+    }
+
+    const previousStageLabel = this.getStageLabel(previousStage);
+
+    this.modalService.open({
+      id: 'general-modal',
+      title: 'Retroceder Estágio',
+      size: 'md',
+      showHeader: true,
+      showCloseButton: true,
+      closeOnBackdropClick: true,
+      closeOnEscapeKey: true,
+      data: {
+        text: `Deseja retroceder a ficha "${productionSheet.internalReference}" para o estágio "${previousStageLabel}"?`,
+        icon: 'fa-solid fa-arrow-left',
+        iconColor: 'warning',
+        textAlign: 'center',
+        buttons: [
+          {
+            label: 'Cancelar',
+            action: false,
+            variant: 'outline'
+          },
+          {
+            label: 'Retroceder',
+            action: true,
+            variant: 'fill',
+            icon: 'fa-solid fa-arrow-left'
+          }
+        ]
+      }
+    }).subscribe(result => {
+      if (result && result.action === true) {
+        this.updateProductionSheetStage(productionSheet, previousStage);
+      }
+    });
+  }
+
+  /**
+   * 🔄 ALTERAR ESTÁGIO - Altera estágio da ficha de produção
+   */
+  private changeProductionSheetStage(productionSheet: ProductionSheet): void {
+    this.selectedProductionSheetForStatusUpdate = productionSheet;
+
+    // Aguarda o próximo ciclo para garantir que o componente seja renderizado
+    setTimeout(() => {
+      if (this.statusUpdaterComponent) {
+        this.statusUpdaterComponent.openStatusModal();
+      }
+    }, 0);
+  }
+
+  /**
+   * 🎯 STATUS ATUALIZADO - Callback quando status é atualizado
+   */
+  onStatusUpdated(result: any): void {
+    if (result.success) {
+      this.showSuccessMessage(result.message);
+      this.loadProductionSheets(); // Recarregar lista
+    }
+  }
+
+  /**
+   * ❌ STATUS UPDATE FALHOU - Callback quando atualização falha
+   */
+  onStatusUpdateFailed(result: any): void {
+    this.showErrorMessage(result.error || 'Erro ao atualizar estágio');
+  }
+
+  /**
+   * 🔄 LIMPAR SELEÇÃO - Limpa a seleção da ficha para atualização de estágio
+   */
+  clearStatusUpdateSelection(): void {
+    this.selectedProductionSheetForStatusUpdate = undefined;
+  }
+
+  /**
+   * 🗑️ EXCLUIR - Exclui ficha de produção
+   */
+  private deleteProductionSheet(productionSheet: ProductionSheet): void {
+    if (!productionSheet._id) {
+      console.error('ID da ficha de produção não encontrado');
+      return;
+    }
+
+    if (confirm(`Tem certeza que deseja excluir a ficha de produção "${productionSheet.internalReference}"?`)) {
+      this.productionSheetsService.deleteProductionSheet(productionSheet._id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.showSuccessMessage(`Ficha de produção ${productionSheet.internalReference} excluída com sucesso.`);
+            this.loadProductionSheets(); // Recarregar lista
+          },
+          error: (error) => {
+            console.error('❌ Erro ao excluir ficha de produção:', error);
+            this.showErrorMessage(error.message || 'Erro ao excluir ficha de produção.');
+          }
+        });
+    }
+  }
+
+  /**
+   * 🟢 SUCESSO - Mostra mensagem de sucesso
+   */
+  private showSuccessMessage(message: string): void {
+    // Implementar toast/notificação de sucesso
+    console.log('SUCCESS:', message);
+  }
+
+  /**
+   * 🔴 ERRO - Mostra mensagem de erro
+   */
+  private showErrorMessage(message: string): void {
+    this.errorMessage = message;
+    this.showError = true;
+
+    // Auto-hide após 5 segundos
+    setTimeout(() => {
+      this.showError = false;
+    }, 5000);
   }
 }

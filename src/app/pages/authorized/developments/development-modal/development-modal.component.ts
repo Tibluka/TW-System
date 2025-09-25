@@ -292,8 +292,6 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
       const formData = this.developmentForm.value;
 
       let result: any;
-      debugger
-      console.log(formData);
 
       if (this.isEditMode && this.developmentForm.value._id) {
         const updateData: UpdateDevelopmentRequest = {

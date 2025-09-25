@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, lastValueFrom, Subject, takeUntil } from 'rxjs';
-import { Development } from '../../../../models/developments/developments';
+import { Development, ProductionTypeEnum } from '../../../../models/developments/developments';
 import { CreateProductionOrderRequest, ProductionOrder, UpdateProductionOrderRequest } from '../../../../models/production-orders/production-orders';
 import { ButtonComponent } from '../../../../shared/components/atoms/button/button.component';
 import { IconComponent } from "../../../../shared/components/atoms/icon/icon.component";
@@ -15,7 +15,8 @@ import { DevelopmentService } from '../../../../shared/services/development/deve
 import { ModalService } from '../../../../shared/services/modal/modal.service';
 import { ProductionOrderService } from '../../../../shared/services/production-order/production-order.service';
 import { FormValidator } from '../../../../shared/utils/form';
-import { SelectComponent } from "../../../../shared/components/atoms/select/select.component";
+import { SelectComponent } from '../../../../shared/components/atoms/select/select.component';
+import { translateProductionType } from '../../../../shared/utils/tools';
 
 interface SelectOption {
   value: string;
@@ -32,6 +33,7 @@ interface SelectOption {
     TextareaComponent,
     SpinnerComponent,
     FormsModule,
+    //SelectComponent,
     IconComponent
   ],
   templateUrl: './production-order-modal.component.html',
@@ -436,5 +438,9 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     return this.developmentFound.productionType.additionalInfo?.sizes.reduce((total, sizeItem) => {
       return total + (sizeItem.value || 0);
     }, 0);
+  }
+
+  productionType(productionType: ProductionTypeEnum): string {
+    return translateProductionType(productionType);
   }
 }

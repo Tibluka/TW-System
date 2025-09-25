@@ -53,7 +53,7 @@
                                 <p class="subtitle-section secondary mb-0">{{developmentFound.client?.companyName}}</p>
                                 <p class="card-small secondary mb-4">{{developmentFound.clientReference}}</p>
                                 <hr>
-                                <p class="body secondary mt-4 mb-0">{{developmentFound.productionType.type}}</p>
+                                {{productionType(developmentFound!.productionType!.type)}}
                             </div>
                         </div>
                     </div>
@@ -93,7 +93,7 @@
                             <!-- Cabeçalho com os tamanhos -->
                             <thead>
                                 <tr>
-                                    <th>
+                                    <th class="d-flex align-items-center gap-8 justify-content-center">
                                         Variante
                                         <ds-icon icon="fa-solid fa-circle-plus" cursorType="pointer" color="tertiary"
                                             fontSize="16px" />
@@ -111,7 +111,11 @@
                                     <td>
                                         <ds-input
                                             [(ngModel)]="developmentFound!.productionType!.additionalInfo!.variant"
+                                            placeholder="Digite o nome da variante"
                                             [ngModelOptions]="{standalone: true}"></ds-input>
+                                        <!-- <ds-select
+                                            [(ngModel)]="developmentFound!.productionType!.additionalInfo!.variant"
+                                            [options]="variantOptions" [ngModelOptions]="{standalone: true}" /> -->
                                     </td>
                                     <td class="size-value"
                                         *ngFor="let sizeItem of developmentFound?.productionType?.additionalInfo?.sizes">

@@ -44,6 +44,7 @@
                 <ds-table-cell [isHeader]="true" align="left">Entrada</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="left">Saída Prevista</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="center">Estágio</ds-table-cell>
+                <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
             </ds-table-row>
 
             <!-- DADOS DAS FICHAS DE PRODUÇÃO -->
@@ -124,6 +125,13 @@
                     </span>
                 </ds-table-cell>
 
+                <!-- Ações -->
+                <ds-table-cell align="center">
+                    <ds-action-menu [items]="getActionMenuItems(productionSheet)"
+                        (itemSelected)="onActionMenuSelect(productionSheet, $event)">
+                    </ds-action-menu>
+                </ds-table-cell>
+
             </ds-table-row>
         </ds-table>
     </div>
@@ -132,6 +140,20 @@
     <!-- Modal de desenvolvimento -->
     <ds-modal modalId="production-sheet-modal" *ngIf="isModalOpen" (modalClosed)="onModalClosed($event)">
         <app-production-sheet-modal></app-production-sheet-modal>
+    </ds-modal>
+
+    <!-- Componente de atualização de estágio -->
+    <ds-status-updater *ngIf="selectedProductionSheetForStatusUpdate" #statusUpdaterRef entityType="production-sheet"
+        [entityId]="selectedProductionSheetForStatusUpdate._id!"
+        [currentStatus]="selectedProductionSheetForStatusUpdate.stage" [availableStatuses]="productionSheetStageOptions"
+        [entityReference]="selectedProductionSheetForStatusUpdate.internalReference"
+        (statusUpdated)="onStatusUpdated($event); clearStatusUpdateSelection()"
+        (statusUpdateFailed)="onStatusUpdateFailed($event)">
+    </ds-status-updater>
+
+    <!-- Modal geral para confirmações -->
+    <ds-modal modalId="general-modal">
+        <app-general-modal-content></app-general-modal-content>
     </ds-modal>
 
 </div>

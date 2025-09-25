@@ -1,12 +1,14 @@
 // pages/authorized/production-orders/production-orders.component.ts
 
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, effect, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, effect, inject, ViewChild } from '@angular/core';
 import { FormsModule, NgModel } from "@angular/forms";
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
 // Componentes
 import { PaginationInfo, ProductionOrder, ProductionOrderFilters } from '../../../models/production-orders/production-orders';
+import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
+import { StatusUpdaterComponent, StatusOption } from '../../../shared/components/molecules/status-updater/status-updater.component';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
 import { SelectComponent, SelectOption } from '../../../shared/components/atoms/select/select.component';
@@ -36,7 +38,9 @@ import { copyToClipboard } from '../../../shared/utils/tools';
     ProductionOrderModalComponent,
     SelectComponent,
     SpinnerComponent,
-    IconComponent
+    IconComponent,
+    ActionMenuComponent,
+    StatusUpdaterComponent
   ],
   providers: [NgModel],
   templateUrl: './production-orders.component.html',
@@ -81,6 +85,36 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
 
   // Propriedade para armazenar ID da ordem selecionada para edição
   selectedProductionOrderId?: string;
+
+  // Configuração do menu de ações
+  actionMenuItems: ActionMenuItem[] = [
+    {
+      label: 'Alterar Status',
+      value: 'change-status',
+      icon: 'fa-solid fa-arrow-right-arrow-left'
+    },
+    {
+      label: 'Excluir',
+      value: 'delete',
+      icon: 'fa-solid fa-trash'
+    }
+  ];
+
+  // Configuração das opções de status para o status-updater
+  productionOrderStatusOptions: StatusOption[] = [
+    { value: 'CREATED', label: 'Criado', icon: 'fa-solid fa-plus', color: 'info' },
+    { value: 'PILOT_PRODUCTION', label: 'Produção Piloto', icon: 'fa-solid fa-flask', color: 'warning' },
+    { value: 'PILOT_SENT', label: 'Piloto Enviado', icon: 'fa-solid fa-paper-plane', color: 'info' },
+    { value: 'PILOT_APPROVED', label: 'Piloto Aprovado', icon: 'fa-solid fa-check-circle', color: 'success' },
+    { value: 'PRODUCTION_STARTED', label: 'Produção Iniciada', icon: 'fa-solid fa-play', color: 'primary' },
+    { value: 'FINALIZED', label: 'Finalizado', icon: 'fa-solid fa-flag-checkered', color: 'success' }
+  ];
+
+  // Propriedades para o status-updater
+  selectedProductionOrderForStatusUpdate?: ProductionOrder;
+
+  // Referência ao componente status-updater
+  @ViewChild('statusUpdaterRef') statusUpdaterComponent?: StatusUpdaterComponent;
 
   // Subject para controlar debounce da busca
   private searchSubject = new Subject<string>();
@@ -353,5 +387,105 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
 
   copy(event: MouseEvent, internalReference: string): void {
     copyToClipboard(internalReference, event);
+  }
+
+  /**
+   * 🎯 MENU DE AÇÕES - Processa ação selecionada no menu
+   */
+  onActionMenuSelect(productionOrder: ProductionOrder, action: ActionMenuItem): void {
+    switch (action.value) {
+      case 'change-status':
+        this.changeProductionOrderStatus(productionOrder);
+        break;
+      case 'delete':
+        this.deleteProductionOrder(productionOrder);
+        break;
+      default:
+        console.warn('Ação não implementada:', action.value);
+    }
+  }
+
+  /**
+   * 🔄 ALTERAR STATUS - Altera status da ordem de produção
+   */
+  private changeProductionOrderStatus(productionOrder: ProductionOrder): void {
+    this.selectedProductionOrderForStatusUpdate = productionOrder;
+
+    // Aguarda o próximo ciclo para garantir que o componente seja renderizado
+    setTimeout(() => {
+      if (this.statusUpdaterComponent) {
+        this.statusUpdaterComponent.openStatusModal();
+      }
+    }, 0);
+  }
+
+  /**
+   * 🎯 STATUS ATUALIZADO - Callback quando status é atualizado
+   */
+  onStatusUpdated(result: any): void {
+    if (result.success) {
+      this.showSuccessMessage(result.message);
+      this.loadProductionOrders(); // Recarregar lista
+    }
+  }
+
+  /**
+   * ❌ STATUS UPDATE FALHOU - Callback quando atualização falha
+   */
+  onStatusUpdateFailed(result: any): void {
+    this.showErrorMessage(result.error || 'Erro ao atualizar status');
+  }
+
+  /**
+   * 🔄 LIMPAR SELEÇÃO - Limpa a seleção da ordem para atualização de status
+   */
+  clearStatusUpdateSelection(): void {
+    this.selectedProductionOrderForStatusUpdate = undefined;
+  }
+
+  /**
+   * 🗑️ EXCLUIR - Exclui ordem de produção
+   */
+  private deleteProductionOrder(productionOrder: ProductionOrder): void {
+    if (!productionOrder._id) {
+      console.error('ID da ordem de produção não encontrado');
+      return;
+    }
+
+    if (confirm(`Tem certeza que deseja excluir a ordem de produção "${productionOrder.internalReference}"?`)) {
+      this.productionOrderService.deleteProductionOrder(productionOrder._id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.showSuccessMessage(`Ordem de produção ${productionOrder.internalReference} excluída com sucesso.`);
+            this.loadProductionOrders(); // Recarregar lista
+          },
+          error: (error) => {
+            console.error('❌ Erro ao excluir ordem de produção:', error);
+            this.showErrorMessage(error.message || 'Erro ao excluir ordem de produção.');
+          }
+        });
+    }
+  }
+
+  /**
+   * 🟢 SUCESSO - Mostra mensagem de sucesso
+   */
+  private showSuccessMessage(message: string): void {
+    // Implementar toast/notificação de sucesso
+    console.log('SUCCESS:', message);
+  }
+
+  /**
+   * 🔴 ERRO - Mostra mensagem de erro
+   */
+  private showErrorMessage(message: string): void {
+    this.errorMessage = message;
+    this.showError = true;
+
+    // Auto-hide após 5 segundos
+    setTimeout(() => {
+      this.showError = false;
+    }, 5000);
   }
 }

@@ -4,6 +4,7 @@
     display: flex;
     flex-direction: column;
     position: relative;
+    overflow: visible !important; // Garantir que o dropdown não seja cortado
 
     .select-label {
         margin-bottom: 8px;
@@ -22,6 +23,7 @@
         position: relative;
         display: flex;
         align-items: center;
+        overflow: visible !important; // Garantir que o dropdown não seja cortado
 
         &.has-icon {
             .select-field {
@@ -204,7 +206,8 @@
             position: absolute;
             left: 0;
             right: 0;
-            z-index: 1000;
+            min-width: fit-content;
+            z-index: 99999 !important;
             background: white;
             border: 1px solid var(--stroke);
             border-radius: $border-radius-sm;
@@ -388,4 +391,44 @@
     &::-webkit-scrollbar-thumb:hover {
         background-color: rgba(1, 48, 71, 0.5);
     }
+}
+
+// ============================================
+// OVERRIDES PARA MODAIS E CONTAINERS COM OVERFLOW
+// ============================================
+
+// Garantir que o dropdown sempre apareça sobre modais
+.ds-modal .select-dropdown,
+.modal .select-dropdown,
+[class*="modal"] .select-dropdown {
+    z-index: 999999 !important;
+    position: absolute !important;
+}
+
+// Abordagem cirúrgica: só afetar containers de select em modais
+.ds-modal,
+.modal,
+[class*="modal"] {
+
+    // Só aplicar overflow visible para containers de select
+    .select-container {
+        overflow: visible !important;
+        z-index: 99998; // Garantir que o container também tenha z-index alto
+    }
+
+    // Para form-groups que contêm selects, vamos usar uma classe específica
+    .form-group.has-select {
+        overflow: visible !important;
+        z-index: 99998;
+    }
+}
+
+// Garantir que containers de select não afetem o dropdown
+.select-container {
+    overflow: visible !important;
+}
+
+// Para form-groups com selects (aplicada via JavaScript)
+.form-group.has-select {
+    overflow: visible !important;
 }

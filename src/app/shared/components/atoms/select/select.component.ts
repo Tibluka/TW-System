@@ -70,10 +70,26 @@ export class SelectComponent implements OnInit, OnDestroy, ControlValueAccessor 
   ngOnInit() {
     this.uniqueId = `ds-select-${Math.random().toString(36).substr(2, 9)}`;
     this.updateFilteredOptions();
+
+    // Adicionar classe has-select ao form-group pai para overflow em modais
+    setTimeout(() => {
+      const selectElement = document.getElementById(this.uniqueId + '-container');
+      const formGroup = selectElement?.closest('.form-group');
+      if (formGroup) {
+        formGroup.classList.add('has-select');
+      }
+    }, 0);
   }
 
   ngOnDestroy() {
     document.removeEventListener('click', this.handleOutsideClick.bind(this));
+
+    // Remover classe has-select ao destruir o componente
+    const selectElement = document.getElementById(this.uniqueId + '-container');
+    const formGroup = selectElement?.closest('.form-group');
+    if (formGroup) {
+      formGroup.classList.remove('has-select');
+    }
   }
 
   // Implementação do ControlValueAccessor
@@ -298,4 +314,5 @@ export class SelectComponent implements OnInit, OnDestroy, ControlValueAccessor 
     }
     return this.value !== null && this.value !== undefined && this.value !== '';
   }
+
 }

@@ -405,12 +405,15 @@
     }
 }
 
+.table-container {
+    overflow-x: visible;
+}
 
 .production-table {
     width: 100%;
     border-collapse: collapse;
     background-color: white;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .production-table th,

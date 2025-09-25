@@ -1,0 +1,22 @@
+<div class="general-modal-content" *ngIf="modalData">
+
+    <!-- Ícone principal (opcional) -->
+    <div class="modal-icon" *ngIf="modalData.icon">
+        <ds-icon [icon]="modalData.icon" [color]="modalData.iconColor || 'primary'" fontSize="48px">
+        </ds-icon>
+    </div>
+
+    <!-- Texto principal -->
+    <div [class]="getTextClasses()">
+        {{ modalData.text }}
+    </div>
+
+    <!-- Botões de ação -->
+    <div class="modal-actions">
+        <ds-button *ngFor="let button of modalData.buttons" [label]="button.label" [variant]="getButtonVariant(button)"
+            [icon]="button.icon || ''" [disabled]="button.disabled || false" [isLoading]="button.isLoading || false"
+            (onClickEmitter)="onButtonClick(button)">
+        </ds-button>
+    </div>
+
+</div>
