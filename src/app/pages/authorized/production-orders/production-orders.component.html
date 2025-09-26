@@ -22,105 +22,147 @@
     </div>
 
     <div class="results mt-32">
-        <ds-table emptyMessage="Nenhuma ordem de produção encontrada" [showPagination]="true"
-            [pageSize]="currentFilters.limit" [totalPages]="pagination?.totalPages"
-            [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)"
-            [loadingData]="shouldShowSpinner">
+        <ds-list-view [items]="productionOrders" [config]="listViewConfig">
+            <div slot="table">
+                <ds-table emptyMessage="Nenhuma ordem de produção encontrada" [showPagination]="true"
+                    [pageSize]="currentFilters.limit" [totalPages]="pagination?.totalPages"
+                    [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)"
+                    [loadingData]="shouldShowSpinner">
 
-            <!-- Cabeçalho da tabela -->
-            <ds-table-row [isHeader]="true">
-                <ds-table-cell [isHeader]="true" align="left">Imagem</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Referência Interna</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Referência do Cliente</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Tipo de Produção</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Tecido</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
-            </ds-table-row>
+                    <!-- Cabeçalho da tabela -->
+                    <ds-table-row [isHeader]="true">
+                        <ds-table-cell [isHeader]="true" align="left">Imagem</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Referência Interna</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Referência do Cliente</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Tipo de Produção</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Tecido</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
+                    </ds-table-row>
 
-            <!-- ✨ DADOS DAS ORDENS DE PRODUÇÃO -->
-            <ds-table-row *ngFor="let productionOrder of productionOrders" [clickable]="true" [data]="productionOrder"
-                (rowClick)="onProductionOrderClick(productionOrder)">
+                    <!-- ✨ DADOS DAS ORDENS DE PRODUÇÃO -->
+                    <ds-table-row *ngFor="let productionOrder of productionOrders" [clickable]="true"
+                        [data]="productionOrder" (rowClick)="onProductionOrderClick(productionOrder)">
 
-                <!-- Imagem -->
-                <ds-table-cell align="left">
-                    <div class="image-cell">
-                        <img *ngIf="productionOrder.development?.pieceImage?.url"
-                            [src]="productionOrder.development?.pieceImage?.url"
-                            [alt]="productionOrder.development?.description || 'Imagem do desenvolvimento'"
-                            class="development-image">
-                        <div *ngIf="!productionOrder.development?.pieceImage?.url" class="no-image">
-                            <ds-icon icon="fa-solid fa-image" color="label" fontSize="24px"></ds-icon>
-                        </div>
+                        <!-- Imagem -->
+                        <ds-table-cell align="left">
+                            <div class="image-cell">
+                                <img *ngIf="productionOrder.development?.pieceImage?.url"
+                                    [src]="productionOrder.development?.pieceImage?.url"
+                                    [alt]="productionOrder.development?.description || 'Imagem do desenvolvimento'"
+                                    class="development-image">
+                                <div *ngIf="!productionOrder.development?.pieceImage?.url" class="no-image">
+                                    <ds-icon icon="fa-solid fa-image" color="label" fontSize="24px"></ds-icon>
+                                </div>
+                            </div>
+                        </ds-table-cell>
+
+                        <!-- Referência Interna -->
+                        <ds-table-cell align="left">
+                            <span class="body primary-dark">
+                                <span class="body primary-dark font-weight-medium">{{
+                                    productionOrder.internalReference }}</span>
+                                <ds-icon (click)="copy($event, productionOrder.internalReference)" class="ml-4"
+                                    cursorType="pointer" icon="fa-regular fa-clipboard" fontSize="16px" />
+                            </span>
+                        </ds-table-cell>
+
+                        <!-- Referência do Cliente -->
+                        <ds-table-cell align="left">
+                            <span class="body primary-dark">
+                                {{ productionOrder.development?.clientReference || '-' }}
+                            </span>
+                        </ds-table-cell>
+
+                        <!-- Cliente -->
+                        <ds-table-cell align="left">
+                            <div class="client-cell" *ngIf="productionOrder.development?.client">
+                                <div class="body primary-dark">
+                                    {{ productionOrder.development?.client?.companyName }}
+                                </div>
+                                <div class="placeholder" *ngIf="productionOrder.development?.client?.acronym">
+                                    {{ productionOrder.development?.client?.acronym }}
+                                </div>
+                            </div>
+                            <span class="body label" *ngIf="!productionOrder.development?.client">
+                                Cliente não encontrado
+                            </span>
+                        </ds-table-cell>
+
+                        <!-- Tipo de Produção -->
+                        <ds-table-cell align="left">
+                            <span class="body primary-dark" *ngIf="productionOrder.productionType.type === 'rotary'">
+                                Rotativo
+                            </span>
+                            <span class="body primary-dark" *ngIf="productionOrder.productionType.type === 'localized'">
+                                Localizado
+                            </span>
+                            <p class="body label" *ngIf="productionOrder.productionType.type === 'rotary'">
+                                {{productionOrder.productionType.meters}}m</p>
+                        </ds-table-cell>
+
+                        <!-- Tecido -->
+                        <ds-table-cell align="left">
+                            <span class="body primary-dark">{{ productionOrder.fabricType || '-' }}</span>
+                        </ds-table-cell>
+
+                        <!-- Status -->
+                        <ds-table-cell align="center">
+                            <ds-badge [text]="getStatusLabel(productionOrder.status)" [status]="productionOrder.status"
+                                entityType="production-order" />
+
+                        </ds-table-cell>
+
+                        <!-- Ações -->
+                        <ds-table-cell align="center">
+                            <ds-action-menu [items]="actionMenuItems"
+                                (itemSelected)="onActionMenuSelect(productionOrder, $event)">
+                            </ds-action-menu>
+                        </ds-table-cell>
+
+                    </ds-table-row>
+                </ds-table>
+            </div>
+
+            <ng-template #cardTemplate let-productionOrder>
+                <div class="card-content" (click)="onProductionOrderClick(productionOrder)">
+                    <img *ngIf="productionOrder.development.pieceImage.url"
+                        [src]="productionOrder.development.pieceImage.url" [alt]="productionOrder.internalReference"
+                        class="card-image" />
+
+                    <div class="card-body">
+                        <h3 class="title-modal mb-6 mt-8 secondary">{{ productionOrder.internalReference }}</h3>
+
+                        <p class="subtitle-section secondary" *ngIf="productionOrder.development.client.companyName">{{
+                            productionOrder.development.client.companyName
+                            }}</p>
+
+                        <p class="card-small secondary mb-8" *ngIf="productionOrder.development.clientReference">{{
+                            productionOrder.development.clientReference
+                            }}</p>
+
+                        <hr>
+
+                        <h4 class="body secondary mt-8 mb-0"> {{ productionType(productionOrder.productionType!.type) }}
+                        </h4>
                     </div>
-                </ds-table-cell>
 
-                <!-- Referência Interna -->
-                <ds-table-cell align="left">
-                    <span class="body primary-dark">
-                        <span class="body primary-dark font-weight-medium">{{
-                            productionOrder.internalReference }}</span>
-                        <ds-icon (click)="copy($event, productionOrder.internalReference)" class="ml-4"
-                            cursorType="pointer" icon="fa-regular fa-clipboard" fontSize="16px" />
-                    </span>
-                </ds-table-cell>
+                    <div class="card-actions">
+                        <ds-icon icon="fa-solid fa-arrow-right-arrow-left" color="label" fontSize="20px"
+                            cursorType="pointer"
+                            (click)="changeProductionOrderStatus(productionOrder); $event.stopPropagation()"
+                            title="Alterar Status" />
 
-                <!-- Referência do Cliente -->
-                <ds-table-cell align="left">
-                    <span class="body primary-dark">
-                        {{ productionOrder.development?.clientReference || '-' }}
-                    </span>
-                </ds-table-cell>
-
-                <!-- Cliente -->
-                <ds-table-cell align="left">
-                    <div class="client-cell" *ngIf="productionOrder.development?.client">
-                        <div class="body primary-dark">
-                            {{ productionOrder.development?.client?.companyName }}
-                        </div>
-                        <div class="placeholder" *ngIf="productionOrder.development?.client?.acronym">
-                            {{ productionOrder.development?.client?.acronym }}
-                        </div>
+                        <ds-icon icon="fa-solid fa-trash" color="label" fontSize="20px" cursorType="pointer"
+                            (click)="deleteProductionOrder(productionOrder); $event.stopPropagation()"
+                            title="Excluir" />
                     </div>
-                    <span class="body label" *ngIf="!productionOrder.development?.client">
-                        Cliente não encontrado
-                    </span>
-                </ds-table-cell>
+                </div>
+            </ng-template>
 
-                <!-- Tipo de Produção -->
-                <ds-table-cell align="left">
-                    <span class="body primary-dark" *ngIf="productionOrder.productionType.type === 'rotary'">
-                        Rotativo
-                    </span>
-                    <span class="body primary-dark" *ngIf="productionOrder.productionType.type === 'localized'">
-                        Localizado
-                    </span>
-                    <p class="body label" *ngIf="productionOrder.productionType.type === 'rotary'">
-                        {{productionOrder.productionType.meters}}m</p>
-                </ds-table-cell>
+        </ds-list-view>
 
-                <!-- Tecido -->
-                <ds-table-cell align="left">
-                    <span class="body primary-dark">{{ productionOrder.fabricType || '-' }}</span>
-                </ds-table-cell>
-
-                <!-- Status -->
-                <ds-table-cell align="center">
-                    <ds-badge [text]="getStatusLabel(productionOrder.status)" [status]="productionOrder.status"
-                        entityType="production-order" />
-
-                </ds-table-cell>
-
-                <!-- Ações -->
-                <ds-table-cell align="center">
-                    <ds-action-menu [items]="actionMenuItems"
-                        (itemSelected)="onActionMenuSelect(productionOrder, $event)">
-                    </ds-action-menu>
-                </ds-table-cell>
-
-            </ds-table-row>
-        </ds-table>
     </div>
 </div>
 

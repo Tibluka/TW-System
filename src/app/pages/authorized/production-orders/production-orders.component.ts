@@ -6,7 +6,7 @@ import { FormsModule, NgModel } from "@angular/forms";
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
 // Componentes
-import { PaginationInfo, ProductionOrder, ProductionOrderFilters } from '../../../models/production-orders/production-orders';
+import { PaginationInfo, ProductionOrder, ProductionOrderFilters, ProductionTypeEnum } from '../../../models/production-orders/production-orders';
 import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
 import { BadgeComponent } from "../../../shared/components/atoms/badge/badge.component";
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
@@ -22,8 +22,11 @@ import { TableComponent } from '../../../shared/components/organisms/table/table
 import { ModalService } from '../../../shared/services/modal/modal.service';
 import { ProductionOrderService } from '../../../shared/services/production-order/production-order.service';
 import { FormValidator } from '../../../shared/utils/form';
-import { copyToClipboard } from '../../../shared/utils/tools';
+import { copyToClipboard, translateProductionType } from '../../../shared/utils/tools';
 import { ProductionOrderModalComponent } from "./production-order-modal/production-order-modal.component";
+import { DsListViewComponent, ViewMode } from "../../../shared/components/molecules/list-view/list-view.component";
+import { ListViewConfig } from '../../../models/list-view/list-view';
+import { ListViewService } from '../../../shared/services/list-view/list-view.service';
 
 @Component({
   selector: 'app-production-orders',
@@ -42,7 +45,8 @@ import { ProductionOrderModalComponent } from "./production-order-modal/producti
     ActionMenuComponent,
     StatusUpdaterComponent,
     BadgeComponent,
-    GeneralModalContentComponent
+    GeneralModalContentComponent,
+    DsListViewComponent
   ],
   providers: [NgModel],
   templateUrl: './production-orders.component.html',
@@ -54,6 +58,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
 
   private productionOrderService = inject(ProductionOrderService);
   private modalService = inject(ModalService);
+  private listViewService = inject(ListViewService);
 
   // Lista de ordens de produção e paginação
   productionOrders: ProductionOrder[] = [];
@@ -73,6 +78,19 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
     limit: 10,
     active: true
   };
+
+  // ✨ CONFIGURAÇÃO DO LIST VIEW
+  listViewConfig: ListViewConfig = {
+    showToggle: true,
+    defaultView: 'table',
+    cardConfig: {
+      minWidth: '350px',
+      gap: '24px'
+    },
+    storageKey: 'developments-view-mode',
+    density: 'normal'
+  };
+  currentViewMode: ViewMode = 'table';
 
   // Opções para select de status
   statusOptions: SelectOption[] = [
@@ -142,11 +160,28 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
   ngOnInit(): void {
     this.setupSearchDebounce();
     this.loadProductionOrders();
+    this.listViewService
+      .getViewMode('developments', 'table')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(mode => {
+        this.currentViewMode = mode;
+      });
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+
+  onViewModeChange(mode: ViewMode) {
+    this.listViewService.setViewMode('developments', mode);
+
+    // Analytics opcional
+    // this.analytics.track('view_mode_changed', { 
+    //   entity: 'developments', 
+    //   mode 
+    // });
   }
 
   // ============================================
@@ -414,7 +449,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
   /**
    * 🔄 ALTERAR STATUS - Altera status da ordem de produção
    */
-  private changeProductionOrderStatus(productionOrder: ProductionOrder): void {
+  changeProductionOrderStatus(productionOrder: ProductionOrder): void {
     this.selectedProductionOrderForStatusUpdate = productionOrder;
 
     // Aguarda o próximo ciclo para garantir que o componente seja renderizado
@@ -452,7 +487,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
   /**
    * 🗑️ EXCLUIR - Exclui ordem de produção
    */
-  private deleteProductionOrder(productionOrder: ProductionOrder): void {
+  deleteProductionOrder(productionOrder: ProductionOrder): void {
     if (!productionOrder._id) {
       console.error('ID da ordem de produção não encontrado');
       return;
@@ -524,4 +559,9 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
       this.showError = false;
     }, 5000);
   }
+
+  productionType(productionType: ProductionTypeEnum) {
+    return translateProductionType(productionType);
+  }
+
 }

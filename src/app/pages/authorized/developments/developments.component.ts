@@ -1,31 +1,30 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, effect, inject, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, effect, inject } from '@angular/core';
 import { FormsModule, NgModel } from "@angular/forms";
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 
 // Componentes
 import { Development, DevelopmentFilters, DevelopmentListResponse, DevelopmentStatus, PaginationInfo, ProductionTypeEnum } from '../../../models/developments/developments';
+import { ListViewConfig } from '../../../models/list-view/list-view';
 import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
-import { StatusUpdaterComponent, StatusOption } from '../../../shared/components/molecules/status-updater/status-updater.component';
+import { BadgeComponent } from "../../../shared/components/atoms/badge/badge.component";
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { IconComponent } from "../../../shared/components/atoms/icon/icon.component";
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
 import { SelectComponent, SelectOption } from "../../../shared/components/atoms/select/select.component";
+import { GeneralModalContentComponent } from "../../../shared/components/general/general-modal-content/general-modal-content.component";
+import { DsListViewComponent } from "../../../shared/components/molecules/list-view/list-view.component";
+import { StatusOption, StatusUpdaterComponent } from '../../../shared/components/molecules/status-updater/status-updater.component';
 import { ModalComponent } from "../../../shared/components/organisms/modal/modal.component";
 import { TableCellComponent } from '../../../shared/components/organisms/table/table-cell/table-cell.component';
 import { TableRowComponent } from '../../../shared/components/organisms/table/table-row/table-row.component';
 import { TableComponent } from '../../../shared/components/organisms/table/table.component';
 import { DevelopmentService } from '../../../shared/services/development/development.service';
+import { ListViewService, ViewMode } from '../../../shared/services/list-view/list-view.service';
 import { ModalService } from '../../../shared/services/modal/modal.service';
 import { FormValidator } from '../../../shared/utils/form';
 import { copyToClipboard, translateDevelopmentStatus, translateProductionType } from '../../../shared/utils/tools';
 import { DevelopmentModalComponent } from "./development-modal/development-modal.component";
-import { BadgeComponent } from "../../../shared/components/atoms/badge/badge.component";
-import { GeneralModalContentComponent } from "../../../shared/components/general/general-modal-content/general-modal-content.component";
-import { ListViewConfig } from '../../../models/list-view/list-view';
-import { ListViewService, ViewMode } from '../../../shared/services/list-view/list-view.service';
-import { WithListView } from '../../../shared/decorators/list-view.decorator';
-import { DsListViewComponent } from "../../../shared/components/molecules/list-view/list-view.component";
 
 @Component({
   selector: 'app-developments',
@@ -51,7 +50,6 @@ import { DsListViewComponent } from "../../../shared/components/molecules/list-v
   templateUrl: './developments.component.html',
   styleUrl: './developments.component.scss'
 })
-@WithListView('developments', { defaultView: 'cards' })
 export class DevelopmentsComponent extends FormValidator implements OnInit, OnDestroy {
 
   isModalOpen: boolean = false;
@@ -404,7 +402,7 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
   /**
    * 🔄 ALTERAR STATUS - Altera status do desenvolvimento
    */
-  private changeDevelopmentStatus(development: Development): void {
+  changeDevelopmentStatus(development: Development): void {
     this.selectedDevelopmentForStatusUpdate = development;
 
     setTimeout(() => {
@@ -441,7 +439,7 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
   /**
    * 🗑️ EXCLUIR - Exclui desenvolvimento
    */
-  private deleteDevelopment(development: Development): void {
+  deleteDevelopment(development: Development): void {
     if (!development._id) {
       console.error('ID do desenvolvimento não encontrado');
       return;

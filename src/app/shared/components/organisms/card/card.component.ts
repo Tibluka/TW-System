@@ -13,8 +13,9 @@ export class CardComponent implements AfterContentInit {
   @Input() subtitle?: string;
   @Input() elevated: boolean = false;
   @Input() clickable: boolean = false;
+  @Input() padding: string = '';
   @Input() size: 'sm' | 'md' | 'lg' = 'md';
-  @Input() variant: 'default' | 'outlined' | 'filled' = 'default';
+  @Input() variant: 'default' | 'outlined' | 'filled' = 'filled';
   @Input() borderRadius: 'sm' | 'md' | 'lg' | 'xl' = 'md';
 
   hasFooterContent = false;

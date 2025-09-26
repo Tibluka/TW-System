@@ -25,7 +25,7 @@
         <div *ngFor="let item of items; trackBy: trackByFn;let i = index" class="card-wrapper"
             [style.animation-delay]="getAnimationDelay(i)">
 
-            <ds-card [clickable]="true" [elevated]="true" size="md" variant="outlined" class="list-item-card"
+            <ds-card [clickable]="true" [elevated]="true" size="md" class="list-item-card" padding="24px"
                 (click)="onItemClick(item)">
 
                 <!-- Conteúdo do card usando template projetado -->

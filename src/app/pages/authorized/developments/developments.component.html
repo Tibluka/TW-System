@@ -104,8 +104,6 @@
                     </ds-table-row>
                 </ds-table>
             </div>
-
-
             <ng-template #cardTemplate let-development>
                 <div class="card-content" (click)="onDevelopmentClick(development)">
                     <img *ngIf="development.pieceImage.url" [src]="development.pieceImage.url"
@@ -123,15 +121,19 @@
 
                     <hr>
 
-                    <h4 class="body secondary mt-8 mb-0"> {{ productionType(development.productionType!.type) }}</h4>
+                    <h4 class="body secondary mt-8 mb-0"> {{ productionType(development.productionType!.type) }}
+                    </h4>
 
+                    <div class="card-actions">
+                        <ds-icon icon="fa-solid fa-arrow-right-arrow-left" color="label" fontSize="20px"
+                            cursorType="pointer"
+                            (click)="changeDevelopmentStatus(development); $event.stopPropagation()"
+                            title="Alterar Status" />
+
+                        <ds-icon icon="fa-solid fa-trash" color="label" fontSize="20px" cursorType="pointer"
+                            (click)="deleteDevelopment(development); $event.stopPropagation()" title="Excluir" />
+                    </div>
                 </div>
-            </ng-template>
-
-            <!-- Template de ações -->
-            <ng-template #actionsTemplate let-development>
-                <ds-action-menu [items]="actionMenuItems" (itemSelected)="onActionMenuSelect(development, $event)">
-                </ds-action-menu>
             </ng-template>
 
         </ds-list-view>
