@@ -1,7 +1,7 @@
 // pages/authorized/production-receipts/production-receipts.component.ts
 
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged, lastValueFrom, takeUntil } from 'rxjs';
 
@@ -12,7 +12,7 @@ import { IconComponent } from '../../../shared/components/atoms/icon/icon.compon
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
 import { SelectComponent, SelectOption } from '../../../shared/components/atoms/select/select.component';
 import { GeneralModalContentComponent } from '../../../shared/components/general/general-modal-content/general-modal-content.component';
-import { StatusOption } from '../../../shared/components/molecules/status-updater/status-updater.component';
+import { StatusOption, StatusUpdaterComponent } from '../../../shared/components/molecules/status-updater/status-updater.component';
 import { ModalComponent } from '../../../shared/components/organisms/modal/modal.component';
 import { TableCellComponent } from '../../../shared/components/organisms/table/table-cell/table-cell.component';
 import { TableRowComponent } from '../../../shared/components/organisms/table/table-row/table-row.component';
@@ -58,13 +58,16 @@ import { ClientService } from '../../../shared/services/clients/clients.service'
     TableRowComponent,
     TableCellComponent,
     GeneralModalContentComponent,
-    ProductionReceiptModalComponent
+    ProductionReceiptModalComponent,
+    StatusUpdaterComponent
   ],
   providers: [NgModel],
   templateUrl: './production-receipt.component.html',
   styleUrl: './production-receipt.component.scss'
 })
 export class ProductionReceiptComponent extends FormValidator implements OnInit, OnDestroy {
+
+  @ViewChild('statusUpdaterRef') statusUpdaterComponent!: StatusUpdaterComponent;
 
   // ============================================
   // INJEÇÕES DE DEPENDÊNCIA
@@ -392,7 +395,8 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     this.modalService.open({
       id: 'production-receipt-modal',
       title: 'Editar Recebimento',
-      size: 'xl'
+      size: 'xl',
+      data: receipt
     });
   }
 
@@ -417,16 +421,9 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   getActionMenuItems(receipt: ProductionReceipt): ActionMenuItem[] {
     const items: ActionMenuItem[] = [
       {
-        label: 'Ver Detalhes',
-        value: 'view',
-        icon: 'fa-solid fa-eye',
-        disabled: false
-      },
-      {
         label: 'Editar',
         value: 'edit',
-        icon: 'fa-solid fa-edit',
-        disabled: receipt.paymentStatus === 'PAID'
+        icon: 'fa-solid fa-edit'
       },
       {
         label: 'Atualizar Status',
@@ -481,6 +478,12 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   // ============================================
   private openStatusUpdater(receipt: ProductionReceipt): void {
     this.selectedProductionReceiptForStatusUpdate = receipt;
+    // Aguarda o próximo ciclo para garantir que o componente seja renderizado
+    setTimeout(() => {
+      if (this.selectedProductionReceiptForStatusUpdate) {
+        this.statusUpdaterComponent.openStatusModal();
+      }
+    }, 0);
   }
 
   onStatusUpdated(result: any): void {

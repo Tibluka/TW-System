@@ -11,7 +11,7 @@
         </div>
 
         <div class="w-100">
-            <ds-select label="Cliente" placeholder="Selecione o cliente" [(ngModel)]="currentFilters.status"
+            <ds-select label="Status" placeholder="Selecione o cliente" [(ngModel)]="currentFilters.status"
                 (ngModelChange)="onSearchChange()" [options]="statusOption" [fullWidth]="true" />
         </div>
 
@@ -29,7 +29,6 @@
                 <ds-table-cell [isHeader]="true" align="left">Imagem</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="left">Referência Interna</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="left">Referência Cliente</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Variante</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="left">Tipo Produção</ds-table-cell>
                 <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
@@ -63,11 +62,6 @@
                 <!-- Referência Cliente -->
                 <ds-table-cell align="left">
                     <span class="body secondary">{{ development.clientReference || '-' }}</span>
-                </ds-table-cell>
-
-                <!-- Variante -->
-                <ds-table-cell align="left">
-                    <span class="body secondary">{{ development.variants || '-' }}</span>
                 </ds-table-cell>
 
                 <!-- Cliente -->

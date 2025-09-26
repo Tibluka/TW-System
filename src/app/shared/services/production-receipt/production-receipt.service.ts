@@ -98,6 +98,14 @@ export class ProductionReceiptService {
   }
 
   /**
+   * 🔄 ATUALIZAR STATUS - Atualiza status do recebimento (método genérico para status-updater)
+   */
+  updateStatus(id: string, status: string): Observable<ProductionReceiptResponse> {
+    const body = { paymentStatus: status as PaymentStatus };
+    return this.http.patch<ProductionReceiptResponse>(`${this.API_URL}/${id}/payment-status`, body);
+  }
+
+  /**
    * ⚡ ATIVAR RECEBIMENTO - Reativa recebimento desativado
    */
   activateProductionReceipt(id: string): Observable<ProductionReceiptResponse> {

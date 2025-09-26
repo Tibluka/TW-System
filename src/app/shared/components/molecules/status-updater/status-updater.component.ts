@@ -24,12 +24,13 @@ export interface StatusUpdateResult {
     error?: string;
 }
 
-export type EntityType = 'development' | 'production-order' | 'production-sheet';
+export type EntityType = 'development' | 'production-order' | 'production-sheet' | 'production-receipt';
 
 // Serviços
 import { DevelopmentService } from '../../../services/development/development.service';
 import { ProductionOrderService } from '../../../services/production-order/production-order.service';
 import { ProductionSheetsService } from '../../../services/production-sheets/production-sheets.service';
+import { ProductionReceiptService } from '../../../services/production-receipt/production-receipt.service';
 import { ModalService } from '../../../services/modal/modal.service';
 import { SelectComponent } from "../../atoms/select/select.component";
 import { FormsModule, NgModel } from '@angular/forms';
@@ -84,6 +85,7 @@ export class StatusUpdaterComponent {
     private developmentService = inject(DevelopmentService);
     private productionOrderService = inject(ProductionOrderService);
     private productionSheetsService = inject(ProductionSheetsService);
+    private productionReceiptService = inject(ProductionReceiptService);
     private modalService = inject(ModalService);
 
     // ============================================
@@ -138,7 +140,7 @@ export class StatusUpdaterComponent {
         this.errorMessage = '';
 
         try {
-            const result = await this.updateEntityStatus(this.entityId, this.selectedStatus);
+            await this.updateEntityStatus(this.entityId, this.selectedStatus);
 
             this.statusUpdated.emit({
                 success: true,
@@ -229,6 +231,9 @@ export class StatusUpdaterComponent {
                 // Para production-sheet, vamos usar um método genérico de atualização
                 return this.productionSheetsService.updateProductionSheet(entityId, { stage: newStatus as any }).toPromise();
 
+            case 'production-receipt':
+                return this.productionReceiptService.updateStatus(entityId, newStatus).toPromise();
+
             default:
                 throw new Error(`Tipo de entidade não suportado: ${this.entityType}`);
         }
@@ -241,7 +246,8 @@ export class StatusUpdaterComponent {
         const entityNames = {
             'development': 'Desenvolvimento',
             'production-order': 'Ordem de Produção',
-            'production-sheet': 'Ficha de Produção'
+            'production-sheet': 'Ficha de Produção',
+            'production-receipt': 'Recebimento de Produção'
         };
 
         const entityName = entityNames[this.entityType];
