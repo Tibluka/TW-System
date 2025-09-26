@@ -7,7 +7,9 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 // Componentes
 import { Client, ClientFilters, ClientListResponse, PaginationInfo } from '../../../models/clients/clients';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
+import { IconComponent } from '../../../shared/components/atoms/icon/icon.component';
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
+import { DsListViewComponent } from '../../../shared/components/molecules/list-view/list-view.component';
 import { ModalComponent } from "../../../shared/components/organisms/modal/modal.component";
 import { TableCellComponent } from '../../../shared/components/organisms/table/table-cell/table-cell.component';
 import { TableRowComponent } from '../../../shared/components/organisms/table/table-row/table-row.component';
@@ -22,9 +24,11 @@ import { ClientModalComponent } from "./client-modal/client-modal.component";
   imports: [
     CommonModule,
     ButtonComponent,
+    IconComponent,
     ReactiveFormsModule,
     InputComponent,
     FormsModule,
+    DsListViewComponent,
     TableComponent,
     TableRowComponent,
     TableCellComponent,
@@ -51,6 +55,71 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
   clients: Client[] = [];
   pagination: PaginationInfo | null = null;
   loading = false;
+
+  // Configuração do list-view
+  listViewConfig = {
+    itemsPerRow: 3,
+    showToggle: true,
+    defaultView: 'table' as 'table' | 'cards'
+  };
+
+  // Métodos para o template de card
+  formatCurrency(value: number): string {
+    if (!value) return 'R$ 0,00';
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
+  }
+
+  deleteClient(client: Client): void {
+    if (!client._id) {
+      console.error('ID do cliente não encontrado');
+      return;
+    }
+
+    this.modalService.open({
+      id: 'general-modal',
+      title: 'Excluir Cliente',
+      size: 'md',
+      showHeader: true,
+      showCloseButton: true,
+      closeOnBackdropClick: true,
+      closeOnEscapeKey: true,
+      data: {
+        text: `Tem certeza que deseja excluir o cliente "${client.companyName}"?`,
+        icon: 'fa-solid fa-triangle-exclamation',
+        iconColor: 'tertiary',
+        textAlign: 'center',
+        buttons: [
+          {
+            label: 'Cancelar',
+            action: false,
+            variant: 'outline'
+          },
+          {
+            label: 'Excluir',
+            action: true,
+            variant: 'fill',
+            icon: 'fa-solid fa-trash'
+          }
+        ]
+      }
+    }).subscribe(result => {
+      if (result && result.action === true) {
+        this.clientService.deleteClient(client._id)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              this.loadClients(); // Recarregar lista
+            },
+            error: (error) => {
+              console.error('❌ Erro ao excluir cliente:', error);
+            }
+          });
+      }
+    });
+  }
   shouldShowTable = false;
 
   // Estados para UI

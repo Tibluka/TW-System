@@ -30,6 +30,8 @@ export class DsListViewComponent implements OnInit {
   @Input() pagination?: any;
   @Input() showPagination: boolean = true;
   @Input() showActions: boolean = true;
+  @Input() emptyMessage: string = 'Nenhum item encontrado';
+  @Input() loading: boolean = false;
   @Input() trackByFn: (index: number, item: any) => any = (index, item) => item.id || item._id || index;
 
   @Output() itemClick = new EventEmitter<any>();
@@ -40,6 +42,14 @@ export class DsListViewComponent implements OnInit {
   @ContentChild('actionsTemplate', { static: false }) actionsTemplate!: TemplateRef<any>;
 
   currentViewMode: ViewMode = 'table';
+
+  get hasItems(): boolean {
+    return this.items && this.items.length > 0;
+  }
+
+  get isEmpty(): boolean {
+    return !this.loading && (!this.items || this.items.length === 0);
+  }
 
   ngOnInit() {
     // Configurar view mode padrão

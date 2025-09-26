@@ -8,6 +8,7 @@ import { PaginationInfo } from '../../../models/clients/clients';
 import { MachineNumber, ProductionSheet, ProductionSheetFilters, ProductionSheetStage } from '../../../models/production-sheet/production-sheet';
 import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
 import { BadgeComponent } from '../../../shared/components/atoms/badge/badge.component';
+import { DsListViewComponent } from '../../../shared/components/molecules/list-view/list-view.component';
 import { StatusUpdaterComponent, StatusOption } from '../../../shared/components/molecules/status-updater/status-updater.component';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { IconComponent } from '../../../shared/components/atoms/icon/icon.component';
@@ -36,6 +37,7 @@ import { copyToClipboard } from '../../../shared/utils/tools';
     TableRowComponent,
     ButtonComponent,
     BadgeComponent,
+    DsListViewComponent,
     FormsModule,
     ModalComponent,
     ProductionSheetModalComponent,
@@ -60,6 +62,13 @@ export class ProductionSheetsComponent extends FormValidator {
   productionSheets: ProductionSheet[] = [];
   pagination: PaginationInfo | null = null;
   loading = false;
+
+  // Configuração do list-view
+  listViewConfig = {
+    itemsPerRow: 3,
+    showToggle: true,
+    defaultView: 'table' as 'table' | 'cards'
+  };
 
 
   // Estados para UI
@@ -634,7 +643,17 @@ export class ProductionSheetsComponent extends FormValidator {
   /**
    * 🗑️ EXCLUIR - Exclui ficha de produção
    */
-  private deleteProductionSheet(productionSheet: ProductionSheet): void {
+  changeProductionSheetStatus(productionSheet: ProductionSheet): void {
+    this.selectedProductionSheetForStatusUpdate = productionSheet;
+    // Aguarda o próximo ciclo para garantir que o componente seja renderizado
+    setTimeout(() => {
+      if (this.selectedProductionSheetForStatusUpdate && this.statusUpdaterComponent) {
+        this.statusUpdaterComponent.openStatusModal();
+      }
+    }, 0);
+  }
+
+  deleteProductionSheet(productionSheet: ProductionSheet): void {
     if (!productionSheet._id) {
       console.error('ID da ficha de produção não encontrado');
       return;

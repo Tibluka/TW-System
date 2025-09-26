@@ -9,6 +9,7 @@ import { Subject, debounceTime, distinctUntilChanged, lastValueFrom, takeUntil }
 import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
 import { BadgeComponent } from '../../../shared/components/atoms/badge/badge.component';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
+import { DsListViewComponent } from '../../../shared/components/molecules/list-view/list-view.component';
 import { IconComponent } from '../../../shared/components/atoms/icon/icon.component';
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
 import { SelectComponent, SelectOption } from '../../../shared/components/atoms/select/select.component';
@@ -55,6 +56,7 @@ import { ClientService } from '../../../shared/services/clients/clients.service'
     SelectComponent,
     IconComponent,
     ActionMenuComponent,
+    DsListViewComponent,
     ModalComponent,
     TableComponent,
     TableRowComponent,
@@ -87,6 +89,13 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   loading = false;
   isModalOpen = false;
   selectedReceiptId?: string;
+
+  // Configuração do list-view
+  listViewConfig = {
+    itemsPerRow: 3,
+    showToggle: true,
+    defaultView: 'table' as 'table' | 'cards'
+  };
 
   // Status updater
   selectedProductionReceiptForStatusUpdate?: ProductionReceipt;
@@ -510,7 +519,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     console.log('Ver detalhes do recebimento:', receipt);
   }
 
-  private deleteProductionReceipt(receipt: ProductionReceipt): void {
+  deleteProductionReceipt(receipt: ProductionReceipt): void {
     if (!receipt._id) {
       console.error('ID do desenvolvimento não encontrado');
       return;
@@ -562,7 +571,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   // ============================================
   // STATUS UPDATER
   // ============================================
-  private openStatusUpdater(receipt: ProductionReceipt): void {
+  openStatusUpdater(receipt: ProductionReceipt): void {
     this.selectedProductionReceiptForStatusUpdate = receipt;
     // Aguarda o próximo ciclo para garantir que o componente seja renderizado
     setTimeout(() => {

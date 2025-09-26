@@ -12,79 +12,113 @@
     </div>
 
     <div class="results mt-32">
-        <ds-table emptyMessage="Nenhum cliente encontrado" *ngIf="shouldShowTable" [showPagination]="true"
-            [pageSize]="currentFilters.limit" [totalPages]="pagination?.totalPages"
-            [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)"
-            [loadingData]="shouldShowSpinner">
+        <ds-list-view [items]="clients" [config]="listViewConfig" [loading]="shouldShowSpinner"
+            emptyMessage="Nenhum cliente encontrado">
+            <div slot="table">
+                <ds-table emptyMessage="Nenhum cliente encontrado" [showPagination]="true"
+                    [pageSize]="currentFilters.limit" [totalPages]="pagination?.totalPages"
+                    [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)"
+                    [loadingData]="shouldShowSpinner">
 
-            <!-- Cabeçalho da tabela -->
-            <ds-table-row [isHeader]="true">
-                <ds-table-cell [isHeader]="true" align="left">Sigla</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Razão Social</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">CNPJ</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Telefone</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Email</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="center">Preço por Metro</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Responsável</ds-table-cell>
-            </ds-table-row>
+                    <!-- Cabeçalho da tabela -->
+                    <ds-table-row [isHeader]="true">
+                        <ds-table-cell [isHeader]="true" align="left">Sigla</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Razão Social</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">CNPJ</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Telefone</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Email</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center">Preço por Metro</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Responsável</ds-table-cell>
+                    </ds-table-row>
 
-            <!-- ✨ DADOS DOS CLIENTES - Usando 'clients' (corrigido) -->
-            <ds-table-row *ngFor="let client of clients" [clickable]="true" [data]="client"
-                (rowClick)="onClienteClick(client)">
+                    <!-- ✨ DADOS DOS CLIENTES - Usando 'clients' (corrigido) -->
+                    <ds-table-row *ngFor="let client of clients" [clickable]="true" [data]="client"
+                        (rowClick)="onClienteClick(client)">
 
-                <!-- Sigla (Acronym) -->
-                <ds-table-cell align="left">
-                    <span class="body primary-dark">{{ client.acronym }}</span>
-                </ds-table-cell>
+                        <!-- Sigla (Acronym) -->
+                        <ds-table-cell align="left">
+                            <span class="body primary-dark">{{ client.acronym }}</span>
+                        </ds-table-cell>
 
-                <!-- Razão Social -->
-                <ds-table-cell align="left">
-                    <div class="d-flex align-items-center">
-                        <div>
-                            <strong class="body primary-dark">{{ client.companyName }}</strong>
-                        </div>
-                    </div>
-                </ds-table-cell>
-
-                <!-- CNPJ -->
-                <ds-table-cell align="left">
-                    <span class="body label">{{ client.cnpj | libPipe: cnpjMask }}</span>
-                </ds-table-cell>
-
-                <!-- Telefone -->
-                <ds-table-cell align="left">
-                    <a [href]="'tel:' + client.contact.phone" class="body secondary-medium">
-                        {{ client.contact.phone | libPipe: phoneMask }}
-                    </a>
-                </ds-table-cell>
-
-                <!-- Email -->
-                <ds-table-cell align="left">
-                    <a [href]="'mailto:' + client.contact.email" class="body secondary-medium">
-                        {{ client.contact.email }}
-                    </a>
-                </ds-table-cell>
-
-                <!-- Preço por Metro -->
-                <ds-table-cell align="center">
-                    <span class="body primary-dark">
-                        {{ client.values.valuePerMeter | currency:'BRL':'symbol':'1.2-2' }}
-                    </span>
-                </ds-table-cell>
-
-                <!-- Responsável -->
-                <ds-table-cell align="left">
-                    <div class="d-flex align-items-center">
-                        <div>
-                            <div class="body primary-dark">{{ client.contact.responsibleName }}</div>
-                            <div class="placeholder">
-                                {{ client.contact.email }}
+                        <!-- Razão Social -->
+                        <ds-table-cell align="left">
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <strong class="body primary-dark">{{ client.companyName }}</strong>
+                                </div>
                             </div>
-                        </div>
+                        </ds-table-cell>
+
+                        <!-- CNPJ -->
+                        <ds-table-cell align="left">
+                            <span class="body label">{{ client.cnpj | libPipe: cnpjMask }}</span>
+                        </ds-table-cell>
+
+                        <!-- Telefone -->
+                        <ds-table-cell align="left">
+                            <a [href]="'tel:' + client.contact.phone" class="body secondary-medium">
+                                {{ client.contact.phone | libPipe: phoneMask }}
+                            </a>
+                        </ds-table-cell>
+
+                        <!-- Email -->
+                        <ds-table-cell align="left">
+                            <a [href]="'mailto:' + client.contact.email" class="body secondary-medium">
+                                {{ client.contact.email }}
+                            </a>
+                        </ds-table-cell>
+
+                        <!-- Preço por Metro -->
+                        <ds-table-cell align="center">
+                            <span class="body primary-dark">
+                                {{ client.values.valuePerMeter | currency:'BRL':'symbol':'1.2-2' }}
+                            </span>
+                        </ds-table-cell>
+
+                        <!-- Responsável -->
+                        <ds-table-cell align="left">
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <div class="body primary-dark">{{ client.contact.responsibleName }}</div>
+                                    <div class="placeholder">
+                                        {{ client.contact.email }}
+                                    </div>
+                                </div>
+                            </div>
+                        </ds-table-cell>
+                    </ds-table-row>
+                </ds-table>
+            </div>
+
+            <ng-template #cardTemplate let-client>
+                <div class="card-content" (click)="onClienteClick(client)">
+                    <div class="card-body">
+                        <h3 class="title-modal mb-6 mt-8 secondary">{{ client.companyName }}</h3>
+
+                        <p class="subtitle-section secondary" *ngIf="client.acronym">{{
+                            client.acronym
+                            }}</p>
+
+                        <p class="card-small secondary mb-8" *ngIf="client.cnpj">{{
+                            client.cnpj
+                            }}</p>
+
+                        <hr>
+
+                        <h4 class="body secondary mt-8 mb-0">{{ formatCurrency(client.pricePerMeter) }}/m</h4>
                     </div>
-                </ds-table-cell>
-            </ds-table-row>
-        </ds-table>
+
+                    <div class="card-actions">
+                        <ds-icon icon="fa-solid fa-edit" color="label" fontSize="20px" cursorType="pointer"
+                            (click)="editClient(client); $event.stopPropagation()" title="Editar" />
+
+                        <ds-icon icon="fa-solid fa-trash" color="label" fontSize="20px" cursorType="pointer"
+                            (click)="deleteClient(client); $event.stopPropagation()" title="Excluir" />
+                    </div>
+                </div>
+            </ng-template>
+
+        </ds-list-view>
     </div>
 </div>
 
