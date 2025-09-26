@@ -1,4 +1,4 @@
-// src/app/services/image-upload.service.ts
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpEventType, HttpResponse } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
@@ -32,13 +32,9 @@ export class ImageUploadService {
   private uploadProgress = new BehaviorSubject<ImageUploadProgress | null>(null);
 
   constructor(private http: HttpClient) { }
-
-  // Observable para acompanhar progresso do upload
   getUploadProgress(): Observable<ImageUploadProgress | null> {
     return this.uploadProgress.asObservable();
   }
-
-  // Upload de imagem para um development
   uploadDevelopmentImage(developmentId: string, file: File): Observable<any> {
     const formData = new FormData();
     formData.append('image', file);
@@ -66,20 +62,14 @@ export class ImageUploadService {
       })
     );
   }
-
-  // Remover imagem de um development
   removeDevelopmentImage(developmentId: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/developments/${developmentId}/image`);
   }
-
-  // Obter informações da imagem
   getDevelopmentImage(developmentId: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/developments/${developmentId}/image`);
   }
-
-  // Validar arquivo de imagem
   validateImageFile(file: File): { valid: boolean; error?: string } {
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 10 * 1024 * 1024;
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
     if (!allowedTypes.includes(file.type)) {
@@ -98,8 +88,6 @@ export class ImageUploadService {
 
     return { valid: true };
   }
-
-  // Resetar progresso
   resetProgress(): void {
     this.uploadProgress.next(null);
   }

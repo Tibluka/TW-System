@@ -33,10 +33,6 @@ export type TabSize = 'small' | 'medium' | 'large';
 })
 export class TabsComponent implements AfterViewInit, OnChanges {
 
-  // ========================================
-  // INPUTS
-  // ========================================
-
   @Input() tabs: TabConfig[] = [];
   @Input() activeTabId: string = '';
   @Input() size: TabSize = 'medium';
@@ -45,28 +41,12 @@ export class TabsComponent implements AfterViewInit, OnChanges {
   @Input() noPadding: boolean = false;
   @Input() compactPadding: boolean = false;
 
-  // ========================================
-  // OUTPUTS
-  // ========================================
-
   @Output() tabChange = new EventEmitter<string>();
   @Output() tabClick = new EventEmitter<{ tabId: string, tab: TabConfig }>();
 
-  // ========================================
-  // VIEW CHILDREN
-  // ========================================
-
   @ViewChild('tabsNav', { static: false }) tabsNav!: ElementRef<HTMLDivElement>;
 
-  // ========================================
-  // PROPRIEDADES PÚBLICAS
-  // ========================================
-
   indicatorTransform = 'translateX(0) scaleX(0)';
-
-  // ========================================
-  // GETTERS
-  // ========================================
 
   get containerClasses(): string[] {
     const classes = ['ds-tabs-container'];
@@ -108,12 +88,8 @@ export class TabsComponent implements AfterViewInit, OnChanges {
     return this.tabs.find(tab => tab.id === this.activeTabId);
   }
 
-  // ========================================
-  // LIFECYCLE HOOKS
-  // ========================================
-
   ngAfterViewInit(): void {
-    // Pequeno delay para garantir que o DOM está renderizado
+
     setTimeout(() => {
       this.updateIndicator();
     }, 0);
@@ -121,24 +97,18 @@ export class TabsComponent implements AfterViewInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['activeTabId'] || changes['tabs']) {
-      // Se não há tab ativa e existem tabs, ativar a primeira tab disponível
+
       if (!this.activeTabId && this.tabs.length > 0) {
         const firstEnabledTab = this.tabs.find(tab => !tab.disabled);
         if (firstEnabledTab) {
           this.activeTabId = firstEnabledTab.id;
         }
       }
-
-      // Atualizar indicador após mudanças
       setTimeout(() => {
         this.updateIndicator();
       }, 0);
     }
   }
-
-  // ========================================
-  // MÉTODOS PÚBLICOS
-  // ========================================
 
   selectTab(tabId: string): void {
     const tab = this.tabs.find(t => t.id === tabId);
@@ -149,28 +119,18 @@ export class TabsComponent implements AfterViewInit, OnChanges {
 
     const previousTabId = this.activeTabId;
     this.activeTabId = tabId;
-
-    // Emitir eventos
     this.tabClick.emit({ tabId, tab });
 
     if (previousTabId !== tabId) {
       this.tabChange.emit(tabId);
     }
-
-    // Atualizar indicador
     this.updateIndicator();
-
-    // Scroll para a tab ativa se necessário
     this.scrollToActiveTab();
   }
 
   trackByTab: TrackByFunction<TabConfig> = (index: number, tab: TabConfig) => {
     return tab.id;
   };
-
-  // ========================================
-  // MÉTODOS PRIVADOS
-  // ========================================
 
   private updateIndicator(): void {
     if (!this.tabsNav?.nativeElement || !this.activeTabId) {
@@ -191,12 +151,12 @@ export class TabsComponent implements AfterViewInit, OnChanges {
     const buttonRect = activeButton.getBoundingClientRect();
 
     if (this.vertical) {
-      // Indicador vertical
+
       const offsetTop = buttonRect.top - navRect.top;
       const height = buttonRect.height;
       this.indicatorTransform = `translateY(${offsetTop}px) scaleY(${height / 3})`;
     } else {
-      // Indicador horizontal
+
       const offsetLeft = buttonRect.left - navRect.left;
       const width = buttonRect.width;
       this.indicatorTransform = `translateX(${offsetLeft}px) scaleX(${width / 100})`;
@@ -215,18 +175,12 @@ export class TabsComponent implements AfterViewInit, OnChanges {
     if (!activeButton) {
       return;
     }
-
-    // Scroll suave para a tab ativa
     activeButton.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest',
       inline: 'center'
     });
   }
-
-  // ========================================
-  // MÉTODOS UTILITÁRIOS
-  // ========================================
 
   getTabButtonClasses(tab: TabConfig): string[] {
     const classes = ['ds-tab-button'];
@@ -244,7 +198,7 @@ export class TabsComponent implements AfterViewInit, OnChanges {
 
   formatBadge(badge: string | number): string {
     if (typeof badge === 'number') {
-      // Para números grandes, mostrar formato abreviado (ex: 99+)
+
       return badge > 99 ? '99+' : badge.toString();
     }
     return badge;
@@ -258,23 +212,15 @@ export class TabsComponent implements AfterViewInit, OnChanges {
     return this.tabs.find(tab => tab.id === tabId);
   }
 
-  // ========================================
-  // MÉTODOS DE NAVEGAÇÃO
-  // ========================================
-
   navigateToNextTab(): void {
     const currentIndex = this.tabs.findIndex(tab => tab.id === this.activeTabId);
     if (currentIndex === -1) return;
-
-    // Procurar próxima tab habilitada
     for (let i = currentIndex + 1; i < this.tabs.length; i++) {
       if (!this.tabs[i].disabled) {
         this.selectTab(this.tabs[i].id);
         return;
       }
     }
-
-    // Se chegou ao final, voltar para a primeira tab habilitada
     for (let i = 0; i <= currentIndex; i++) {
       if (!this.tabs[i].disabled) {
         this.selectTab(this.tabs[i].id);
@@ -286,16 +232,12 @@ export class TabsComponent implements AfterViewInit, OnChanges {
   navigateToPrevTab(): void {
     const currentIndex = this.tabs.findIndex(tab => tab.id === this.activeTabId);
     if (currentIndex === -1) return;
-
-    // Procurar tab anterior habilitada
     for (let i = currentIndex - 1; i >= 0; i--) {
       if (!this.tabs[i].disabled) {
         this.selectTab(this.tabs[i].id);
         return;
       }
     }
-
-    // Se chegou ao início, ir para a última tab habilitada
     for (let i = this.tabs.length - 1; i >= currentIndex; i--) {
       if (!this.tabs[i].disabled) {
         this.selectTab(this.tabs[i].id);
@@ -303,10 +245,6 @@ export class TabsComponent implements AfterViewInit, OnChanges {
       }
     }
   }
-
-  // ========================================
-  // MÉTODOS DE ACESSIBILIDADE
-  // ========================================
 
   onKeyDown(event: KeyboardEvent, tabId: string): void {
     switch (event.key) {

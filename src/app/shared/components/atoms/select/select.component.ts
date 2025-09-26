@@ -47,14 +47,10 @@ export class SelectComponent implements OnInit, OnDestroy, OnChanges, ControlVal
   @Input() noOptionsText: string = 'Nenhuma opção encontrada';
   @Input() loading: boolean = false;
   @Input() placement: 'top' | 'bottom' = 'bottom';
-
-  // Eventos
   @Output() selectionChanged = new EventEmitter<any>();
   @Output() opened = new EventEmitter<void>();
   @Output() closed = new EventEmitter<void>();
   @Output() searched = new EventEmitter<string>();
-
-  // Propriedades internas
   value: any = null;
   selectedOptions: SelectOption[] = [];
   isOpen: boolean = false;
@@ -62,16 +58,12 @@ export class SelectComponent implements OnInit, OnDestroy, OnChanges, ControlVal
   uniqueId: string = '';
   searchTerm: string = '';
   filteredOptions: SelectOption[] = [];
-
-  // Callbacks do ControlValueAccessor
   private onChange = (value: any) => { };
   public onTouched = () => { };
 
   ngOnInit() {
     this.uniqueId = `ds-select-${Math.random().toString(36).substr(2, 9)}`;
     this.updateFilteredOptions();
-
-    // Adicionar classe has-select ao form-group pai para overflow em modais
     setTimeout(() => {
       const selectElement = document.getElementById(this.uniqueId + '-container');
       const formGroup = selectElement?.closest('.form-group');
@@ -82,9 +74,8 @@ export class SelectComponent implements OnInit, OnDestroy, OnChanges, ControlVal
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // Detecta mudanças nas opções
+
     if (changes['options']) {
-      console.log('🔄 Select: Opções mudaram:', changes['options'].currentValue);
       this.updateFilteredOptions();
       this.updateSelectedOptions();
     }
@@ -92,16 +83,12 @@ export class SelectComponent implements OnInit, OnDestroy, OnChanges, ControlVal
 
   ngOnDestroy() {
     document.removeEventListener('click', this.handleOutsideClick.bind(this));
-
-    // Remover classe has-select ao destruir o componente
     const selectElement = document.getElementById(this.uniqueId + '-container');
     const formGroup = selectElement?.closest('.form-group');
     if (formGroup) {
       formGroup.classList.remove('has-select');
     }
   }
-
-  // Implementação do ControlValueAccessor
   writeValue(value: any): void {
     this.value = value;
     this.updateSelectedOptions();
@@ -118,8 +105,6 @@ export class SelectComponent implements OnInit, OnDestroy, OnChanges, ControlVal
   setDisabledState(isDisabled: boolean): void {
     this.disabled = isDisabled;
   }
-
-  // Métodos do componente
   toggleDropdown(): void {
     if (this.disabled || this.readonly) return;
 
@@ -236,7 +221,6 @@ export class SelectComponent implements OnInit, OnDestroy, OnChanges, ControlVal
   }
 
   private updateFilteredOptions(): void {
-    console.log('🔄 Select: Atualizando opções filtradas. Total de opções:', this.options.length);
 
     if (!this.searchTerm) {
       this.filteredOptions = [...this.options];
@@ -247,7 +231,6 @@ export class SelectComponent implements OnInit, OnDestroy, OnChanges, ControlVal
       });
     }
 
-    console.log('🔄 Select: Opções filtradas atualizadas:', this.filteredOptions.length);
   }
 
   private updateSelectedOptions(): void {
@@ -273,8 +256,6 @@ export class SelectComponent implements OnInit, OnDestroy, OnChanges, ControlVal
     }
     return this.value === option[this.optionValue];
   }
-
-  // Getters para classes CSS dinâmicas
   get selectClasses(): string {
     const classes = ['select-field'];
 

@@ -1,7 +1,3 @@
-// ============================================
-// INTERFACES BASEADAS NO SCHEMA DO BACKEND
-// ============================================
-
 /**
  * Interface principal do Client baseada no schema MongoDB
  */
@@ -32,10 +28,6 @@ export interface Client {
     createdAt?: string;
     updatedAt?: string;
 }
-
-// ============================================
-// INTERFACES PARA RESPOSTAS DA API
-// ============================================
 
 /**
  * Interface base para todas as respostas da API
@@ -82,10 +74,6 @@ export interface ClientListResponse extends PaginatedResponse<Client> {
 export interface ClientResponse extends ApiResponse<Client> {
     data: Client;
 }
-
-// ============================================
-// INTERFACES PARA FILTROS E PARÂMETROS
-// ============================================
 
 /**
  * Filtros para listagem de clientes
@@ -146,12 +134,8 @@ export interface CreateClientRequest {
  * Interface para atualização de cliente
  */
 export interface UpdateClientRequest extends Partial<CreateClientRequest> {
-    // Todos os campos são opcionais para update
-}
 
-// ============================================
-// INTERFACES PARA ESTATÍSTICAS
-// ============================================
+}
 
 /**
  * Interface para estatísticas de clientes
@@ -173,10 +157,6 @@ export interface ClientStats {
 export interface ClientStatsResponse extends ApiResponse<ClientStats> {
     data: ClientStats;
 }
-
-// ============================================
-// TYPES AUXILIARES
-// ============================================
 
 /**
  * Estados brasileiros válidos

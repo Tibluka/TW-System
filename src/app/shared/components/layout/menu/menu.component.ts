@@ -1,4 +1,4 @@
-// menu.component.ts - CORREÇÃO COM ROUTER AWARENESS
+
 import { Component, OnInit, OnDestroy, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
@@ -23,13 +23,11 @@ export class MenuComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   protected menuService = inject(MenuService);
   private authService = inject(AuthService);
-
-  // 🔧 CORREÇÃO: Subject para gerenciar unsubscribe
   private destroy$ = new Subject<void>();
 
   @HostListener('document:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent): void {
-    // Ctrl + B para toggle do menu
+
     if (event.ctrlKey && event.key === 'b') {
       event.preventDefault();
       this.toggleMenu();
@@ -38,27 +36,21 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   @HostListener('window:resize')
   onWindowResize(): void {
-    // Em telas pequenas, força o menu expandido
+
     if (window.innerWidth <= 768 && this.menuService.isCollapsed()) {
       this.menuService.expand();
     }
   }
 
   ngOnInit(): void {
-    // 🔧 CORREÇÃO: Log para debug
-    console.log('🚀 MenuComponent inicializado');
-    console.log('📍 Rota atual:', this.router.url);
-    console.log('📋 Itens do menu:', this.menuService.menuItems());
-    console.log('🎯 Item ativo atual:', this.menuService.activeItem());
 
-    // 🔧 CORREÇÃO: Garantir que o item ativo está correto na inicialização
     setTimeout(() => {
       this.menuService.updateActiveItemFromCurrentRoute();
-    }, 100); // Pequeno delay para garantir que tudo está carregado
+    }, 100);
   }
 
   ngOnDestroy(): void {
-    // 🔧 CORREÇÃO: Cleanup adequado
+
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -90,25 +82,17 @@ export class MenuComponent implements OnInit, OnDestroy {
    */
   onMenuItemClick(item: MenuItem, index: number): void {
     if (item.disabled || this.menuService.isAnimating()) return;
-
-    console.log('🖱️ Clique no menu:', item.label, `(${item.id})`);
-
-    // 🔧 CORREÇÃO: Primeiro navegar, depois executar ação
-    // O MenuService vai definir o activeItem automaticamente via router events
     if (item.route) {
       this.router.navigate([item.route]).then(success => {
         if (success) {
-          console.log('✅ Navegação bem-sucedida para:', item.route);
-          // Executar ação do item após navegação bem-sucedida
+
           this.menuService.executeMenuItem(item);
         } else {
-          console.error('❌ Falha na navegação para:', item.route);
         }
       }).catch(err => {
-        console.error('❌ Erro na navegação:', err);
       });
     } else {
-      // Se não tem rota, apenas executa a ação e define como ativo
+
       this.menuService.setActiveItem(item.id);
       this.menuService.executeMenuItem(item);
     }
@@ -126,12 +110,7 @@ export class MenuComponent implements OnInit, OnDestroy {
    */
   isItemActive(item: MenuItem): boolean {
     const isActive = this.menuService.activeItem() === item.id;
-
-    // Debug apenas quando necessário
     if (item.id === 'clients') {
-      console.log(`🔍 Verificando se '${item.label}' está ativo:`, isActive);
-      console.log('📍 Rota atual:', this.router.url);
-      console.log('🎯 Item ativo no service:', this.menuService.activeItem());
     }
 
     return isActive;
@@ -169,7 +148,6 @@ export class MenuComponent implements OnInit, OnDestroy {
    * 🔧 CORREÇÃO: Método para forçar atualização (para debug)
    */
   forceUpdateActiveItem(): void {
-    console.log('🔄 Forçando atualização do item ativo...');
     this.menuService.updateActiveItemFromCurrentRoute();
   }
 

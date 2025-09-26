@@ -1,10 +1,4 @@
-// models/production-receipt/production-receipt.ts
-
 import { ProductionOrder } from '../production-orders/production-orders';
-
-// ============================================
-// TYPES E ENUMS
-// ============================================
 
 export type PaymentMethod =
     | 'CASH'
@@ -16,46 +10,24 @@ export type PaymentMethod =
 
 export type PaymentStatus = 'PENDING' | 'PAID';
 
-// ============================================
-// INTERFACE PRINCIPAL
-// ============================================
-
 export interface ProductionReceipt {
     _id: string;
-
-    // PRODUCTION ORDER REFERENCE
     productionOrderId: string;
     productionOrder?: ProductionOrder;
-
-    // DADOS COPIADOS
     internalReference: string;
-
-    // DADOS FINANCEIROS
     paymentMethod: PaymentMethod;
     paymentStatus: PaymentStatus;
-
-    // VALORES
     totalAmount: number;
     paidAmount: number;
     remainingAmount: number;
-
-    // DATAS
     issueDate: Date | string;
     dueDate: Date | string;
     paymentDate?: Date | string;
-
-    // OBSERVAÇÕES
     notes?: string;
-
-    // METADADOS
     active?: boolean;
     createdAt?: Date | string;
     updatedAt?: Date | string;
 }
-
-// ============================================
-// REQUEST INTERFACES
-// ============================================
 
 export interface CreateProductionReceiptRequest {
     productionOrderId: string;
@@ -72,33 +44,23 @@ export interface UpdateProductionReceiptRequest extends Partial<CreateProduction
     paymentDate?: Date | string;
 }
 
-// ============================================
-// FILTER INTERFACE
-// ============================================
-
 export interface ProductionReceiptFilters {
-    search?: string; // Busca em internalReference e notes
+    search?: string;
     productionOrderId?: string;
     paymentStatus?: PaymentStatus;
     paymentMethod?: PaymentMethod;
     active?: boolean;
     clientId?: string;
-    // Filtros por data
+
     createdFrom?: Date | string;
     createdTo?: Date | string;
     dueDateFrom?: Date | string;
     dueDateTo?: Date | string;
-
-    // Paginação
     page?: number;
     limit?: number;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
 }
-
-// ============================================
-// RESPONSE INTERFACES
-// ============================================
 
 export interface PaginationInfo {
     currentPage: number;
@@ -122,10 +84,6 @@ export interface ProductionReceiptResponse {
     message?: string;
 }
 
-// ============================================
-// STATISTICS INTERFACES
-// ============================================
-
 export interface PaymentMethodStats {
     count: number;
     totalAmount: number;
@@ -148,10 +106,6 @@ export interface ProductionReceiptStatistics {
     paymentMethods: Record<PaymentMethod, PaymentMethodStats>;
     overdue: number;
 }
-
-// ============================================
-// UTILITY FUNCTIONS
-// ============================================
 
 export class ProductionReceiptUtils {
 
@@ -187,7 +141,7 @@ export class ProductionReceiptUtils {
         if (receipt.paymentStatus === 'PAID') return false;
         const dueDate = new Date(receipt.dueDate);
         const today = new Date();
-        today.setHours(23, 59, 59, 999); // Fim do dia atual
+        today.setHours(23, 59, 59, 999);
         return dueDate < today;
     }
 
@@ -216,10 +170,6 @@ export class ProductionReceiptUtils {
     }
 }
 
-// ============================================
-// FORM HELPERS
-// ============================================
-
 export class ProductionReceiptFormUtils {
 
     static getPaymentMethodOptions(): Array<{ value: PaymentMethod; label: string }> {
@@ -242,13 +192,13 @@ export class ProductionReceiptFormUtils {
 
     static initializeFromProductionOrder(productionOrder: ProductionOrder): Partial<CreateProductionReceiptRequest> {
         const dueDate = new Date();
-        dueDate.setDate(dueDate.getDate() + 30); // Vencimento padrão de 30 dias
+        dueDate.setDate(dueDate.getDate() + 30);
 
         return {
             productionOrderId: productionOrder._id!,
-            totalAmount: 0, // Deve ser preenchido pelo usuário
-            dueDate: dueDate.toISOString().split('T')[0], // Format YYYY-MM-DD
-            paymentMethod: 'PIX', // Método padrão
+            totalAmount: 0,
+            dueDate: dueDate.toISOString().split('T')[0],
+            paymentMethod: 'PIX',
             paymentStatus: 'PENDING',
             paidAmount: 0
         };

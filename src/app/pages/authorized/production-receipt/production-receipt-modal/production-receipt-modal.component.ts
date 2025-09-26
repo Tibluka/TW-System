@@ -1,24 +1,16 @@
-// pages/authorized/production-receipts/production-receipt-modal/production-receipt-modal.component.ts
-
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, Input, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged, lastValueFrom, takeUntil } from 'rxjs';
-
-// Components
 import { ButtonComponent } from '../../../../shared/components/atoms/button/button.component';
 import { InputComponent } from '../../../../shared/components/atoms/input/input.component';
 import { SelectComponent, SelectOption } from '../../../../shared/components/atoms/select/select.component';
 import { SpinnerComponent } from '../../../../shared/components/atoms/spinner/spinner.component';
 import { TextareaComponent } from '../../../../shared/components/atoms/textarea/textarea.component';
 import { IconComponent } from '../../../../shared/components/atoms/icon/icon.component';
-
-// Services
 import { ProductionReceiptService } from '../../../../shared/services/production-receipt/production-receipt.service';
 import { ProductionOrderService } from '../../../../shared/services/production-order/production-order.service';
 import { ModalService } from '../../../../shared/services/modal/modal.service';
-
-// Models
 import {
   ProductionReceipt,
   CreateProductionReceiptRequest,
@@ -28,8 +20,6 @@ import {
   ProductionReceiptFormUtils
 } from '../../../../models/production-receipt/production-receipt';
 import { ProductionOrder, ProductionOrderResponse, ProductionTypeEnum } from '../../../../models/production-orders/production-orders';
-
-// Utils
 import { FormValidator } from '../../../../shared/utils/form';
 import { translateProductionType } from '../../../../shared/utils/tools';
 
@@ -51,47 +41,29 @@ import { translateProductionType } from '../../../../shared/utils/tools';
 export class ProductionReceiptModalComponent extends FormValidator implements OnInit, OnDestroy {
 
   @Input() productionReceiptId?: string;
-
-  // ============================================
-  // INJEÇÕES DE DEPENDÊNCIA
-  // ============================================
   private formBuilder = inject(FormBuilder);
   private productionReceiptService = inject(ProductionReceiptService);
   private productionOrderService = inject(ProductionOrderService);
   private modalService = inject(ModalService);
   private cdr = inject(ChangeDetectorRef);
-
-  // ============================================
-  // PROPRIEDADES DO COMPONENTE
-  // ============================================
   productionReceiptForm!: FormGroup;
   isLoading = false;
   submitting = false;
   productionReceipt?: ProductionReceipt;
   isEditMode = false;
-  // Search e busca de ordens de produção
+
   searchingProductionOrder = false;
   productionOrderFound: ProductionOrder | null = null;
   productionOrderNotFound = false;
-
-  // Search e busca de ordens de produção
   searchingOrders = false;
   productionOrders: ProductionOrder[] = [];
   selectedProductionOrder?: ProductionOrder;
 
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
-
-  // ============================================
-  // OPTIONS PARA SELECTS
-  // ============================================
   paymentMethodOptions: SelectOption[] = [];
   paymentStatusOptions: SelectOption[] = [];
   productionOrderOptions: SelectOption[] = [];
-
-  // ============================================
-  // LIFECYCLE HOOKS
-  // ============================================
   ngOnInit(): void {
     this.setupForm();
     this.setupSelectOptions();
@@ -111,7 +83,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
     this.isLoading = true;
 
     try {
-      // Acessar dados do modal ativo
+
       const activeModal = this.modalService.activeModal();
       if (activeModal?.config.data) {
         const productionReceipt = activeModal.config.data;
@@ -121,7 +93,6 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       }
 
     } catch (error) {
-      console.error('❌ Erro ao carregar dados iniciais:', error);
     } finally {
       this.isLoading = false;
       this.cdr.detectChanges();
@@ -145,13 +116,13 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
     this.productionOrderFound = null;
 
     try {
-      // Buscar desenvolvimento pela referência interna
+
       const response: ProductionOrderResponse = await lastValueFrom(
         this.productionOrderService.getProductionOrderById(internalReference)
       );
 
       if (response.data) {
-        // Verificar se encontrou exatamente a referência pesquisada
+
         this.productionOrderFound = response.data;
         this.productionReceiptForm.patchValue({
           productionOrderId: response.data._id,
@@ -169,26 +140,20 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       this.cdr.detectChanges();
     }
   }
-
-  // ============================================
-  // SETUP INICIAL
-  // ============================================
   private setupForm(): void {
     this.productionReceiptForm = this.formBuilder.group({
-      // CAMPOS OBRIGATÓRIOS
+
       internalReference: ['', [Validators.required]],
       productionOrderId: ['', [Validators.required]],
       paymentMethod: ['PIX', [Validators.required]],
       totalAmount: [0, [Validators.required, Validators.min(0.01)]],
       dueDate: ['', [Validators.required]],
       paymentDate: [''],
-      // CAMPOS OPCIONAIS
+
       paymentStatus: ['PENDING'],
       paidAmount: [0, [Validators.min(0)]],
       notes: ['', [Validators.maxLength(1000)]]
     });
-
-    // Validação customizada para paidAmount
     this.productionReceiptForm.get('paidAmount')?.valueChanges.subscribe(() => {
       this.validatePaidAmount();
     });
@@ -196,19 +161,15 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
     this.productionReceiptForm.get('totalAmount')?.valueChanges.subscribe(() => {
       this.validatePaidAmount();
     });
-
-    // Definir data padrão de vencimento (30 dias)
     this.setDefaultDueDate();
   }
 
   private setupSelectOptions(): void {
-    // Payment Method Options
+
     this.paymentMethodOptions = ProductionReceiptFormUtils.getPaymentMethodOptions().map(option => ({
       value: option.value,
       label: option.label
     }));
-
-    // Payment Status Options
     this.paymentStatusOptions = ProductionReceiptFormUtils.getPaymentStatusOptions().map(option => ({
       value: option.value,
       label: option.label
@@ -217,14 +178,10 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
 
   private setDefaultDueDate(): void {
     const today = new Date();
-    const dueDate = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 dias
+    const dueDate = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000));
     const formattedDate = dueDate.toISOString().split('T')[0];
     this.productionReceiptForm.patchValue({ dueDate: formattedDate });
   }
-
-  // ============================================
-  // CARREGAMENTO DE DADOS
-  // ============================================
   private async loadProductionReceipt(): Promise<void> {
     if (!this.productionReceiptId) return;
 
@@ -237,14 +194,11 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       this.productionReceipt = response.data;
       this.populateForm(this.productionReceipt);
     } catch (error) {
-      console.error('Erro ao carregar recebimento:', error);
-      // TODO: Toast de erro
+
     } finally {
       this.isLoading = false;
     }
   }
-
-
   private formatProductionOrderLabel(order: ProductionOrder): string {
     const clientName = order.development?.client?.companyName || 'Cliente não informado';
     const reference = order.internalReference || order._id;
@@ -253,17 +207,11 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
 
     return `${reference} - ${clientName} (${productionType})`;
   }
-
-  // ============================================
-  // MANIPULAÇÃO DO FORMULÁRIO
-  // ============================================
   private populateForm(productionReceipt: ProductionReceipt): void {
-    // Encontrar e selecionar a ordem de produção
+
     if (productionReceipt.productionOrder) {
       this.selectedProductionOrder = productionReceipt.productionOrder;
     }
-
-    // Preencher formulário
     this.productionReceiptForm.patchValue({
       internalReference: productionReceipt.internalReference,
       productionOrderId: productionReceipt.productionOrder?._id,
@@ -305,10 +253,6 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       });
     }
   }
-
-  // ============================================
-  // EVENTOS DA UI
-  // ============================================
   onProductionOrderSearch(): void {
     this.searchSubject.next(this.productionReceiptForm.value.internalReference);
   }
@@ -344,15 +288,11 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       });
     }
   }
-
-  // ============================================
-  // SUBMIT E AÇÕES
-  // ============================================
   async onSubmit(): Promise<void> {
     this.productionReceiptForm.markAllAsTouched();
 
     if (this.productionReceiptForm.invalid || this.submitting) {
-      //this.markFormGroupTouched(this.productionReceiptForm);
+
       return;
     }
 
@@ -362,7 +302,6 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       const formData = this.prepareFormData();
 
       if (this.isEditMode) {
-        console.log(this.productionReceiptForm);
 
         await this.updateProductionReceipt({ ...formData, _id: this.productionReceiptForm.value?._id || '' });
       } else {
@@ -375,8 +314,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       });
 
     } catch (error) {
-      console.error('Erro ao salvar recebimento:', error);
-      // TODO: Toast de erro
+
     } finally {
       this.submitting = false;
     }
@@ -423,8 +361,6 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
   onCancel(): void {
     this.modalService.close('production-receipt-modal');
   }
-
-
   get modalTitle(): string {
     return this.isEditMode ? 'Editar Recebimento' : 'Novo Recebimento';
   }
@@ -444,16 +380,10 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
 
     return `${client} - ${type}`;
   }
-
-  // ============================================
-  // VALIDAÇÃO E ERROS
-  // ============================================
   getFieldError(fieldName: string): string {
     return this.getErrorMessage(this.productionReceiptForm, fieldName);
   }
 
-
-  // Métodos herdados de FormValidator
   protected getErrorMessage(form: FormGroup, fieldName: string): string {
     const field = form.get(fieldName);
     if (!field || !field.errors || !field.touched) {
@@ -493,18 +423,12 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
     if (errors['exceedsTotal']) {
       return 'Valor pago não pode ser maior que o valor total';
     }
-
-    // Erro genérico
     return 'Campo inválido';
   }
 
   isFieldInvalid(fieldName: string): boolean {
     return this.isFormControlInvalid(this.productionReceiptForm.get(fieldName));
   }
-
-  // ============================================
-  // MÉTODOS UTILITÁRIOS PARA TEMPLATE
-  // ============================================
 
   formatCurrency(value: number): string {
     if (!value) return 'R$ 0,00';

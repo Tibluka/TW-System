@@ -8,7 +8,7 @@ export function copyToClipboard(internalReference: string, event?: MouseEvent) {
     }
     if (navigator && navigator.clipboard) {
         navigator.clipboard.writeText(internalReference).then(() => {
-            //alert('copiado com sucesso')
+
         }).catch(err => {
             alert('Erro ao copiar')
         });
@@ -34,8 +34,6 @@ export function translateProductionOrderStatus(productionOrderStatus: Production
     };
     return statusMap[productionOrderStatus] || 'Desconhecido';
 }
-
-
 export function translateDevelopmentStatus(developmentStatus: DevelopmentStatus) {
     const statusMap: Record<DevelopmentStatus, string> = {
         CREATED: 'Criado',

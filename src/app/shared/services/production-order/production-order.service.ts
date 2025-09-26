@@ -1,5 +1,3 @@
-// shared/services/production-orders/production-order.service.ts
-
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -14,17 +12,11 @@ export class ProductionOrderService {
   private http = inject(HttpClient);
   private readonly API_URL = `${environment.apiUrl}/production-orders`;
 
-  // ============================================
-  // MÉTODOS CRUD PRINCIPAIS
-  // ============================================
-
   /**
    * 📋 LISTAR - Busca ordens de produção com filtros e paginação
    */
   getProductionOrders(filters: ProductionOrderFilters = {}): Observable<ProductionOrderListResponse> {
     let params = new HttpParams();
-
-    // Adicionar filtros como parâmetros
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         params = params.set(key, value.toString());
@@ -62,10 +54,6 @@ export class ProductionOrderService {
     return this.http.delete<ProductionOrderResponse>(`${this.API_URL}/${id}`);
   }
 
-  // ============================================
-  // MÉTODOS ESPECÍFICOS DE ATUALIZAÇÃO
-  // ============================================
-
   /**
    * 🔄 ATUALIZAR STATUS - Atualiza apenas o status da ordem
    */
@@ -93,10 +81,6 @@ export class ProductionOrderService {
   updateObservations(id: string, observations: string): Observable<ProductionOrderResponse> {
     return this.http.patch<ProductionOrderResponse>(`${this.API_URL}/${id}/observations`, { observations });
   }
-
-  // ============================================
-  // MÉTODOS DE BUSCA ESPECÍFICA
-  // ============================================
 
   /**
    * 🔍 BUSCAR POR DESENVOLVIMENTO - Lista ordens de um desenvolvimento específico
@@ -138,10 +122,6 @@ export class ProductionOrderService {
     return this.getProductionOrders(searchFilters);
   }
 
-  // ============================================
-  // MÉTODOS DE ESTATÍSTICAS E RELATÓRIOS
-  // ============================================
-
   /**
    * 📊 ESTATÍSTICAS - Busca estatísticas das ordens de produção
    */
@@ -173,10 +153,6 @@ export class ProductionOrderService {
   getProductionOrderPriorityCount(): Observable<any> {
     return this.http.get<any>(`${this.API_URL}/stats/priority`);
   }
-
-  // ============================================
-  // MÉTODOS DE RELATÓRIOS
-  // ============================================
 
   /**
    * 📄 EXPORTAR CSV - Exporta ordens de produção em CSV
@@ -214,10 +190,6 @@ export class ProductionOrderService {
     });
   }
 
-  // ============================================
-  // MÉTODOS DE WORKFLOW
-  // ============================================
-
   /**
    * ▶️ INICIAR PRODUÇÃO - Move ordem para produção iniciada
    */
@@ -253,10 +225,6 @@ export class ProductionOrderService {
   finalizeOrder(id: string): Observable<ProductionOrderResponse> {
     return this.http.patch<ProductionOrderResponse>(`${this.API_URL}/${id}/finalize`, {});
   }
-
-  // ============================================
-  // MÉTODOS DE VALIDAÇÃO E UTILITÁRIOS
-  // ============================================
 
   /**
    * ✅ VALIDAR ORDEM - Verifica se ordem pode ser criada

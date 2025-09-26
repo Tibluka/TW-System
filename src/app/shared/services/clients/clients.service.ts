@@ -1,4 +1,4 @@
-// src/app/shared/services/client/client.service.ts
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -13,26 +13,18 @@ export class ClientService {
 
     constructor(private http: HttpClient) { }
 
-    // ============================================
-    // CRUD BÁSICO - SEM TRATAMENTO DE ERRO
-    // ============================================
-
     /**
      * Lista todos os clientes com paginação e filtros
      * GET /api/v1/clients
      */
     getClients(filters: ClientFilters = {}): Observable<ClientListResponse> {
         let params = new HttpParams();
-
-        // Adiciona parâmetros apenas se existirem
         Object.keys(filters).forEach(key => {
             const value = (filters as any)[key];
             if (value !== undefined && value !== null && value !== '') {
                 params = params.append(key, value.toString());
             }
         });
-
-        // ✨ Não há mais .pipe(catchError) - o interceptor cuida dos erros!
         return this.http.get<ClientListResponse>(this.apiUrl, { params });
     }
 
@@ -67,10 +59,6 @@ export class ClientService {
     deleteClient(id: string): Observable<any> {
         return this.http.delete<any>(`${this.apiUrl}/${id}`);
     }
-
-    // ============================================
-    // MÉTODOS AUXILIARES (se necessário)
-    // ============================================
 
     /**
      * Busca clientes por texto (helper method)

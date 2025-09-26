@@ -1,10 +1,4 @@
-// models/production-sheets/production-sheets.ts
-
 import { ProductionOrder } from '../production-orders/production-orders';
-
-// ============================================
-// TYPES E ENUMS
-// ============================================
 
 export type ProductionSheetStage =
     | 'PRINTING'
@@ -13,40 +7,20 @@ export type ProductionSheetStage =
 
 export type MachineNumber = 1 | 2 | 3 | 4;
 
-// ============================================
-// INTERFACE PRINCIPAL
-// ============================================
-
 export interface ProductionSheet {
     _id: string;
-
-    // REFERÊNCIA À ORDEM DE PRODUÇÃO
     productionOrderId: string;
-    productionOrder?: ProductionOrder; // Populated automaticamente pelo backend
-
-    // DADOS COPIADOS (preenchidos automaticamente)
+    productionOrder?: ProductionOrder;
     internalReference?: string;
-
-    // DADOS OPERACIONAIS ESPECÍFICOS
     entryDate: Date | string;
     expectedExitDate: Date | string;
     machine: MachineNumber;
-
-    // ETAPAS OPERACIONAIS
     stage: ProductionSheetStage;
-
-    // OBSERVAÇÕES ESPECÍFICAS DA PRODUÇÃO
     productionNotes?: string;
-
-    // METADADOS
     active?: boolean;
     createdAt?: Date | string;
     updatedAt?: Date | string;
 }
-
-// ============================================
-// INTERFACES DE ESTATÍSTICAS
-// ============================================
 
 export interface ProductionSheetStatistics {
     stages: {
@@ -63,15 +37,11 @@ export interface ProductionSheetStatistics {
     };
 }
 
-// ============================================
-// REQUEST INTERFACES
-// ============================================
-
 export interface CreateProductionSheetRequest {
     productionOrderId: string;
     expectedExitDate: Date | string;
     machine: MachineNumber;
-    entryDate?: Date | string; // Default: Date.now no backend
+    entryDate?: Date | string;
     productionNotes?: string;
 }
 
@@ -83,33 +53,21 @@ export interface UpdateStageRequest {
     stage: ProductionSheetStage;
 }
 
-// ============================================
-// FILTER INTERFACE
-// ============================================
-
 export interface ProductionSheetFilters {
     search?: string;
     productionOrderId?: string;
     machine?: MachineNumber;
     stage?: ProductionSheetStage;
     active?: boolean;
-
-    // Filtros por data
     entryDateFrom?: Date | string;
     entryDateTo?: Date | string;
     expectedExitDateFrom?: Date | string;
     expectedExitDateTo?: Date | string;
-
-    // Paginação
     page?: number;
     limit?: number;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
 }
-
-// ============================================
-// RESPONSE INTERFACES
-// ============================================
 
 export interface ProductionSheetListResponse {
     success: boolean;
@@ -139,10 +97,6 @@ export interface PaginationInfo {
     nextPage: number | null;
     prevPage: number | null;
 }
-
-// ============================================
-// UTILITY CLASS
-// ============================================
 
 export class ProductionSheetUtils {
 
@@ -183,7 +137,7 @@ export class ProductionSheetUtils {
             return stageOrder[currentIndex + 1];
         }
 
-        return null; // Já está no estágio final
+        return null;
     }
 
     /**

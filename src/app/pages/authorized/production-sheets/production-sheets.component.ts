@@ -1,5 +1,3 @@
-// pages/authorized/production-sheets/production-sheets.component.ts
-
 import { CommonModule } from '@angular/common';
 import { Component, effect, inject, ViewChild } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
@@ -57,25 +55,17 @@ export class ProductionSheetsComponent extends FormValidator {
 
   private productionSheetsService = inject(ProductionSheetsService);
   private modalService = inject(ModalService);
-
-  // Lista de fichas de produção e paginação
   productionSheets: ProductionSheet[] = [];
   pagination: PaginationInfo | null = null;
   loading = false;
-
-  // Configuração do list-view
   listViewConfig = {
     itemsPerRow: 3,
     showToggle: true,
     defaultView: 'table' as 'table' | 'cards'
   };
 
-
-  // Estados para UI
   errorMessage: string = '';
   showError = false;
-
-  // Filtros atuais
   currentFilters: ProductionSheetFilters = {
     search: undefined,
     stage: undefined,
@@ -84,8 +74,6 @@ export class ProductionSheetsComponent extends FormValidator {
     limit: 10,
     active: true
   };
-
-  // Opções para selects
   stageOptions: SelectOption[] = [
     { value: undefined, label: 'Todos os Estágios' },
     { value: 'PRINTING', label: 'Impressão' },
@@ -100,37 +88,21 @@ export class ProductionSheetsComponent extends FormValidator {
     { value: 3, label: 'Máquina 3' },
     { value: 4, label: 'Máquina 4' }
   ];
-
-  // Propriedade para armazenar ID da ficha selecionada para edição
   selectedProductionSheetId?: string;
-
-  // Configuração do menu de ações
   actionMenuItems: ActionMenuItem[] = [];
-
-  // Configuração das opções de estágio para o status-updater
   productionSheetStageOptions: StatusOption[] = [
     { value: 'PRINTING', label: 'Impressão', icon: 'fa-solid fa-print', color: 'primary' },
     { value: 'CALENDERING', label: 'Calandra', icon: 'fa-solid fa-cogs', color: 'warning' },
     { value: 'FINISHED', label: 'Finalizado', icon: 'fa-solid fa-check-circle', color: 'success' }
   ];
-
-  // Propriedades para o status-updater
   selectedProductionSheetForStatusUpdate?: ProductionSheet;
-
-  // Referência ao componente status-updater
   @ViewChild('statusUpdaterRef') statusUpdaterComponent?: StatusUpdaterComponent;
-
-  // Subject para controlar debounce da busca
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
-  // ============================================
-  // CICLO DE VIDA
-  // ============================================
-
   constructor() {
     super();
-    // Effect para monitorar quando o modal está aberto
+
     effect(() => {
       const modalInstance = this.modalService.modals().find(m => m.id === 'production-sheet-modal');
       this.isModalOpen = modalInstance ? modalInstance.isOpen : false;
@@ -147,10 +119,6 @@ export class ProductionSheetsComponent extends FormValidator {
     this.destroy$.complete();
   }
 
-  // ============================================
-  // CONFIGURAÇÃO DE BUSCA COM DEBOUNCE
-  // ============================================
-
   /**
    * 🔍 SETUP SEARCH DEBOUNCE - Configura debounce para busca
    */
@@ -163,14 +131,10 @@ export class ProductionSheetsComponent extends FormValidator {
       )
       .subscribe(searchTerm => {
         this.currentFilters.search = searchTerm || undefined;
-        this.currentFilters.page = 1; // Reset para primeira página
+        this.currentFilters.page = 1;
         this.loadProductionSheets();
       });
   }
-
-  // ============================================
-  // MÉTODOS DE CARREGAMENTO DE DADOS
-  // ============================================
 
   /**
    * 📋 CARREGAR FICHAS DE PRODUÇÃO - Carrega lista com filtros
@@ -185,14 +149,10 @@ export class ProductionSheetsComponent extends FormValidator {
       if (response && response.success) {
         this.productionSheets = response.data || [];
         this.pagination = response.pagination || null;
-
-
-        console.log('✅ Fichas de produção carregadas:', this.productionSheets.length);
       } else {
         throw new Error(response?.message || 'Erro desconhecido');
       }
     } catch (error) {
-      console.error('❌ Erro ao carregar fichas de produção:', error);
       this.errorMessage = 'Erro ao carregar fichas de produção. Tente novamente.';
       this.showError = true;
 
@@ -201,10 +161,6 @@ export class ProductionSheetsComponent extends FormValidator {
       this.loading = false;
     }
   }
-
-  // ============================================
-  // MÉTODOS DE EVENTOS DE FILTROS
-  // ============================================
 
   /**
    * 🔍 BUSCA - Evento de mudança no campo de busca
@@ -218,7 +174,7 @@ export class ProductionSheetsComponent extends FormValidator {
    * 📂 FILTRO ESTÁGIO - Evento de mudança no filtro de estágio
    */
   onStageFilterChange(): void {
-    this.currentFilters.page = 1; // Reset para primeira página
+    this.currentFilters.page = 1;
     this.loadProductionSheets();
   }
 
@@ -226,13 +182,9 @@ export class ProductionSheetsComponent extends FormValidator {
    * 🖥️ FILTRO MÁQUINA - Evento de mudança no filtro de máquina
    */
   onMachineFilterChange(): void {
-    this.currentFilters.page = 1; // Reset para primeira página
+    this.currentFilters.page = 1;
     this.loadProductionSheets();
   }
-
-  // ============================================
-  // MÉTODOS DE INTERAÇÃO COM TABELA
-  // ============================================
 
   /**
    * 👆 CLICK NA FICHA - Abre modal para editar ficha
@@ -250,7 +202,7 @@ export class ProductionSheetsComponent extends FormValidator {
       showCloseButton: true,
       closeOnBackdropClick: false,
       closeOnEscapeKey: true,
-      data: productionSheet // Passar dados para o modal
+      data: productionSheet
     }).subscribe(result => {
       this.handleModalResult(result);
     });
@@ -260,7 +212,7 @@ export class ProductionSheetsComponent extends FormValidator {
    * ➕ CRIAR - Abre modal para criar nova ficha de produção
    */
   createProductionSheet(): void {
-    // Limpar ID selecionado para modo criação
+
     this.selectedProductionSheetId = undefined;
 
     this.modalService.open({
@@ -282,17 +234,15 @@ export class ProductionSheetsComponent extends FormValidator {
   private handleModalResult(result: any): void {
     if (result && result.action) {
       if (result.action === 'created') {
-        this.loadProductionSheets(); // Recarregar lista
-        // TODO: Exibir toast de sucesso
+        this.loadProductionSheets();
+
       } else if (result.action === 'updated') {
-        this.loadProductionSheets(); // Recarregar lista
-        // TODO: Exibir toast de sucesso
+        this.loadProductionSheets();
+
       } else if (result.action === 'stage-updated') {
-        this.loadProductionSheets(); // Recarrega
+        this.loadProductionSheets();
       }
     }
-
-    // Sempre limpar o ID selecionado após fechar modal
     this.selectedProductionSheetId = undefined;
   }
 
@@ -302,10 +252,6 @@ export class ProductionSheetsComponent extends FormValidator {
   onModalClosed(result: any): void {
     this.handleModalResult(result);
   }
-
-  // ============================================
-  // MÉTODOS UTILITÁRIOS PARA TEMPLATE
-  // ============================================
 
   /**
    * 📅 FORMATAR DATA - Formata data para exibição
@@ -341,10 +287,6 @@ export class ProductionSheetsComponent extends FormValidator {
   isFinished(stage: ProductionSheetStage): boolean {
     return this.productionSheetsService.isFinished(stage);
   }
-
-  // ============================================
-  // MÉTODOS DE PAGINAÇÃO
-  // ============================================
 
   /**
    * 📄 PÁGINA ANTERIOR - Navega para página anterior
@@ -417,7 +359,6 @@ export class ProductionSheetsComponent extends FormValidator {
         this.retrocedeProductionSheetStage(productionSheet);
         break;
       default:
-        console.warn('Ação não implementada:', action.value);
     }
   }
 
@@ -432,8 +373,6 @@ export class ProductionSheetsComponent extends FormValidator {
         icon: 'fa-solid fa-arrow-right-arrow-left'
       }
     ];
-
-    // Botão "Avançar" - só aparece se não estiver no último estágio
     if (productionSheet.stage !== 'FINISHED') {
       items.push({
         label: 'Avançar Estágio',
@@ -441,8 +380,6 @@ export class ProductionSheetsComponent extends FormValidator {
         icon: 'fa-solid fa-arrow-right'
       });
     }
-
-    // Botão "Retroceder" - só aparece se não estiver no primeiro estágio
     if (productionSheet.stage !== 'PRINTING') {
       items.push({
         label: 'Retroceder Estágio',
@@ -450,8 +387,6 @@ export class ProductionSheetsComponent extends FormValidator {
         icon: 'fa-solid fa-arrow-left'
       });
     }
-
-    // Botão "Excluir" sempre aparece
     items.push({
       label: 'Excluir',
       value: 'delete',
@@ -521,7 +456,6 @@ export class ProductionSheetsComponent extends FormValidator {
           this.loadProductionSheets();
         },
         error: (error) => {
-          console.error('❌ Erro ao avançar estágio:', error);
           this.showErrorMessage(error.message || 'Erro ao avançar estágio.');
         }
       });
@@ -538,7 +472,7 @@ export class ProductionSheetsComponent extends FormValidator {
       return stageFlow[currentIndex + 1];
     }
 
-    return null; // Já está no estágio final
+    return null;
   }
 
   /**
@@ -552,7 +486,7 @@ export class ProductionSheetsComponent extends FormValidator {
       return stageFlow[currentIndex - 1];
     }
 
-    return null; // Já está no primeiro estágio
+    return null;
   }
 
   /**
@@ -607,8 +541,6 @@ export class ProductionSheetsComponent extends FormValidator {
    */
   private changeProductionSheetStage(productionSheet: ProductionSheet): void {
     this.selectedProductionSheetForStatusUpdate = productionSheet;
-
-    // Aguarda o próximo ciclo para garantir que o componente seja renderizado
     setTimeout(() => {
       if (this.statusUpdaterComponent) {
         this.statusUpdaterComponent.openStatusModal();
@@ -622,7 +554,7 @@ export class ProductionSheetsComponent extends FormValidator {
   onStatusUpdated(result: any): void {
     if (result.success) {
       this.showSuccessMessage(result.message);
-      this.loadProductionSheets(); // Recarregar lista
+      this.loadProductionSheets();
     }
   }
 
@@ -645,7 +577,7 @@ export class ProductionSheetsComponent extends FormValidator {
    */
   changeProductionSheetStatus(productionSheet: ProductionSheet): void {
     this.selectedProductionSheetForStatusUpdate = productionSheet;
-    // Aguarda o próximo ciclo para garantir que o componente seja renderizado
+
     setTimeout(() => {
       if (this.selectedProductionSheetForStatusUpdate && this.statusUpdaterComponent) {
         this.statusUpdaterComponent.openStatusModal();
@@ -655,7 +587,6 @@ export class ProductionSheetsComponent extends FormValidator {
 
   deleteProductionSheet(productionSheet: ProductionSheet): void {
     if (!productionSheet._id) {
-      console.error('ID da ficha de produção não encontrado');
       return;
     }
 
@@ -693,10 +624,9 @@ export class ProductionSheetsComponent extends FormValidator {
           .subscribe({
             next: () => {
               this.showSuccessMessage(`Ficha de produção ${productionSheet.internalReference} excluída com sucesso.`);
-              this.loadProductionSheets(); // Recarregar lista
+              this.loadProductionSheets();
             },
             error: (error) => {
-              console.error('❌ Erro ao excluir ficha de produção:', error);
               this.showErrorMessage(error.message || 'Erro ao excluir ficha de produção.');
             }
           });
@@ -708,8 +638,7 @@ export class ProductionSheetsComponent extends FormValidator {
    * 🟢 SUCESSO - Mostra mensagem de sucesso
    */
   private showSuccessMessage(message: string): void {
-    // Implementar toast/notificação de sucesso
-    console.log('SUCCESS:', message);
+
   }
 
   /**
@@ -718,14 +647,10 @@ export class ProductionSheetsComponent extends FormValidator {
   private showErrorMessage(message: string): void {
     this.errorMessage = message;
     this.showError = true;
-
-    // Auto-hide após 5 segundos
     setTimeout(() => {
       this.showError = false;
     }, 5000);
   }
-
-
   copy(event: MouseEvent, internalReference: string): void {
     copyToClipboard(internalReference, event);
   }

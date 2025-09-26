@@ -22,8 +22,6 @@ describe('StatusUpdaterComponent', () => {
 
         fixture = TestBed.createComponent(StatusUpdaterComponent);
         component = fixture.componentInstance;
-
-        // Configurar inputs padrão para os testes
         component.entityType = 'development';
         component.entityId = 'test-id';
         component.currentStatus = 'CREATED';
@@ -69,7 +67,7 @@ describe('StatusUpdaterComponent', () => {
         component.openStatusModal();
         const initialStatus = component.selectedStatus;
 
-        component.selectStatus('CANCELLED'); // Status disabled
+        component.selectStatus('CANCELLED');
 
         expect(component.selectedStatus).toBe(initialStatus);
     });
@@ -78,7 +76,7 @@ describe('StatusUpdaterComponent', () => {
         component.openStatusModal();
         const initialStatus = component.selectedStatus;
 
-        component.selectStatus('CREATED'); // Current status
+        component.selectStatus('CREATED');
 
         expect(component.selectedStatus).toBe(initialStatus);
     });
@@ -95,7 +93,7 @@ describe('StatusUpdaterComponent', () => {
 
     it('should return correct status color', () => {
         const color = component.getStatusColor('IN_PROGRESS');
-        expect(color).toBe('primary'); // Default color
+        expect(color).toBe('primary');
     });
 
     it('should return correct status icon', () => {
@@ -149,8 +147,6 @@ describe('StatusUpdaterComponent', () => {
 
         component.openStatusModal();
         component.selectStatus('IN_PROGRESS');
-
-        // Mock do método updateEntityStatus para retornar sucesso
         spyOn(component as any, 'updateEntityStatus').and.returnValue(Promise.resolve({}));
 
         await component.confirmUpdate();
@@ -168,8 +164,6 @@ describe('StatusUpdaterComponent', () => {
 
         component.openStatusModal();
         component.selectStatus('IN_PROGRESS');
-
-        // Mock do método updateEntityStatus para retornar erro
         spyOn(component as any, 'updateEntityStatus').and.returnValue(Promise.reject(new Error('API Error')));
 
         await component.confirmUpdate();

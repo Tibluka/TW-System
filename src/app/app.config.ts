@@ -12,10 +12,8 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-
-    // ✨ CONFIGURAÇÃO PARA MANTER INTERCEPTORS DE CLASSE (formato legado)
     provideHttpClient(
-      withInterceptorsFromDi() // Esta linha permite usar HTTP_INTERCEPTORS
+      withInterceptorsFromDi()
     ),
 
     provideAnimationsAsync(),

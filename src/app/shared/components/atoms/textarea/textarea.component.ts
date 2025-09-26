@@ -22,39 +22,33 @@ export class TextareaComponent implements OnInit, OnDestroy, ControlValueAccesso
   @Input() required: boolean = false;
   @Input() disabled: boolean = false;
   @Input() invalid: boolean = false;
-  @Input() icon: string = ''; // Ícone opcional
+  @Input() icon: string = '';
   @Input() iconPosition: 'left' | 'right' = 'left';
   @Input() maxlength: number | null = null;
   @Input() minlength: number | null = null;
   @Input() readonly: boolean = false;
-  @Input() rows: number = 4; // Número de linhas visíveis
-  @Input() cols: number | null = null; // Número de colunas
-  @Input() resize: 'none' | 'vertical' | 'horizontal' | 'both' = 'vertical'; // Controle de redimensionamento
+  @Input() rows: number = 4;
+  @Input() cols: number | null = null;
+  @Input() resize: 'none' | 'vertical' | 'horizontal' | 'both' = 'vertical';
   @Input() autocomplete: string = 'off';
   @Input() errorMessage: string = '';
   @Input() helperText: string = '';
   @Input() fullWidth: boolean = false;
   @Input() width: string = 'fit-content';
-
-  // Propriedades internas
   value: string = '';
   isFocused: boolean = false;
   uniqueId: string = '';
-
-  // Callbacks do ControlValueAccessor
   private onChange = (value: string) => { };
   private onTouched = () => { };
 
   ngOnInit() {
-    // Gerar ID único para o textarea
+
     this.uniqueId = `ds-textarea-${Math.random().toString(36).substr(2, 9)}`;
   }
 
   ngOnDestroy() {
-    // Cleanup se necessário
-  }
 
-  // Implementação do ControlValueAccessor
+  }
   writeValue(value: string): void {
     this.value = value || '';
   }
@@ -70,8 +64,6 @@ export class TextareaComponent implements OnInit, OnDestroy, ControlValueAccesso
   setDisabledState(isDisabled: boolean): void {
     this.disabled = isDisabled;
   }
-
-  // Métodos de evento
   onTextareaChange(event: Event): void {
     const target = event.target as HTMLTextAreaElement;
     this.value = target.value;
@@ -86,14 +78,10 @@ export class TextareaComponent implements OnInit, OnDestroy, ControlValueAccesso
     this.isFocused = false;
     this.onTouched();
   }
-
-  // Auto-resize para textarea (opcional)
   onTextareaInput(event: Event): void {
     const target = event.target as HTMLTextAreaElement;
     this.value = target.value;
     this.onChange(this.value);
-
-    // Auto-resize se não tiver rows fixo e resize for 'none'
     if (this.resize === 'none' || this.resize === 'horizontal') {
       this.autoResize(target);
     }
@@ -103,8 +91,6 @@ export class TextareaComponent implements OnInit, OnDestroy, ControlValueAccesso
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
   }
-
-  // Getters para classes CSS dinâmicas
   get textareaClasses(): string {
     const classes = ['textarea-field'];
 

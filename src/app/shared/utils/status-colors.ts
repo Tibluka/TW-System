@@ -1,21 +1,11 @@
-// shared/utils/status-colors.ts
-
 import { DevelopmentStatus } from '../../models/developments/developments';
 import { ProductionOrderStatus } from '../../models/production-orders/production-orders';
 import { ProductionSheetStage } from '../../models/production-sheet/production-sheet';
 import { PaymentStatus } from '../../models/production-receipt/production-receipt';
 
-// ============================================
-// TYPES
-// ============================================
-
 export type BadgeColor = 'green' | 'yellow' | 'orange' | 'red' | 'blue' | 'purple' | 'gray';
 
 export type StatusType = DevelopmentStatus | ProductionOrderStatus | ProductionSheetStage | PaymentStatus;
-
-// ============================================
-// STATUS COLOR MAPPING
-// ============================================
 
 /**
  * 🎨 MAPEAMENTO DE CORES POR STATUS
@@ -23,63 +13,53 @@ export type StatusType = DevelopmentStatus | ProductionOrderStatus | ProductionS
  */
 export class StatusColorMapper {
 
-    // ============================================
-    // MAPEAMENTOS ESPECÍFICOS POR TIPO
-    // ============================================
-
     /**
      * 🏗️ DESENVOLVIMENTOS - Cores para status de desenvolvimento
      */
     private static readonly DEVELOPMENT_COLORS: Record<DevelopmentStatus, BadgeColor> = {
-        'CREATED': 'blue',           // Azul - Novo/Inicial
-        'AWAITING_APPROVAL': 'yellow', // Amarelo - Aguardando
-        'APPROVED': 'green',         // Verde - Aprovado
-        'CANCELED': 'red'            // Vermelho - Cancelado
+        'CREATED': 'blue',
+        'AWAITING_APPROVAL': 'yellow',
+        'APPROVED': 'green',
+        'CANCELED': 'red'
     };
 
     /**
      * 🏭 ORDENS DE PRODUÇÃO - Cores para status de ordem de produção
      */
     private static readonly PRODUCTION_ORDER_COLORS: Record<ProductionOrderStatus, BadgeColor> = {
-        'CREATED': 'blue',              // Azul - Criado
-        'PILOT_PRODUCTION': 'orange',   // Laranja - Em produção piloto
-        'PILOT_SENT': 'yellow',         // Amarelo - Piloto enviado
-        'PILOT_APPROVED': 'green',      // Verde - Piloto aprovado
-        'PRODUCTION_STARTED': 'purple', // Roxo - Produção iniciada
-        'FINALIZED': 'green'            // Verde - Finalizado
+        'CREATED': 'blue',
+        'PILOT_PRODUCTION': 'orange',
+        'PILOT_SENT': 'yellow',
+        'PILOT_APPROVED': 'green',
+        'PRODUCTION_STARTED': 'purple',
+        'FINALIZED': 'green'
     };
 
     /**
      * 📋 FICHAS DE PRODUÇÃO - Cores para estágios de produção
      */
     private static readonly PRODUCTION_SHEET_COLORS: Record<ProductionSheetStage, BadgeColor> = {
-        'PRINTING': 'blue',      // Azul - Impressão
-        'CALENDERING': 'orange', // Laranja - Calandragem
-        'FINISHED': 'green'      // Verde - Finalizado
+        'PRINTING': 'blue',
+        'CALENDERING': 'orange',
+        'FINISHED': 'green'
     };
 
     /**
      * 💰 RECEBIMENTOS - Cores para status de pagamento
      */
     private static readonly PAYMENT_COLORS: Record<PaymentStatus, BadgeColor> = {
-        'PENDING': 'yellow', // Amarelo - Pendente
-        'PAID': 'green'      // Verde - Pago
+        'PENDING': 'yellow',
+        'PAID': 'green'
     };
-
-    // ============================================
-    // MÉTODOS PÚBLICOS
-    // ============================================
 
     /**
      * 🎨 OBTER COR POR STATUS - Retorna a cor apropriada para um status
      */
     static getColorForStatus(status: string, entityType?: 'development' | 'production-order' | 'production-sheet' | 'production-receipt'): BadgeColor {
-        // Se não especificar o tipo de entidade, tenta detectar automaticamente
+
         if (!entityType) {
             return this.detectColorByStatus(status);
         }
-
-        // Mapeamento específico por tipo de entidade
         switch (entityType) {
             case 'development':
                 return this.DEVELOPMENT_COLORS[status as DevelopmentStatus] || 'gray';
@@ -103,8 +83,6 @@ export class StatusColorMapper {
      */
     private static detectColorByStatus(status: string): BadgeColor {
         const statusUpper = status.toUpperCase();
-
-        // Padrões de detecção automática
         if (statusUpper.includes('CREATED') || statusUpper.includes('NEW')) {
             return 'blue';
         }
@@ -128,8 +106,6 @@ export class StatusColorMapper {
         if (statusUpper.includes('PILOT') || statusUpper.includes('SENT')) {
             return 'purple';
         }
-
-        // Status específicos conhecidos
         const knownStatuses: Record<string, BadgeColor> = {
             'CREATED': 'blue',
             'AWAITING_APPROVAL': 'yellow',
@@ -169,10 +145,6 @@ export class StatusColorMapper {
         };
     }
 }
-
-// ============================================
-// FUNÇÕES UTILITÁRIAS
-// ============================================
 
 /**
  * 🎨 FUNÇÃO HELPER - Obtém cor para um status

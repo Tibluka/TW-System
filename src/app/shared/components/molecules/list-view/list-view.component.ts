@@ -1,4 +1,4 @@
-// ds-list-view.component.ts - COMPONENTE GENÉRICO REUTILIZÁVEL
+
 import { Component, Input, Output, EventEmitter, ContentChild, TemplateRef, OnInit } from '@angular/core';
 import { NgFor, NgIf, CommonModule } from '@angular/common';
 import { CardComponent } from '../../organisms/card/card.component';
@@ -14,7 +14,7 @@ export interface ListViewConfig {
     minWidth?: string;
     gap?: string;
   };
-  storageKey?: string; // Para persistir preferência
+  storageKey?: string;
 }
 
 @Component({
@@ -36,8 +36,6 @@ export class DsListViewComponent implements OnInit {
 
   @Output() itemClick = new EventEmitter<any>();
   @Output() viewModeChange = new EventEmitter<ViewMode>();
-
-  // Templates projetados do componente pai
   @ContentChild('cardTemplate', { static: false }) cardTemplate!: TemplateRef<any>;
   @ContentChild('actionsTemplate', { static: false }) actionsTemplate!: TemplateRef<any>;
 
@@ -52,10 +50,8 @@ export class DsListViewComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Configurar view mode padrão
-    this.currentViewMode = this.config.defaultView || 'table';
 
-    // Carregar preferência salva se houver storage key
+    this.currentViewMode = this.config.defaultView || 'table';
     if (this.config.storageKey) {
       const saved = localStorage.getItem(this.config.storageKey) as ViewMode;
       if (saved) {
@@ -67,8 +63,6 @@ export class DsListViewComponent implements OnInit {
   setViewMode(mode: ViewMode) {
     this.currentViewMode = mode;
     this.viewModeChange.emit(mode);
-
-    // Salvar preferência se configurado
     if (this.config.storageKey) {
       localStorage.setItem(this.config.storageKey, mode);
     }

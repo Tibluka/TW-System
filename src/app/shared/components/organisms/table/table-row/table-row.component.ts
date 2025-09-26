@@ -20,7 +20,7 @@ export class TableRowComponent {
   @Output() rowClick = new EventEmitter<any>();
 
   constructor(private elementRef: ElementRef) {
-    // Define o elemento como tr
+
     this.elementRef.nativeElement.style.display = 'table-row';
   }
 

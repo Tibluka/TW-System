@@ -1,27 +1,17 @@
-// pages/authorized/production-sheets/production-sheet-modal/production-sheet-modal.component.ts
-
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, Input, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, lastValueFrom, Subject, takeUntil } from 'rxjs';
-
-// Services
 import { ProductionSheetsService, ProductionSheet, CreateProductionSheetRequest, UpdateProductionSheetRequest } from '../../../../shared/services/production-sheets/production-sheets.service';
 import { ProductionOrderService } from '../../../../shared/services/production-order/production-order.service';
 import { ModalService } from '../../../../shared/services/modal/modal.service';
-
-// Components
 import { ButtonComponent } from '../../../../shared/components/atoms/button/button.component';
 import { InputComponent } from '../../../../shared/components/atoms/input/input.component';
 import { SelectComponent, SelectOption } from '../../../../shared/components/atoms/select/select.component';
 import { SpinnerComponent } from '../../../../shared/components/atoms/spinner/spinner.component';
 import { TextareaComponent } from '../../../../shared/components/atoms/textarea/textarea.component';
 import { IconComponent } from '../../../../shared/components/atoms/icon/icon.component';
-
-// Utils
 import { FormValidator } from '../../../../shared/utils/form';
-
-// Models
 import { ProductionOrder, ProductionOrderStatus, ProductionTypeEnum } from '../../../../models/production-orders/production-orders';
 import { translateProductionOrderStatus, translateProductionType } from '../../../../shared/utils/tools';
 import { PrintButtonComponent } from "../../../../shared/components/atoms/print-button/print-button.component";
@@ -50,10 +40,6 @@ import { PrintOptions } from '../../../../shared/components/print/print.service'
 export class ProductionSheetModalComponent extends FormValidator implements OnInit, OnDestroy {
 
   @Input() productionSheetId?: string;
-
-  // ============================================
-  // INJEÇÕES DE DEPENDÊNCIA
-  // ============================================
   private formBuilder = inject(FormBuilder);
   private productionSheetsService = inject(ProductionSheetsService);
   private productionOrderService = inject(ProductionOrderService);
@@ -64,26 +50,14 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     title: 'Ficha de Produção',
     hideElements: ['.modal-actions', 'ds-button', '.no-print']
   };
-
-  // ============================================
-  // PROPRIEDADES DO COMPONENTE
-  // ============================================
   productionSheetForm!: FormGroup;
-
-  // Estados
   isLoading = false;
   isSaving = false;
   isEditMode = false;
-
-  // Dados
   currentProductionSheet: ProductionSheet | null = null;
-
-  // Estados da busca de ordem de produção
   productionOrderFound: ProductionOrder | null = null;
   productionOrderNotFound = false;
   searchingProductionOrder = false;
-
-  // Opções para selects
   machineOptions: SelectOption[] = [
     { value: 1, label: 'Máquina 1' },
     { value: 2, label: 'Máquina 2' },
@@ -96,16 +70,8 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     { value: 'CALENDERING', label: 'Calandra' },
     { value: 'FINISHED', label: 'Finalizado' }
   ];
-
-  // Alertas e avisos
   machineConflictWarning: string = '';
-
-  // Subject para controlar subscriptions
   private destroy$ = new Subject<void>();
-
-  // ============================================
-  // CICLO DE VIDA
-  // ============================================
 
   constructor() {
     super();
@@ -121,23 +87,15 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     this.destroy$.complete();
   }
 
-  // ============================================
-  // GETTERS PARA O TEMPLATE
-  // ============================================
-
   get saveButtonLabel(): string {
     return this.isEditMode ? 'Atualizar' : 'Criar';
   }
-
-  // ============================================
-  // INICIALIZAÇÃO
-  // ============================================
 
   /**
    * 📝 INICIALIZAR FORM - Cria formulário reativo
    */
   private initializeForm(): void {
-    // Campos básicos sempre presentes
+
     const formConfig: any = {
       internalReference: ['', [Validators.required, Validators.minLength(3)]],
       machine: ['', [Validators.required]],
@@ -148,7 +106,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
 
     this.productionSheetForm = this.formBuilder.group(formConfig);
 
-    console.log('📝 Formulário da ficha de produção inicializado');
   }
 
   /**
@@ -157,26 +114,16 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
   private async loadInitialData(): Promise<void> {
     this.isLoading = true;
     try {
-      // Acessar dados do modal ativo
+
       const activeModal = this.modalService.activeModal();
       if (activeModal?.config.data) {
         const productionSheet = activeModal.config.data;
-
-        // ✅ Definir modo de edição e dados atuais
         this.isEditMode = true;
         this.productionSheetId = productionSheet._id;
         this.currentProductionSheet = productionSheet;
-
-        // ✅ Popular formulário
         this.populateForm(productionSheet);
-
-        // ✅ Configurar campo stage para modo edição após popular
         this.addStageControlForEditMode();
-
-        // ✅ Desabilitar campo de referência interna no modo edição
         this.productionSheetForm.get('internalReference')?.disable();
-
-        // ✅ Definir ordem de produção encontrada
         if (productionSheet.productionOrder) {
           this.productionOrderFound = productionSheet.productionOrder;
         }
@@ -186,7 +133,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       }
 
     } catch (error) {
-      console.error('❌ Erro ao carregar dados iniciais:', error);
     } finally {
       this.isLoading = false;
       this.cdr.detectChanges();
@@ -206,7 +152,7 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
    * 📋 POPULAR FORMULÁRIO - Preenche dados da ficha de produção para edição
    */
   private populateForm(productionSheet: ProductionSheet): void {
-    // Buscar a referência interna da ordem de produção
+
     const internalReference = productionSheet.productionOrder?.internalReference ||
       productionSheet.internalReference || '';
 
@@ -218,21 +164,15 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       productionNotes: productionSheet.productionNotes || '',
       stage: productionSheet.stage
     });
-
-    // ✅ Definir ordem de produção encontrada ANTES de configurar stage
     if (productionSheet.productionOrder) {
       this.productionOrderFound = productionSheet.productionOrder;
     }
-
-    // ✅ Configurar stage se for modo edição
     if (this.isEditMode && productionSheet.stage) {
-      // Aguardar próximo ciclo para garantir que o controle foi adicionado
+
       setTimeout(() => {
         this.productionSheetForm.get('stage')?.setValue(productionSheet.stage);
       });
     }
-
-    // ✅ Se existir _id na productionSheet, adicionar o form control _id se não existir
     if (productionSheet._id) {
       if (!this.productionSheetForm.contains('_id')) {
         this.productionSheetForm.addControl('_id', this.formBuilder.control(productionSheet._id));
@@ -261,13 +201,8 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
         this.addStageControlForEditMode();
       }
     } catch (error) {
-      console.error('❌ Erro ao carregar ficha de produção:', error);
     }
   }
-
-  // ============================================
-  // MÉTODOS DE BUSCA DE ORDEM DE PRODUÇÃO
-  // ============================================
 
   private initializeProductionOrderSearch(): void {
     this.productionSheetForm.get('internalReference')?.valueChanges
@@ -290,13 +225,13 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     this.productionOrderNotFound = false;
 
     try {
-      // Buscar ordem de produção pela referência interna
+
       const response = await lastValueFrom(
         this.productionOrderService.getProductionOrderById(internalReference)
       );
 
       if (response && response.data) {
-        // Verificar se encontrou exatamente a referência pesquisada
+
         const foundOrder = response.data;
         if (foundOrder.internalReference?.toLowerCase() === internalReference.toLowerCase()) {
           this.productionOrderFound = foundOrder;
@@ -311,7 +246,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       }
 
     } catch (error) {
-      console.error('Erro ao buscar ordem de produção:', error);
       this.productionOrderNotFound = true;
       this.productionOrderFound = null;
     } finally {
@@ -325,21 +259,14 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     this.searchingProductionOrder = false;
   }
 
-  // ============================================
-  // EVENTOS DO FORMULÁRIO
-  // ============================================
-
   async onSubmit(): Promise<void> {
     this.productionSheetForm.markAllAsTouched();
 
     if (this.productionSheetForm.invalid) {
       return;
     }
-
-    // Verificar se foi encontrada uma ordem de produção válida
     if (!this.productionOrderFound) {
-      console.log('Ordem de produção não encontrada');
-      // TODO: Exibir toast de erro
+
       return;
     }
 
@@ -349,7 +276,7 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       const formData = this.productionSheetForm.value;
 
       if (this.isEditMode && this.productionSheetId) {
-        // Atualizar ficha existente
+
         const updateData: UpdateProductionSheetRequest = {
           machine: formData.machine,
           entryDate: formData.entryDate,
@@ -368,7 +295,7 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
           throw new Error(response?.message || 'Erro ao atualizar ficha');
         }
       } else {
-        // Criar nova ficha - usar o ID da ordem encontrada
+
         const createData: CreateProductionSheetRequest = {
           productionOrderId: this.productionOrderFound._id!,
           machine: formData.machine,
@@ -388,9 +315,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
         }
       }
     } catch (error: any) {
-      console.error('Erro ao salvar ficha:', error);
-
-      // TODO: Exibir toast de erro
       let errorMessage = 'Erro inesperado ao salvar ficha de produção.';
 
       if (error?.error?.message) {
@@ -401,7 +325,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
 
       alert(error.message)
 
-      console.error('Mensagem de erro:', errorMessage);
     } finally {
       this.isSaving = false;
     }
@@ -412,7 +335,7 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
   }
 
   async onAdvanceStage(event: Event): Promise<void> {
-    // PREVENIR O SUBMIT DO FORM
+
     if (event) {
       event.preventDefault();
       event.stopPropagation();
@@ -442,16 +365,11 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       this.modalService.close('production-sheet-modal', { action: 'stage-updated' });
 
     } catch (error: any) {
-      console.error('Erro ao avançar estágio:', error);
-      // TODO: Exibir toast de erro
+
     } finally {
       this.isSaving = false;
     }
   }
-
-  // ============================================
-  // MÉTODOS UTILITÁRIOS
-  // ============================================
 
   canAdvanceStage(): boolean {
     if (!this.isEditMode || !this.currentProductionSheet) {
@@ -497,10 +415,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     });
   }
 
-  // ============================================
-  // VALIDAÇÃO DE CAMPOS
-  // ============================================
-
   getFieldError(fieldName: string): string {
     const field = this.productionSheetForm.get(fieldName);
     if (!field || !field.errors || !field.touched) {
@@ -508,8 +422,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     }
 
     const errors = field.errors;
-
-    // Mensagens de erro específicas por campo
     const errorMessages: { [key: string]: { [key: string]: string } } = {
       internalReference: {
         required: 'Digite a referência interna da ordem de produção',
@@ -525,8 +437,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
         maxlength: 'Observações devem ter no máximo 1000 caracteres'
       }
     };
-
-    // Buscar mensagem específica ou usar mensagem genérica
     const fieldErrors = errorMessages[fieldName] || {};
     const firstErrorKey = Object.keys(errors)[0];
 

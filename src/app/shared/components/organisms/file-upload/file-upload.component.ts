@@ -23,7 +23,7 @@ export class FileUploadComponent implements OnChanges {
   @Input() placeholder: string = 'Clique para selecionar ou arraste arquivos aqui';
   @Input() helperText: string = 'Apenas imagens (JPG, JPEG, PNG) são aceitas';
   @Input() multiple: boolean = false;
-  @Input() maxFileSize: number = 5 * 1024 * 1024; // 5MB em bytes
+  @Input() maxFileSize: number = 5 * 1024 * 1024;
   @Input() acceptedTypes: string[] = ['image/jpeg', 'image/jpg', 'image/png'];
   @Input() disabled: boolean = false;
   @Input() required: boolean = false;
@@ -39,8 +39,6 @@ export class FileUploadComponent implements OnChanges {
   uploadedFiles: UploadedFile[] = [];
   isDragOver = false;
   isProcessing = false;
-
-  // ID único gerado uma só vez
   readonly inputId: string = this.generateId();
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -48,7 +46,7 @@ export class FileUploadComponent implements OnChanges {
       const file = changes['existingFile'].currentValue as PieceImage;
       const existingFile: UploadedFile = {
         id: '',
-        file: undefined as any, // Não há File real, apenas referência
+        file: undefined as any,
         previewUrl: file.url || '',
         name: file.filename || '',
         size: 0
@@ -98,35 +96,25 @@ export class FileUploadComponent implements OnChanges {
 
     this.isProcessing = true;
     const validFiles: File[] = [];
-
-    // Validações
     for (const file of files) {
-      // Validar tipo de arquivo
+
       if (!this.acceptedTypes.includes(file.type)) {
         this.uploadError.emit(`Tipo de arquivo não aceito: ${file.name}`);
         continue;
       }
-
-      // Validar tamanho
       if (file.size > this.maxFileSize) {
         this.uploadError.emit(`Arquivo muito grande: ${file.name}. Máximo ${this.formatFileSize(this.maxFileSize)}`);
         continue;
       }
-
-      // Se não é múltiplo, limpar arquivos existentes
       if (!this.multiple && this.uploadedFiles.length > 0) {
         this.clearAllFiles();
       }
-
-      // Se não é múltiplo e já tem um arquivo sendo adicionado, pegar apenas o primeiro
       if (!this.multiple && validFiles.length > 0) {
         break;
       }
 
       validFiles.push(file);
     }
-
-    // Processar arquivos válidos
     this.processValidFiles(validFiles);
   }
 
@@ -164,11 +152,7 @@ export class FileUploadComponent implements OnChanges {
 
   removeFile(fileToRemove: UploadedFile): void {
     if (this.disabled) return;
-
-    // Revogar URL para liberar memória
     URL.revokeObjectURL(fileToRemove.previewUrl);
-
-    // Remover da lista
     this.uploadedFiles = this.uploadedFiles.filter(file => file.id !== fileToRemove.id);
 
     this.fileRemoved.emit(fileToRemove);
@@ -177,8 +161,6 @@ export class FileUploadComponent implements OnChanges {
 
   clearAllFiles(): void {
     if (this.disabled) return;
-
-    // Revogar todas as URLs
     this.uploadedFiles.forEach(file => {
       URL.revokeObjectURL(file.previewUrl);
     });

@@ -47,11 +47,7 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
 
   isLoading = false;
   isSaving = false;
-
-  // Formulário centralizado
   developmentForm: FormGroup = new FormGroup({});
-
-  // Opções para selects
   clientOptions: SelectOption[] = [];
   productionTypeOptions: SelectOption[] = [
     { value: 'rotary', label: 'Rotativo' },
@@ -65,23 +61,13 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
     { value: 'CANCELED', label: 'Cancelado' }
   ];
 
-
-  // Controle de upload de imagem
   uploadedFiles: UploadedFile[] = [];
   existingFile: PieceImage | undefined = undefined;
-
-  // ============================================
-  // LIFECYCLE HOOKS
-  // ============================================
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadInitialData();
   }
-
-  // ============================================
-  // GETTERS PARA O TEMPLATE
-  // ============================================
 
   get isEditMode(): boolean {
     return !!this.developmentForm.value._id;
@@ -90,10 +76,6 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
   get saveButtonLabel(): string {
     return this.isEditMode ? 'Atualizar' : 'Criar';
   }
-
-  // ============================================
-  // SETUP METHODS
-  // ============================================
 
   /**
    * 📝 INICIALIZAR FORM - Cria formulário reativo
@@ -108,7 +90,6 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
       clientReference: ['']
     });
 
-    console.log('📝 Formulário inicializado');
   }
   /**
    * 📊 CARREGAR DADOS INICIAIS - Carrega clientes e desenvolvimento (se edição)
@@ -117,21 +98,18 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
     this.isLoading = true;
 
     try {
-      // Carregar lista de clientes
-      await this.loadClients();
 
-      // Acessar dados do modal ativo (IGUAL AO CLIENT-MODAL)
+      await this.loadClients();
       const activeModal = this.modalService.activeModal();
       if (activeModal?.config.data) {
         const development = activeModal.config.data;
         this.populateForm(development);
       } else if (this.developmentId) {
-        // Fallback: Se não há dados no modal, mas há ID, buscar pelos dados
+
         await this.loadDevelopmentData();
       }
 
     } catch (error) {
-      console.error('❌ Erro ao carregar dados iniciais:', error);
     } finally {
       this.isLoading = false;
       this.cdr.detectChanges();
@@ -155,10 +133,8 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
           label: client.companyName || 'Cliente sem nome'
         }));
 
-        console.log('✅ Clientes carregados para select:', this.clientOptions.length);
       }
     } catch (error) {
-      console.error('❌ Erro ao carregar clientes para select:', error);
     }
   }
 
@@ -166,15 +142,15 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
  * 📋 POPULAR FORMULÁRIO - Preenche dados do desenvolvimento para edição
  */
   private populateForm(development: Development): void {
-    // ✅ CORREÇÃO: productionType agora é um objeto, não string
+
     let productionTypeValue = '';
 
     if (development.productionType) {
-      // Se productionType é um objeto com a propriedade type
+
       if (typeof development.productionType === 'object' && development.productionType.type) {
         productionTypeValue = development.productionType.type;
       }
-      // Se ainda vier como string (compatibilidade)
+
       else if (typeof development.productionType === 'string') {
         productionTypeValue = development.productionType;
       }
@@ -188,12 +164,10 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
       clientId: development.client?._id || development.clientId,
       description: development.description || '',
       productionType: {
-        type: productionTypeValue // ✅ Usar o valor extraído
+        type: productionTypeValue
       },
       clientReference: development.clientReference || ''
     });
-
-    // Se existir _id no development, adiciona o form control _id se não existir
     if (development._id) {
       if (!this.developmentForm.contains('_id')) {
         this.developmentForm.addControl('_id', this.formBuilder.control(development._id));
@@ -204,7 +178,6 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
       }
     }
 
-    console.log('✅ Dados do desenvolvimento carregados para edição:', {
       development,
       productionTypeExtracted: productionTypeValue,
       formValue: this.developmentForm.value
@@ -224,46 +197,33 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
         this.populateForm(development);
       }
     } catch (error) {
-      console.error('❌ Erro ao carregar desenvolvimento:', error);
     }
   }
-
-  // ============================================
-  // FILE UPLOAD HANDLERS
-  // ============================================
 
   /**
    * 📁 ARQUIVOS ALTERADOS - Callback quando arquivos são alterados
    */
   onImageChanged(files: UploadedFile[]): void {
     this.uploadedFiles = files;
-    console.log('📁 Arquivos alterados:', files);
   }
 
   /**
    * ➕ ARQUIVO ADICIONADO - Callback quando arquivo é adicionado
    */
   onImageAdded(file: UploadedFile): void {
-    console.log('➕ Arquivo adicionado:', file);
   }
 
   /**
    * 🗑️ ARQUIVO REMOVIDO - Callback quando arquivo é removido
    */
   onImageRemoved(file: UploadedFile): void {
-    console.log('🗑️ Arquivo removido:', file);
   }
 
   /**
    * ❌ ERRO UPLOAD - Callback para erros de upload
    */
   onUploadError(error: string): void {
-    console.error('❌ Erro no upload:', error);
   }
-
-  // ============================================
-  // FORM ACTIONS
-  // ============================================
 
   /**
    * ❌ CANCELAR - Fecha modal sem salvar
@@ -271,8 +231,6 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
   onCancel(): void {
     this.modalService.close('development-modal', { success: false });
   }
-
-
   /**
    * 💾 SUBMIT - Processa envio do formulário (ATUALIZADO)
    */
@@ -327,14 +285,11 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
       }
 
     } catch (error: any) {
-      console.error('❌ Erro ao salvar desenvolvimento:', error);
       alert(error.message || 'Erro ao salvar desenvolvimento. Tente novamente.');
     } finally {
       this.isSaving = false;
     }
   }
-
-
 
   /**
    * 📷 UPLOAD IMAGEM PARA DESENVOLVIMENTO - Faz upload da imagem para o desenvolvimento
@@ -343,36 +298,23 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
     if (this.uploadedFiles.length === 0) return;
 
     try {
-      console.log('📷 Fazendo upload de imagem para desenvolvimento:', developmentId);
 
       const formData = new FormData();
       formData.append('image', this.uploadedFiles[0].file);
 
       const response = await this.developmentService.uploadImage(developmentId, this.uploadedFiles[0].file).toPromise();
 
-      console.log('✅ Imagem enviada com sucesso:', response);
-
-      // Limpar arquivos após upload bem-sucedido
       this.uploadedFiles = [];
 
     } catch (uploadError) {
-      console.error('❌ Erro ao enviar imagem:', uploadError);
       throw new Error('Erro ao fazer upload da imagem. Desenvolvimento salvo mas imagem não foi enviada.');
     }
   }
-
-  // ============================================
-  // FORM VALIDATION
-  // ============================================
-
-
   /**
    * 🔍 ERRO DO CAMPO - Retorna mensagem de erro para um campo específico (ATUALIZADO)
    */
   getFieldError(fieldName: string): string {
     let field;
-
-    // ✅ MUDANÇA: Tratamento especial para productionType aninhado
     if (fieldName === 'productionType') {
       field = this.developmentForm.get('productionType.type');
     } else {

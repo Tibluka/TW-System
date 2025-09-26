@@ -15,8 +15,6 @@ export function WithListView(entityType: string, config?: Partial<ListViewConfig
                     ...ListViewUtils.getDefaultConfig(entityType),
                     ...config
                 };
-
-                // Carregar view mode salvo
                 const saved = localStorage.getItem(`${entityType}-view-mode`) as ViewMode;
                 if (saved) {
                     this.currentViewMode = saved;

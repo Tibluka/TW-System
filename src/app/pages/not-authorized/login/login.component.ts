@@ -4,8 +4,6 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../shared/services/auth/auth-service';
 
-
-
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -44,13 +42,12 @@ export class LoginComponent {
     this.authService.login(email, password).subscribe({
       next: (response) => {
         this.isLoading = false;
-        // Redireciona para a página original ou home
+
         this.router.navigate(['authorized/clients']);
       },
       error: (error) => {
         this.isLoading = false;
         this.errorMessage = 'Credenciais inválidas. Tente novamente.';
-        console.error('Erro no login:', error);
       }
     });
   }
@@ -61,8 +58,6 @@ export class LoginComponent {
       control?.markAsTouched();
     });
   }
-
-  // Métodos auxiliares para validação no template
   get email() { return this.loginForm.get('email'); }
   get password() { return this.loginForm.get('password'); }
 

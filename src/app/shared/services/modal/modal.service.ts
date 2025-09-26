@@ -1,4 +1,4 @@
-// modal.service.ts
+
 import { Injectable, signal, computed } from '@angular/core';
 import { Subject } from 'rxjs';
 
@@ -26,8 +26,6 @@ export interface ModalInstance {
 export class ModalService {
   private _modals = signal<Map<string, ModalInstance>>(new Map());
   private _activeModalId = signal<string | null>(null);
-
-  // Computed signals
   readonly modals = computed(() => Array.from(this._modals().values()));
   readonly activeModal = computed(() => {
     const activeId = this._activeModalId();
@@ -36,7 +34,7 @@ export class ModalService {
   readonly hasOpenModals = computed(() => this.modals().some(modal => modal.isOpen));
 
   constructor() {
-    // Escuta a tecla ESC para fechar modais
+
     this.setupGlobalKeyListener();
   }
 
@@ -75,8 +73,6 @@ export class ModalService {
   close(modalId: string, result?: any): void {
     const modal = this._modals().get(modalId);
     if (!modal) return;
-
-    // Atualiza o estado do modal para fechado
     this._modals.update(modals => {
       const newModals = new Map(modals);
       const modalToUpdate = newModals.get(modalId);
@@ -86,17 +82,11 @@ export class ModalService {
       }
       return newModals;
     });
-
-    // Remove o modal como ativo se for o ativo atual
     if (this._activeModalId() === modalId) {
       this._activeModalId.set(null);
     }
-
-    // Emite o resultado e completa o subject
     modal.closeSubject.next(result);
     modal.closeSubject.complete();
-
-    // Remove o modal após um pequeno delay para permitir animações
     setTimeout(() => {
       this._modals.update(modals => {
         const newModals = new Map(modals);

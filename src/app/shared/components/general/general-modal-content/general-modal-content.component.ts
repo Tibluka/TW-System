@@ -3,11 +3,9 @@ import { Component, effect, inject } from '@angular/core';
 import { ButtonComponent } from '../../atoms/button/button.component';
 import { IconComponent } from '../../atoms/icon/icon.component';
 import { ModalService } from '../../../services/modal/modal.service';
-
-// Interfaces
 export interface GeneralModalButton {
   label: string;
-  action: any; // Valor retornado quando clicado
+  action: any;
   variant?: 'fill' | 'outline' | 'ghost';
   icon?: string;
   disabled?: boolean;
@@ -31,13 +29,11 @@ export interface GeneralModalData {
 export class GeneralModalContentComponent {
 
   private modalService = inject(ModalService);
-
-  // Dados do modal vindos do modal service
   modalData: GeneralModalData | null = null;
   modalId: string = 'general-modal';
 
   constructor() {
-    // Effect para obter dados do modal ativo
+
     effect(() => {
       const activeModal = this.modalService.activeModal();
       if (activeModal && activeModal.id === this.modalId) {
@@ -51,8 +47,6 @@ export class GeneralModalContentComponent {
    */
   onButtonClick(button: GeneralModalButton): void {
     if (button.disabled || button.isLoading) return;
-
-    // Fechar modal e retornar o valor da ação
     this.modalService.close(this.modalId, {
       action: button.action,
       button: button

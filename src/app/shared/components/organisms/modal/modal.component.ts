@@ -1,4 +1,4 @@
-// modal.component.ts
+
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModalService, ModalConfig } from '../../../services/modal/modal.service';
@@ -19,15 +19,13 @@ export class ModalComponent implements OnInit, OnDestroy {
   @Output() modalClosed = new EventEmitter<any>();
 
   private modalService = inject(ModalService);
-
-  // Estados do modal
   isVisible = false;
   modalConfig: ModalConfig | null = null;
   animationState: 'in' | 'out' = 'out';
-  shouldShowModal = false; // Controla quando o modal deve estar no DOM
+  shouldShowModal = false;
 
   constructor() {
-    // Usa effect para reagir às mudanças nos signals do service
+
     effect(() => {
       if (this.modalId) {
         const modal = this.modalService.modals().find(m => m.id === this.modalId);
@@ -37,16 +35,16 @@ export class ModalComponent implements OnInit, OnDestroy {
           this.isVisible = newVisibility;
 
           if (newVisibility) {
-            // Modal está abrindo
+
             this.shouldShowModal = true;
-            // Aguarda próximo ciclo para permitir que o elemento seja renderizado
+
             setTimeout(() => {
               this.animationState = 'in';
             }, 0);
           } else {
-            // Modal está fechando
+
             this.animationState = 'out';
-            // shouldShowModal será definido como false após a animação terminar
+
           }
         }
 
@@ -57,13 +55,12 @@ export class ModalComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (!this.modalId) {
-      console.error('Modal ID é obrigatório');
       return;
     }
   }
 
   ngOnDestroy(): void {
-    // Cleanup automático do effect quando o componente for destruído
+
   }
 
   /**
@@ -108,9 +105,8 @@ export class ModalComponent implements OnInit, OnDestroy {
    */
   onAnimationDone(event: any): void {
     if (event.toState === 'out' && event.fromState === 'in') {
-      // Animação de saída terminou, remove do DOM
+
       this.shouldShowModal = false;
-      console.log('Modal removido do DOM após animação');
     }
   }
 }

@@ -39,11 +39,7 @@ export class ClientModalComponent implements OnInit {
   currentTabIndex = 0;
   isLoading = false;
   isSaving = false;
-
-  // Formulário centralizado
   clientForm: FormGroup = new FormGroup({});
-
-  // Estados brasileiros para validação
   private brazilianStates: BrazilianState[] = [
     'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO',
     'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI',
@@ -81,18 +77,12 @@ export class ClientModalComponent implements OnInit {
   ngOnInit(): void {
     this.initializeForm();
     this.updateCurrentTabIndex();
-
-    // Acessar dados do modal ativo
     const activeModal = this.modalService.activeModal();
     if (activeModal?.config.data) {
       const client = activeModal.config.data;
       this.populateForm(client);
     }
   }
-
-  // ============================================
-  // GETTERS PARA O TEMPLATE
-  // ============================================
 
   get isEditMode(): boolean {
     return !!this.clientForm.value._id;
@@ -104,17 +94,13 @@ export class ClientModalComponent implements OnInit {
 
   private populateForm(client: Client): void {
     this.clientForm.patchValue({
-      // Company fields
+
       companyName: client.companyName,
       cnpj: this.formatCNPJ(client.cnpj),
       acronym: client.acronym,
-
-      // Contact fields  
       responsibleName: client.contact.responsibleName,
       email: client.contact.email,
       phone: client.contact.phone,
-
-      // Address fields
       zipcode: client.address.zipcode,
       street: client.address.street,
       number: client.address.number,
@@ -122,13 +108,9 @@ export class ClientModalComponent implements OnInit {
       neighborhood: client.address.neighborhood,
       city: client.address.city,
       state: client.address.state,
-
-      // Values fields
       valuePerMeter: client.values.valuePerMeter,
       valuePerPiece: client.values.valuePerPiece
     });
-
-    // Se existir _id no client, adiciona o form control _id se não existir
     if (client._id) {
       if (!this.clientForm.contains('_id')) {
         this.clientForm.addControl('_id', this.formBuilder.control(client._id));
@@ -139,20 +121,16 @@ export class ClientModalComponent implements OnInit {
   }
 
   private formatCNPJ(cnpj: string): string {
-    // Se CNPJ vem apenas com números, formatar para exibição
+
     if (cnpj && cnpj.length === 14) {
       return cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
     }
     return cnpj;
   }
 
-  // ============================================
-  // INICIALIZAÇÃO DO FORMULÁRIO
-  // ============================================
-
   private initializeForm(): void {
     this.clientForm = this.formBuilder.group({
-      // Company fields
+
       companyName: ['', [
         Validators.required,
         Validators.minLength(2),
@@ -167,8 +145,6 @@ export class ClientModalComponent implements OnInit {
         Validators.minLength(2),
         Validators.maxLength(10)
       ]],
-
-      // Contact fields
       responsibleName: ['', [
         Validators.required,
         Validators.minLength(2),
@@ -182,8 +158,6 @@ export class ClientModalComponent implements OnInit {
         Validators.required,
         Validators.pattern(/^[\d\s\(\)\-\+]+$/)
       ]],
-
-      // Address fields
       zipcode: ['', [
         Validators.required,
         Validators.pattern(/^\d{5}-?\d{3}$/)
@@ -195,7 +169,7 @@ export class ClientModalComponent implements OnInit {
       number: ['', [
         Validators.required
       ]],
-      complement: [''], // Campo opcional
+      complement: [''],
       neighborhood: ['', [
         Validators.required,
         Validators.minLength(2)
@@ -210,8 +184,6 @@ export class ClientModalComponent implements OnInit {
         Validators.maxLength(2),
         this.brazilianStateValidator.bind(this)
       ]],
-
-      // Values fields
       valuePerMeter: ['', [
         Validators.required,
         Validators.min(0),
@@ -224,10 +196,6 @@ export class ClientModalComponent implements OnInit {
       ]]
     });
   }
-
-  // ============================================
-  // VALIDADORES CUSTOMIZADOS
-  // ============================================
 
   private brazilianStateValidator(control: any): { [key: string]: any } | null {
     if (!control.value) return null;
@@ -253,10 +221,6 @@ export class ClientModalComponent implements OnInit {
 
     return null;
   }
-
-  // ============================================
-  // MÉTODOS DE VALIDAÇÃO POR ABA
-  // ============================================
 
   private getTabFields(tabId: string): string[] {
     switch (tabId) {
@@ -310,10 +274,6 @@ export class ClientModalComponent implements OnInit {
     });
   }
 
-  // ============================================
-  // MÉTODOS DE NAVEGAÇÃO DAS TABS
-  // ============================================
-
   handleTabChange(tabId: string): void {
     this.currentTab = tabId;
     this.updateCurrentTabIndex();
@@ -321,17 +281,12 @@ export class ClientModalComponent implements OnInit {
   }
 
   handleTabClick(event: { tabId: string, tab: TabConfig }): void {
-    console.log('Clicou na tab:', event.tab.label);
     this.trackTabClick(event.tabId);
   }
 
   private updateCurrentTabIndex(): void {
     this.currentTabIndex = this.advancedTabs.findIndex(tab => tab.id === this.currentTab);
   }
-
-  // ============================================
-  // MÉTODOS DOS BOTÕES DE NAVEGAÇÃO
-  // ============================================
 
   onCancelClick(): void {
     this.modalService.close('client-modal');
@@ -345,36 +300,34 @@ export class ClientModalComponent implements OnInit {
   }
 
   onNextClick(): void {
-    // Verificar se a aba atual é válida antes de avançar
-    const currentTabId = this.currentTab;
 
-    // Marcar campos da aba atual como touched
+    const currentTabId = this.currentTab;
     this.markTabFieldsAsTouched(currentTabId);
 
     if (!this.isTabValid(currentTabId)) {
-      // Aba atual inválida - não permite avançar
+
       this.updateTabBadges();
       return;
     }
 
     if (this.isLastStep) {
-      // Se for o último passo, verificar todo o formulário
+
       this.onSaveClient();
     } else {
-      // Navegar para a próxima tab
+
       const nextTab = this.advancedTabs[this.currentTabIndex + 1];
       this.handleTabChange(nextTab.id);
     }
   }
 
   private onSaveClient(): void {
-    // Marcar todos os campos como touched
+
     Object.keys(this.clientForm.controls).forEach(key => {
       this.clientForm.get(key)?.markAsTouched();
     });
 
     if (this.clientForm.valid) {
-      // Formulário válido - preparar dados e salvar
+
       const formData = this.prepareFormData();
       if (this.isEditMode) {
         this.updateClient(formData);
@@ -382,19 +335,14 @@ export class ClientModalComponent implements OnInit {
         this.createClient(formData);
       }
     } else {
-      // Formulário inválido - ir para a primeira aba com erro
+
       const invalidTab = this.getFirstInvalidTab();
       if (invalidTab) {
-        console.log('Formulário inválido. Indo para aba:', invalidTab);
         this.handleTabChange(invalidTab);
         this.updateTabBadges();
       }
     }
   }
-
-  // ============================================
-  // CRIAR/ATUALIZAR CLIENTE
-  // ============================================
 
   private prepareFormData(): CreateClientRequest | UpdateClientRequest {
     const formValues = this.clientForm.value;
@@ -436,7 +384,6 @@ export class ClientModalComponent implements OnInit {
     this.clientService.createClient(clientData).subscribe({
       next: (response) => {
         this.isSaving = false;
-        console.log('Cliente criado com sucesso:', response.data);
 
         this.modalService.close('client-modal', {
           action: 'created',
@@ -445,8 +392,7 @@ export class ClientModalComponent implements OnInit {
       },
       error: (error) => {
         this.isSaving = false;
-        console.error('Erro ao criar cliente:', error);
-        // TODO: Exibir mensagem de erro para o usuário
+
       }
     });
   }
@@ -459,7 +405,6 @@ export class ClientModalComponent implements OnInit {
     this.clientService.updateClient(this.clientForm.value._id, clientData).subscribe({
       next: (response) => {
         this.isSaving = false;
-        console.log('Cliente atualizado com sucesso:', response.data);
 
         this.modalService.close('client-modal', {
           action: 'updated',
@@ -468,15 +413,10 @@ export class ClientModalComponent implements OnInit {
       },
       error: (error) => {
         this.isSaving = false;
-        console.error('Erro ao atualizar cliente:', error);
-        // TODO: Exibir mensagem de erro para o usuário
+
       }
     });
   }
-
-  // ============================================
-  // GETTERS PARA O TEMPLATE
-  // ============================================
 
   get isFirstStep(): boolean {
     return this.currentTabIndex === 0;
@@ -502,12 +442,8 @@ export class ClientModalComponent implements OnInit {
     return this.isSaving || this.isLoading;
   }
 
-  // ============================================
-  // MÉTODOS AUXILIARES
-  // ============================================
-
   private updateBadgeCount(tabId: string): void {
-    // Resetar badge da tab ativa se ela for válida
+
     const tab = this.advancedTabs.find(t => t.id === tabId);
     if (tab && this.isTabValid(tabId)) {
       tab.badge = undefined;
@@ -515,6 +451,5 @@ export class ClientModalComponent implements OnInit {
   }
 
   private trackTabClick(tabId: string): void {
-    console.log('Analytics: tab clicked', tabId);
   }
 }

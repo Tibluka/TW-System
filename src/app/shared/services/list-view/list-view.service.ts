@@ -24,8 +24,6 @@ export class ListViewService {
       this.viewModes.get(key)!.next(mode);
     }
   }
-
-  // Método para sincronizar view modes entre tabs
   syncViewModes(): void {
     window.addEventListener('storage', (event) => {
       if (event.key?.endsWith('-view-mode')) {
