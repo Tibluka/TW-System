@@ -19,86 +19,123 @@
     </div>
 
     <div class="results mt-32">
-        <ds-table emptyMessage="Nenhum desenvolvimento encontrado" [showPagination]="true"
-            [pageSize]="currentFilters.limit" [totalPages]="pagination?.totalPages"
-            [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)"
-            [loadingData]="shouldShowSpinner">
+        <ds-list-view [items]="developments" [config]="listViewConfig">
+            <div slot="table">
+                <ds-table emptyMessage="Nenhum desenvolvimento encontrado" [showPagination]="true"
+                    [pageSize]="currentFilters.limit" [totalPages]="pagination?.totalPages"
+                    [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)"
+                    [loadingData]="shouldShowSpinner">
 
-            <!-- Cabeçalho da tabela -->
-            <ds-table-row [isHeader]="true">
-                <ds-table-cell [isHeader]="true" align="left">Imagem</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Referência Interna</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Referência Cliente</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Tipo Produção</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
-            </ds-table-row>
+                    <!-- Cabeçalho da tabela -->
+                    <ds-table-row [isHeader]="true">
+                        <ds-table-cell [isHeader]="true" align="left">Imagem</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Referência Interna</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Referência Cliente</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Tipo Produção</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
+                    </ds-table-row>
 
-            <!-- ✨ DADOS DOS DESENVOLVIMENTOS -->
-            <ds-table-row *ngFor="let development of developments" [clickable]="true" [data]="development"
-                (rowClick)="onDevelopmentClick(development)">
+                    <!-- ✨ DADOS DOS DESENVOLVIMENTOS -->
+                    <ds-table-row *ngFor="let development of developments" [clickable]="true" [data]="development"
+                        (rowClick)="onDevelopmentClick(development)">
 
-                <!-- Imagem -->
-                <ds-table-cell align="left">
-                    <div class="image-cell">
-                        <img *ngIf="development.pieceImage?.url; else noImage" [src]="development.pieceImage?.url"
-                            [alt]="development.internalReference" class="development-image" />
-                        <ng-template #noImage>
-                            <div class="no-image-placeholder">
-                                <i class="fa-solid fa-image"></i>
+                        <!-- Imagem -->
+                        <ds-table-cell align="left">
+                            <div class="image-cell">
+                                <img *ngIf="development.pieceImage?.url; else noImage"
+                                    [src]="development.pieceImage?.url" [alt]="development.internalReference"
+                                    class="development-image" />
+                                <ng-template #noImage>
+                                    <div class="no-image-placeholder">
+                                        <i class="fa-solid fa-image"></i>
+                                    </div>
+                                </ng-template>
                             </div>
-                        </ng-template>
-                    </div>
-                </ds-table-cell>
+                        </ds-table-cell>
 
-                <!-- Referência Interna -->
-                <ds-table-cell align="left">
-                    <span class="body secondary font-weight-medium">{{ development.internalReference }}</span>
-                    <ds-icon (click)="copy($event, development.internalReference)" class="ml-4" cursorType="pointer"
-                        icon="fa-regular fa-clipboard" fontSize="16px" />
-                </ds-table-cell>
+                        <!-- Referência Interna -->
+                        <ds-table-cell align="left">
+                            <span class="body secondary font-weight-medium">{{ development.internalReference }}</span>
+                            <ds-icon (click)="copy($event, development.internalReference)" class="ml-4"
+                                cursorType="pointer" icon="fa-regular fa-clipboard" fontSize="16px" />
+                        </ds-table-cell>
 
-                <!-- Referência Cliente -->
-                <ds-table-cell align="left">
-                    <span class="body secondary">{{ development.clientReference || '-' }}</span>
-                </ds-table-cell>
+                        <!-- Referência Cliente -->
+                        <ds-table-cell align="left">
+                            <span class="body secondary">{{ development.clientReference || '-' }}</span>
+                        </ds-table-cell>
 
-                <!-- Cliente -->
-                <ds-table-cell align="left">
-                    <div class="client-info">
-                        <span class="body secondary">
-                            {{ development.client?.companyName || 'Cliente não encontrado' }}
-                        </span>
-                        <div class="body-small label" *ngIf="development.client?.acronym">
-                            {{ development.client?.acronym }}
-                        </div>
-                    </div>
-                </ds-table-cell>
+                        <!-- Cliente -->
+                        <ds-table-cell align="left">
+                            <div class="client-info">
+                                <span class="body secondary">
+                                    {{ development.client?.companyName || 'Cliente não encontrado' }}
+                                </span>
+                                <div class="body-small label" *ngIf="development.client?.acronym">
+                                    {{ development.client?.acronym }}
+                                </div>
+                            </div>
+                        </ds-table-cell>
 
-                <!-- Tipo Produção -->
-                <ds-table-cell align="left">
-                    <div class="production-types">
-                        <span class="body secondary">
-                            {{productionType(development.productionType!.type)}}
-                        </span>
-                    </div>
-                </ds-table-cell>
+                        <!-- Tipo Produção -->
+                        <ds-table-cell align="left">
+                            <div class="production-types">
+                                <span class="body secondary">
+                                    {{productionType(development.productionType!.type)}}
+                                </span>
+                            </div>
+                        </ds-table-cell>
 
-                <!-- Status -->
-                <ds-table-cell align="center">
-                    <ds-badge [text]="getStatusLabel(development.status)" [status]="development.status"
-                        entityType="development" />
-                </ds-table-cell>
+                        <!-- Status -->
+                        <ds-table-cell align="center">
+                            <ds-badge [text]="getStatusLabel(development.status)" [status]="development.status"
+                                entityType="development" />
+                        </ds-table-cell>
 
-                <!-- Ações -->
-                <ds-table-cell align="center">
-                    <ds-action-menu [items]="actionMenuItems" (itemSelected)="onActionMenuSelect(development, $event)">
-                    </ds-action-menu>
-                </ds-table-cell>
+                        <!-- Ações -->
+                        <ds-table-cell align="center">
+                            <ds-action-menu [items]="actionMenuItems"
+                                (itemSelected)="onActionMenuSelect(development, $event)">
+                            </ds-action-menu>
+                        </ds-table-cell>
 
-            </ds-table-row>
-        </ds-table>
+                    </ds-table-row>
+                </ds-table>
+            </div>
+
+
+            <ng-template #cardTemplate let-development>
+                <div class="card-content" (click)="onDevelopmentClick(development)">
+                    <img *ngIf="development.pieceImage.url" [src]="development.pieceImage.url"
+                        [alt]="development.internalReference" class="card-image" />
+
+                    <h3 class="title-modal mb-6 mt-8 secondary">{{ development.internalReference }}</h3>
+
+                    <p class="subtitle-section secondary" *ngIf="development.client.companyName">{{
+                        development.client.companyName
+                        }}</p>
+
+                    <p class="card-small secondary mb-8" *ngIf="development.clientReference">{{
+                        development.clientReference
+                        }}</p>
+
+                    <hr>
+
+                    <h4 class="body secondary mt-8 mb-0"> {{ productionType(development.productionType!.type) }}</h4>
+
+                </div>
+            </ng-template>
+
+            <!-- Template de ações -->
+            <ng-template #actionsTemplate let-development>
+                <ds-action-menu [items]="actionMenuItems" (itemSelected)="onActionMenuSelect(development, $event)">
+                </ds-action-menu>
+            </ng-template>
+
+        </ds-list-view>
+
     </div>
 
 </div>

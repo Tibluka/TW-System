@@ -1,0 +1,77 @@
+// ds-list-view.component.scss - ESTILOS COMPLETOS
+@use 'abstracts/variables' as *;
+@use 'abstracts/spacing' as *;
+@use 'abstracts/typography' as *;
+@use 'abstracts/spacing' as *;
+@use 'base/typography' as *;
+
+
+// ========================================
+// TOGGLE DE VISUALIZAÇÃO
+// ========================================
+.view-toggle-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.view-toggle {
+    display: flex;
+    border-radius: $border-radius-md;
+    padding: 4px;
+    gap: 2px;
+
+    .toggle-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 32px;
+        border: none;
+        border-radius: $border-radius-sm;
+        background-color: transparent;
+        color: $secondary;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+            background-color: rgba($primary-medium, 0.1);
+            color: $primary-medium;
+        }
+
+        &.active {
+            color: $primary-dark;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+    }
+}
+
+
+
+.cards-view {
+    .cards-grid {
+        margin-bottom: $spacing-lg;
+
+        // Responsividade automática
+        @media (max-width: 768px) {
+            grid-template-columns: 1fr !important;
+            gap: $spacing-md !important;
+        }
+    }
+
+    .card-wrapper {
+        animation: fadeInUp 0.3s ease forwards;
+    }
+}
+
+.card-content {
+    img {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+        border-radius: $border-radius-sm;
+    }
+
+    display: flex;
+    flex-direction: column;
+}

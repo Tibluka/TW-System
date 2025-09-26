@@ -1,0 +1,48 @@
+<!-- Toggle de Visualização -->
+<div class="view-toggle-container" *ngIf="config.showToggle !== false">
+    <div class="view-toggle">
+        <button type="button" class="toggle-btn" [class.active]="currentViewMode === 'table'"
+            (click)="setViewMode('table')" title="Visualização em Tabela">
+            <ds-icon icon="fa-solid fa-table" fontSize="16px" color="primary-dark" />
+        </button>
+
+        <button type="button" class="toggle-btn" [class.active]="currentViewMode === 'cards'"
+            (click)="setViewMode('cards')" title="Visualização em Cards">
+            <ds-icon icon="fa-solid fa-grip" fontSize="16px" color="primary-dark" />
+        </button>
+    </div>
+</div>
+
+<!-- Visualização em Tabela -->
+<div *ngIf="currentViewMode === 'table'" class="table-view">
+    <ng-content select="[slot=table]"></ng-content>
+</div>
+
+<!-- Visualização em Cards -->
+<div *ngIf="currentViewMode === 'cards'" class="cards-view">
+    <div class="cards-grid" [style]="getGridStyles()">
+        <!-- Cards usando template customizável -->
+        <div *ngFor="let item of items; trackBy: trackByFn;let i = index" class="card-wrapper"
+            [style.animation-delay]="getAnimationDelay(i)">
+
+            <ds-card [clickable]="true" [elevated]="true" size="md" variant="outlined" class="list-item-card"
+                (click)="onItemClick(item)">
+
+                <!-- Conteúdo do card usando template projetado -->
+                <ng-container *ngTemplateOutlet="cardTemplate; context: { $implicit: item, index: i }">
+                </ng-container>
+
+                <!-- Footer padrão com ações -->
+                <div slot="footer" class="card-footer" *ngIf="showActions">
+                    <ng-container *ngTemplateOutlet="actionsTemplate; context: { $implicit: item, index: i }">
+                    </ng-container>
+                </div>
+            </ds-card>
+        </div>
+    </div>
+
+    <!-- Paginação -->
+    <div class="pagination-container mt-32" *ngIf="showPagination && pagination">
+        <ng-content select="[slot=pagination]"></ng-content>
+    </div>
+</div>

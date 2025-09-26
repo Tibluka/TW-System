@@ -22,6 +22,10 @@ import { copyToClipboard, translateDevelopmentStatus, translateProductionType } 
 import { DevelopmentModalComponent } from "./development-modal/development-modal.component";
 import { BadgeComponent } from "../../../shared/components/atoms/badge/badge.component";
 import { GeneralModalContentComponent } from "../../../shared/components/general/general-modal-content/general-modal-content.component";
+import { ListViewConfig } from '../../../models/list-view/list-view';
+import { ListViewService, ViewMode } from '../../../shared/services/list-view/list-view.service';
+import { WithListView } from '../../../shared/decorators/list-view.decorator';
+import { DsListViewComponent } from "../../../shared/components/molecules/list-view/list-view.component";
 
 @Component({
   selector: 'app-developments',
@@ -40,18 +44,21 @@ import { GeneralModalContentComponent } from "../../../shared/components/general
     ActionMenuComponent,
     StatusUpdaterComponent,
     BadgeComponent,
-    GeneralModalContentComponent
+    GeneralModalContentComponent,
+    DsListViewComponent
   ],
   providers: [NgModel],
   templateUrl: './developments.component.html',
   styleUrl: './developments.component.scss'
 })
+@WithListView('developments', { defaultView: 'cards' })
 export class DevelopmentsComponent extends FormValidator implements OnInit, OnDestroy {
 
   isModalOpen: boolean = false;
 
   private developmentService = inject(DevelopmentService);
   private modalService = inject(ModalService);
+  private listViewService = inject(ListViewService);
 
   // Lista de desenvolvimentos e paginação
   developments: Development[] = [];
@@ -95,6 +102,20 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
       icon: 'fa-solid fa-trash'
     }
   ];
+
+  // ✨ CONFIGURAÇÃO DO LIST VIEW
+  listViewConfig: ListViewConfig = {
+    showToggle: true,
+    defaultView: 'table',
+    cardConfig: {
+      minWidth: '350px',
+      gap: '24px'
+    },
+    storageKey: 'developments-view-mode',
+    density: 'normal'
+  };
+  currentViewMode: ViewMode = 'table';
+
 
   // Configuração das opções de status para o status-updater
   developmentStatusOptions: StatusOption[] = [
@@ -141,6 +162,12 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
   ngOnInit(): void {
     this.setupSearchDebounce();
     this.loadDevelopments();
+    this.listViewService
+      .getViewMode('developments', 'table')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(mode => {
+        this.currentViewMode = mode;
+      });
   }
 
   ngOnDestroy(): void {
@@ -151,6 +178,17 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
   // ============================================
   // SETUP METHODS
   // ============================================
+
+  // ✨ HANDLER PARA MUDANÇA DE VIEW
+  onViewModeChange(mode: ViewMode) {
+    this.listViewService.setViewMode('developments', mode);
+
+    // Analytics opcional
+    // this.analytics.track('view_mode_changed', { 
+    //   entity: 'developments', 
+    //   mode 
+    // });
+  }
 
   /**
    * ⏱️ DEBOUNCE - Configura debounce para busca
