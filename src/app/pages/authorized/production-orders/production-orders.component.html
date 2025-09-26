@@ -22,9 +22,10 @@
     </div>
 
     <div class="results mt-32">
-        <ds-table emptyMessage="Nenhuma ordem de produção encontrada" *ngIf="shouldShowTable" [showPagination]="true"
+        <ds-table emptyMessage="Nenhuma ordem de produção encontrada" [showPagination]="true"
             [pageSize]="currentFilters.limit" [totalPages]="pagination?.totalPages"
-            [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)" [loadingData]="loading">
+            [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)"
+            [loadingData]="shouldShowSpinner">
 
             <!-- Cabeçalho da tabela -->
             <ds-table-row [isHeader]="true">
@@ -121,15 +122,6 @@
             </ds-table-row>
         </ds-table>
     </div>
-
-    <!-- 📊 LOADING -->
-    <div class="loading-container" *ngIf="loading">
-        <div class="loading-content">
-            <ds-spinner size="32px"></ds-spinner>
-            <span class="body label mt-16">Carregando ordens de produção...</span>
-        </div>
-    </div>
-
 </div>
 
 <!-- 🎭 MODAL -->
@@ -147,3 +139,9 @@
     (statusUpdated)="onStatusUpdated($event); clearStatusUpdateSelection()"
     (statusUpdateFailed)="onStatusUpdateFailed($event)">
 </ds-status-updater>
+
+
+<!-- Modal geral para confirmações -->
+<ds-modal modalId="general-modal">
+    <app-general-modal-content></app-general-modal-content>
+</ds-modal>

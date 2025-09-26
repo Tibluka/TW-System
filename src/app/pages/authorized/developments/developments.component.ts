@@ -21,6 +21,7 @@ import { FormValidator } from '../../../shared/utils/form';
 import { copyToClipboard, translateDevelopmentStatus, translateProductionType } from '../../../shared/utils/tools';
 import { DevelopmentModalComponent } from "./development-modal/development-modal.component";
 import { BadgeComponent } from "../../../shared/components/atoms/badge/badge.component";
+import { GeneralModalContentComponent } from "../../../shared/components/general/general-modal-content/general-modal-content.component";
 
 @Component({
   selector: 'app-developments',
@@ -38,7 +39,8 @@ import { BadgeComponent } from "../../../shared/components/atoms/badge/badge.com
     IconComponent,
     ActionMenuComponent,
     StatusUpdaterComponent,
-    BadgeComponent
+    BadgeComponent,
+    GeneralModalContentComponent
   ],
   providers: [NgModel],
   templateUrl: './developments.component.html',
@@ -55,7 +57,6 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
   developments: Development[] = [];
   pagination: PaginationInfo | null = null;
   loading = false;
-  shouldShowTable = false;
 
   // Estados para UI
   errorMessage: string = '';
@@ -174,7 +175,6 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
    */
   private loadDevelopments(): void {
     this.loading = true;
-    this.shouldShowTable = true;
 
     this.developmentService.listDevelopments(this.currentFilters)
       .pipe(takeUntil(this.destroy$))
@@ -409,19 +409,49 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
       return;
     }
 
-    if (confirm(`Tem certeza que deseja excluir o desenvolvimento "${development.internalReference}"?`)) {
-      this.developmentService.deleteDevelopment(development._id)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: () => {
-            this.showSuccessMessage(`Desenvolvimento ${development.internalReference} excluído com sucesso.`);
-            this.loadDevelopments(); // Recarregar lista
+
+    this.modalService.open({
+      id: 'general-modal',
+      title: 'Excluir Desenvolvimento',
+      size: 'md',
+      showHeader: true,
+      showCloseButton: true,
+      closeOnBackdropClick: true,
+      closeOnEscapeKey: true,
+      data: {
+        text: `Tem certeza que deseja excluir a ordem de produção "${development.internalReference}"?`,
+        icon: 'fa-solid fa-exclamation-triangle',
+        iconColor: 'tertiary',
+        textAlign: 'center',
+        buttons: [
+          {
+            label: 'Cancelar',
+            action: false,
+            variant: 'outline'
           },
-          error: (error) => {
-            console.error('❌ Erro ao excluir desenvolvimento:', error);
-            this.showErrorMessage(error.message || 'Erro ao excluir desenvolvimento.');
+          {
+            label: 'Excluir',
+            action: true,
+            variant: 'fill',
+            icon: 'fa-solid fa-trash'
           }
-        });
-    }
+        ]
+      }
+    }).subscribe(result => {
+      if (result && result.action === true) {
+        this.developmentService.deleteDevelopment(development._id)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              this.showSuccessMessage(`Desenvolvimento ${development.internalReference} excluído com sucesso.`);
+              this.loadDevelopments(); // Recarregar lista
+            },
+            error: (error) => {
+              console.error('❌ Erro ao excluir desenvolvimento:', error);
+              this.showErrorMessage(error.message || 'Erro ao excluir desenvolvimento.');
+            }
+          });
+      }
+    });
   }
 }

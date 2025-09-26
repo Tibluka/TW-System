@@ -35,7 +35,7 @@ export interface ProductionType {
 // ============================================
 
 export interface Development {
-    _id?: string;
+    _id: string;
 
     // IDENTIFIERS
     clientReference?: string; // Referência fornecida pelo cliente

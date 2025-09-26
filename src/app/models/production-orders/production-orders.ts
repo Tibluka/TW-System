@@ -37,7 +37,7 @@ export interface ProductionTypeWithQuantities extends ProductionType {
 // ============================================
 
 export interface ProductionOrder {
-    _id?: string;
+    _id: string;
 
     // DEVELOPMENT REFERENCE
     developmentId: string;

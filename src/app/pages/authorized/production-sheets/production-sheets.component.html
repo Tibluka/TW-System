@@ -30,7 +30,7 @@
 
     <!-- TABELA DE RESULTADOS -->
     <div class="results mt-32">
-        <ds-table emptyMessage="Nenhuma ficha de produção encontrada" *ngIf="shouldShowTable" [showPagination]="true"
+        <ds-table emptyMessage="Nenhuma ficha de produção encontrada" [showPagination]="true"
             [pageSize]="currentFilters.limit" [totalPages]="pagination?.totalPages"
             [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)" [loadingData]="loading">
 

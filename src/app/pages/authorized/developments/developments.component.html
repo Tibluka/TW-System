@@ -19,7 +19,7 @@
     </div>
 
     <div class="results mt-32">
-        <ds-table emptyMessage="Nenhum desenvolvimento encontrado" *ngIf="shouldShowTable" [showPagination]="true"
+        <ds-table emptyMessage="Nenhum desenvolvimento encontrado" [showPagination]="true"
             [pageSize]="currentFilters.limit" [totalPages]="pagination?.totalPages"
             [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)"
             [loadingData]="shouldShowSpinner">
@@ -89,7 +89,6 @@
                 <ds-table-cell align="center">
                     <ds-badge [text]="getStatusLabel(development.status)" [status]="development.status"
                         entityType="development" />
-
                 </ds-table-cell>
 
                 <!-- Ações -->
@@ -102,18 +101,24 @@
         </ds-table>
     </div>
 
-    <!-- Modal de desenvolvimento -->
-    <ds-modal modalId="development-modal" *ngIf="isModalOpen" (modalClosed)="onModalClosed($event)">
-        <app-development-modal></app-development-modal>
-    </ds-modal>
-
-    <!-- Componente de atualização de status -->
-    <ds-status-updater *ngIf="selectedDevelopmentForStatusUpdate" #statusUpdaterRef entityType="development"
-        [entityId]="selectedDevelopmentForStatusUpdate._id!" [currentStatus]="selectedDevelopmentForStatusUpdate.status"
-        [availableStatuses]="developmentStatusOptions"
-        [entityReference]="selectedDevelopmentForStatusUpdate.internalReference"
-        (statusUpdated)="onStatusUpdated($event); clearStatusUpdateSelection()"
-        (statusUpdateFailed)="onStatusUpdateFailed($event)">
-    </ds-status-updater>
-
 </div>
+
+
+<!-- Modal de desenvolvimento -->
+<ds-modal modalId="development-modal" *ngIf="isModalOpen" (modalClosed)="onModalClosed($event)">
+    <app-development-modal></app-development-modal>
+</ds-modal>
+
+<!-- Componente de atualização de status -->
+<ds-status-updater *ngIf="selectedDevelopmentForStatusUpdate" #statusUpdaterRef entityType="development"
+    [entityId]="selectedDevelopmentForStatusUpdate._id!" [currentStatus]="selectedDevelopmentForStatusUpdate.status"
+    [availableStatuses]="developmentStatusOptions"
+    [entityReference]="selectedDevelopmentForStatusUpdate.internalReference"
+    (statusUpdated)="onStatusUpdated($event); clearStatusUpdateSelection()"
+    (statusUpdateFailed)="onStatusUpdateFailed($event)">
+</ds-status-updater>
+
+<!-- Modal geral para confirmações -->
+<ds-modal modalId="general-modal">
+    <app-general-modal-content></app-general-modal-content>
+</ds-modal>

@@ -1,18 +1,20 @@
 // pages/authorized/production-orders/production-orders.component.ts
 
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, effect, inject, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, effect, inject } from '@angular/core';
 import { FormsModule, NgModel } from "@angular/forms";
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
 // Componentes
 import { PaginationInfo, ProductionOrder, ProductionOrderFilters } from '../../../models/production-orders/production-orders';
 import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
-import { StatusUpdaterComponent, StatusOption } from '../../../shared/components/molecules/status-updater/status-updater.component';
+import { BadgeComponent } from "../../../shared/components/atoms/badge/badge.component";
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
+import { IconComponent } from "../../../shared/components/atoms/icon/icon.component";
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
 import { SelectComponent, SelectOption } from '../../../shared/components/atoms/select/select.component';
-import { SpinnerComponent } from '../../../shared/components/atoms/spinner/spinner.component';
+import { GeneralModalContentComponent } from "../../../shared/components/general/general-modal-content/general-modal-content.component";
+import { StatusOption, StatusUpdaterComponent } from '../../../shared/components/molecules/status-updater/status-updater.component';
 import { ModalComponent } from "../../../shared/components/organisms/modal/modal.component";
 import { TableCellComponent } from '../../../shared/components/organisms/table/table-cell/table-cell.component';
 import { TableRowComponent } from '../../../shared/components/organisms/table/table-row/table-row.component';
@@ -20,10 +22,8 @@ import { TableComponent } from '../../../shared/components/organisms/table/table
 import { ModalService } from '../../../shared/services/modal/modal.service';
 import { ProductionOrderService } from '../../../shared/services/production-order/production-order.service';
 import { FormValidator } from '../../../shared/utils/form';
-import { ProductionOrderModalComponent } from "./production-order-modal/production-order-modal.component";
-import { IconComponent } from "../../../shared/components/atoms/icon/icon.component";
 import { copyToClipboard } from '../../../shared/utils/tools';
-import { BadgeComponent } from "../../../shared/components/atoms/badge/badge.component";
+import { ProductionOrderModalComponent } from "./production-order-modal/production-order-modal.component";
 
 @Component({
   selector: 'app-production-orders',
@@ -38,11 +38,11 @@ import { BadgeComponent } from "../../../shared/components/atoms/badge/badge.com
     ModalComponent,
     ProductionOrderModalComponent,
     SelectComponent,
-    SpinnerComponent,
     IconComponent,
     ActionMenuComponent,
     StatusUpdaterComponent,
-    BadgeComponent
+    BadgeComponent,
+    GeneralModalContentComponent
   ],
   providers: [NgModel],
   templateUrl: './production-orders.component.html',
@@ -59,7 +59,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
   productionOrders: ProductionOrder[] = [];
   pagination: PaginationInfo | null = null;
   loading = false;
-  shouldShowTable = false;
+
 
   // Estados para UI
   errorMessage: string = '';
@@ -122,6 +122,10 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
+  get shouldShowSpinner(): boolean {
+    return this.loading;
+  }
+
   // ============================================
   // CICLO DE VIDA
   // ============================================
@@ -183,7 +187,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
       if (response) {
         this.productionOrders = response.data || [];
         this.pagination = response.pagination || null;
-        this.shouldShowTable = true;
+
 
         console.log('✅ Ordens de produção carregadas:', this.productionOrders.length);
       }
@@ -191,7 +195,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
       console.error('❌ Erro ao carregar ordens de produção:', error);
       this.errorMessage = 'Erro ao carregar ordens de produção. Tente novamente.';
       this.showError = true;
-      this.shouldShowTable = false;
+
     } finally {
       this.loading = false;
     }
@@ -454,20 +458,50 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
       return;
     }
 
-    if (confirm(`Tem certeza que deseja excluir a ordem de produção "${productionOrder.internalReference}"?`)) {
-      this.productionOrderService.deleteProductionOrder(productionOrder._id)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: () => {
-            this.showSuccessMessage(`Ordem de produção ${productionOrder.internalReference} excluída com sucesso.`);
-            this.loadProductionOrders(); // Recarregar lista
+    this.modalService.open({
+      id: 'general-modal',
+      title: 'Excluir Ordem de Produção',
+      size: 'md',
+      showHeader: true,
+      showCloseButton: true,
+      closeOnBackdropClick: true,
+      closeOnEscapeKey: true,
+      data: {
+        text: `Tem certeza que deseja excluir a ordem de produção "${productionOrder.internalReference}"?`,
+        icon: 'fa-solid fa-exclamation-triangle',
+        iconColor: 'tertiary',
+        textAlign: 'center',
+        buttons: [
+          {
+            label: 'Cancelar',
+            action: false,
+            variant: 'outline'
           },
-          error: (error) => {
-            console.error('❌ Erro ao excluir ordem de produção:', error);
-            this.showErrorMessage(error.message || 'Erro ao excluir ordem de produção.');
+          {
+            label: 'Excluir',
+            action: true,
+            variant: 'fill',
+            icon: 'fa-solid fa-trash'
           }
-        });
-    }
+        ]
+      }
+    }).subscribe(result => {
+      if (result && result.action === true) {
+        this.productionOrderService.deleteProductionOrder(productionOrder._id)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              this.showSuccessMessage(`Ordem de produção ${productionOrder.internalReference} excluída com sucesso.`);
+              this.loadProductionOrders(); // Recarregar lista
+            },
+            error: (error) => {
+              console.error('❌ Erro ao excluir ordem de produção:', error);
+              this.showErrorMessage(error.message || 'Erro ao excluir ordem de produção.');
+            }
+          });
+      }
+    });
+
   }
 
   /**

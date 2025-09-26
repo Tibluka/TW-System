@@ -60,7 +60,7 @@ export class ProductionSheetsComponent extends FormValidator {
   productionSheets: ProductionSheet[] = [];
   pagination: PaginationInfo | null = null;
   loading = false;
-  shouldShowTable = false;
+
 
   // Estados para UI
   errorMessage: string = '';
@@ -176,7 +176,7 @@ export class ProductionSheetsComponent extends FormValidator {
       if (response && response.success) {
         this.productionSheets = response.data || [];
         this.pagination = response.pagination || null;
-        this.shouldShowTable = true;
+
 
         console.log('✅ Fichas de produção carregadas:', this.productionSheets.length);
       } else {
@@ -186,7 +186,7 @@ export class ProductionSheetsComponent extends FormValidator {
       console.error('❌ Erro ao carregar fichas de produção:', error);
       this.errorMessage = 'Erro ao carregar fichas de produção. Tente novamente.';
       this.showError = true;
-      this.shouldShowTable = false;
+
       this.productionSheets = [];
     } finally {
       this.loading = false;
@@ -640,20 +640,49 @@ export class ProductionSheetsComponent extends FormValidator {
       return;
     }
 
-    if (confirm(`Tem certeza que deseja excluir a ficha de produção "${productionSheet.internalReference}"?`)) {
-      this.productionSheetsService.deleteProductionSheet(productionSheet._id)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: () => {
-            this.showSuccessMessage(`Ficha de produção ${productionSheet.internalReference} excluída com sucesso.`);
-            this.loadProductionSheets(); // Recarregar lista
+    this.modalService.open({
+      id: 'general-modal',
+      title: 'Excluir Ficha de Produção',
+      size: 'md',
+      showHeader: true,
+      showCloseButton: true,
+      closeOnBackdropClick: true,
+      closeOnEscapeKey: true,
+      data: {
+        text: `Tem certeza que deseja excluir a ficha de produção "${productionSheet.internalReference}"?`,
+        icon: 'fa-solid fa-triangle-exclamation',
+        iconColor: 'tertiary',
+        textAlign: 'center',
+        buttons: [
+          {
+            label: 'Cancelar',
+            action: false,
+            variant: 'outline'
           },
-          error: (error) => {
-            console.error('❌ Erro ao excluir ficha de produção:', error);
-            this.showErrorMessage(error.message || 'Erro ao excluir ficha de produção.');
+          {
+            label: 'Excluir',
+            action: true,
+            variant: 'fill',
+            icon: 'fa-solid fa-trash'
           }
-        });
-    }
+        ]
+      }
+    }).subscribe(result => {
+      if (result && result.action === true) {
+        this.productionSheetsService.deleteProductionSheet(productionSheet._id)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              this.showSuccessMessage(`Ficha de produção ${productionSheet.internalReference} excluída com sucesso.`);
+              this.loadProductionSheets(); // Recarregar lista
+            },
+            error: (error) => {
+              console.error('❌ Erro ao excluir ficha de produção:', error);
+              this.showErrorMessage(error.message || 'Erro ao excluir ficha de produção.');
+            }
+          });
+      }
+    });
   }
 
   /**

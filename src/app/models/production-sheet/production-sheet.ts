@@ -18,7 +18,7 @@ export type MachineNumber = 1 | 2 | 3 | 4;
 // ============================================
 
 export interface ProductionSheet {
-    _id?: string;
+    _id: string;
 
     // REFERÊNCIA À ORDEM DE PRODUÇÃO
     productionOrderId: string;

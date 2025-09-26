@@ -170,6 +170,12 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     { value: 'asc', label: 'Mais Antigo Primeiro' }
   ];
 
+  statusOptions: SelectOption[] = [
+    { value: '', label: 'Todos os Status' },
+    { value: 'PENDING', label: 'Pendente' },
+    { value: 'PAID', label: 'Pago' }
+  ];
+
   constructor() {
     super();
     effect(() => {
@@ -333,6 +339,11 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     this.loadProductionReceipts();
   }
 
+  onStatusFilterChange(): void {
+    this.currentFilters.page = 1;
+    this.loadProductionReceipts();
+  }
+
   onDateFilterChange(): void {
     this.currentFilters.page = 1;
     this.loadProductionReceipts();
@@ -455,6 +466,12 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
         value: 'update-status',
         icon: 'fa-solid fa-refresh',
         disabled: false
+      },
+      {
+        label: 'Excluir',
+        value: 'delete',
+        icon: 'fa-solid fa-trash',
+        disabled: false
       }
     ];
 
@@ -494,8 +511,52 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   }
 
   private deleteProductionReceipt(receipt: ProductionReceipt): void {
-    // TODO: Implementar modal de confirmação e exclusão
-    console.log('Excluir recebimento:', receipt);
+    if (!receipt._id) {
+      console.error('ID do desenvolvimento não encontrado');
+      return;
+    }
+
+    this.modalService.open({
+      id: 'general-modal',
+      title: 'Excluir Recibo',
+      size: 'md',
+      showHeader: true,
+      showCloseButton: true,
+      closeOnBackdropClick: true,
+      closeOnEscapeKey: true,
+      data: {
+        text: `Tem certeza que deseja excluir o recibo "${receipt.internalReference}"?`,
+        icon: 'fa-solid fa-triangle-exclamation',
+        iconColor: 'tertiary',
+        textAlign: 'center',
+        buttons: [
+          {
+            label: 'Cancelar',
+            action: false,
+            variant: 'outline'
+          },
+          {
+            label: 'Excluir',
+            action: true,
+            variant: 'fill',
+            icon: 'fa-solid fa-trash'
+          }
+        ]
+      }
+    }).subscribe(result => {
+      if (result && result.action === true) {
+        this.productionReceiptService.deleteProductionReceipt(receipt._id)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              this.loadProductionReceipts(); // Recarregar lista
+            },
+            error: (error) => {
+              console.error('❌ Erro ao excluir desenvolvimento:', error);
+            }
+          });
+      }
+    });
   }
 
   // ============================================
@@ -578,13 +639,6 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
       'CHECK': 'Cheque'
     };
     return methodMap[method] || method;
-  }
-
-  // ============================================
-  // GETTERS PARA TEMPLATE - EXPANDIDO
-  // ============================================
-  get shouldShowTable(): boolean {
-    return !this.loading || this.productionReceipts.length > 0;
   }
 
   get hasActiveFilters(): boolean {

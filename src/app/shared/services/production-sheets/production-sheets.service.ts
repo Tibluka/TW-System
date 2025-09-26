@@ -10,7 +10,7 @@ import { environment } from '../../../../environments/environment';
 // ============================================
 
 export interface ProductionSheet {
-  _id?: string;
+  _id: string;
 
   // REFERÊNCIA À ORDEM DE PRODUÇÃO
   productionOrderId: string;

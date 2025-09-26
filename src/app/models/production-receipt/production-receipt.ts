@@ -21,7 +21,7 @@ export type PaymentStatus = 'PENDING' | 'PAID';
 // ============================================
 
 export interface ProductionReceipt {
-    _id?: string;
+    _id: string;
 
     // PRODUCTION ORDER REFERENCE
     productionOrderId: string;
