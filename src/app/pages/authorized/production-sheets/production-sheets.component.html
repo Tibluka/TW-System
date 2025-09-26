@@ -121,10 +121,8 @@
 
                 <!-- Estágio -->
                 <ds-table-cell align="center">
-                    <span class="status-badge"
-                        [ngClass]="'status-' + productionSheet.stage.toLowerCase().replace('_', '-')">
-                        {{ getStageLabel(productionSheet.stage) }}
-                    </span>
+                    <ds-badge [text]="getStageLabel(productionSheet.stage)" [status]="productionSheet.stage"
+                        entityType="production-sheet" />
                 </ds-table-cell>
 
                 <!-- Ações -->

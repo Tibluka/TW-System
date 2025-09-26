@@ -1,12 +1,13 @@
 // pages/authorized/production-receipts/production-receipts.component.ts
 
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, inject, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, ChangeDetectorRef, ViewChild, effect } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged, lastValueFrom, takeUntil } from 'rxjs';
 
 // Componentes
 import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
+import { BadgeComponent } from '../../../shared/components/atoms/badge/badge.component';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { IconComponent } from '../../../shared/components/atoms/icon/icon.component';
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
@@ -48,6 +49,7 @@ import { ClientService } from '../../../shared/services/clients/clients.service'
   imports: [
     CommonModule,
     FormsModule,
+    BadgeComponent,
     ButtonComponent,
     InputComponent,
     SelectComponent,
@@ -167,6 +169,14 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     { value: 'desc', label: 'Mais Recente Primeiro' },
     { value: 'asc', label: 'Mais Antigo Primeiro' }
   ];
+
+  constructor() {
+    super();
+    effect(() => {
+      const modalInstance = this.modalService.modals().find(m => m.id === 'production-receipt-modal');
+      this.isModalOpen = modalInstance ? modalInstance.isOpen : false;
+    });
+  }
 
   // ============================================
   // LIFECYCLE HOOKS

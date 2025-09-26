@@ -252,6 +252,9 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       this.productionOrderForm.get('status')?.setValue(productionOrder.status);
     }
 
+    if (this.productionOrderForm.get('status')?.value === 'FINALIZED') {
+      this.productionOrderForm.disable();
+    }
   }
 
   // ============================================

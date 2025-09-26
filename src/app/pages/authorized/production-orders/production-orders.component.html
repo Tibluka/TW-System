@@ -106,10 +106,9 @@
 
                 <!-- Status -->
                 <ds-table-cell align="center">
-                    <span class="status-badge"
-                        [ngClass]="'status-' + productionOrder.status.toLowerCase().replace('_', '-')">
-                        {{ getStatusLabel(productionOrder.status) }}
-                    </span>
+                    <ds-badge [text]="getStatusLabel(productionOrder.status)" [status]="productionOrder.status"
+                        entityType="production-order" />
+
                 </ds-table-cell>
 
                 <!-- Ações -->

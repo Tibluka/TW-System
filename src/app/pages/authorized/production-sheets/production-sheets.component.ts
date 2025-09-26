@@ -7,6 +7,7 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { PaginationInfo } from '../../../models/clients/clients';
 import { MachineNumber, ProductionSheet, ProductionSheetFilters, ProductionSheetStage } from '../../../models/production-sheet/production-sheet';
 import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
+import { BadgeComponent } from '../../../shared/components/atoms/badge/badge.component';
 import { StatusUpdaterComponent, StatusOption } from '../../../shared/components/molecules/status-updater/status-updater.component';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { IconComponent } from '../../../shared/components/atoms/icon/icon.component';
@@ -34,6 +35,7 @@ import { copyToClipboard } from '../../../shared/utils/tools';
     IconComponent,
     TableRowComponent,
     ButtonComponent,
+    BadgeComponent,
     FormsModule,
     ModalComponent,
     ProductionSheetModalComponent,

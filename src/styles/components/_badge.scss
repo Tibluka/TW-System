@@ -1,0 +1,85 @@
+// Badges de status
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: capitalize;
+
+    .status-icon {
+        font-size: 6px;
+    }
+
+    // Green
+    &.status-green {
+        background: rgba(46, 204, 113, 0.1);
+        color: #27AE60;
+
+        .status-icon {
+            color: #27AE60;
+        }
+    }
+
+    // Yellow
+    &.status-yellow {
+        background: rgba(241, 196, 15, 0.1);
+        color: #F1C40F;
+
+        .status-icon {
+            color: #F1C40F;
+        }
+    }
+
+    // Orange
+    &.status-orange {
+        background: rgba(230, 126, 34, 0.1);
+        color: #E67E22;
+
+        .status-icon {
+            color: #E67E22;
+        }
+    }
+
+    // Red
+    &.status-red {
+        background: rgba(231, 76, 60, 0.1);
+        color: #E74C3C;
+
+        .status-icon {
+            color: #E74C3C;
+        }
+    }
+
+    // Blue
+    &.status-blue {
+        background: rgba(52, 152, 219, 0.1);
+        color: #3498DB;
+
+        .status-icon {
+            color: #3498DB;
+        }
+    }
+
+    // Purple
+    &.status-purple {
+        background: rgba(155, 89, 182, 0.1);
+        color: #9B59B6;
+
+        .status-icon {
+            color: #9B59B6;
+        }
+    }
+
+    // Gray
+    &.status-gray {
+        background: rgba(149, 165, 166, 0.1);
+        color: #95A5A6;
+
+        .status-icon {
+            color: #95A5A6;
+        }
+    }
+}

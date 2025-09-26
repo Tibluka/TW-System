@@ -23,6 +23,7 @@ import { FormValidator } from '../../../shared/utils/form';
 import { ProductionOrderModalComponent } from "./production-order-modal/production-order-modal.component";
 import { IconComponent } from "../../../shared/components/atoms/icon/icon.component";
 import { copyToClipboard } from '../../../shared/utils/tools';
+import { BadgeComponent } from "../../../shared/components/atoms/badge/badge.component";
 
 @Component({
   selector: 'app-production-orders',
@@ -40,7 +41,8 @@ import { copyToClipboard } from '../../../shared/utils/tools';
     SpinnerComponent,
     IconComponent,
     ActionMenuComponent,
-    StatusUpdaterComponent
+    StatusUpdaterComponent,
+    BadgeComponent
   ],
   providers: [NgModel],
   templateUrl: './production-orders.component.html',

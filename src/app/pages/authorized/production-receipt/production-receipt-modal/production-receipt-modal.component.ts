@@ -282,8 +282,12 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       } else {
         this.productionReceiptForm.get('_id')?.setValue(productionReceipt._id);
       }
-      debugger
+
       this.productionReceiptForm.get('internalReference')?.disable();
+    }
+
+    if (this.productionReceiptForm.get('status')?.value === 'FINALIZED') {
+      this.productionReceiptForm.disable();
     }
   }
 
@@ -356,7 +360,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
 
     try {
       const formData = this.prepareFormData();
-      debugger
+
       if (this.isEditMode) {
         console.log(this.productionReceiptForm);
 
