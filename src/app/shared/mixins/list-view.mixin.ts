@@ -22,7 +22,6 @@ export function createListViewMixin(
         onViewModeChange(mode: ViewMode) {
             localStorage.setItem(`${storageKey}-view-mode`, mode);
 
-            console.log(`View mode changed to ${mode} for ${storageKey}`);
         }
     };
 }

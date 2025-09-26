@@ -201,15 +201,10 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
           this.developments = response.data || [];
           this.pagination = response.pagination || null;
 
-          console.log('✅ Desenvolvimentos carregados:', {
-            count: this.developments.length,
-            pagination: this.pagination
-          });
 
           this.loading = false;
         },
         error: (error) => {
-          console.error('❌ Erro ao carregar desenvolvimentos:', error);
           this.loading = false;
           this.showErrorMessage(error.message || 'Erro ao carregar desenvolvimentos.');
         }
@@ -263,7 +258,6 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
    */
   private showSuccessMessage(message: string): void {
 
-    console.log('SUCCESS:', message);
   }
 
   /**
@@ -335,11 +329,9 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
   private handleModalResult(result: any): void {
     if (result && result.action) {
       if (result.action === 'created') {
-        console.log('Desenvolvimento criado com sucesso:', result.data?.internalReference);
         this.loadDevelopments(); // Recarregar lista
 
       } else if (result.action === 'updated') {
-        console.log('Desenvolvimento atualizado com sucesso:', result.data?.internalReference);
         this.loadDevelopments(); // Recarregar lista
 
       }
@@ -370,7 +362,6 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
         this.deleteDevelopment(development);
         break;
       default:
-        console.warn('Ação não implementada:', action.value);
     }
   }
 
@@ -416,7 +407,6 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
    */
   deleteDevelopment(development: Development): void {
     if (!development._id) {
-      console.error('ID do desenvolvimento não encontrado');
       return;
     }
 
@@ -458,7 +448,6 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
               this.loadDevelopments(); // Recarregar lista
             },
             error: (error) => {
-              console.error('❌ Erro ao excluir desenvolvimento:', error);
               this.showErrorMessage(error.message || 'Erro ao excluir desenvolvimento.');
             }
           });

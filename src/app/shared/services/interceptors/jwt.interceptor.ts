@@ -48,21 +48,18 @@ export class JwtInterceptor implements HttpInterceptor {
                 if (error.error instanceof ErrorEvent) {
 
                     userMessage = 'Problema de conexão. Verifique sua internet.';
-                    console.error('Erro de rede:', error.error.message);
 
                 } else {
 
                     switch (error.status) {
                         case 400:
                             userMessage = error.error?.message || 'Dados inválidos fornecidos.';
-                            console.warn('Requisição inválida (400):', error.error);
                             break;
 
                         case 401:
 
                             if (!shouldExclude) {
                                 userMessage = 'Sua sessão expirou. Faça login novamente.';
-                                console.warn('Token inválido ou expirado (401). Redirecionando para login...');
 
 
                                 this.authService.logout();
@@ -75,38 +72,32 @@ export class JwtInterceptor implements HttpInterceptor {
                         case 403:
 
                             userMessage = 'Você não tem permissão para esta operação.';
-                            console.warn('Acesso negado (403):', error.error);
 
 
                             break;
 
                         case 404:
                             userMessage = error.error?.message || 'Recurso não encontrado.';
-                            console.warn('Recurso não encontrado (404):', error.url);
                             break;
 
                         case 409:
 
                             userMessage = error.error?.message || 'Conflito nos dados fornecidos.';
-                            console.warn('Conflito (409):', error.error);
                             break;
 
                         case 422:
 
                             userMessage = error.error?.message || 'Dados fornecidos são inválidos.';
-                            console.warn('Dados inválidos (422):', error.error);
                             break;
 
                         case 429:
 
                             userMessage = 'Muitas tentativas. Tente novamente em alguns minutos.';
-                            console.warn('Rate limit atingido (429):', error.error);
                             break;
 
                         case 500:
 
                             userMessage = 'Erro interno do servidor. Tente novamente mais tarde.';
-                            console.error('Erro interno do servidor (500):', error.error);
                             break;
 
                         case 502:
@@ -114,22 +105,16 @@ export class JwtInterceptor implements HttpInterceptor {
                         case 504:
 
                             userMessage = 'Serviço temporariamente indisponível. Tente novamente.';
-                            console.error(`Erro de infraestrutura (${error.status}):`, error.error);
                             break;
 
                         default:
                             userMessage = error.error?.message || `Erro HTTP ${error.status}`;
-                            console.error(`Erro não tratado (${error.status}):`, error.error);
                     }
                 }
 
 
                 if (this.isDevelopment()) {
                     console.group(`🚨 HTTP Error ${error.status}`);
-                    console.log('URL:', error.url);
-                    console.log('Método:', req.method);
-                    console.log('Resposta:', error.error);
-                    console.log('Headers:', error.headers);
                     console.groupEnd();
                 }
 

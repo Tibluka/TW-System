@@ -49,7 +49,6 @@ export class LoginComponent {
       error: (error) => {
         this.isLoading = false;
         this.errorMessage = 'Credenciais inválidas. Tente novamente.';
-        console.error('Erro no login:', error);
       }
     });
   }

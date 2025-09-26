@@ -135,7 +135,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
 
     this.productionSheetForm = this.formBuilder.group(formConfig);
 
-    console.log('📝 Formulário da ficha de produção inicializado');
   }
 
   /**
@@ -173,7 +172,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       }
 
     } catch (error) {
-      console.error('❌ Erro ao carregar dados iniciais:', error);
     } finally {
       this.isLoading = false;
       this.cdr.detectChanges();
@@ -248,7 +246,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
         this.addStageControlForEditMode();
       }
     } catch (error) {
-      console.error('❌ Erro ao carregar ficha de produção:', error);
     }
   }
 
@@ -295,7 +292,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       }
 
     } catch (error) {
-      console.error('Erro ao buscar ordem de produção:', error);
       this.productionOrderNotFound = true;
       this.productionOrderFound = null;
     } finally {
@@ -319,7 +315,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
 
 
     if (!this.productionOrderFound) {
-      console.log('Ordem de produção não encontrada');
 
       return;
     }
@@ -369,7 +364,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
         }
       }
     } catch (error: any) {
-      console.error('Erro ao salvar ficha:', error);
 
 
       let errorMessage = 'Erro inesperado ao salvar ficha de produção.';
@@ -382,7 +376,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
 
       alert(error.message)
 
-      console.error('Mensagem de erro:', errorMessage);
     } finally {
       this.isSaving = false;
     }
@@ -423,7 +416,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       this.modalService.close('production-sheet-modal', { action: 'stage-updated' });
 
     } catch (error: any) {
-      console.error('Erro ao avançar estágio:', error);
 
     } finally {
       this.isSaving = false;

@@ -177,12 +177,10 @@ export class ProductionSheetsComponent extends FormValidator {
         this.pagination = response.pagination || null;
 
 
-        console.log('✅ Fichas de produção carregadas:', this.productionSheets.length);
       } else {
         throw new Error(response?.message || 'Erro desconhecido');
       }
     } catch (error) {
-      console.error('❌ Erro ao carregar fichas de produção:', error);
       this.errorMessage = 'Erro ao carregar fichas de produção. Tente novamente.';
       this.showError = true;
 
@@ -395,7 +393,6 @@ export class ProductionSheetsComponent extends FormValidator {
         this.retrocedeProductionSheetStage(productionSheet);
         break;
       default:
-        console.warn('Ação não implementada:', action.value);
     }
   }
 
@@ -499,7 +496,6 @@ export class ProductionSheetsComponent extends FormValidator {
           this.loadProductionSheets();
         },
         error: (error) => {
-          console.error('❌ Erro ao avançar estágio:', error);
           this.showErrorMessage(error.message || 'Erro ao avançar estágio.');
         }
       });
@@ -633,7 +629,6 @@ export class ProductionSheetsComponent extends FormValidator {
 
   deleteProductionSheet(productionSheet: ProductionSheet): void {
     if (!productionSheet._id) {
-      console.error('ID da ficha de produção não encontrado');
       return;
     }
 
@@ -674,7 +669,6 @@ export class ProductionSheetsComponent extends FormValidator {
               this.loadProductionSheets(); // Recarregar lista
             },
             error: (error) => {
-              console.error('❌ Erro ao excluir ficha de produção:', error);
               this.showErrorMessage(error.message || 'Erro ao excluir ficha de produção.');
             }
           });
@@ -687,7 +681,6 @@ export class ProductionSheetsComponent extends FormValidator {
    */
   private showSuccessMessage(message: string): void {
 
-    console.log('SUCCESS:', message);
   }
 
   /**

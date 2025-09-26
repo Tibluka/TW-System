@@ -80,7 +80,6 @@ export class PrintButtonComponent {
       this.afterPrint.emit();
 
     } catch (error) {
-      console.error('❌ Erro na impressão:', error);
       this.printError.emit(error as Error);
     } finally {
 

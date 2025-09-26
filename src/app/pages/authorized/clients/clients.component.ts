@@ -74,7 +74,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
 
   deleteClient(client: Client): void {
     if (!client._id) {
-      console.error('ID do cliente não encontrado');
       return;
     }
 
@@ -114,7 +113,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
               this.loadClients(); // Recarregar lista
             },
             error: (error) => {
-              console.error('❌ Erro ao excluir cliente:', error);
             }
           });
       }
@@ -154,7 +152,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
   }
 
   ngOnInit(): void {
-    console.log('🚀 Iniciando componente de clientes...');
     this.loadClients();
   }
 
@@ -179,7 +176,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
    * 📋 LISTAR - Carrega lista de clientes da API
    */
   private loadClients(filters: ClientFilters = this.currentFilters): void {
-    console.log('📡 Carregando clientes com filtros:', filters);
 
     this.loading = true;
     this.shouldShowTable = true;
@@ -191,22 +187,18 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: ClientListResponse) => {
-          console.log('✅ Resposta da API recebida:', response);
 
           if (response.success && response.data) {
             this.clients = response.data;
             this.pagination = response.pagination;
 
-            console.log(`📊 ${this.clients.length} clientes carregados:`, this.clients);
           } else {
-            console.warn('⚠️ Resposta da API não contém dados válidos:', response);
             this.clients = [];
             this.showErrorMessage('Nenhum dado foi retornado da API.');
           }
           this.loading = false;
         },
         error: (error) => {
-          console.error('❌ Erro ao carregar clientes:', error);
           this.loading = false;
           this.showErrorMessage(error.message || 'Erro ao carregar clientes.');
         }
@@ -274,7 +266,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
    * 🎯 PERFORM SEARCH - Executa a busca de fato
    */
   private performSearch(searchTerm: string): void {
-    console.log('🔍 Buscando por:', searchTerm);
 
     const searchFilters: ClientFilters = {
       ...this.currentFilters,
@@ -291,7 +282,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
    */
   onPageChange(page: number): void {
     if (page !== this.currentFilters.page) {
-      console.log('📄 Mudando para página:', page);
       this.loadClients({ ...this.currentFilters, page });
     }
   }
@@ -303,11 +293,9 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
   private handleModalResult(result: any): void {
     if (result && result.action) {
       if (result.action === 'created') {
-        console.log('Cliente criado com sucesso:', result.data?.companyName);
         this.loadClients(); // Recarregar lista
 
       } else if (result.action === 'updated') {
-        console.log('Cliente atualizado com sucesso:', result.data?.companyName);
         this.loadClients(); // Recarregar lista
 
       }
@@ -321,7 +309,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
    * 🚪 MODAL CLOSED - Callback para quando modal é fechado
    */
   onModalClosed(result: any): void {
-    console.log('Modal fechado:', result);
     this.handleModalResult(result);
   }
 

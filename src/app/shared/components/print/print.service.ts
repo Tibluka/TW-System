@@ -42,7 +42,6 @@ export class PrintService {
       });
 
     } catch (error) {
-      console.error('❌ Erro ao imprimir elemento:', error);
       alert('Erro ao imprimir. Tente novamente.');
     }
   }
@@ -82,7 +81,6 @@ export class PrintService {
       };
 
     } catch (error) {
-      console.error('❌ Erro ao imprimir HTML:', error);
       alert('Erro ao imprimir. Tente novamente.');
     }
   }
@@ -105,7 +103,6 @@ export class PrintService {
       }
 
     } catch (error) {
-      console.error('❌ Erro ao imprimir página:', error);
       alert('Erro ao imprimir. Tente novamente.');
     }
   }
@@ -183,7 +180,6 @@ export class PrintService {
         })
         .join('\n');
     } catch (error) {
-      console.warn('Não foi possível extrair todos os estilos:', error);
       return '';
     }
   }
@@ -468,7 +464,6 @@ export class PrintService {
 
               if (possibleForm && possibleForm.get && typeof possibleForm.get === 'function') {
                 angularForm = possibleForm;
-                console.log('FormGroup encontrado no contexto Angular:', angularForm);
                 break;
               }
             }
@@ -484,7 +479,6 @@ export class PrintService {
               for (let i = 0; i < parentContext.length; i++) {
                 if (parentContext[i] && parentContext[i].productionSheetForm) {
                   angularForm = parentContext[i].productionSheetForm;
-                  console.log('FormGroup encontrado no elemento pai:', angularForm);
                   break;
                 }
               }
@@ -493,7 +487,6 @@ export class PrintService {
           }
         }
       } catch (e) {
-        console.warn('Erro ao acessar o FormGroup do Angular:', e);
       }
     }
 
@@ -521,9 +514,7 @@ export class PrintService {
         const control = angularForm.get(formControlName);
         currentValue = control.value || '';
         displayValue = currentValue;
-        console.log(`✅ Valor do FormGroup para ${formControlName}:`, currentValue);
       } else {
-        console.log(`⚠️ FormGroup não disponível para ${formControlName}, usando busca no DOM`);
 
 
         if (tagName === 'ds-input') {
@@ -559,11 +550,6 @@ export class PrintService {
 
           const innerHTML = originalComponent.innerHTML;
 
-          console.log('Debug ds-textarea via innerHTML:', {
-            innerHTML: innerHTML.substring(0, 500),
-            formControlName
-          });
-
 
           const textareaMatch = innerHTML.match(/<textarea[^>]*>(.*?)<\/textarea>/s);
 
@@ -582,7 +568,6 @@ export class PrintService {
             displayValue = currentValue;
 
           } else {
-            console.warn('Textarea não encontrado dentro do textarea-container');
           }
 
 
@@ -591,11 +576,9 @@ export class PrintService {
             if (componentValue) {
               currentValue = componentValue;
               displayValue = currentValue;
-              console.log(`Fallback: valor do atributo component - Value: "${currentValue}"`);
             }
           }
 
-          console.log(`DS-TEXTAREA Final - FormControl: ${formControlName}, Value: "${currentValue}"`);
         }
       }
 
@@ -616,10 +599,7 @@ export class PrintService {
         formControlName
       });
 
-      console.log(`Componente processado: ${uniqueKey}`, componentValues.get(uniqueKey));
     });
-
-    console.log('Todos os valores coletados:', componentValues);
 
 
     const clone = element.cloneNode(true) as HTMLElement;
@@ -644,11 +624,8 @@ export class PrintService {
       const componentData = componentValues.get(uniqueKey);
 
       if (!componentData) {
-        console.warn(`Dados não encontrados para componente: ${uniqueKey}`);
         return;
       }
-
-      console.log(`Processando clone - Key: ${uniqueKey}, Data:`, componentData);
 
 
       const fieldWrapper = document.createElement('div');
@@ -707,7 +684,6 @@ export class PrintService {
       const originalInput = originalInputs[index] as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
       if (!originalInput) {
-        console.warn(`Input original não encontrado no índice ${index}`);
         return;
       }
 

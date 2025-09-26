@@ -306,7 +306,6 @@ export class ClientModalComponent implements OnInit {
   }
 
   handleTabClick(event: { tabId: string, tab: TabConfig }): void {
-    console.log('Clicou na tab:', event.tab.label);
     this.trackTabClick(event.tabId);
   }
 
@@ -367,7 +366,6 @@ export class ClientModalComponent implements OnInit {
 
       const invalidTab = this.getFirstInvalidTab();
       if (invalidTab) {
-        console.log('Formulário inválido. Indo para aba:', invalidTab);
         this.handleTabChange(invalidTab);
         this.updateTabBadges();
       }
@@ -415,7 +413,6 @@ export class ClientModalComponent implements OnInit {
     this.clientService.createClient(clientData).subscribe({
       next: (response) => {
         this.isSaving = false;
-        console.log('Cliente criado com sucesso:', response.data);
 
         this.modalService.close('client-modal', {
           action: 'created',
@@ -424,7 +421,6 @@ export class ClientModalComponent implements OnInit {
       },
       error: (error) => {
         this.isSaving = false;
-        console.error('Erro ao criar cliente:', error);
 
       }
     });
@@ -438,7 +434,6 @@ export class ClientModalComponent implements OnInit {
     this.clientService.updateClient(this.clientForm.value._id, clientData).subscribe({
       next: (response) => {
         this.isSaving = false;
-        console.log('Cliente atualizado com sucesso:', response.data);
 
         this.modalService.close('client-modal', {
           action: 'updated',
@@ -447,7 +442,6 @@ export class ClientModalComponent implements OnInit {
       },
       error: (error) => {
         this.isSaving = false;
-        console.error('Erro ao atualizar cliente:', error);
 
       }
     });
@@ -488,6 +482,5 @@ export class ClientModalComponent implements OnInit {
   }
 
   private trackTabClick(tabId: string): void {
-    console.log('Analytics: tab clicked', tabId);
   }
 }

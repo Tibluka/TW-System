@@ -19,7 +19,6 @@ export class CompanyDataComponent implements OnInit {
 
   ngOnInit(): void {
     if (!this.parentForm) {
-      console.error('parentForm is required for CompanyDataComponent');
     }
   }
 

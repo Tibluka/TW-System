@@ -51,7 +51,6 @@ export class AddressDataComponent implements OnInit {
 
   ngOnInit(): void {
     if (!this.parentForm) {
-      console.error('parentForm is required for AddressDataComponent');
     }
   }
 
@@ -103,7 +102,6 @@ export class AddressDataComponent implements OnInit {
     const cep = this.parentForm.get('zipcode')?.value;
     if (cep && cep.length === 9) {
 
-      console.log('Buscar endereço para CEP:', cep);
     }
   }
 }

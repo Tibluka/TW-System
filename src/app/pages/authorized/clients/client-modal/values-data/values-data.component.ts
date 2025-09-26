@@ -16,7 +16,6 @@ export class ValuesDataComponent extends FormValidator implements OnInit {
 
   ngOnInit(): void {
     if (!this.parentForm) {
-      console.error('parentForm is required for ValuesDataComponent');
     }
   }
 

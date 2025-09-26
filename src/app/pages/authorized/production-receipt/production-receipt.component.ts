@@ -217,9 +217,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
           ...clientOptionsFromAPI
         ];
 
-        console.log('✅ Clientes carregados para select:', this.clientOptions.length);
       } else {
-        console.warn('⚠️ Resposta da API não contém dados válidos:', response);
 
         this.clientOptions = [
           { value: '', label: 'Todos os Clientes' }
@@ -228,10 +226,8 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
 
 
       this.cdr.detectChanges();
-      console.log('🔄 Change detection forçada para clientOptions');
 
     } catch (error) {
-      console.error('❌ Erro ao carregar clientes para select:', error);
 
       this.clientOptions = [
         { value: '', label: 'Todos os Clientes' }
@@ -239,7 +235,6 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
 
 
       this.cdr.detectChanges();
-      console.log('🔄 Change detection forçada após erro');
     }
   }
 
@@ -277,7 +272,6 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
       }
     });
 
-    console.log('Filters being sent:', filters); // Debug
 
     this.productionReceiptService.getProductionReceipts(filters)
       .pipe(takeUntil(this.destroy$))
@@ -291,7 +285,6 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
           this.cdr.detectChanges();
         },
         error: (error: any) => {
-          console.error('Erro ao carregar recibos:', error);
           this.loading = false;
 
 
@@ -416,7 +409,6 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   private handleModalResult(result: any): void {
     if (result && result.action) {
       if (result.action === 'saved') {
-        console.log('Ordem de produção criada com sucesso:', result.data?.internalReference);
         this.loadProductionReceipts(); // Recarregar lista
 
       }
@@ -489,12 +481,10 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
 
   private viewReceiptDetails(receipt: ProductionReceipt): void {
 
-    console.log('Ver detalhes do recebimento:', receipt);
   }
 
   deleteProductionReceipt(receipt: ProductionReceipt): void {
     if (!receipt._id) {
-      console.error('ID do desenvolvimento não encontrado');
       return;
     }
 
@@ -534,7 +524,6 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
               this.loadProductionReceipts(); // Recarregar lista
             },
             error: (error) => {
-              console.error('❌ Erro ao excluir desenvolvimento:', error);
             }
           });
       }
@@ -556,13 +545,11 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     if (result.success) {
       this.loadProductionReceipts();
 
-      console.log('Status atualizado com sucesso:', result);
     }
   }
 
   onStatusUpdateFailed(error: any): void {
 
-    console.error('Erro ao atualizar status:', error);
   }
 
   clearStatusUpdateSelection(): void {

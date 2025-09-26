@@ -57,7 +57,6 @@ export class ModalComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (!this.modalId) {
-      console.error('Modal ID é obrigatório');
       return;
     }
   }
@@ -110,7 +109,6 @@ export class ModalComponent implements OnInit, OnDestroy {
     if (event.toState === 'out' && event.fromState === 'in') {
 
       this.shouldShowModal = false;
-      console.log('Modal removido do DOM após animação');
     }
   }
 }

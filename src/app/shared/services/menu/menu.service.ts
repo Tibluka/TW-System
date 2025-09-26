@@ -59,7 +59,6 @@ export class MenuService {
    * 🔧 CORREÇÃO: Define item ativo baseado na URL
    */
   private setActiveItemFromRoute(url: string): void {
-    console.log('🔍 Verificando rota atual:', url);
 
     const menuItems = this._menuItems();
     const activeItem = menuItems.find(item => {
@@ -77,10 +76,8 @@ export class MenuService {
     });
 
     if (activeItem) {
-      console.log('✅ Item ativo encontrado:', activeItem.label, `(${activeItem.id})`);
       this._activeItem.set(activeItem.id);
     } else {
-      console.log('❌ Nenhum item ativo encontrado para:', url);
       this._activeItem.set(null);
     }
   }
@@ -158,7 +155,6 @@ export class MenuService {
    * Define o item ativo (para cliques manuais)
    */
   setActiveItem(id: string | null): void {
-    console.log('🎯 Definindo item ativo manualmente:', id);
     this._activeItem.set(id);
   }
 
@@ -228,7 +224,6 @@ export class MenuService {
     try {
       localStorage.setItem('menuCollapsed', JSON.stringify(this._isCollapsed()));
     } catch (error) {
-      console.warn('Erro ao salvar estado do menu:', error);
     }
   }
 
@@ -242,7 +237,6 @@ export class MenuService {
         this._isCollapsed.set(JSON.parse(saved));
       }
     } catch (error) {
-      console.warn('Erro ao carregar estado do menu:', error);
     }
   }
 

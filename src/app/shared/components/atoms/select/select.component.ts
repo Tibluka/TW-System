@@ -84,7 +84,6 @@ export class SelectComponent implements OnInit, OnDestroy, OnChanges, ControlVal
   ngOnChanges(changes: SimpleChanges): void {
 
     if (changes['options']) {
-      console.log('🔄 Select: Opções mudaram:', changes['options'].currentValue);
       this.updateFilteredOptions();
       this.updateSelectedOptions();
     }
@@ -236,7 +235,6 @@ export class SelectComponent implements OnInit, OnDestroy, OnChanges, ControlVal
   }
 
   private updateFilteredOptions(): void {
-    console.log('🔄 Select: Atualizando opções filtradas. Total de opções:', this.options.length);
 
     if (!this.searchTerm) {
       this.filteredOptions = [...this.options];
@@ -247,7 +245,6 @@ export class SelectComponent implements OnInit, OnDestroy, OnChanges, ControlVal
       });
     }
 
-    console.log('🔄 Select: Opções filtradas atualizadas:', this.filteredOptions.length);
   }
 
   private updateSelectedOptions(): void {

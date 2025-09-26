@@ -210,10 +210,8 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
         this.pagination = response.pagination || null;
 
 
-        console.log('✅ Ordens de produção carregadas:', this.productionOrders.length);
       }
     } catch (error) {
-      console.error('❌ Erro ao carregar ordens de produção:', error);
       this.errorMessage = 'Erro ao carregar ordens de produção. Tente novamente.';
       this.showError = true;
 
@@ -289,11 +287,9 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
   private handleModalResult(result: any): void {
     if (result && result.action) {
       if (result.action === 'created') {
-        console.log('Ordem de produção criada com sucesso:', result.data?.internalReference);
         this.loadProductionOrders(); // Recarregar lista
 
       } else if (result.action === 'updated') {
-        console.log('Ordem de produção atualizada com sucesso:', result.data?.internalReference);
         this.loadProductionOrders(); // Recarregar lista
 
       }
@@ -416,7 +412,6 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
         this.deleteProductionOrder(productionOrder);
         break;
       default:
-        console.warn('Ação não implementada:', action.value);
     }
   }
 
@@ -463,7 +458,6 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
    */
   deleteProductionOrder(productionOrder: ProductionOrder): void {
     if (!productionOrder._id) {
-      console.error('ID da ordem de produção não encontrado');
       return;
     }
 
@@ -504,7 +498,6 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
               this.loadProductionOrders(); // Recarregar lista
             },
             error: (error) => {
-              console.error('❌ Erro ao excluir ordem de produção:', error);
               this.showErrorMessage(error.message || 'Erro ao excluir ordem de produção.');
             }
           });
@@ -518,7 +511,6 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
    */
   private showSuccessMessage(message: string): void {
 
-    console.log('SUCCESS:', message);
   }
 
   /**

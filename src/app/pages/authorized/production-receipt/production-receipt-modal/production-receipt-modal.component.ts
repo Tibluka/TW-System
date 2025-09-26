@@ -113,7 +113,6 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       }
 
     } catch (error) {
-      console.error('❌ Erro ao carregar dados iniciais:', error);
     } finally {
       this.isLoading = false;
       this.cdr.detectChanges();
@@ -225,7 +224,6 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       this.productionReceipt = response.data;
       this.populateForm(this.productionReceipt);
     } catch (error) {
-      console.error('Erro ao carregar recebimento:', error);
 
     } finally {
       this.isLoading = false;
@@ -344,7 +342,6 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       const formData = this.prepareFormData();
 
       if (this.isEditMode) {
-        console.log(this.productionReceiptForm);
 
         await this.updateProductionReceipt({ ...formData, _id: this.productionReceiptForm.value?._id || '' });
       } else {
@@ -357,7 +354,6 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       });
 
     } catch (error) {
-      console.error('Erro ao salvar recebimento:', error);
 
     } finally {
       this.submitting = false;

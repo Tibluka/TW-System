@@ -46,11 +46,6 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
-    console.log('🚀 MenuComponent inicializado');
-    console.log('📍 Rota atual:', this.router.url);
-    console.log('📋 Itens do menu:', this.menuService.menuItems());
-    console.log('🎯 Item ativo atual:', this.menuService.activeItem());
-
 
     setTimeout(() => {
       this.menuService.updateActiveItemFromCurrentRoute();
@@ -91,20 +86,15 @@ export class MenuComponent implements OnInit, OnDestroy {
   onMenuItemClick(item: MenuItem, index: number): void {
     if (item.disabled || this.menuService.isAnimating()) return;
 
-    console.log('🖱️ Clique no menu:', item.label, `(${item.id})`);
-
 
     if (item.route) {
       this.router.navigate([item.route]).then(success => {
         if (success) {
-          console.log('✅ Navegação bem-sucedida para:', item.route);
 
           this.menuService.executeMenuItem(item);
         } else {
-          console.error('❌ Falha na navegação para:', item.route);
         }
       }).catch(err => {
-        console.error('❌ Erro na navegação:', err);
       });
     } else {
 
@@ -128,9 +118,6 @@ export class MenuComponent implements OnInit, OnDestroy {
 
 
     if (item.id === 'clients') {
-      console.log(`🔍 Verificando se '${item.label}' está ativo:`, isActive);
-      console.log('📍 Rota atual:', this.router.url);
-      console.log('🎯 Item ativo no service:', this.menuService.activeItem());
     }
 
     return isActive;
@@ -168,7 +155,6 @@ export class MenuComponent implements OnInit, OnDestroy {
    * 🔧 CORREÇÃO: Método para forçar atualização (para debug)
    */
   forceUpdateActiveItem(): void {
-    console.log('🔄 Forçando atualização do item ativo...');
     this.menuService.updateActiveItemFromCurrentRoute();
   }
 

@@ -70,16 +70,13 @@ export class DevelopmentService {
       params = params.set('sortOrder', filters.sortOrder);
     }
 
-    console.log('🔍 Buscando desenvolvimentos com filtros:', filters);
 
     return this.http.get<DevelopmentListResponse>(this.baseUrl, { params })
       .pipe(
         map(response => {
-          console.log('✅ Desenvolvimentos recebidos:', response);
           return response;
         }),
         catchError(error => {
-          console.error('❌ Erro ao buscar desenvolvimentos:', error);
           return throwError(() => this.handleError(error));
         })
       );
@@ -90,16 +87,13 @@ export class DevelopmentService {
    * 👁️ BUSCAR POR ID - Retorna desenvolvimento específico
    */
   getDevelopmentById(id: string): Observable<Development> {
-    console.log('🔍 Buscando desenvolvimento por ID:', id);
 
     return this.http.get<DevelopmentResponse>(`${this.baseUrl}/${id}`)
       .pipe(
         map(response => {
-          console.log('✅ Desenvolvimento encontrado:', response.data);
           return response.data;
         }),
         catchError(error => {
-          console.error('❌ Erro ao buscar desenvolvimento:', error);
           return throwError(() => this.handleError(error));
         })
       );
@@ -109,16 +103,13 @@ export class DevelopmentService {
    * ➕ CRIAR - Cria novo desenvolvimento
    */
   createDevelopment(data: CreateDevelopmentRequest): Observable<Development> {
-    console.log('➕ Criando desenvolvimento:', data);
 
     return this.http.post<DevelopmentResponse>(this.baseUrl, data)
       .pipe(
         map(response => {
-          console.log('✅ Desenvolvimento criado:', response.data);
           return response.data;
         }),
         catchError(error => {
-          console.error('❌ Erro ao criar desenvolvimento:', error);
           return throwError(() => this.handleError(error));
         })
       );
@@ -128,16 +119,13 @@ export class DevelopmentService {
    * ✏️ ATUALIZAR - Atualiza desenvolvimento existente
    */
   updateDevelopment(id: string, data: UpdateDevelopmentRequest): Observable<Development> {
-    console.log('✏️ Atualizando desenvolvimento:', { id, data });
 
     return this.http.put<DevelopmentResponse>(`${this.baseUrl}/${id}`, data)
       .pipe(
         map(response => {
-          console.log('✅ Desenvolvimento atualizado:', response.data);
           return response.data;
         }),
         catchError(error => {
-          console.error('❌ Erro ao atualizar desenvolvimento:', error);
           return throwError(() => this.handleError(error));
         })
       );
@@ -147,15 +135,12 @@ export class DevelopmentService {
    * 🗑️ DELETAR - Remove desenvolvimento (soft delete)
    */
   deleteDevelopment(id: string): Observable<void> {
-    console.log('🗑️ Removendo desenvolvimento:', id);
 
     return this.http.delete<void>(`${this.baseUrl}/${id}`)
       .pipe(
         map(() => {
-          console.log('✅ Desenvolvimento removido com sucesso');
         }),
         catchError(error => {
-          console.error('❌ Erro ao remover desenvolvimento:', error);
           return throwError(() => this.handleError(error));
         })
       );
@@ -165,16 +150,13 @@ export class DevelopmentService {
    * 🔄 ALTERAR STATUS - Atualiza apenas o status do desenvolvimento
    */
   updateDevelopmentStatus(id: string, status: string): Observable<Development> {
-    console.log(`🔄 Alterando status do desenvolvimento ${id} para:`, status);
 
     return this.http.patch<DevelopmentResponse>(`${this.baseUrl}/${id}/status`, { status })
       .pipe(
         map(response => {
-          console.log('✅ Status do desenvolvimento alterado:', response.data);
           return response.data;
         }),
         catchError(error => {
-          console.error('❌ Erro ao alterar status do desenvolvimento:', error);
           return throwError(() => this.handleError(error));
         })
       );
@@ -184,16 +166,13 @@ export class DevelopmentService {
    * 🔄 ATIVAR/DESATIVAR - Alterna status ativo do desenvolvimento
    */
   toggleDevelopmentStatus(id: string, active: boolean): Observable<Development> {
-    console.log(`🔄 ${active ? 'Ativando' : 'Desativando'} desenvolvimento:`, id);
 
     return this.http.post<DevelopmentResponse>(`${this.baseUrl}/${id}/${active ? 'activate' : 'deactivate'}`, {})
       .pipe(
         map(response => {
-          console.log('✅ Status do desenvolvimento alterado:', response.data);
           return response.data;
         }),
         catchError(error => {
-          console.error('❌ Erro ao alterar status do desenvolvimento:', error);
           return throwError(() => this.handleError(error));
         })
       );
@@ -217,7 +196,6 @@ export class DevelopmentService {
     return this.http.get<DevelopmentStatistics>(`${this.baseUrl}/stats`, { params })
       .pipe(
         catchError(error => {
-          console.error('❌ Erro ao buscar estatísticas:', error);
           return throwError(() => this.handleError(error));
         })
       );
@@ -240,7 +218,6 @@ export class DevelopmentService {
    * 📷 UPLOAD IMAGEM - Faz upload da imagem da peça
    */
   uploadImage(developmentId: string, file: File): Observable<any> {
-    console.log('📷 Fazendo upload de imagem para desenvolvimento:', developmentId);
 
     const formData = new FormData();
     formData.append('image', file);
@@ -248,11 +225,9 @@ export class DevelopmentService {
     return this.http.post<any>(`${this.baseUrl}/${developmentId}/image`, formData)
       .pipe(
         map(response => {
-          console.log('✅ Imagem enviada com sucesso:', response);
           return response;
         }),
         catchError(error => {
-          console.error('❌ Erro ao fazer upload da imagem:', error);
           return throwError(() => this.handleError(error));
         })
       );
@@ -262,16 +237,13 @@ export class DevelopmentService {
    * 🗑️ REMOVER IMAGEM - Remove imagem da peça
    */
   removeImage(developmentId: string): Observable<any> {
-    console.log('🗑️ Removendo imagem do desenvolvimento:', developmentId);
 
     return this.http.delete<any>(`${this.baseUrl}/${developmentId}/image`)
       .pipe(
         map(response => {
-          console.log('✅ Imagem removida com sucesso:', response);
           return response;
         }),
         catchError(error => {
-          console.error('❌ Erro ao remover imagem:', error);
           return throwError(() => this.handleError(error));
         })
       );
@@ -281,12 +253,10 @@ export class DevelopmentService {
    * 👁️ OBTER IMAGEM - Busca informações da imagem
    */
   getImage(developmentId: string): Observable<any> {
-    console.log('👁️ Buscando imagem do desenvolvimento:', developmentId);
 
     return this.http.get<any>(`${this.baseUrl}/${developmentId}/image`)
       .pipe(
         catchError(error => {
-          console.error('❌ Erro ao buscar imagem:', error);
           return throwError(() => this.handleError(error));
         })
       );
@@ -323,13 +293,6 @@ export class DevelopmentService {
       errorMessage = error.message;
     }
 
-
-    console.error('🔍 Detalhes do erro:', {
-      status: error.status,
-      statusText: error.statusText,
-      url: error.url,
-      error: error.error
-    });
 
     return new Error(errorMessage);
   }

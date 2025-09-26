@@ -124,7 +124,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       status: ['']
     });
 
-    console.log('📝 Formulário da ordem de produção inicializado');
   }
 
   /**
@@ -161,7 +160,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       }
 
     } catch (error) {
-      console.error('❌ Erro ao carregar dados iniciais:', error);
     } finally {
       this.isLoading = false;
       this.cdr.detectChanges();
@@ -293,7 +291,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
   async onSave(): Promise<void> {
     this.validate();
     this.productionOrderForm.markAllAsTouched();
-    console.log(this.productionOrderForm);
 
     if (this.productionOrderForm.invalid) {
 
@@ -324,7 +321,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
           this.productionOrderService.updateProductionOrder(formData._id, updateData)
         );
 
-        console.log('✅ Ordem de produção atualizada:', response);
         this.modalService.close('production-order-modal', { action: 'updated', data: response.data });
 
       } else {
@@ -340,12 +336,10 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
           this.productionOrderService.createProductionOrder(createData)
         );
 
-        console.log('✅ Nova ordem de produção criada:', response);
         this.modalService.close('production-order-modal', { action: 'created', data: response.data });
       }
 
     } catch (error: any) {
-      console.error('❌ Erro ao salvar ordem de produção:', error);
 
       const errorMessage = error.error?.message || error.message || 'Erro ao salvar ordem de produção.';
       alert(errorMessage);
