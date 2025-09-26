@@ -1,8 +1,8 @@
-// src/app/shared/animations/menu.animations.ts
+
 import { trigger, state, style, transition, animate, query, stagger } from '@angular/animations';
 
 export const menuAnimations = {
-    // Animação do container do menu
+
     slideMenu: trigger('slideMenu', [
         state('expanded', style({
             width: '300px'
@@ -15,7 +15,7 @@ export const menuAnimations = {
         ])
     ]),
 
-    // Animação para fade do texto
+
     fadeText: trigger('fadeText', [
         state('visible', style({
             opacity: 1,
@@ -33,7 +33,7 @@ export const menuAnimations = {
         ])
     ]),
 
-    // Animação para os ícones
+
     scaleIcon: trigger('scaleIcon', [
         transition('* => collapsed', [
             animate('300ms ease-out', style({

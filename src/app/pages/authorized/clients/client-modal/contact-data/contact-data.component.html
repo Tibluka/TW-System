@@ -1,7 +1,7 @@
-<!-- contact-data.component.html -->
+
 <form [formGroup]="parentForm" class="contact-form">
 
-    <!-- Nome do Responsável - 50% da largura -->
+
     <div class="responsible-name-field">
         <ds-input label="Nome do Responsável" placeholder="Digite o nome completo do responsável"
             formControlName="responsibleName" [fullWidth]="true" [required]="true"
@@ -10,7 +10,7 @@
         </ds-input>
     </div>
 
-    <!-- Email - 50% da largura -->
+
     <div class="email-field">
         <ds-input label="Email" placeholder="exemplo@empresa.com" formControlName="email" type="email"
             [fullWidth]="true" [required]="true" [invalid]="isFieldInvalid('email')"
@@ -18,7 +18,7 @@
         </ds-input>
     </div>
 
-    <!-- Telefone - 50% da largura -->
+
     <div class="phone-field">
         <ds-input label="Telefone" placeholder="(11) 99999-9999" formControlName="phone" [fullWidth]="true"
             [required]="true" [invalid]="isFieldInvalid('phone')" [errorMessage]="getErrorMessage('phone')"

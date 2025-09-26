@@ -1,10 +1,7 @@
-// models/production-orders/production-orders.ts
+
 
 import { Development, ProductionType, ProductionTypeEnum } from '../developments/developments';
 
-// ============================================
-// TYPES E ENUMS
-// ============================================
 
 export type ProductionOrderStatus =
     | 'CREATED'
@@ -14,55 +11,46 @@ export type ProductionOrderStatus =
     | 'PRODUCTION_STARTED'
     | 'FINALIZED';
 
-// Reexportar para compatibilidade
+
 export type { ProductionTypeEnum } from '../developments/developments';
 
-// ============================================
-// INTERFACES DE PRODUCTION TYPE
-// ============================================
 
 export interface SizeItem {
     size: string;
     value: number;
 }
 
-// ✅ ATUALIZADA - Agora usa a nova estrutura ProductionType
+
 export interface ProductionTypeWithQuantities extends ProductionType {
-    // Herda toda a estrutura de ProductionType
-    // Não precisa redefinir nada, apenas usar a estrutura existente
+
+
 }
 
-// ============================================
-// INTERFACE PRINCIPAL
-// ============================================
 
 export interface ProductionOrder {
     _id: string;
 
-    // DEVELOPMENT REFERENCE
+
     developmentId: string;
     development?: Development;
 
-    // DADOS COPIADOS
+
     internalReference: string;
 
-    // STATUS DA ORDEM DE PRODUÇÃO
+
     status: ProductionOrderStatus;
 
-    // DADOS ESPECÍFICOS DA PRODUÇÃO
+
     fabricType: string;
     productionType: ProductionType; // ✅ MUDANÇA: Usa ProductionType diretamente
     observations?: string;
 
-    // METADADOS
+
     active?: boolean;
     createdAt?: Date | string;
     updatedAt?: Date | string;
 }
 
-// ============================================
-// REQUEST INTERFACES
-// ============================================
 
 export interface CreateProductionOrderRequest {
     developmentId: string;
@@ -75,9 +63,6 @@ export interface UpdateProductionOrderRequest extends Partial<CreateProductionOr
     status?: ProductionOrderStatus;
 }
 
-// ============================================
-// FILTER INTERFACE
-// ============================================
 
 export interface ProductionOrderFilters {
     search?: string;
@@ -86,20 +71,17 @@ export interface ProductionOrderFilters {
     productionType?: ProductionTypeEnum;
     active?: boolean;
 
-    // Filtros por data
+
     createdFrom?: Date | string;
     createdTo?: Date | string;
 
-    // Paginação
+
     page?: number;
     limit?: number;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
 }
 
-// ============================================
-// RESPONSE INTERFACES
-// ============================================
 
 export interface ProductionOrderListResponse {
     data: ProductionOrder[];
@@ -121,9 +103,6 @@ export interface PaginationInfo {
     hasPrev: boolean;
 }
 
-// ============================================
-// HELPERS E UTILITÁRIOS
-// ============================================
 
 export class ProductionOrderUtils {
 
@@ -153,7 +132,7 @@ export class ProductionOrderUtils {
         return labels[type] || type;
     }
 
-    // ✅ ATUALIZADA - Trabalha com nova estrutura
+
     static getTotalQuantity(productionType: ProductionType): string {
         if (productionType.type === 'rotary' && productionType.meters) {
             return `${productionType.meters}m`;
@@ -190,13 +169,10 @@ export class ProductionOrderUtils {
     }
 }
 
-// ============================================
-// FORM HELPERS
-// ============================================
 
 export class ProductionOrderFormUtils {
 
-    // ✅ ATUALIZADA - Trabalha com nova estrutura
+
     static initializeFromDevelopment(development: Development): Partial<CreateProductionOrderRequest> {
         return {
             developmentId: development._id!,
@@ -211,7 +187,7 @@ export class ProductionOrderFormUtils {
         };
     }
 
-    // ✅ NOVA FUNÇÃO - Constrói ProductionType a partir de dados do form
+
     static buildProductionTypeFromForm(
         type: ProductionTypeEnum,
         meters?: number,
@@ -234,7 +210,7 @@ export class ProductionOrderFormUtils {
         return productionType;
     }
 
-    // ✅ ATUALIZADA - Trabalha com nova estrutura
+
     static calculateTotalPieces(productionType: ProductionType): number {
         if (productionType.type === 'localized' && productionType.additionalInfo?.sizes) {
             return productionType.additionalInfo.sizes.reduce((sum, item) => sum + (item.value || 0), 0);
@@ -257,17 +233,17 @@ export class ProductionOrderFormUtils {
         );
     }
 
-    // ✅ NOVA FUNÇÃO - Extrai variant do productionType
+
     static getVariant(productionType: ProductionType): string {
         return productionType.additionalInfo?.variant || '';
     }
 
-    // ✅ NOVA FUNÇÃO - Extrai sizes do productionType
+
     static getSizes(productionType: ProductionType): SizeItem[] {
         return productionType.additionalInfo?.sizes || [];
     }
 
-    // ✅ NOVA FUNÇÃO - Verifica se tem informações adicionais
+
     static hasAdditionalInfo(productionType: ProductionType): boolean {
         return !!productionType.additionalInfo;
     }

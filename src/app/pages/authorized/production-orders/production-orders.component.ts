@@ -1,11 +1,11 @@
-// pages/authorized/production-orders/production-orders.component.ts
+
 
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild, effect, inject } from '@angular/core';
 import { FormsModule, NgModel } from "@angular/forms";
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
-// Componentes
+
 import { PaginationInfo, ProductionOrder, ProductionOrderFilters, ProductionTypeEnum } from '../../../models/production-orders/production-orders';
 import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
 import { BadgeComponent } from "../../../shared/components/atoms/badge/badge.component";
@@ -60,17 +60,16 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
   private modalService = inject(ModalService);
   private listViewService = inject(ListViewService);
 
-  // Lista de ordens de produção e paginação
+
   productionOrders: ProductionOrder[] = [];
   pagination: PaginationInfo | null = null;
   loading = false;
 
 
-  // Estados para UI
   errorMessage: string = '';
   showError = false;
 
-  // Filtros atuais
+
   currentFilters: ProductionOrderFilters = {
     search: undefined,
     status: undefined,
@@ -79,7 +78,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
     active: true
   };
 
-  // ✨ CONFIGURAÇÃO DO LIST VIEW
+
   listViewConfig: ListViewConfig = {
     showToggle: true,
     defaultView: 'table',
@@ -92,7 +91,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
   };
   currentViewMode: ViewMode = 'table';
 
-  // Opções para select de status
+
   statusOptions: SelectOption[] = [
     { value: undefined, label: 'Todos os Status' },
     { value: 'CREATED', label: 'Criado' },
@@ -103,10 +102,10 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
     { value: 'FINALIZED', label: 'Finalizado' }
   ];
 
-  // Propriedade para armazenar ID da ordem selecionada para edição
+
   selectedProductionOrderId?: string;
 
-  // Configuração do menu de ações
+
   actionMenuItems: ActionMenuItem[] = [
     {
       label: 'Alterar Status',
@@ -120,7 +119,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
     }
   ];
 
-  // Configuração das opções de status para o status-updater
+
   productionOrderStatusOptions: StatusOption[] = [
     { value: 'CREATED', label: 'Criado', icon: 'fa-solid fa-plus', color: 'info' },
     { value: 'PILOT_PRODUCTION', label: 'Produção Piloto', icon: 'fa-solid fa-flask', color: 'warning' },
@@ -130,13 +129,13 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
     { value: 'FINALIZED', label: 'Finalizado', icon: 'fa-solid fa-flag-checkered', color: 'success' }
   ];
 
-  // Propriedades para o status-updater
+
   selectedProductionOrderForStatusUpdate?: ProductionOrder;
 
-  // Referência ao componente status-updater
+
   @ViewChild('statusUpdaterRef') statusUpdaterComponent?: StatusUpdaterComponent;
 
-  // Subject para controlar debounce da busca
+
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
@@ -144,13 +143,10 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
     return this.loading;
   }
 
-  // ============================================
-  // CICLO DE VIDA
-  // ============================================
 
   constructor() {
     super();
-    // Effect para monitorar quando o modal está aberto
+
     effect(() => {
       const modalInstance = this.modalService.modals().find(m => m.id === 'production-order-modal');
       this.isModalOpen = modalInstance ? modalInstance.isOpen : false;
@@ -177,16 +173,9 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
   onViewModeChange(mode: ViewMode) {
     this.listViewService.setViewMode('developments', mode);
 
-    // Analytics opcional
-    // this.analytics.track('view_mode_changed', { 
-    //   entity: 'developments', 
-    //   mode 
-    // });
+
   }
 
-  // ============================================
-  // CONFIGURAÇÃO DE BUSCA COM DEBOUNCE
-  // ============================================
 
   /**
    * 🔍 SETUP SEARCH DEBOUNCE - Configura debounce para busca
@@ -205,9 +194,6 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
       });
   }
 
-  // ============================================
-  // MÉTODOS DE CARREGAMENTO DE DADOS
-  // ============================================
 
   /**
    * 📋 CARREGAR ORDENS DE PRODUÇÃO - Carrega lista com filtros
@@ -236,9 +222,6 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
     }
   }
 
-  // ============================================
-  // MÉTODOS DE EVENTOS DE FILTROS
-  // ============================================
 
   /**
    * 🔍 BUSCA - Evento de mudança no campo de busca
@@ -256,9 +239,6 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
     this.loadProductionOrders();
   }
 
-  // ============================================
-  // MÉTODOS DE INTERAÇÃO COM TABELA
-  // ============================================
 
   /**
    * 👆 CLICK NA ORDEM - Abre modal para editar ordem
@@ -286,7 +266,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
    * ➕ CRIAR - Abre modal para criar nova ordem de produção
    */
   createProductionOrder(): void {
-    // Limpar ID selecionado para modo criação
+
     this.selectedProductionOrderId = undefined;
 
     this.modalService.open({
@@ -297,7 +277,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
       showCloseButton: true,
       closeOnBackdropClick: false,
       closeOnEscapeKey: true
-      // NÃO passar data para criação
+
     }).subscribe(result => {
       this.handleModalResult(result);
     });
@@ -311,15 +291,15 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
       if (result.action === 'created') {
         console.log('Ordem de produção criada com sucesso:', result.data?.internalReference);
         this.loadProductionOrders(); // Recarregar lista
-        // TODO: Exibir toast de sucesso
+
       } else if (result.action === 'updated') {
         console.log('Ordem de produção atualizada com sucesso:', result.data?.internalReference);
         this.loadProductionOrders(); // Recarregar lista
-        // TODO: Exibir toast de sucesso
+
       }
     }
 
-    // Sempre limpar o ID selecionado após fechar modal
+
     this.selectedProductionOrderId = undefined;
   }
 
@@ -330,9 +310,6 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
     this.handleModalResult(result);
   }
 
-  // ============================================
-  // MÉTODOS UTILITÁRIOS PARA TEMPLATE
-  // ============================================
 
   /**
    * 📅 FORMATAR DATA - Formata data para exibição
@@ -382,9 +359,6 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
     return pilot ? 'Sim' : 'Não';
   }
 
-  // ============================================
-  // MÉTODOS DE PAGINAÇÃO
-  // ============================================
 
   /**
    * 📄 PÁGINA ANTERIOR - Navega para página anterior
@@ -452,7 +426,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
   changeProductionOrderStatus(productionOrder: ProductionOrder): void {
     this.selectedProductionOrderForStatusUpdate = productionOrder;
 
-    // Aguarda o próximo ciclo para garantir que o componente seja renderizado
+
     setTimeout(() => {
       if (this.statusUpdaterComponent) {
         this.statusUpdaterComponent.openStatusModal();
@@ -543,7 +517,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
    * 🟢 SUCESSO - Mostra mensagem de sucesso
    */
   private showSuccessMessage(message: string): void {
-    // Implementar toast/notificação de sucesso
+
     console.log('SUCCESS:', message);
   }
 
@@ -554,7 +528,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
     this.errorMessage = message;
     this.showError = true;
 
-    // Auto-hide após 5 segundos
+
     setTimeout(() => {
       this.showError = false;
     }, 5000);

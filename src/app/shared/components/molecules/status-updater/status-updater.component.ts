@@ -2,12 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-// Componentes
+
 import { ModalComponent } from '../../organisms/modal/modal.component';
 import { ButtonComponent } from '../../atoms/button/button.component';
 import { IconComponent } from '../../atoms/icon/icon.component';
 
-// Interfaces
+
 export interface StatusOption {
     value: string;
     label: string;
@@ -26,7 +26,7 @@ export interface StatusUpdateResult {
 
 export type EntityType = 'development' | 'production-order' | 'production-sheet' | 'production-receipt';
 
-// Serviços
+
 import { DevelopmentService } from '../../../services/development/development.service';
 import { ProductionOrderService } from '../../../services/production-order/production-order.service';
 import { ProductionSheetsService } from '../../../services/production-sheets/production-sheets.service';
@@ -54,9 +54,6 @@ import { FormsModule, NgModel } from '@angular/forms';
 })
 export class StatusUpdaterComponent {
 
-    // ============================================
-    // INPUTS
-    // ============================================
 
     @Input() entityType: EntityType = 'development';
     @Input() entityId: string = '';
@@ -65,32 +62,23 @@ export class StatusUpdaterComponent {
     @Input() entityReference?: string; // Para exibir no modal (ex: internalReference)
     @Input() disabled: boolean = false;
 
-    // ============================================
-    // OUTPUTS
-    // ============================================
 
     @Output() statusUpdated = new EventEmitter<StatusUpdateResult>();
     @Output() statusUpdateFailed = new EventEmitter<StatusUpdateResult>();
 
-    // ============================================
-    // PROPRIEDADES
-    // ============================================
 
     isModalOpen: boolean = false;
     selectedStatus: string = '';
     isLoading: boolean = false;
     errorMessage: string = '';
 
-    // Serviços
+
     private developmentService = inject(DevelopmentService);
     private productionOrderService = inject(ProductionOrderService);
     private productionSheetsService = inject(ProductionSheetsService);
     private productionReceiptService = inject(ProductionReceiptService);
     private modalService = inject(ModalService);
 
-    // ============================================
-    // MÉTODOS PÚBLICOS
-    // ============================================
 
     /**
      * 🚀 ABRIR MODAL - Abre o modal de atualização de status
@@ -212,9 +200,6 @@ export class StatusUpdaterComponent {
         return option?.icon || '';
     }
 
-    // ============================================
-    // MÉTODOS PRIVADOS
-    // ============================================
 
     /**
      * 🔄 ATUALIZAR STATUS DA ENTIDADE - Chama o serviço apropriado
@@ -228,7 +213,7 @@ export class StatusUpdaterComponent {
                 return this.productionOrderService.updateStatus(entityId, newStatus).toPromise();
 
             case 'production-sheet':
-                // Para production-sheet, vamos usar um método genérico de atualização
+
                 return this.productionSheetsService.updateProductionSheet(entityId, { stage: newStatus as any }).toPromise();
 
             case 'production-receipt':

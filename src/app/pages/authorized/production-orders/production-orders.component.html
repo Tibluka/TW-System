@@ -1,5 +1,5 @@
 <div class="production-orders-container">
-    <!-- ✨ Usando variáveis do sistema: mb-48 ao invés de margin-bottom: 48px -->
+
     <h1 class="title-semibold primary-dark mb-48">Ordens de produção</h1>
 
     <div class="search-input">
@@ -29,7 +29,7 @@
                     [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)"
                     [loadingData]="shouldShowSpinner">
 
-                    <!-- Cabeçalho da tabela -->
+
                     <ds-table-row [isHeader]="true">
                         <ds-table-cell [isHeader]="true" align="left">Imagem</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="left">Referência Interna</ds-table-cell>
@@ -41,11 +41,11 @@
                         <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
                     </ds-table-row>
 
-                    <!-- ✨ DADOS DAS ORDENS DE PRODUÇÃO -->
+
                     <ds-table-row *ngFor="let productionOrder of productionOrders" [clickable]="true"
                         [data]="productionOrder" (rowClick)="onProductionOrderClick(productionOrder)">
 
-                        <!-- Imagem -->
+
                         <ds-table-cell align="left">
                             <div class="image-cell">
                                 <img *ngIf="productionOrder.development?.pieceImage?.url"
@@ -58,7 +58,7 @@
                             </div>
                         </ds-table-cell>
 
-                        <!-- Referência Interna -->
+
                         <ds-table-cell align="left">
                             <span class="body primary-dark">
                                 <span class="body primary-dark font-weight-medium">{{
@@ -68,14 +68,14 @@
                             </span>
                         </ds-table-cell>
 
-                        <!-- Referência do Cliente -->
+
                         <ds-table-cell align="left">
                             <span class="body primary-dark">
                                 {{ productionOrder.development?.clientReference || '-' }}
                             </span>
                         </ds-table-cell>
 
-                        <!-- Cliente -->
+
                         <ds-table-cell align="left">
                             <div class="client-cell" *ngIf="productionOrder.development?.client">
                                 <div class="body primary-dark">
@@ -90,7 +90,7 @@
                             </span>
                         </ds-table-cell>
 
-                        <!-- Tipo de Produção -->
+
                         <ds-table-cell align="left">
                             <span class="body primary-dark" *ngIf="productionOrder.productionType.type === 'rotary'">
                                 Rotativo
@@ -102,19 +102,19 @@
                                 {{productionOrder.productionType.meters}}m</p>
                         </ds-table-cell>
 
-                        <!-- Tecido -->
+
                         <ds-table-cell align="left">
                             <span class="body primary-dark">{{ productionOrder.fabricType || '-' }}</span>
                         </ds-table-cell>
 
-                        <!-- Status -->
+
                         <ds-table-cell align="center">
                             <ds-badge [text]="getStatusLabel(productionOrder.status)" [status]="productionOrder.status"
                                 entityType="production-order" />
 
                         </ds-table-cell>
 
-                        <!-- Ações -->
+
                         <ds-table-cell align="center">
                             <ds-action-menu [items]="actionMenuItems"
                                 (itemSelected)="onActionMenuSelect(productionOrder, $event)">
@@ -166,14 +166,13 @@
     </div>
 </div>
 
-<!-- 🎭 MODAL -->
-<!-- Modal só renderiza o conteúdo quando estiver visível -->
+
 <ds-modal *ngIf="isModalOpen" modalId="production-order-modal" (modalClosed)="onModalClosed($event)">
-    <!-- Só renderiza app-production-order-modal quando o modal está realmente aberto -->
+
     <app-production-order-modal [productionOrderId]="selectedProductionOrderId"></app-production-order-modal>
 </ds-modal>
 
-<!-- Componente de atualização de status -->
+
 <ds-status-updater *ngIf="selectedProductionOrderForStatusUpdate" #statusUpdaterRef entityType="production-order"
     [entityId]="selectedProductionOrderForStatusUpdate._id!"
     [currentStatus]="selectedProductionOrderForStatusUpdate.status" [availableStatuses]="productionOrderStatusOptions"
@@ -183,7 +182,6 @@
 </ds-status-updater>
 
 
-<!-- Modal geral para confirmações -->
 <ds-modal modalId="general-modal">
     <app-general-modal-content></app-general-modal-content>
 </ds-modal>

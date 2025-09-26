@@ -1,11 +1,11 @@
-// pages/authorized/production-receipts/production-receipts.component.ts
+
 
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, ChangeDetectorRef, ViewChild, effect } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged, lastValueFrom, takeUntil } from 'rxjs';
 
-// Componentes
+
 import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
 import { BadgeComponent } from '../../../shared/components/atoms/badge/badge.component';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
@@ -21,11 +21,11 @@ import { TableRowComponent } from '../../../shared/components/organisms/table/ta
 import { TableComponent } from '../../../shared/components/organisms/table/table.component';
 import { ProductionReceiptModalComponent } from './production-receipt-modal/production-receipt-modal.component';
 
-// Services
+
 import { ModalService } from '../../../shared/services/modal/modal.service';
 import { ProductionReceiptService } from '../../../shared/services/production-receipt/production-receipt.service';
 
-// Models
+
 import { ProductionOrderStatus } from '../../../models/production-orders/production-orders';
 import {
   PaginationInfo,
@@ -35,7 +35,7 @@ import {
   ProductionReceiptFilters
 } from '../../../models/production-receipt/production-receipt';
 
-// Utils
+
 import { FormValidator } from '../../../shared/utils/form';
 import {
   copyToClipboard,
@@ -73,79 +73,70 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
 
   @ViewChild('statusUpdaterRef') statusUpdaterComponent!: StatusUpdaterComponent;
 
-  // ============================================
-  // INJEÇÕES DE DEPENDÊNCIA
-  // ============================================
+
   private productionReceiptService = inject(ProductionReceiptService);
   private modalService = inject(ModalService);
   private clientService = inject(ClientService);
   private cdr = inject(ChangeDetectorRef);
 
-  // ============================================
-  // PROPRIEDADES DO COMPONENTE
-  // ============================================
+
   productionReceipts: ProductionReceipt[] = [];
   pagination?: PaginationInfo;
   loading = false;
   isModalOpen = false;
   selectedReceiptId?: string;
 
-  // Configuração do list-view
+
   listViewConfig = {
     itemsPerRow: 3,
     showToggle: true,
     defaultView: 'table' as 'table' | 'cards'
   };
 
-  // Status updater
+
   selectedProductionReceiptForStatusUpdate?: ProductionReceipt;
   productionReceiptStatusOptions: StatusOption[] = [];
 
-  // ============================================
-  // FILTROS E BUSCA - ATUALIZADO COM TODOS OS FILTROS DISPONÍVEIS
-  // ============================================
+
   currentFilters: ProductionReceiptFilters = {
     page: 1,
     limit: 10,
     search: '',
     clientId: '',
-    // Filtros de status e método de pagamento
+
     paymentStatus: undefined,
     paymentMethod: undefined,
 
-    // Filtros por data
+
     createdFrom: undefined,
     createdTo: undefined,
 
-    // Filtros por ordem de produção
+
     productionOrderId: undefined,
 
-    // Filtros especiais
+
     active: true,        // Por padrão, apenas ativos
 
-    // Ordenação
+
     sortBy: 'createdAt',
     sortOrder: 'desc'
   };
 
-  // Subject para debounce da busca
+
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
-  // ============================================
-  // OPTIONS PARA SELECTS - EXPANDIDO
-  // ============================================
 
   clientOptions: SelectOption[] = [];
 
-  // Opções de status de pagamento
+
   paymentStatusOptions: SelectOption[] = [
     { value: '', label: 'Todos os Status' },
     { value: 'PENDING', label: 'Pendente' },
     { value: 'PAID', label: 'Pago' }
   ];
 
-  // Opções de método de pagamento
+
   paymentMethodOptions: SelectOption[] = [
     { value: '', label: 'Todos os Métodos' },
     { value: 'CASH', label: 'Dinheiro' },
@@ -156,14 +147,14 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     { value: 'CHECK', label: 'Cheque' }
   ];
 
-  // Opções de filtro por status ativo
+
   activeStatusOptions: SelectOption[] = [
     { value: 'true', label: 'Apenas Ativos' },
     { value: 'false', label: 'Apenas Inativos' },
     { value: 'all', label: 'Todos' }
   ];
 
-  // Opções de ordenação
+
   sortByOptions: SelectOption[] = [
     { value: 'createdAt', label: 'Data de Criação' },
     { value: 'issueDate', label: 'Data de Emissão' },
@@ -193,9 +184,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     });
   }
 
-  // ============================================
-  // LIFECYCLE HOOKS
-  // ============================================
+
   ngOnInit(): void {
     this.setupSearchDebounce();
     this.setupStatusOptions();
@@ -222,7 +211,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
           label: client.companyName || 'Cliente sem nome'
         }));
 
-        // Adiciona os clientes à opção padrão
+
         this.clientOptions = [
           { value: '', label: 'Todos os Clientes' },
           ...clientOptionsFromAPI
@@ -231,32 +220,30 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
         console.log('✅ Clientes carregados para select:', this.clientOptions.length);
       } else {
         console.warn('⚠️ Resposta da API não contém dados válidos:', response);
-        // Mantém apenas a opção padrão
+
         this.clientOptions = [
           { value: '', label: 'Todos os Clientes' }
         ];
       }
 
-      // 🔄 FORÇA DETECÇÃO DE MUDANÇAS
+
       this.cdr.detectChanges();
       console.log('🔄 Change detection forçada para clientOptions');
 
     } catch (error) {
       console.error('❌ Erro ao carregar clientes para select:', error);
-      // Mantém apenas a opção padrão em caso de erro
+
       this.clientOptions = [
         { value: '', label: 'Todos os Clientes' }
       ];
 
-      // 🔄 FORÇA DETECÇÃO DE MUDANÇAS MESMO EM CASO DE ERRO
+
       this.cdr.detectChanges();
       console.log('🔄 Change detection forçada após erro');
     }
   }
 
-  // ============================================
-  // SETUP INICIAL
-  // ============================================
+
   private setupSearchDebounce(): void {
     this.searchSubject.pipe(
       debounceTime(500),
@@ -276,15 +263,13 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     ];
   }
 
-  // ============================================
-  // CARREGAMENTO DE DADOS
-  // ============================================
+
   private loadProductionReceipts(): void {
     this.loading = true;
 
     const filters = { ...this.currentFilters };
 
-    // Limpar campos vazios, mas preservar valores false e 0
+
     Object.keys(filters).forEach(key => {
       const value = (filters as any)[key];
       if (value === '' || value === null || value === undefined) {
@@ -302,23 +287,21 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
           this.pagination = response.pagination;
           this.loading = false;
 
-          // 🔄 FORÇA DETECÇÃO DE MUDANÇAS
+
           this.cdr.detectChanges();
         },
         error: (error: any) => {
           console.error('Erro ao carregar recibos:', error);
           this.loading = false;
 
-          // 🔄 FORÇA DETECÇÃO DE MUDANÇAS MESMO EM CASO DE ERRO
+
           this.cdr.detectChanges();
-          // TODO: Implementar toast de erro
+
         }
       });
   }
 
-  // ============================================
-  // EVENTOS DE FILTROS - EXPANDIDO
-  // ============================================
+
   onSearchChange(): void {
     this.searchSubject.next(this.currentFilters.search || '');
   }
@@ -334,7 +317,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   }
 
   onActiveStatusFilterChange(): void {
-    // Converter string para o tipo correto
+
     const value = (this.currentFilters.active as any);
     if (value === 'true') {
       this.currentFilters.active = true;
@@ -368,17 +351,13 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     this.loadProductionReceipts();
   }
 
-  // ============================================
-  // MÉTODOS DE FILTRO ESPECIAIS
-  // ============================================
 
-  // Filtrar apenas recibos vencidos
   toggleOverdueFilter(): void {
     this.currentFilters.page = 1;
     this.loadProductionReceipts();
   }
 
-  // Limpar todos os filtros
+
   clearAllFilters(): void {
     this.currentFilters = {
       page: 1,
@@ -396,9 +375,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     this.loadProductionReceipts();
   }
 
-  // ============================================
-  // PAGINAÇÃO
-  // ============================================
+
   onPageChange(page: number): void {
     if (page !== this.currentFilters.page) {
       this.currentFilters.page = page;
@@ -406,9 +383,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     }
   }
 
-  // ============================================
-  // MODAL E AÇÕES
-  // ============================================
+
   createProductionReceipt(): void {
     this.selectedReceiptId = undefined;
     this.isModalOpen = true;
@@ -443,7 +418,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
       if (result.action === 'saved') {
         console.log('Ordem de produção criada com sucesso:', result.data?.internalReference);
         this.loadProductionReceipts(); // Recarregar lista
-        // TODO: Exibir toast de sucesso
+
       }
     }
 
@@ -456,13 +431,11 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
 
     if (result && (result.action === 'created' || result.action === 'updated')) {
       this.loadProductionReceipts();
-      // TODO: Implementar toast de sucesso
+
     }
   }
 
-  // ============================================
-  // ACTION MENU
-  // ============================================
+
   getActionMenuItems(receipt: ProductionReceipt): ActionMenuItem[] {
     const items: ActionMenuItem[] = [
       {
@@ -484,7 +457,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
       }
     ];
 
-    // Adicionar ação de deletar se não estiver pago
+
     if (receipt.paymentStatus !== 'PAID') {
       items.push({
         label: 'Excluir',
@@ -515,7 +488,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   }
 
   private viewReceiptDetails(receipt: ProductionReceipt): void {
-    // TODO: Implementar modal de detalhes ou navegação
+
     console.log('Ver detalhes do recebimento:', receipt);
   }
 
@@ -568,12 +541,10 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     });
   }
 
-  // ============================================
-  // STATUS UPDATER
-  // ============================================
+
   openStatusUpdater(receipt: ProductionReceipt): void {
     this.selectedProductionReceiptForStatusUpdate = receipt;
-    // Aguarda o próximo ciclo para garantir que o componente seja renderizado
+
     setTimeout(() => {
       if (this.selectedProductionReceiptForStatusUpdate) {
         this.statusUpdaterComponent.openStatusModal();
@@ -584,13 +555,13 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   onStatusUpdated(result: any): void {
     if (result.success) {
       this.loadProductionReceipts();
-      // TODO: Toast de sucesso
+
       console.log('Status atualizado com sucesso:', result);
     }
   }
 
   onStatusUpdateFailed(error: any): void {
-    // TODO: Toast de erro
+
     console.error('Erro ao atualizar status:', error);
   }
 
@@ -598,9 +569,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     this.selectedProductionReceiptForStatusUpdate = undefined;
   }
 
-  // ============================================
-  // HELPERS DE FORMATAÇÃO
-  // ============================================
+
   formatDate(date: string | Date | undefined): string {
     if (!date) return '-';
     return new Date(date).toLocaleDateString('pt-BR');
@@ -673,9 +642,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     return count;
   }
 
-  // ============================================
-  // TRACK BY FUNCTIONS
-  // ============================================
+
   trackByReceiptId(index: number, receipt: ProductionReceipt): string {
     return receipt._id || index.toString();
   }

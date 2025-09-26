@@ -1,4 +1,4 @@
-// menu.service.ts - CORREÇÃO COM ROUTER AWARENESS
+
 import { computed, Injectable, signal, inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -15,13 +15,13 @@ export class MenuService {
   private readonly _menuItems = signal<MenuItem[]>([]);
   private readonly _activeItem = signal<string | null>(null);
 
-  // Computed signals
+
   readonly isCollapsed = this._isCollapsed.asReadonly();
   readonly isAnimating = this._isAnimating.asReadonly();
   readonly menuItems = this._menuItems.asReadonly();
   readonly activeItem = this._activeItem.asReadonly();
 
-  // Estados combinados
+
   readonly canInteract = computed(() => !this._isAnimating());
   readonly menuState = computed(() => ({
     isCollapsed: this._isCollapsed(),
@@ -65,10 +65,10 @@ export class MenuService {
     const activeItem = menuItems.find(item => {
       if (!item.route) return false;
 
-      // Verificação exata da rota
+
       if (item.route === url) return true;
 
-      // Verificação se a URL atual começa com a rota do item (para sub-rotas)
+
       if (url.startsWith(item.route) && url.charAt(item.route.length) === '/') {
         return true;
       }
@@ -94,10 +94,10 @@ export class MenuService {
     this._isAnimating.set(true);
     this._isCollapsed.update(current => !current);
 
-    // Salva o estado
+
     this.saveCollapsedState();
 
-    // Simula o tempo da animação CSS (500ms)
+
     setTimeout(() => {
       this._isAnimating.set(false);
     }, 500);
@@ -132,7 +132,7 @@ export class MenuService {
    */
   setMenuItems(items: MenuItem[]): void {
     this._menuItems.set(items);
-    // 🔧 CORREÇÃO: Quando itens mudam, re-verificar rota ativa
+
     this.setActiveItemFromCurrentRoute();
   }
 
@@ -141,7 +141,7 @@ export class MenuService {
    */
   addMenuItem(item: MenuItem): void {
     this._menuItems.update(items => [...items, item]);
-    // 🔧 CORREÇÃO: Re-verificar rota ativa após adicionar item
+
     this.setActiveItemFromCurrentRoute();
   }
 
@@ -168,8 +168,6 @@ export class MenuService {
   executeMenuItem(item: MenuItem): void {
     if (item.disabled) return;
 
-    // 🔧 CORREÇÃO: Não definir ativo aqui, deixar o router fazer isso
-    // this.setActiveItem(item.id); // Removido para evitar conflito
 
     if (item.action) {
       item.action();
@@ -257,7 +255,7 @@ export class MenuService {
     this._activeItem.set(null);
   }
 
-  // Métodos mantidos para compatibilidade (deprecated)
+
   /**
    * @deprecated Use isCollapsed() ao invés de isOpen()
    */

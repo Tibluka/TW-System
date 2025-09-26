@@ -1,16 +1,16 @@
-<!-- production-receipt-modal.component.html -->
+
 <div class="modal-content">
 
-    <!-- Loading Spinner para carregamento inicial -->
+
     <div *ngIf="isLoading" class="loading-container">
         <ds-spinner size="large" message="Carregando recebimento..."></ds-spinner>
     </div>
 
-    <!-- Conteúdo do formulário -->
+
     <div *ngIf="!isLoading" class="form-container">
-        <!-- Formulário -->
+
         <form [formGroup]="productionReceiptForm" (ngSubmit)="onSubmit()" class="receipt-form">
-            <!-- 🔍 REFERÊNCIA INTERNA -->
+
             <div class="form-field">
                 <ds-input icon="fa-solid fa-search" iconPosition="left" label="Referência Interna do Desenvolvimento"
                     placeholder="Ex: 25ABC0001" formControlName="internalReference"
@@ -20,12 +20,12 @@
             </div>
 
             <div class="search-status">
-                <!-- Loading da busca -->
+
                 <div class="text-center p-48" *ngIf="searchingProductionOrder">
                     <ds-spinner size="48px" variant="outline"></ds-spinner>
                 </div>
 
-                <!-- Desenvolvimento não encontrado -->
+
                 <div class="search-not-found" *ngIf="productionOrderNotFound && !searchingProductionOrder">
                     <ds-icon icon="fa-solid fa-triangle-exclamation" color="tertiary" fontSize="16px"></ds-icon>
                     <span class="body tertiary ml-8">Ordem de produção não encontrada</span>

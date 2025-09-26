@@ -1,8 +1,8 @@
-<!-- Modal de atualização de status -->
+
 <ds-modal *ngIf="isModalOpen" modalId="status-updater-modal" (modalClosed)="closeModal()">
 
     <div class="status-updater-content">
-        <!-- Seleção do novo status -->
+
         <div class="new-status-section mb-32">
             <h3 class="body primary-dark mb-16">Selecionar Novo Status</h3>
 
@@ -11,13 +11,13 @@
 
         </div>
 
-        <!-- Mensagem de erro -->
+
         <div class="error-message" *ngIf="errorMessage">
             <ds-icon icon="fa-solid fa-triangle-exclamation" color="error" fontSize="16px"></ds-icon>
             <span class="body-small error">{{ errorMessage }}</span>
         </div>
 
-        <!-- Botões de ação -->
+
         <div class="action-buttons">
             <ds-button label="Cancelar" variant="outline" (onClickEmitter)="closeModal()" [disabled]="isLoading">
             </ds-button>

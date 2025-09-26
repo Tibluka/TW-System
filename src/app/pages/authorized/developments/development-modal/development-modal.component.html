@@ -1,24 +1,24 @@
 <div class="development-modal-container">
 
-    <!-- Loading state -->
+
     <div *ngIf="isLoading" class="loading-container">
         <ds-spinner size="lg" message="Carregando desenvolvimento..."></ds-spinner>
     </div>
 
-    <!-- Formulário principal -->
+
     <form [formGroup]="developmentForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
 
-        <!-- Seção do formulário -->
+
         <div class="form-section">
             <div class="development-form-grid">
-                <!-- Cliente -->
+
                 <div class="field-group client-field">
                     <ds-select label="Cliente" placeholder="Selecione o cliente" formControlName="clientId"
                         [options]="clientOptions" [required]="true" [errorMessage]="getFieldError('clientId')"
                         [invalid]="isFormControlInvalid(developmentForm.get('clientId'))" width="100%" />
                 </div>
 
-                <!-- Upload de Imagem -->
+
                 <div class="field-group image-field">
                     <ds-file-upload label="Imagem da Peça" placeholder="Clique ou arraste uma imagem aqui"
                         helperText="Imagem (JPG, JPEG, PNG) de até 5MB" [multiple]="false" [fullWidth]="true"
@@ -27,14 +27,14 @@
                         (uploadError)="onUploadError($event)" />
                 </div>
 
-                <!-- Descrição -->
+
                 <div class="field-group description-field">
                     <ds-textarea label="Descrição" placeholder="Descreva o desenvolvimento (opcional)..."
                         formControlName="description" [rows]="4" [errorMessage]="getFieldError('description')"
                         [invalid]="isFormControlInvalid(developmentForm.get('description'))" width="100%" />
                 </div>
 
-                <!-- Tipo de Produção -->
+
                 <div class="field-group production-type-field" formGroupName="productionType">
                     <ds-select label="Tipo de Produção" placeholder="Selecione o tipo" formControlName="type"
                         [options]="productionTypeOptions" [required]="true" placement="top"
@@ -42,7 +42,7 @@
                         [invalid]="isFormControlInvalid(developmentForm.get('productionType')?.get('type'))"
                         width="100%" />
                 </div>
-                <!-- Referência do Cliente -->
+
                 <div class="field-group client-reference-field">
                     <ds-input label="Referência do Cliente" placeholder="Digite a referência do cliente"
                         formControlName="clientReference" icon="fa-solid fa-hashtag" iconPosition="left"
@@ -50,7 +50,7 @@
                         [invalid]="isFormControlInvalid(developmentForm.get('clientReference'))" width="100%" />
                 </div>
 
-                <!-- Estágio (apenas no modo edição) -->
+
                 <div class="field-group" *ngIf="isEditMode">
                     <ds-select label="Estágio da Produção" placeholder="Selecione o estágio" formControlName="status"
                         [options]="statusOptions" [errorMessage]="getFieldError('stage')" placement="top"
@@ -59,7 +59,7 @@
             </div>
         </div>
 
-        <!-- Botões de ação -->
+
         <div class="modal-actions">
             <ds-button label="Cancelar" variant="ghost" (onClickEmitter)="onCancel()" [disabled]="isSaving" />
 

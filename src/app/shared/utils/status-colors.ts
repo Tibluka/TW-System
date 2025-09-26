@@ -1,21 +1,15 @@
-// shared/utils/status-colors.ts
+
 
 import { DevelopmentStatus } from '../../models/developments/developments';
 import { ProductionOrderStatus } from '../../models/production-orders/production-orders';
 import { ProductionSheetStage } from '../../models/production-sheet/production-sheet';
 import { PaymentStatus } from '../../models/production-receipt/production-receipt';
 
-// ============================================
-// TYPES
-// ============================================
 
 export type BadgeColor = 'green' | 'yellow' | 'orange' | 'red' | 'blue' | 'purple' | 'gray';
 
 export type StatusType = DevelopmentStatus | ProductionOrderStatus | ProductionSheetStage | PaymentStatus;
 
-// ============================================
-// STATUS COLOR MAPPING
-// ============================================
 
 /**
  * 🎨 MAPEAMENTO DE CORES POR STATUS
@@ -23,9 +17,6 @@ export type StatusType = DevelopmentStatus | ProductionOrderStatus | ProductionS
  */
 export class StatusColorMapper {
 
-    // ============================================
-    // MAPEAMENTOS ESPECÍFICOS POR TIPO
-    // ============================================
 
     /**
      * 🏗️ DESENVOLVIMENTOS - Cores para status de desenvolvimento
@@ -66,20 +57,17 @@ export class StatusColorMapper {
         'PAID': 'green'      // Verde - Pago
     };
 
-    // ============================================
-    // MÉTODOS PÚBLICOS
-    // ============================================
 
     /**
      * 🎨 OBTER COR POR STATUS - Retorna a cor apropriada para um status
      */
     static getColorForStatus(status: string, entityType?: 'development' | 'production-order' | 'production-sheet' | 'production-receipt'): BadgeColor {
-        // Se não especificar o tipo de entidade, tenta detectar automaticamente
+
         if (!entityType) {
             return this.detectColorByStatus(status);
         }
 
-        // Mapeamento específico por tipo de entidade
+
         switch (entityType) {
             case 'development':
                 return this.DEVELOPMENT_COLORS[status as DevelopmentStatus] || 'gray';
@@ -104,7 +92,7 @@ export class StatusColorMapper {
     private static detectColorByStatus(status: string): BadgeColor {
         const statusUpper = status.toUpperCase();
 
-        // Padrões de detecção automática
+
         if (statusUpper.includes('CREATED') || statusUpper.includes('NEW')) {
             return 'blue';
         }
@@ -129,7 +117,7 @@ export class StatusColorMapper {
             return 'purple';
         }
 
-        // Status específicos conhecidos
+
         const knownStatuses: Record<string, BadgeColor> = {
             'CREATED': 'blue',
             'AWAITING_APPROVAL': 'yellow',
@@ -170,9 +158,6 @@ export class StatusColorMapper {
     }
 }
 
-// ============================================
-// FUNÇÕES UTILITÁRIAS
-// ============================================
 
 /**
  * 🎨 FUNÇÃO HELPER - Obtém cor para um status

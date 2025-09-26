@@ -1,4 +1,4 @@
-// pages/authorized/production-orders/production-order-modal/production-order-modal.component.ts
+
 
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core';
@@ -15,7 +15,7 @@ import { DevelopmentService } from '../../../../shared/services/development/deve
 import { ModalService } from '../../../../shared/services/modal/modal.service';
 import { ProductionOrderService } from '../../../../shared/services/production-order/production-order.service';
 import { FormValidator } from '../../../../shared/utils/form';
-//import { SelectComponent } from '../../../../shared/components/atoms/select/select.component';
+
 import { translateProductionType } from '../../../../shared/utils/tools';
 
 interface SelectOption {
@@ -33,7 +33,7 @@ interface SelectOption {
     TextareaComponent,
     SpinnerComponent,
     FormsModule,
-    //SelectComponent,
+
     IconComponent
   ],
   templateUrl: './production-order-modal.component.html',
@@ -43,28 +43,24 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
 
   @Input() productionOrderId?: string;
 
-  // ============================================
-  // INJEÇÕES DE DEPENDÊNCIA
-  // ============================================
+
   private formBuilder = inject(FormBuilder);
   private productionOrderService = inject(ProductionOrderService);
   private developmentService = inject(DevelopmentService);
   private modalService = inject(ModalService);
   private cdr = inject(ChangeDetectorRef);
 
-  // ============================================
-  // PROPRIEDADES DO COMPONENTE
-  // ============================================
+
   productionOrderForm!: FormGroup;
   isLoading = false;
   isSaving = false;
 
-  // Estados para busca de desenvolvimento
+
   searchingDevelopment = false;
   developmentFound: Development | null = null;
   developmentNotFound = false;
 
-  // Opções para selects
+
   statusOptions: SelectOption[] = [
     { value: 'CREATED', label: 'Criado' },
     { value: 'PILOT_PRODUCTION', label: 'Produção Piloto' },
@@ -83,13 +79,10 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     { value: 'COR123', label: 'Cor 1' }
   ];
 
-  // Subject para controlar debounce da busca de desenvolvimento
+
   private searchDevelopmentSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
-  // ============================================
-  // CICLO DE VIDA
-  // ============================================
 
   async ngOnInit(): Promise<void> {
     this.initializeForm();
@@ -102,9 +95,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     this.destroy$.complete();
   }
 
-  // ============================================
-  // GETTERS
-  // ============================================
 
   get isEditMode(): boolean {
     return !!this.productionOrderForm.value._id;
@@ -114,9 +104,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     return this.isEditMode ? 'Atualizar' : 'Criar';
   }
 
-  // ============================================
-  // SETUP METHODS
-  // ============================================
 
   /**
    * 📝 INICIALIZAR FORM - Cria formulário reativo
@@ -129,7 +116,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
         meters: [null],
         additionalInfo: this.formBuilder.group({
           variant: ['']
-          // sizes are managed from developmentFound for now
+
         })
       }),
       fabricType: ['', [Validators.required]],
@@ -166,7 +153,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     this.isLoading = true;
 
     try {
-      // Acessar dados do modal ativo
+
       const activeModal = this.modalService.activeModal();
       if (activeModal?.config.data) {
         const productionOrder = activeModal.config.data;
@@ -189,13 +176,13 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     this.developmentNotFound = false;
 
     try {
-      // Buscar desenvolvimento pela referência interna
+
       const response: Development = await lastValueFrom(
         this.developmentService.getDevelopmentById(internalReference)
       );
 
       if (response) {
-        // Verificar se encontrou exatamente a referência pesquisada
+
         this.developmentFound = response;
         this.productionOrderForm.get('productionType')!.patchValue(response.productionType || {});
       } else {
@@ -225,7 +212,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
    * 📋 POPULAR FORMULÁRIO - Preenche dados da ordem de produção para edição
    */
   private async populateForm(productionOrder: ProductionOrder): Promise<void> {
-    // Se tem desenvolvimento vinculado, carregar e exibir
+
     if (productionOrder.development) {
       this.developmentFound = productionOrder.development;
       if (productionOrder.productionType.additionalInfo && productionOrder.productionType.additionalInfo.sizes) {
@@ -241,7 +228,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       status: productionOrder.status
     });
 
-    // Se existir _id na ordem de produção, adiciona o form control _id
+
     if (productionOrder._id) {
       if (!this.productionOrderForm.contains('_id')) {
         this.productionOrderForm.addControl('_id', this.formBuilder.control(productionOrder._id));
@@ -257,9 +244,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     }
   }
 
-  // ============================================
-  // MÉTODOS DE EVENTOS
-  // ============================================
 
   /**
    * 🔍 BUSCA DE DESENVOLVIMENTO - Evento quando usuário digita referência
@@ -273,16 +257,13 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     }
   }
 
-  // ============================================
-  // MÉTODOS DE AÇÃO
-  // ============================================
 
   validate() {
     const productionTypeControl = this.productionOrderForm.get('productionType');
     const productionTypeValue = productionTypeControl?.value;
 
     if (productionTypeValue?.type === 'rotary') {
-      // meters is required
+
       const metersControl = productionTypeControl?.get('meters');
       if (!metersControl || metersControl.value === null || metersControl.value === undefined || metersControl.value === '') {
         metersControl?.setErrors({ required: true });
@@ -293,7 +274,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     }
 
     if (productionTypeValue?.type === 'localized') {
-      // additionalInfo is required
+
       const additionalInfoControl = productionTypeControl?.get('additionalInfo');
       if (!additionalInfoControl || !additionalInfoControl.value) {
         additionalInfoControl?.setErrors({ required: true });
@@ -319,7 +300,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       return;
     }
 
-    // Verificar se desenvolvimento foi encontrado
+
     if (!this.developmentFound && !this.isEditMode) {
       alert('É necessário selecionar um desenvolvimento válido.');
       return;
@@ -331,7 +312,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       const formData = this.productionOrderForm.value;
 
       if (this.isEditMode) {
-        // ATUALIZAR ordem existente
+
         const updateData: UpdateProductionOrderRequest = {
           fabricType: formData.fabricType,
           observations: formData.observations,
@@ -347,7 +328,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
         this.modalService.close('production-order-modal', { action: 'updated', data: response.data });
 
       } else {
-        // CRIAR nova ordem
+
         const createData: CreateProductionOrderRequest = {
           developmentId: this.developmentFound!._id!,
           fabricType: formData.fabricType,
@@ -381,9 +362,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     this.modalService.close('production-order-modal', { action: 'cancelled' });
   }
 
-  // ============================================
-  // MÉTODOS DE VALIDAÇÃO E HELPERS
-  // ============================================
 
   /**
    * ✅ VALIDAR CAMPO - Verifica se campo específico é válido
@@ -428,8 +406,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     return new Date(date).toLocaleDateString('pt-BR');
   }
 
-
-  // Adicione este método no seu componente
 
   /**
    * 📊 CALCULAR TOTAL DE PEÇAS - Soma todos os valores dos tamanhos

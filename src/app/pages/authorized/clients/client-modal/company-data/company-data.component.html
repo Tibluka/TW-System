@@ -1,7 +1,7 @@
-<!-- company-data.component.html -->
+
 <form [formGroup]="parentForm" class="company-form">
 
-    <!-- Razão Social - 100% da largura -->
+
     <div class="company-name-field">
         <ds-input label="Razão Social" placeholder="Digite a razão social da empresa" formControlName="companyName"
             [fullWidth]="true" [required]="true" [invalid]="isFieldInvalid('companyName')"
@@ -9,7 +9,7 @@
         </ds-input>
     </div>
 
-    <!-- CNPJ - 50% da largura -->
+
     <div class="cnpj-field">
         <ds-input label="CNPJ" placeholder="00.000.000/0000-00" formControlName="cnpj" [fullWidth]="true"
             [required]="true" [invalid]="isFieldInvalid('cnpj')" [errorMessage]="getErrorMessage('cnpj')"
@@ -17,7 +17,7 @@
         </ds-input>
     </div>
 
-    <!-- Sigla - 50% da largura -->
+
     <div class="acronym-field">
         <ds-input label="Sigla" placeholder="Ex: ACME, TECH" formControlName="acronym" [fullWidth]="true"
             [required]="true" [invalid]="isFieldInvalid('acronym')" [errorMessage]="getErrorMessage('acronym')"

@@ -1,4 +1,4 @@
-<!-- menu.component.html - Versão retrátil -->
+
 <nav role="navigation" aria-label="Menu principal">
     <div class="menu-container" [class.collapsed]="menuService.isCollapsed()"
         [attr.aria-expanded]="!menuService.isCollapsed()">
@@ -24,7 +24,7 @@
             </ul>
         </div>
 
-        <!-- Botão de logout no rodapé -->
+
         <footer class="menu-footer">
             <button type="button" class="menu-item-button logout-button" (click)="logout()" aria-label="Sair">
                 <ds-icon color="white" fontSize="32px" cursor="pointer" icon="fa-solid fa-right-from-bracket"

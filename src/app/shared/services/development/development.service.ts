@@ -1,4 +1,4 @@
-// services/development/development.service.ts
+
 
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
@@ -15,9 +15,6 @@ export class DevelopmentService {
   private http = inject(HttpClient);
   private baseUrl = `${environment.apiUrl}/developments`;
 
-  // ============================================
-  // MÉTODOS DE LISTAGEM
-  // ============================================
 
   /**
    * 📋 LISTAR - Busca desenvolvimentos com filtros e paginação
@@ -25,7 +22,7 @@ export class DevelopmentService {
   listDevelopments(filters: DevelopmentFilters = {}): Observable<DevelopmentListResponse> {
     let params = new HttpParams();
 
-    // Adicionar filtros aos parâmetros
+
     if (filters.search) {
       params = params.set('search', filters.search);
     }
@@ -42,12 +39,12 @@ export class DevelopmentService {
       params = params.set('active', filters.active.toString());
     }
 
-    // NOVO FILTRO - tipo de produção simplificado
+
     if (filters.productionType) {
       params = params.set('productionType', filters.productionType);
     }
 
-    // Filtros por data de criação
+
     if (filters.createdFrom) {
       params = params.set('createdFrom', this.formatDate(filters.createdFrom));
     }
@@ -56,7 +53,7 @@ export class DevelopmentService {
       params = params.set('createdTo', this.formatDate(filters.createdTo));
     }
 
-    // Paginação
+
     if (filters.page) {
       params = params.set('page', filters.page.toString());
     }
@@ -88,9 +85,6 @@ export class DevelopmentService {
       );
   }
 
-  // ============================================
-  // MÉTODOS DE CRUD
-  // ============================================
 
   /**
    * 👁️ BUSCAR POR ID - Retorna desenvolvimento específico
@@ -205,9 +199,6 @@ export class DevelopmentService {
       );
   }
 
-  // ============================================
-  // MÉTODOS ESPECIAIS
-  // ============================================
 
   /**
    * 📊 ESTATÍSTICAS - Busca estatísticas dos desenvolvimentos
@@ -244,9 +235,6 @@ export class DevelopmentService {
     return this.listDevelopments(clientFilters);
   }
 
-  // ============================================
-  // MÉTODOS DE IMAGEM
-  // ============================================
 
   /**
    * 📷 UPLOAD IMAGEM - Faz upload da imagem da peça
@@ -304,9 +292,6 @@ export class DevelopmentService {
       );
   }
 
-  // ============================================
-  // HELPERS PRIVADOS
-  // ============================================
 
   /**
    * 📅 FORMATAR DATA - Converte data para string ISO
@@ -325,20 +310,20 @@ export class DevelopmentService {
     let errorMessage = 'Erro interno do servidor';
 
     if (error.error) {
-      // Erro da API
+
       if (typeof error.error === 'string') {
         errorMessage = error.error;
       } else if (error.error.message) {
         errorMessage = error.error.message;
       } else if (error.error.errors && Array.isArray(error.error.errors)) {
-        // Erros de validação
+
         errorMessage = error.error.errors.map((err: any) => err.message || err).join(', ');
       }
     } else if (error.message) {
       errorMessage = error.message;
     }
 
-    // Log para debug
+
     console.error('🔍 Detalhes do erro:', {
       status: error.status,
       statusText: error.statusText,

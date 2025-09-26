@@ -1,8 +1,8 @@
 <div class="clients-container">
-    <!-- ✨ Usando variáveis do sistema: mb-48 ao invés de margin-bottom: 48px -->
+
     <h1 class="title-semibold primary-dark mb-48">Clientes</h1>
 
-    <!-- Barra de busca com espaçamento usando variáveis -->
+
     <div class="search-input">
         <ds-input width="400px" label="Buscar" placeholder="Digite o nome, CNPJ, etc."
             [(ngModel)]="currentFilters.search" (ngModelChange)="onSearchChange()" icon="fa-solid fa-search"
@@ -20,7 +20,7 @@
                     [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)"
                     [loadingData]="shouldShowSpinner">
 
-                    <!-- Cabeçalho da tabela -->
+
                     <ds-table-row [isHeader]="true">
                         <ds-table-cell [isHeader]="true" align="left">Sigla</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="left">Razão Social</ds-table-cell>
@@ -31,16 +31,16 @@
                         <ds-table-cell [isHeader]="true" align="left">Responsável</ds-table-cell>
                     </ds-table-row>
 
-                    <!-- ✨ DADOS DOS CLIENTES - Usando 'clients' (corrigido) -->
+
                     <ds-table-row *ngFor="let client of clients" [clickable]="true" [data]="client"
                         (rowClick)="onClienteClick(client)">
 
-                        <!-- Sigla (Acronym) -->
+
                         <ds-table-cell align="left">
                             <span class="body primary-dark">{{ client.acronym }}</span>
                         </ds-table-cell>
 
-                        <!-- Razão Social -->
+
                         <ds-table-cell align="left">
                             <div class="d-flex align-items-center">
                                 <div>
@@ -49,33 +49,33 @@
                             </div>
                         </ds-table-cell>
 
-                        <!-- CNPJ -->
+
                         <ds-table-cell align="left">
                             <span class="body label">{{ client.cnpj | libPipe: cnpjMask }}</span>
                         </ds-table-cell>
 
-                        <!-- Telefone -->
+
                         <ds-table-cell align="left">
                             <a [href]="'tel:' + client.contact.phone" class="body secondary-medium">
                                 {{ client.contact.phone | libPipe: phoneMask }}
                             </a>
                         </ds-table-cell>
 
-                        <!-- Email -->
+
                         <ds-table-cell align="left">
                             <a [href]="'mailto:' + client.contact.email" class="body secondary-medium">
                                 {{ client.contact.email }}
                             </a>
                         </ds-table-cell>
 
-                        <!-- Preço por Metro -->
+
                         <ds-table-cell align="center">
                             <span class="body primary-dark">
                                 {{ client.values.valuePerMeter | currency:'BRL':'symbol':'1.2-2' }}
                             </span>
                         </ds-table-cell>
 
-                        <!-- Responsável -->
+
                         <ds-table-cell align="left">
                             <div class="d-flex align-items-center">
                                 <div>
@@ -122,8 +122,8 @@
     </div>
 </div>
 
-<!-- Modal só renderiza o conteúdo quando estiver visível -->
+
 <ds-modal *ngIf="isModalOpen" modalId="client-modal" (modalClosed)="onModalClosed($event)">
-    <!-- Só renderiza app-client-modal quando o modal está realmente aberto -->
+
     <app-client-modal></app-client-modal>
 </ds-modal>

@@ -1,10 +1,7 @@
-// models/developments/developments.ts
+
 
 import { Client } from '../clients/clients';
 
-// ============================================
-// TYPES E ENUMS
-// ============================================
 
 export type DevelopmentStatus =
     | 'CREATED'
@@ -14,9 +11,6 @@ export type DevelopmentStatus =
 
 export type ProductionTypeEnum = 'rotary' | 'localized';
 
-// ============================================
-// NOVA INTERFACE PRODUCTIONTYPE
-// ============================================
 
 export interface ProductionType {
     type: 'rotary' | 'localized';
@@ -30,25 +24,22 @@ export interface ProductionType {
     };
 }
 
-// ============================================
-// INTERFACE PRINCIPAL
-// ============================================
 
 export interface Development {
     _id: string;
 
-    // IDENTIFIERS
+
     clientReference?: string; // Referência fornecida pelo cliente
     internalReference: string; // Auto-gerado: formato 25ABC0001
 
-    // CLIENT REFERENCE
+
     clientId: string; // ID de referência obrigatório
     client?: Client; // Pode vir populado da API via populate
 
-    // BASIC DATA
+
     description?: string;
 
-    // PIECE IMAGE
+
     pieceImage?: {
         url?: string;
         publicId?: string;
@@ -63,26 +54,23 @@ export interface Development {
         uploadedAt?: Date | string;
     };
 
-    // STATUS
+
     status: DevelopmentStatus;
 
-    // VARIANTS
+
     variants?: {
         color?: string;
     };
 
-    // ✅ NOVA ESTRUTURA COM OBJETO COMPLETO
+
     productionType: ProductionType;
 
-    // METADADOS
+
     active?: boolean;
     createdAt?: Date | string;
     updatedAt?: Date | string;
 }
 
-// ============================================
-// INTERFACE PARA IMAGEM
-// ============================================
 
 export interface PieceImage {
     url?: string;
@@ -98,17 +86,11 @@ export interface PieceImage {
     uploadedAt?: Date | string;
 }
 
-// ============================================
-// INTERFACE PARA VARIANTES
-// ============================================
 
 export interface DevelopmentVariants {
     color?: string;
 }
 
-// ============================================
-// REQUEST INTERFACES
-// ============================================
 
 export interface CreateDevelopmentRequest {
     clientId: string;
@@ -118,7 +100,7 @@ export interface CreateDevelopmentRequest {
     variants?: {
         color?: string;
     };
-    // ✅ NOVA ESTRUTURA COM OBJETO COMPLETO
+
     productionType: ProductionType;
 }
 
@@ -126,9 +108,6 @@ export interface UpdateDevelopmentRequest extends Partial<CreateDevelopmentReque
     internalReference?: string; // Não pode ser alterado após criação
 }
 
-// ============================================
-// FILTER INTERFACE
-// ============================================
 
 export interface DevelopmentFilters {
     search?: string; // Busca em clientReference e description
@@ -136,24 +115,21 @@ export interface DevelopmentFilters {
     status?: DevelopmentStatus;
     active?: boolean;
 
-    // ✅ FILTRO PODE SER POR TIPO OU OBJETO COMPLETO
+
     productionType?: ProductionTypeEnum; // Para filtros simples por tipo
     productionTypeFilter?: ProductionType; // Para filtros complexos
 
-    // Filtros por data
+
     createdFrom?: Date | string;
     createdTo?: Date | string;
 
-    // Paginação
+
     page?: number;
     limit?: number;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
 }
 
-// ============================================
-// RESPONSE INTERFACES
-// ============================================
 
 export interface DevelopmentListResponse {
     data: Development[];
@@ -175,9 +151,6 @@ export interface PaginationInfo {
     hasPrev: boolean;
 }
 
-// ============================================
-// STATISTICS INTERFACE
-// ============================================
 
 export interface DevelopmentStatistics {
     total: number;
@@ -191,9 +164,6 @@ export interface DevelopmentStatistics {
     };
 }
 
-// ============================================
-// HELPERS E UTILITÁRIOS
-// ============================================
 
 export class DevelopmentUtils {
 

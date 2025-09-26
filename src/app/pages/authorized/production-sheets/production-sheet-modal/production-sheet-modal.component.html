@@ -1,6 +1,6 @@
 <div class="production-sheet-modal-container">
 
-    <!-- Loading state -->
+
     <div *ngIf="isLoading" class="loading-container">
         <ds-spinner size="lg" message="Carregando recibo de produção..."></ds-spinner>
     </div>
@@ -10,12 +10,12 @@
             [disabled]="isSaving" />
     </div>
 
-    <!-- Formulário principal -->
+
     <form [formGroup]="productionSheetForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
 
-        <!-- Seção do formulário -->
+
         <div class="form-section">
-            <!-- Referência Interna da Ordem de Produção -->
+
             <div class="field-group mb-16">
                 <ds-input label="Referência Interna da Ordem" placeholder="Digite a referência interna (ex: DEV001)"
                     formControlName="internalReference" icon="fa-solid fa-search" iconPosition="left" [required]="true"
@@ -24,18 +24,18 @@
             </div>
             <div class="search-status">
 
-                <!-- Loading da busca -->
+
                 <div class="text-center p-48" *ngIf="searchingProductionOrder">
                     <ds-spinner size="48px" variant="outline"></ds-spinner>
                 </div>
 
-                <!-- Referência não encontrado -->
+
                 <div class="search-not-found" *ngIf="productionOrderNotFound">
                     <ds-icon icon="fa-solid fa-triangle-exclamation" color="tertiary" fontSize="16px"></ds-icon>
                     <span class="body tertiary ml-8">Ordem de produção não encontrada</span>
                 </div>
 
-                <!-- Desenvolvimento encontrado -->
+
                 <div class="development-found mb-24" *ngIf="productionOrderFound && !searchingProductionOrder">
                     <p class="input-label">Resumo da Ordem de Produção</p>
                     <div class="development-card">
@@ -61,18 +61,18 @@
                                 {{productionType(productionOrderFound!.development!.productionType!.type)}}
                             </p>
                             <div class="form-field" *ngIf="productionOrderFound.productionType!.type === 'rotary'">
-                                <!-- 📏 QUANTIDADE DE METROS -->
+
                                 <p class="body secondary">{{productionOrderFound.productionType!.meters}}m
                                 </p>
                             </div>
                         </div>
                     </div>
-                    <!-- Tabela para tipo de produção localizada -->
+
                     <div class="mt-24" *ngIf="productionOrderFound?.productionType!.type === 'localized'">
                         <div class="table-container"
                             *ngIf="productionOrderFound?.productionType?.additionalInfo?.sizes && productionOrderFound.development?.productionType?.additionalInfo?.sizes!.length > 0; else noSizes">
                             <table class="production-table">
-                                <!-- Cabeçalho com os tamanhos -->
+
                                 <thead>
                                     <tr>
                                         <th>
@@ -85,7 +85,7 @@
                                     </tr>
                                 </thead>
 
-                                <!-- Corpo com os valores -->
+
                                 <tbody>
                                     <tr>
                                         <td>
@@ -100,7 +100,7 @@
                             </table>
                         </div>
 
-                        <!-- Estado vazio -->
+
                         <ng-template #noSizes>
                             <div class="empty-state">
                                 <i class="fa-solid fa-table"></i>
@@ -114,14 +114,14 @@
 
             <div class="d-grid columns-3 gap-24" *ngIf="productionOrderFound">
 
-                <!-- Máquina -->
+
                 <div class="field-group machine-field">
                     <ds-select label="Máquina" placeholder="Selecione a máquina" formControlName="machine"
                         [options]="machineOptions" [required]="true" [errorMessage]="getFieldError('machine')"
                         [invalid]="isFormControlInvalid(productionSheetForm.get('machine'))" width="100%" />
                 </div>
 
-                <!-- Data de Entrada -->
+
                 <div class="field-group entry-date-field">
                     <ds-input label="Data de Entrada" placeholder="Data de início da produção"
                         formControlName="entryDate" type="date" icon="fa-solid fa-calendar" iconPosition="left"
@@ -129,7 +129,7 @@
                         [invalid]="isFormControlInvalid(productionSheetForm.get('entryDate'))" width="100%" />
                 </div>
 
-                <!-- Data de Saída Prevista -->
+
                 <div class="field-group expected-exit-date-field">
                     <ds-input label="Data de Saída Prevista" placeholder="Data prevista para conclusão"
                         formControlName="expectedExitDate" type="date" icon="fa-solid fa-calendar-check"
@@ -138,7 +138,7 @@
                 </div>
 
             </div>
-            <!-- Observações de Produção -->
+
 
             <div *ngIf="productionOrderFound || isEditMode">
                 <ds-textarea label="Observações de Produção"
@@ -148,7 +148,7 @@
             </div>
         </div>
 
-        <!-- Botões de ação -->
+
         <div class="modal-actions mt-32" *ngIf="productionOrderFound || isEditMode">
             <ds-button label="Cancelar" variant="ghost" (onClickEmitter)="onCancel()" [disabled]="isSaving" />
 

@@ -19,13 +19,13 @@ export class ContactDataComponent implements OnInit {
     }
   }
 
-  // Verifica se campo é inválido e foi tocado
+
   isFieldInvalid(fieldName: string): boolean {
     const field = this.parentForm.get(fieldName);
     return !!(field && field.invalid && field.touched);
   }
 
-  // Obtém mensagem de erro personalizada
+
   getErrorMessage(fieldName: string): string {
     const field = this.parentForm.get(fieldName);
 

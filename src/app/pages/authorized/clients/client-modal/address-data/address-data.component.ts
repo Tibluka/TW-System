@@ -55,13 +55,13 @@ export class AddressDataComponent implements OnInit {
     }
   }
 
-  // Verifica se campo é inválido e foi tocado
+
   isFieldInvalid(fieldName: string): boolean {
     const field = this.parentForm.get(fieldName);
     return !!(field && field.invalid && field.touched);
   }
 
-  // Obtém mensagem de erro personalizada
+
   getErrorMessage(fieldName: string): string {
     const field = this.parentForm.get(fieldName);
 
@@ -98,11 +98,11 @@ export class AddressDataComponent implements OnInit {
     return '';
   }
 
-  // Método para buscar endereço por CEP (futura implementação)
+
   onCepBlur(): void {
     const cep = this.parentForm.get('zipcode')?.value;
     if (cep && cep.length === 9) {
-      // TODO: Implementar busca de endereço via CEP
+
       console.log('Buscar endereço para CEP:', cep);
     }
   }

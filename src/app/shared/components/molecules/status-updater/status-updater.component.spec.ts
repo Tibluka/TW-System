@@ -23,7 +23,7 @@ describe('StatusUpdaterComponent', () => {
         fixture = TestBed.createComponent(StatusUpdaterComponent);
         component = fixture.componentInstance;
 
-        // Configurar inputs padrão para os testes
+
         component.entityType = 'development';
         component.entityId = 'test-id';
         component.currentStatus = 'CREATED';
@@ -150,7 +150,7 @@ describe('StatusUpdaterComponent', () => {
         component.openStatusModal();
         component.selectStatus('IN_PROGRESS');
 
-        // Mock do método updateEntityStatus para retornar sucesso
+
         spyOn(component as any, 'updateEntityStatus').and.returnValue(Promise.resolve({}));
 
         await component.confirmUpdate();
@@ -169,7 +169,7 @@ describe('StatusUpdaterComponent', () => {
         component.openStatusModal();
         component.selectStatus('IN_PROGRESS');
 
-        // Mock do método updateEntityStatus para retornar erro
+
         spyOn(component as any, 'updateEntityStatus').and.returnValue(Promise.reject(new Error('API Error')));
 
         await component.confirmUpdate();

@@ -1,4 +1,4 @@
-// shared/components/atoms/print-button/print-button.component.ts
+
 
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
@@ -16,43 +16,31 @@ export class PrintButtonComponent {
 
   private printService = inject(PrintService);
 
-  // ============================================
-  // INPUTS
-  // ============================================
 
   @Input() label = 'Imprimir';
   @Input() variant: 'primary' | 'secondary' | 'ghost' | 'danger' = 'secondary';
   @Input() icon = 'fa-solid fa-print';
   @Input() disabled = false;
 
-  // Opções de impressão
+
   @Input() target?: string | HTMLElement; // Elemento alvo para impressão
   @Input() printOptions: PrintOptions = {};
 
-  // Modo de impressão
+
   @Input() mode: 'element' | 'html' | 'page' = 'element';
   @Input() htmlContent?: string; // Para modo 'html'
 
-  // ============================================
-  // OUTPUTS
-  // ============================================
 
   @Output() beforePrint = new EventEmitter<void>();
   @Output() afterPrint = new EventEmitter<void>();
   @Output() printError = new EventEmitter<Error>();
 
-  // ============================================
-  // PROPRIEDADES
-  // ============================================
 
   isPrinting = false;
 
-  // ============================================
-  // MÉTODOS
-  // ============================================
 
   onPrint(event: Event): void {
-    // Prevenir submit se estiver em form
+
     if (event) {
       event.preventDefault();
       event.stopPropagation();
@@ -67,13 +55,13 @@ export class PrintButtonComponent {
     this.isPrinting = true;
 
     try {
-      // Emitir evento antes da impressão
+
       this.beforePrint.emit();
 
-      // Aguardar um ciclo para permitir preparações
+
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      // Executar impressão baseada no modo
+
       switch (this.mode) {
         case 'element':
           this.printElement();
@@ -88,14 +76,14 @@ export class PrintButtonComponent {
           throw new Error(`Modo de impressão '${this.mode}' não suportado`);
       }
 
-      // Emitir evento após impressão
+
       this.afterPrint.emit();
 
     } catch (error) {
       console.error('❌ Erro na impressão:', error);
       this.printError.emit(error as Error);
     } finally {
-      // Resetar estado após delay
+
       setTimeout(() => {
         this.isPrinting = false;
       }, 1000);
@@ -108,7 +96,7 @@ export class PrintButtonComponent {
     if (this.target) {
       targetElement = this.target;
     } else {
-      // Buscar elemento pai mais próximo com dados para impressão
+
       const button = document.querySelector('ds-print-button')?.parentElement;
       targetElement = this.findPrintableParent(button) || document.body;
     }
@@ -134,7 +122,7 @@ export class PrintButtonComponent {
   private findPrintableParent(element?: Element | null): HTMLElement | null {
     if (!element) return null;
 
-    // Lista de seletores que indicam conteúdo imprimível
+
     const printableSelectors = [
       '.modal-container',
       '.page-content',
@@ -148,7 +136,7 @@ export class PrintButtonComponent {
     let current = element;
 
     while (current && current !== document.body) {
-      // Verificar se elemento atual é imprimível
+
       for (const selector of printableSelectors) {
         if (current.matches?.(selector)) {
           return current as HTMLElement;

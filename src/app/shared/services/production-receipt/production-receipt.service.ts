@@ -1,4 +1,4 @@
-// shared/services/production-receipt/production-receipt.service.ts
+
 
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
@@ -23,9 +23,6 @@ export class ProductionReceiptService {
   private http = inject(HttpClient);
   private readonly API_URL = `${environment.apiUrl}/production-receipts`;
 
-  // ============================================
-  // MÉTODOS CRUD PRINCIPAIS
-  // ============================================
 
   /**
    * 📋 LISTAR - Busca recebimentos com filtros e paginação
@@ -33,7 +30,7 @@ export class ProductionReceiptService {
   getProductionReceipts(filters: ProductionReceiptFilters = {}): Observable<ProductionReceiptListResponse> {
     let params = new HttpParams();
 
-    // Adicionar filtros como parâmetros
+
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         params = params.set(key, value.toString());
@@ -71,9 +68,6 @@ export class ProductionReceiptService {
     return this.http.delete<ProductionReceiptResponse>(`${this.API_URL}/${id}`);
   }
 
-  // ============================================
-  // MÉTODOS ESPECÍFICOS DE PAGAMENTO
-  // ============================================
 
   /**
    * 💳 PROCESSAR PAGAMENTO - Processa pagamento do recebimento
@@ -112,9 +106,6 @@ export class ProductionReceiptService {
     return this.http.post<ProductionReceiptResponse>(`${this.API_URL}/${id}/activate`, {});
   }
 
-  // ============================================
-  // MÉTODOS DE BUSCA ESPECÍFICA
-  // ============================================
 
   /**
    * 🔍 BUSCAR POR ORDEM DE PRODUÇÃO - Busca recebimento de uma ordem específica
@@ -178,9 +169,6 @@ export class ProductionReceiptService {
     return this.getProductionReceipts(searchFilters);
   }
 
-  // ============================================
-  // MÉTODOS DE ESTATÍSTICAS E RELATÓRIOS
-  // ============================================
 
   /**
    * 📊 ESTATÍSTICAS - Busca estatísticas dos recebimentos
@@ -221,9 +209,6 @@ export class ProductionReceiptService {
     return this.http.get<any>(`${this.API_URL}/stats/overdue`);
   }
 
-  // ============================================
-  // MÉTODOS DE EXPORTAÇÃO
-  // ============================================
 
   /**
    * 📄 EXPORTAR CSV - Exporta recebimentos em CSV
@@ -279,9 +264,6 @@ export class ProductionReceiptService {
     });
   }
 
-  // ============================================
-  // MÉTODOS DE VALIDAÇÃO E UTILITÁRIOS
-  // ============================================
 
   /**
    * ✅ VALIDAR RECEBIMENTO - Verifica se recebimento pode ser criado
@@ -315,9 +297,6 @@ export class ProductionReceiptService {
     return this.http.get<any>(`${this.API_URL}/calculate-values`, { params });
   }
 
-  // ============================================
-  // MÉTODOS DE WORKFLOW/FLUXO
-  // ============================================
 
   /**
    * 📋 CRIAR A PARTIR DE ORDEM - Cria recebimento automaticamente de uma ordem

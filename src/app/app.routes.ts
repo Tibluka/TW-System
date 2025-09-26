@@ -11,14 +11,14 @@ import { ProductionSheetsComponent } from './pages/authorized/production-sheets/
 import { authenticationGuard } from './shared/services/guards/authentication.guard';
 
 export const routes: Routes = [
-    // Rota raiz redireciona para login
+
     {
         path: '',
         pathMatch: 'full',
         redirectTo: 'login'
     },
 
-    // Rotas não autorizadas (sem menu)
+
     {
         path: 'login',
         component: LoginComponent
@@ -28,7 +28,7 @@ export const routes: Routes = [
         component: SignupComponent
     },
 
-    // Rotas autorizadas (com menu através do layout)
+
     {
         path: 'authorized',
         component: AuthorizedComponent,

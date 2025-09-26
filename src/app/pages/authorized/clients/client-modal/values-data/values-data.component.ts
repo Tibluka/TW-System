@@ -20,13 +20,13 @@ export class ValuesDataComponent extends FormValidator implements OnInit {
     }
   }
 
-  // Verifica se campo é inválido e foi tocado
+
   isFieldInvalid(fieldName: string): boolean {
     const field = this.parentForm.get(fieldName);
     return !!(field && field.invalid && field.touched);
   }
 
-  // Obtém mensagem de erro personalizada
+
   getErrorMessage(fieldName: string): string {
     const field = this.parentForm.get(fieldName);
 
@@ -52,7 +52,7 @@ export class ValuesDataComponent extends FormValidator implements OnInit {
     return '';
   }
 
-  // Formatação de moeda no blur
+
   onCurrencyBlur(fieldName: string): void {
     const field = this.parentForm.get(fieldName);
     if (field && field.value) {
@@ -63,7 +63,7 @@ export class ValuesDataComponent extends FormValidator implements OnInit {
     }
   }
 
-  // Método para calcular diferença percentual (se útil)
+
   getPercentageDifference(): string {
     const meterValue = parseFloat(this.parentForm.get('valuePerMeter')?.value || '0');
     const pieceValue = parseFloat(this.parentForm.get('valuePerPiece')?.value || '0');

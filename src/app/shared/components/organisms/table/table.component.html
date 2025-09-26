@@ -1,7 +1,7 @@
 <table class="ds-table">
-    <!-- Conteúdo dinâmico projetado -->
+
     <ng-content *ngIf="!loadingData"></ng-content>
-    <!-- Estado vazio (se necessário) -->
+
     <tbody *ngIf="totalPages === 0">
         <tr class="empty-state">
             <td colspan="100%">
@@ -15,7 +15,7 @@
         <ds-spinner size="48px" variant="outline"></ds-spinner>
     </div>
 </div>
-<!-- Paginação (se habilitada) -->
+
 <div *ngIf="showPagination && totalPages && totalPages > 1" class="pagination">
     <ds-button label="Anterior" icon="fa-solid fa-arrow-left" [disabled]="currentPage === 1"
         (onClickEmitter)="previousPage()" variant="ghost" />

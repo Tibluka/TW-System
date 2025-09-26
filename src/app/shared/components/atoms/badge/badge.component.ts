@@ -16,13 +16,13 @@ export class BadgeComponent {
   @Input() status: string = ''; // Status para mapeamento automático
   @Input() entityType: 'development' | 'production-order' | 'production-sheet' | 'production-receipt' | undefined = undefined;
 
-  // Computed property para determinar a cor final
+
   computedColor = computed(() => {
-    // Se status foi fornecido, usa mapeamento automático
+
     if (this.status) {
       return getStatusColor(this.status, this.entityType);
     }
-    // Caso contrário, usa a cor fornecida diretamente
+
     return this.color;
   });
 }

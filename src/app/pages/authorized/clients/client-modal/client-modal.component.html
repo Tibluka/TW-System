@@ -1,21 +1,21 @@
-<!-- client-modal.component.html -->
+
 <div class="client-modal-container">
 
-    <!-- Loading State -->
+
     <div *ngIf="isLoading" class="loading-overlay">
         <div class="loading-content">
             <ds-spinner size="48px" variant="outline"></ds-spinner>
             <p class="body label mt-16">Carregando dados do cliente...</p>
         </div>
     </div>
-    <!-- Conteúdo do Modal -->
+
     <div class="modal-content-wrapper" [class.is-loading]="isLoading">
 
-        <!-- Tabs do formulário -->
+
         <ds-tabs [tabs]="advancedTabs" [activeTabId]="currentTab" size="large" (tabChange)="handleTabChange($event)"
             (tabClick)="handleTabClick($event)">
 
-            <!-- Conteúdo das tabs usando ng-container com ngSwitch -->
+
             <ng-container [ngSwitch]="currentTab">
 
                 <div *ngSwitchCase="'company'">
@@ -38,19 +38,19 @@
 
         </ds-tabs>
 
-        <!-- Botões alinhados à direita -->
+
         <div class="footer-actions">
 
-            <!-- Botão Cancelar (sempre visível) -->
+
             <ds-button label="Cancelar" variant="ghost" [disabled]="isSaving" (onClickEmitter)="onCancelClick()">
             </ds-button>
 
-            <!-- Botão Voltar (visível quando não é o primeiro passo) -->
+
             <ds-button *ngIf="showBackButton" label="Voltar" variant="outline" icon="fa-solid fa-arrow-left"
                 [disabled]="isSaving" (onClickEmitter)="onBackClick()">
             </ds-button>
 
-            <!-- Botão Próximo/Salvar -->
+
             <ds-button [label]="isSaving ? 'Salvando...' : nextButtonLabel" [icon]="isSaving ? '' : nextButtonIcon"
                 variant="fill" [isLoading]="isSaving" [disabled]="isNextButtonDisabled"
                 (onClickEmitter)="onNextClick()">

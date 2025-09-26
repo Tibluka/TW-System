@@ -1,16 +1,16 @@
 <div class="production-receipts-container">
-    <!-- ✨ Usando variáveis do sistema: mb-48 ao invés de margin-bottom: 48px -->
+
     <h1 class="title-semibold primary-dark mb-48">Recibos de Produção</h1>
 
-    <!-- FILTROS E BUSCA -->
+
     <div class="search-input">
-        <!-- Campo de Busca -->
-        <!-- Cliente -->
+
+
         <div class="w-100">
             <ds-select label="Cliente" placeholder="Selecione o cliente" [(ngModel)]="currentFilters.clientId"
                 [fullWidth]="true" [options]="clientOptions" (ngModelChange)="onClientChange()" />
         </div>
-        <!-- Campo de Busca -->
+
         <div class="w-100">
             <ds-input label="Buscar recibo" placeholder="Digite referência interna, cliente, observações..."
                 icon="fa-solid fa-magnifying-glass" iconPosition="left" [(ngModel)]="currentFilters.search"
@@ -18,34 +18,34 @@
             </ds-input>
         </div>
 
-        <!-- Filtro de Data Inicial -->
+
         <div class="w-100">
             <ds-input label="Data inicial" type="date" [(ngModel)]="currentFilters.createdFrom"
                 (ngModelChange)="onDateFilterChange()" width="100%">
             </ds-input>
         </div>
 
-        <!-- Filtro de Data Final -->
+
         <div class="w-100">
             <ds-input label="Data final" type="date" [(ngModel)]="currentFilters.createdTo"
                 (ngModelChange)="onDateFilterChange()" width="100%">
             </ds-input>
         </div>
 
-        <!-- Filtro por Status -->
+
         <div class="w-100">
             <ds-select label="Filtrar por Status" [options]="statusOptions" [(ngModel)]="currentFilters.paymentStatus"
                 (ngModelChange)="onStatusFilterChange()" width="100%">
             </ds-select>
         </div>
 
-        <!-- Botão de Novo Recebimento -->
+
         <ds-button label="Novo Recibo" variant="fill" icon="fa-solid fa-plus"
             (onClickEmitter)="createProductionReceipt()">
         </ds-button>
     </div>
 
-    <!-- TABELA DE RESULTADOS -->
+
     <div class="results mt-32">
         <ds-list-view [items]="productionReceipts" [config]="listViewConfig" [loading]="loading"
             emptyMessage="Nenhum recibo encontrado">
@@ -55,7 +55,7 @@
                     [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)"
                     [loadingData]="loading">
 
-                    <!-- Cabeçalho da tabela -->
+
                     <ds-table-row [isHeader]="true">
                         <ds-table-cell [isHeader]="true" align="left">Ref. Interna</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="left">Ref. do Cliente</ds-table-cell>
@@ -67,11 +67,11 @@
                         <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
                     </ds-table-row>
 
-                    <!-- DADOS DOS RECEBIMENTOS -->
+
                     <ds-table-row *ngFor="let productionReceipt of productionReceipts" [clickable]="true"
                         [data]="productionReceipt" (rowClick)="editProductionReceipt(productionReceipt)">
 
-                        <!-- Referência Interna -->
+
                         <ds-table-cell align="left">
                             <div class="reference-cell">
                                 <span class="body primary-dark">
@@ -84,14 +84,14 @@
                             </div>
                         </ds-table-cell>
 
-                        <!-- Referência do Cliente -->
+
                         <ds-table-cell align="left">
                             <span class="body primary-dark">
                                 {{ productionReceipt.productionOrder?.development?.clientReference}}
                             </span>
                         </ds-table-cell>
 
-                        <!-- Cliente -->
+
                         <ds-table-cell align="left">
                             <div class="client-cell" *ngIf="productionReceipt.productionOrder?.development?.client">
                                 <div class="body primary-dark">
@@ -108,13 +108,12 @@
                         </ds-table-cell>
 
 
-                        <!-- Status -->
                         <ds-table-cell align="center">
                             <ds-badge [text]="getReceiptStatusLabel(productionReceipt.paymentStatus)"
                                 [status]="productionReceipt.paymentStatus" entityType="production-receipt" />
                         </ds-table-cell>
 
-                        <!-- Data de Recebimento -->
+
                         <ds-table-cell align="center">
                             <div class="date-cell">
                                 <span class="body primary-dark">
@@ -123,7 +122,7 @@
                             </div>
                         </ds-table-cell>
 
-                        <!-- Quantidade -->
+
                         <ds-table-cell align="center">
                             <div class="quantity-cell">
                                 <span class="body primary-dark">
@@ -135,7 +134,7 @@
                             </div>
                         </ds-table-cell>
 
-                        <!-- Valor Total -->
+
                         <ds-table-cell align="right">
                             <div class="value-cell">
                                 <span class="body primary-dark">
@@ -149,7 +148,7 @@
                             </div>
                         </ds-table-cell>
 
-                        <!-- Ações -->
+
                         <ds-table-cell align="center">
                             <ds-action-menu [items]="getActionMenuItems(productionReceipt)"
                                 (itemSelected)="onActionMenuSelect(productionReceipt, $event)">
@@ -196,7 +195,7 @@
         </ds-list-view>
     </div>
 
-    <!-- Modal de recebimento -->
+
     <ds-modal modalId="production-receipt-modal" *ngIf="isModalOpen" (modalClosed)="onModalClosed($event)">
         <app-production-receipt-modal></app-production-receipt-modal>
     </ds-modal>
@@ -213,7 +212,7 @@
 
 </div>
 
-<!-- Modal geral para confirmações -->
+
 <ds-modal modalId="general-modal">
     <app-general-modal-content></app-general-modal-content>
 </ds-modal>

@@ -1,8 +1,8 @@
 <div class="developments-container">
-    <!-- ✨ Usando variáveis do sistema: mb-48 ao invés de margin-bottom: 48px -->
+
     <h1 class="title-semibold primary-dark mb-48">Desenvolvimentos</h1>
 
-    <!-- Barra de busca com espaçamento usando variáveis -->
+
     <div class="search-input">
         <div class="w-100">
             <ds-input [fullWidth]="true" label="Buscar" placeholder="Digite o nome do desenvolvimento, cliente, etc."
@@ -26,7 +26,7 @@
                     [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)"
                     [loadingData]="shouldShowSpinner">
 
-                    <!-- Cabeçalho da tabela -->
+
                     <ds-table-row [isHeader]="true">
                         <ds-table-cell [isHeader]="true" align="left">Imagem</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="left">Referência Interna</ds-table-cell>
@@ -37,11 +37,11 @@
                         <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
                     </ds-table-row>
 
-                    <!-- ✨ DADOS DOS DESENVOLVIMENTOS -->
+
                     <ds-table-row *ngFor="let development of developments" [clickable]="true" [data]="development"
                         (rowClick)="onDevelopmentClick(development)">
 
-                        <!-- Imagem -->
+
                         <ds-table-cell align="left">
                             <div class="image-cell">
                                 <img *ngIf="development.pieceImage?.url; else noImage"
@@ -55,19 +55,19 @@
                             </div>
                         </ds-table-cell>
 
-                        <!-- Referência Interna -->
+
                         <ds-table-cell align="left">
                             <span class="body secondary font-weight-medium">{{ development.internalReference }}</span>
                             <ds-icon (click)="copy($event, development.internalReference)" class="ml-4"
                                 cursorType="pointer" icon="fa-regular fa-clipboard" fontSize="16px" />
                         </ds-table-cell>
 
-                        <!-- Referência Cliente -->
+
                         <ds-table-cell align="left">
                             <span class="body secondary">{{ development.clientReference || '-' }}</span>
                         </ds-table-cell>
 
-                        <!-- Cliente -->
+
                         <ds-table-cell align="left">
                             <div class="client-info">
                                 <span class="body secondary">
@@ -79,7 +79,7 @@
                             </div>
                         </ds-table-cell>
 
-                        <!-- Tipo Produção -->
+
                         <ds-table-cell align="left">
                             <div class="production-types">
                                 <span class="body secondary">
@@ -88,13 +88,13 @@
                             </div>
                         </ds-table-cell>
 
-                        <!-- Status -->
+
                         <ds-table-cell align="center">
                             <ds-badge [text]="getStatusLabel(development.status)" [status]="development.status"
                                 entityType="development" />
                         </ds-table-cell>
 
-                        <!-- Ações -->
+
                         <ds-table-cell align="center">
                             <ds-action-menu [items]="actionMenuItems"
                                 (itemSelected)="onActionMenuSelect(development, $event)">
@@ -143,12 +143,11 @@
 </div>
 
 
-<!-- Modal de desenvolvimento -->
 <ds-modal modalId="development-modal" *ngIf="isModalOpen" (modalClosed)="onModalClosed($event)">
     <app-development-modal></app-development-modal>
 </ds-modal>
 
-<!-- Componente de atualização de status -->
+
 <ds-status-updater *ngIf="selectedDevelopmentForStatusUpdate" #statusUpdaterRef entityType="development"
     [entityId]="selectedDevelopmentForStatusUpdate._id!" [currentStatus]="selectedDevelopmentForStatusUpdate.status"
     [availableStatuses]="developmentStatusOptions"
@@ -157,7 +156,7 @@
     (statusUpdateFailed)="onStatusUpdateFailed($event)">
 </ds-status-updater>
 
-<!-- Modal geral para confirmações -->
+
 <ds-modal modalId="general-modal">
     <app-general-modal-content></app-general-modal-content>
 </ds-modal>

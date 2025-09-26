@@ -15,7 +15,7 @@ import { SpinnerComponent } from "../../atoms/spinner/spinner.component";
   styleUrl: './table.component.scss'
 })
 export class TableComponent implements AfterContentInit {
-  // Inputs opcionais para modo compatível
+
   @Input() showPagination: boolean = false;
   @Input() pageSize?: number = 10;
   @Input() currentPage: number = 1;
@@ -23,10 +23,10 @@ export class TableComponent implements AfterContentInit {
   @Input() emptyMessage: string = 'Nenhum dado encontrado';
   @Input() loadingData: boolean = false;
 
-  // Outputs
+
   @Output() pageChanged = new EventEmitter<number>();
 
-  // ContentChildren para detectar rows
+
   @ContentChildren(TableRowComponent) rows!: QueryList<TableRowComponent>;
 
 
@@ -36,9 +36,8 @@ export class TableComponent implements AfterContentInit {
 
   private updatePagination() {
     if (this.showPagination && this.rows && this.pageSize) {
-      // Filtra apenas as rows que não são header
-      //const dataRows = this.rows.filter(row => !row.isHeader);
-      //this.totalPages = Math.ceil(dataRows.length / this.pageSize);
+
+
     }
   }
 

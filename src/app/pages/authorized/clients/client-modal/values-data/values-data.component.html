@@ -1,7 +1,7 @@
-<!-- values-data.component.html - TEMPLATE CORRIGIDO SEM MÁSCARA -->
+
 <form [formGroup]="parentForm" class="values-form">
 
-    <!-- Valor por Metro - 50% da largura -->
+
     <div class="value-per-meter-field">
         <ds-input label="Valor por Metro (R$)" placeholder="0.00" formControlName="valuePerMeter" type="number"
             step="0.01" min="0" [fullWidth]="true" [required]="true" [invalid]="isFieldInvalid('valuePerMeter')"
@@ -10,7 +10,7 @@
         </ds-input>
     </div>
 
-    <!-- Valor por Peça - 50% da largura -->
+
     <div class="value-per-piece-field">
         <ds-input label="Valor por Peça (R$)" placeholder="0.00" formControlName="valuePerPiece" type="number"
             step="0.01" min="0" [fullWidth]="true" [required]="true" [invalid]="isFieldInvalid('valuePerPiece')"

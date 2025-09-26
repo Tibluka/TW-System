@@ -1,23 +1,21 @@
-<!-- pages/authorized/production-orders/production-order-modal/production-order-modal.component.html -->
+
 
 <div class="production-order-modal-container">
 
-    <!-- 📊 LOADING INICIAL -->
+
     <div *ngIf="isLoading" class="loading-container">
         <ds-spinner size="32px"></ds-spinner>
         <p class="body label mt-16">Carregando dados...</p>
     </div>
 
-    <!-- 📝 FORMULÁRIO PRINCIPAL -->
+
     <div *ngIf="!isLoading" class="modal-content-wrapper">
         <form [formGroup]="productionOrderForm" (ngSubmit)="onSave()" class="production-order-form">
 
-            <!-- ============================================ -->
-            <!-- SEÇÃO: BUSCA DO DESENVOLVIMENTO -->
-            <!-- ============================================ -->
+
             <div class="form-section mb-32">
 
-                <!-- 🔍 REFERÊNCIA INTERNA -->
+
                 <div class="form-field">
                     <ds-input icon="fa-solid fa-search" iconPosition="left"
                         label="Referência Interna do Desenvolvimento" placeholder="Ex: 25ABC0001"
@@ -27,21 +25,21 @@
                     </ds-input>
                 </div>
 
-                <!-- 🔍 ESTADO DA BUSCA -->
+
                 <div class="search-status">
 
-                    <!-- Loading da busca -->
+
                     <div class="text-center p-48" *ngIf="searchingDevelopment">
                         <ds-spinner size="48px" variant="outline"></ds-spinner>
                     </div>
 
-                    <!-- Desenvolvimento não encontrado -->
+
                     <div class="search-not-found" *ngIf="developmentNotFound && !searchingDevelopment">
                         <ds-icon icon="fa-solid fa-triangle-exclamation" color="tertiary" fontSize="16px"></ds-icon>
                         <span class="body tertiary ml-8">Desenvolvimento não encontrado</span>
                     </div>
 
-                    <!-- Desenvolvimento encontrado -->
+
                     <div class="development-found" *ngIf="developmentFound && !searchingDevelopment">
                         <p class="input-label">Resumo do desenvolvimento</p>
                         <div class="development-card">
@@ -62,15 +60,13 @@
                 </div>
             </div>
 
-            <!-- ============================================ -->
-            <!-- SEÇÃO: INFORMAÇÕES DA PRODUÇÃO -->
-            <!-- ============================================ -->
+
             <div class="form-section mb-32" *ngIf="developmentFound || isEditMode">
-                <!-- Linha: Tipo de Produção, Quantidade, Tipo de Tecido -->
+
                 <div class="d-grid columns-3 mb-24 gap-24">
                     <div class="form-field" [formGroupName]="'productionType'"
                         *ngIf="developmentFound?.productionType?.type === 'rotary'">
-                        <!-- 📏 QUANTIDADE DE METROS -->
+
                         <ds-input label="Quantidade (metros)" placeholder="Ex: 100.5" type="number" step="0.1" min="0.1"
                             formControlName="meters" [invalid]="isFieldInvalid('productionType.meters')"
                             [errorMessage]="getFieldErrorMessage('productionType.meters')" [fullWidth]="true"
@@ -78,7 +74,7 @@
                         </ds-input>
                     </div>
 
-                    <!-- 🧵 TIPO DE TECIDO -->
+
                     <div class="form-field">
                         <ds-input label="Tipo de Tecido" placeholder="Ex: Algodão, Poliéster..."
                             formControlName="fabricType" [invalid]="isFieldInvalid('fabricType')"
@@ -87,12 +83,12 @@
                     </div>
                 </div>
 
-                <!-- Tabela para tipo de produção localizada -->
+
                 <div *ngIf="developmentFound?.productionType?.type === 'localized'">
                     <div class="table-container"
                         *ngIf="developmentFound?.productionType?.additionalInfo?.sizes && developmentFound?.productionType?.additionalInfo?.sizes!.length > 0; else noSizes">
                         <table class="production-table">
-                            <!-- Cabeçalho com os tamanhos -->
+
                             <thead>
                                 <tr>
                                     <th class="d-flex align-items-center gap-8 justify-content-center">
@@ -107,7 +103,7 @@
                                 </tr>
                             </thead>
 
-                            <!-- Corpo com os valores -->
+
                             <tbody>
                                 <tr>
                                     <td>
@@ -129,7 +125,7 @@
                         </table>
                     </div>
 
-                    <!-- Estado vazio -->
+
                     <ng-template #noSizes>
                         <div class="empty-state">
                             <i class="fa-solid fa-table"></i>
@@ -140,12 +136,10 @@
 
             </div>
 
-            <!-- ============================================ -->
-            <!-- SEÇÃO: OBSERVAÇÕES -->
-            <!-- ============================================ -->
+
             <div class="form-section mb-32" *ngIf="developmentFound || isEditMode">
                 <div class="form-row mb-24">
-                    <!-- 📝 OBSERVAÇÕES -->
+
                     <div class="form-field full-width">
                         <ds-textarea label="Observações"
                             placeholder="Adicione observações sobre a produção, instruções especiais, etc..."
@@ -157,16 +151,14 @@
 
         </form>
 
-        <!-- ============================================ -->
-        <!-- AÇÕES DO FORMULÁRIO (Fixas no rodapé) -->
-        <!-- ============================================ -->
+
         <div class="form-actions" *ngIf="developmentFound || isEditMode">
-            <!-- ❌ BOTÃO CANCELAR -->
+
             <ds-button label="Cancelar" variant="ghost" type="button" (onClickEmitter)="onCancel()"
                 [disabled]="isSaving">
             </ds-button>
 
-            <!-- 💾 BOTÃO SALVAR -->
+
             <ds-button [label]="saveButtonLabel" variant="fill" type="submit" icon="fa-solid fa-floppy-disk"
                 [isLoading]="isSaving" [disabled]="isSaving" (onClickEmitter)="onSave()">
             </ds-button>

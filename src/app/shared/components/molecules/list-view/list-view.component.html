@@ -1,4 +1,4 @@
-<!-- Toggle de Visualização -->
+
 <div class="view-toggle-container" *ngIf="config.showToggle !== false">
     <div class="view-toggle">
         <button type="button" class="toggle-btn" [class.active]="currentViewMode === 'table'"
@@ -13,14 +13,14 @@
     </div>
 </div>
 
-<!-- Visualização em Tabela -->
+
 <div *ngIf="currentViewMode === 'table'" class="table-view">
     <ng-content select="[slot=table]"></ng-content>
 </div>
 
-<!-- Visualização em Cards -->
+
 <div *ngIf="currentViewMode === 'cards'" class="cards-view">
-    <!-- Loading State -->
+
     <div *ngIf="loading" class="loading-container">
         <div class="loading-content">
             <ds-icon icon="fa-solid fa-spinner" fontSize="32px" color="primary" class="spinning"></ds-icon>
@@ -28,7 +28,7 @@
         </div>
     </div>
 
-    <!-- Empty State -->
+
     <div *ngIf="isEmpty" class="empty-state">
         <div class="empty-content">
             <ds-icon icon="fa-solid fa-inbox" fontSize="48px" color="label"></ds-icon>
@@ -37,20 +37,20 @@
         </div>
     </div>
 
-    <!-- Cards Grid -->
+
     <div *ngIf="hasItems && !loading" class="cards-grid" [style]="getGridStyles()">
-        <!-- Cards usando template customizável -->
+
         <div *ngFor="let item of items; trackBy: trackByFn;let i = index" class="card-wrapper"
             [style.animation-delay]="getAnimationDelay(i)">
 
             <ds-card [clickable]="true" [elevated]="true" size="md" class="list-item-card" padding="24px"
                 (click)="onItemClick(item)">
 
-                <!-- Conteúdo do card usando template projetado -->
+
                 <ng-container *ngTemplateOutlet="cardTemplate; context: { $implicit: item, index: i }">
                 </ng-container>
 
-                <!-- Footer padrão com ações -->
+
                 <div slot="footer" class="card-footer" *ngIf="showActions">
                     <ng-container *ngTemplateOutlet="actionsTemplate; context: { $implicit: item, index: i }">
                     </ng-container>
@@ -59,7 +59,7 @@
         </div>
     </div>
 
-    <!-- Paginação -->
+
     <div class="pagination-container mt-32" *ngIf="showPagination && pagination && hasItems">
         <ng-content select="[slot=pagination]"></ng-content>
     </div>

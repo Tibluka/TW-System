@@ -1,8 +1,8 @@
 <div class="production-sheets-container">
-    <!-- ✨ Usando variáveis do sistema: mb-48 ao invés de margin-bottom: 48px -->
+
     <h1 class="title-semibold primary-dark mb-48">Fichas de produção</h1>
 
-    <!-- FILTROS E BUSCA -->
+
     <div class="search-input">
         <div class="w-100">
             <ds-input label="Buscar ficha de produção" placeholder="Digite referência interna, observações..."
@@ -28,7 +28,7 @@
         </ds-button>
     </div>
 
-    <!-- TABELA DE RESULTADOS -->
+
     <div class="results mt-32">
         <ds-list-view [items]="productionSheets" [config]="listViewConfig" [loading]="loading"
             emptyMessage="Nenhuma ficha de produção encontrada">
@@ -38,7 +38,7 @@
                     [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)"
                     [loadingData]="loading">
 
-                    <!-- Cabeçalho da tabela -->
+
                     <ds-table-row [isHeader]="true">
                         <ds-table-cell [isHeader]="true" align="left">Imagem</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="left">Ref. Interna</ds-table-cell>
@@ -51,11 +51,11 @@
                         <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
                     </ds-table-row>
 
-                    <!-- DADOS DAS FICHAS DE PRODUÇÃO -->
+
                     <ds-table-row *ngFor="let productionSheet of productionSheets" [clickable]="true"
                         [data]="productionSheet" (rowClick)="onProductionSheetClick(productionSheet)">
 
-                        <!-- Imagem -->
+
                         <ds-table-cell align="left">
                             <div class="image-cell">
                                 <img *ngIf="productionSheet.productionOrder?.development?.pieceImage?.url"
@@ -69,7 +69,7 @@
                             </div>
                         </ds-table-cell>
 
-                        <!-- Referência Interna -->
+
                         <ds-table-cell align="left">
                             <span class="body primary-dark font-weight-medium">{{
                                 productionSheet.internalReference }}</span>
@@ -78,14 +78,14 @@
 
                         </ds-table-cell>
 
-                        <!-- Referência do Cliente -->
+
                         <ds-table-cell align="left">
                             <span class="body primary-dark">
                                 {{ productionSheet.productionOrder?.development?.clientReference || '-' }}
                             </span>
                         </ds-table-cell>
 
-                        <!-- Cliente -->
+
                         <ds-table-cell align="left">
                             <div class="client-cell" *ngIf="productionSheet.productionOrder?.development?.client">
                                 <div class="body primary-dark">
@@ -101,7 +101,7 @@
                             </span>
                         </ds-table-cell>
 
-                        <!-- Máquina -->
+
                         <ds-table-cell align="center">
                             <div class="machine-cell">
                                 <ds-icon icon="fa-solid fa-cogs" color="primary" fontSize="16px"></ds-icon>
@@ -111,27 +111,27 @@
                             </div>
                         </ds-table-cell>
 
-                        <!-- Data de Entrada -->
+
                         <ds-table-cell align="left">
                             <span class="body primary-dark">
                                 {{ formatDate(productionSheet.entryDate) }}
                             </span>
                         </ds-table-cell>
 
-                        <!-- Data de Saída Prevista -->
+
                         <ds-table-cell align="left">
                             <span class="body primary-dark">
                                 {{ formatDate(productionSheet.expectedExitDate) }}
                             </span>
                         </ds-table-cell>
 
-                        <!-- Estágio -->
+
                         <ds-table-cell align="center">
                             <ds-badge [text]="getStageLabel(productionSheet.stage)" [status]="productionSheet.stage"
                                 entityType="production-sheet" />
                         </ds-table-cell>
 
-                        <!-- Ações -->
+
                         <ds-table-cell align="center">
                             <ds-action-menu [items]="getActionMenuItems(productionSheet)"
                                 (itemSelected)="onActionMenuSelect(productionSheet, $event)">
@@ -183,12 +183,11 @@
     </div>
 
 
-    <!-- Modal de desenvolvimento -->
     <ds-modal modalId="production-sheet-modal" *ngIf="isModalOpen" (modalClosed)="onModalClosed($event)">
         <app-production-sheet-modal></app-production-sheet-modal>
     </ds-modal>
 
-    <!-- Componente de atualização de estágio -->
+
     <ds-status-updater *ngIf="selectedProductionSheetForStatusUpdate" #statusUpdaterRef entityType="production-sheet"
         [entityId]="selectedProductionSheetForStatusUpdate._id!"
         [currentStatus]="selectedProductionSheetForStatusUpdate.stage" [availableStatuses]="productionSheetStageOptions"
@@ -197,7 +196,7 @@
         (statusUpdateFailed)="onStatusUpdateFailed($event)">
     </ds-status-updater>
 
-    <!-- Modal geral para confirmações -->
+
     <ds-modal modalId="general-modal">
         <app-general-modal-content></app-general-modal-content>
     </ds-modal>

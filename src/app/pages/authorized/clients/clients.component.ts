@@ -4,7 +4,7 @@ import { FormsModule, NgModel, ReactiveFormsModule } from "@angular/forms";
 import { MaskPipe } from 'mask-directive';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
-// Componentes
+
 import { Client, ClientFilters, ClientListResponse, PaginationInfo } from '../../../models/clients/clients';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { IconComponent } from '../../../shared/components/atoms/icon/icon.component';
@@ -47,23 +47,23 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
   private clientService = inject(ClientService);
   private modalService = inject(ModalService);
 
-  // Máscaras usando variáveis do sistema
+
   cnpjMask: string = '00.000.000/0000-00';
   phoneMask: string = '(00) 0000-0000||(00) 00000-0000';
 
-  // Lista de clientes e paginação
+
   clients: Client[] = [];
   pagination: PaginationInfo | null = null;
   loading = false;
 
-  // Configuração do list-view
+
   listViewConfig = {
     itemsPerRow: 3,
     showToggle: true,
     defaultView: 'table' as 'table' | 'cards'
   };
 
-  // Métodos para o template de card
+
   formatCurrency(value: number): string {
     if (!value) return 'R$ 0,00';
     return new Intl.NumberFormat('pt-BR', {
@@ -122,11 +122,11 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
   }
   shouldShowTable = false;
 
-  // Estados para UI
+
   errorMessage: string = '';
   showError = false;
 
-  // Filtros atuais
+
   currentFilters: ClientFilters = {
     search: '',
     page: 1,
@@ -134,23 +134,19 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
     active: true
   };
 
-  // Propriedade para armazenar ID do cliente selecionado para edição
+
   selectedClientId?: string;
 
-  // RxJS para cleanup e debounce
+
   private destroy$ = new Subject<void>();
   private searchSubject = new Subject<string>();
 
-  // ============================================
-  // CONSTRUCTOR E LIFECYCLE
-  // ============================================
 
-  // No constructor, adicione um effect para monitorar o modal
   constructor() {
     super();
     this.setupSearchDebounce();
 
-    // Effect para monitorar quando o modal está aberto
+
     effect(() => {
       const modalInstance = this.modalService.modals().find(m => m.id === 'client-modal');
       this.isModalOpen = modalInstance ? modalInstance.isOpen : false;
@@ -167,9 +163,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
     this.destroy$.complete();
   }
 
-  // ============================================
-  // SETUP DE DEBOUNCE PARA BUSCA
-  // ============================================
 
   private setupSearchDebounce(): void {
     this.searchSubject.pipe(
@@ -181,9 +174,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
     });
   }
 
-  // ============================================
-  // MÉTODOS PRINCIPAIS - CRUD
-  // ============================================
 
   /**
    * 📋 LISTAR - Carrega lista de clientes da API
@@ -227,7 +217,7 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
    * ➕ CRIAR - Abre modal para criar novo cliente
    */
   createClient(): void {
-    // Limpar ID selecionado para modo criação
+
     this.selectedClientId = undefined;
 
     this.modalService.open({
@@ -247,7 +237,7 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
    * ✏️ EDITAR - Abre modal para editar cliente existente
    */
   editClient(client: Client): void {
-    // Definir o client ID para edição
+
     this.selectedClientId = client._id;
 
     this.modalService.open({
@@ -271,9 +261,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
     this.editClient(client);
   }
 
-  // ============================================
-  // MÉTODOS DE BUSCA E FILTROS
-  // ============================================
 
   /**
    * 🔍 BUSCA - Dispara busca quando usuário digita
@@ -298,9 +285,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
     this.loadClients(searchFilters);
   }
 
-  // ============================================
-  // MÉTODOS DE PAGINAÇÃO
-  // ============================================
 
   /**
    * 📄 PAGINAÇÃO - Navegar entre páginas
@@ -312,9 +296,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
     }
   }
 
-  // ============================================
-  // CALLBACKS DO MODAL
-  // ============================================
 
   /**
    * 🏁 MODAL RESULT - Processa resultado do modal
@@ -324,15 +305,15 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
       if (result.action === 'created') {
         console.log('Cliente criado com sucesso:', result.data?.companyName);
         this.loadClients(); // Recarregar lista
-        // TODO: Exibir toast de sucesso
+
       } else if (result.action === 'updated') {
         console.log('Cliente atualizado com sucesso:', result.data?.companyName);
         this.loadClients(); // Recarregar lista
-        // TODO: Exibir toast de sucesso
+
       }
     }
 
-    // Sempre limpar o ID selecionado após fechar modal
+
     this.selectedClientId = undefined;
   }
 
@@ -344,9 +325,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
     this.handleModalResult(result);
   }
 
-  // ============================================
-  // MÉTODOS DE UI E ESTADOS
-  // ============================================
 
   /**
    * 🧹 CLEAR ERROR - Limpa mensagens de erro
@@ -363,15 +341,12 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
     this.errorMessage = message;
     this.showError = true;
 
-    // Auto-limpar erro após 5 segundos
+
     setTimeout(() => {
       this.clearError();
     }, 5000);
   }
 
-  // ============================================
-  // GETTERS PARA TEMPLATE
-  // ============================================
 
   /**
    * 📊 GET SHOULD SHOW SPINNER - Mostra spinner quando necessário

@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit, ViewChild, effect, inject } from '@angula
 import { FormsModule, NgModel } from "@angular/forms";
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 
-// Componentes
+
 import { Development, DevelopmentFilters, DevelopmentListResponse, DevelopmentStatus, PaginationInfo, ProductionTypeEnum } from '../../../models/developments/developments';
 import { ListViewConfig } from '../../../models/list-view/list-view';
 import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
@@ -58,16 +58,16 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
   private modalService = inject(ModalService);
   private listViewService = inject(ListViewService);
 
-  // Lista de desenvolvimentos e paginação
+
   developments: Development[] = [];
   pagination: PaginationInfo | null = null;
   loading = false;
 
-  // Estados para UI
+
   errorMessage: string = '';
   showError = false;
 
-  // Filtros atuais
+
   currentFilters: DevelopmentFilters = {
     search: undefined,
     status: undefined,
@@ -84,10 +84,10 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
     { value: 'CANCELED', label: 'Cancelado' }
   ];
 
-  // Propriedade para armazenar ID do desenvolvimento selecionado para edição
+
   selectedDevelopmentId?: string;
 
-  // Configuração do menu de ações
+
   actionMenuItems: ActionMenuItem[] = [
     {
       label: 'Alterar Status',
@@ -101,7 +101,7 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
     }
   ];
 
-  // ✨ CONFIGURAÇÃO DO LIST VIEW
+
   listViewConfig: ListViewConfig = {
     showToggle: true,
     defaultView: 'table',
@@ -115,7 +115,6 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
   currentViewMode: ViewMode = 'table';
 
 
-  // Configuração das opções de status para o status-updater
   developmentStatusOptions: StatusOption[] = [
     { value: 'CREATED', label: 'Criado', icon: 'fa-solid fa-plus', color: 'info' },
     { value: 'AWAITING_APPROVAL', label: 'Aguardando Aprovação', icon: 'fa-solid fa-clock', color: 'warning' },
@@ -123,19 +122,16 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
     { value: 'CANCELED', label: 'Cancelado', icon: 'fa-solid fa-times', color: 'error' }
   ];
 
-  // Propriedades para o status-updater
+
   selectedDevelopmentForStatusUpdate?: Development;
 
-  // Referência ao componente status-updater
+
   @ViewChild('statusUpdaterRef') statusUpdaterComponent?: StatusUpdaterComponent;
 
-  // Subject para debounce da busca
+
   private searchSubject = new Subject<DevelopmentFilters>();
   private destroy$ = new Subject<void>();
 
-  // ============================================
-  // COMPUTED PROPERTIES
-  // ============================================
 
   /**
    * 🔄 SPINNER - Determina se deve mostrar spinner
@@ -146,16 +142,13 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
 
   constructor() {
     super();
-    // Effect para monitorar quando o modal está aberto
+
     effect(() => {
       const modalInstance = this.modalService.modals().find(m => m.id === 'development-modal');
       this.isModalOpen = modalInstance ? modalInstance.isOpen : false;
     });
   }
 
-  // ============================================
-  // LIFECYCLE HOOKS
-  // ============================================
 
   ngOnInit(): void {
     this.setupSearchDebounce();
@@ -173,19 +166,11 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
     this.destroy$.complete();
   }
 
-  // ============================================
-  // SETUP METHODS
-  // ============================================
 
-  // ✨ HANDLER PARA MUDANÇA DE VIEW
   onViewModeChange(mode: ViewMode) {
     this.listViewService.setViewMode('developments', mode);
 
-    // Analytics opcional
-    // this.analytics.track('view_mode_changed', { 
-    //   entity: 'developments', 
-    //   mode 
-    // });
+
   }
 
   /**
@@ -202,9 +187,6 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
     });
   }
 
-  // ============================================
-  // MÉTODOS DE DADOS
-  // ============================================
 
   /**
    * 📋 CARREGAR - Busca desenvolvimentos do servidor
@@ -241,9 +223,6 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
     this.editDevelopment(development);
   }
 
-  // ============================================
-  // MÉTODOS DE BUSCA E FILTROS
-  // ============================================
 
   /**
    * 🔍 BUSCA - Dispara busca quando usuário digita
@@ -260,9 +239,6 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
     this.loadDevelopments();
   }
 
-  // ============================================
-  // HELPERS
-  // ============================================
 
   /**
    * 🏷️ STATUS LABEL - Retorna label do status
@@ -286,7 +262,7 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
    * 🟢 SUCESSO - Mostra mensagem de sucesso
    */
   private showSuccessMessage(message: string): void {
-    // Implementar toast/notificação de sucesso
+
     console.log('SUCCESS:', message);
   }
 
@@ -297,7 +273,7 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
     this.errorMessage = message;
     this.showError = true;
 
-    // Auto-hide após 5 segundos
+
     setTimeout(() => {
       this.showError = false;
     }, 5000);
@@ -310,13 +286,12 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
     this.handleModalResult(result);
   }
 
-  // Apenas o método editDevelopment corrigido para seguir a mesma lógica do clients.component.ts
 
   /**
    * ✏️ EDITAR - Abre modal para editar desenvolvimento existente
    */
   editDevelopment(development: Development): void {
-    // Definir o development ID para edição
+
     this.selectedDevelopmentId = development._id;
 
     this.modalService.open({
@@ -337,7 +312,7 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
    * ➕ CRIAR - Abre modal para criar novo desenvolvimento
    */
   createDevelopment(): void {
-    // Limpar ID selecionado para modo criação
+
     this.selectedDevelopmentId = undefined;
 
     this.modalService.open({
@@ -348,7 +323,7 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
       showCloseButton: true,
       closeOnBackdropClick: false,
       closeOnEscapeKey: true
-      // NÃO passar data para criação
+
     }).subscribe(result => {
       this.handleModalResult(result);
     });
@@ -362,15 +337,15 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
       if (result.action === 'created') {
         console.log('Desenvolvimento criado com sucesso:', result.data?.internalReference);
         this.loadDevelopments(); // Recarregar lista
-        // TODO: Exibir toast de sucesso
+
       } else if (result.action === 'updated') {
         console.log('Desenvolvimento atualizado com sucesso:', result.data?.internalReference);
         this.loadDevelopments(); // Recarregar lista
-        // TODO: Exibir toast de sucesso
+
       }
     }
 
-    // Sempre limpar o ID selecionado após fechar modal
+
     this.selectedDevelopmentId = undefined;
   }
 

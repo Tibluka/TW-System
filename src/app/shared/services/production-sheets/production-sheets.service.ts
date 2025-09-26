@@ -1,36 +1,33 @@
-// shared/services/production-sheets/production-sheets.service.ts
+
 
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
-// ============================================
-// INTERFACES BASEADAS NO SCHEMA REAL
-// ============================================
 
 export interface ProductionSheet {
   _id: string;
 
-  // REFERÊNCIA À ORDEM DE PRODUÇÃO
+
   productionOrderId: string;
   productionOrder?: any; // Populated automaticamente pelo backend
 
-  // DADOS COPIADOS
+
   internalReference?: string;
 
-  // DADOS OPERACIONAIS
+
   entryDate: Date | string;
   expectedExitDate: Date | string;
   machine: 1 | 2 | 3 | 4;
 
-  // ESTÁGIO DA PRODUÇÃO
+
   stage: ProductionSheetStage;
 
-  // OBSERVAÇÕES
+
   productionNotes?: string;
 
-  // METADADOS
+
   active?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
@@ -56,9 +53,6 @@ export interface ProductionSheetStatistics {
   };
 }
 
-// ============================================
-// INTERFACES DE FILTROS E REQUESTS
-// ============================================
 
 export interface ProductionSheetFilters {
   search?: string;
@@ -67,13 +61,13 @@ export interface ProductionSheetFilters {
   stage?: ProductionSheetStage;
   active?: boolean;
 
-  // Filtros por data
+
   entryDateFrom?: Date | string;
   entryDateTo?: Date | string;
   expectedExitDateFrom?: Date | string;
   expectedExitDateTo?: Date | string;
 
-  // Paginação
+
   page?: number;
   limit?: number;
   sortBy?: string;
@@ -96,9 +90,6 @@ export interface UpdateStageRequest {
   stage: ProductionSheetStage;
 }
 
-// ============================================
-// INTERFACES DE RESPONSE
-// ============================================
 
 export interface ProductionSheetListResponse {
   success: boolean;
@@ -127,9 +118,6 @@ export interface ProductionSheetStatsResponse {
   data: ProductionSheetStatistics;
 }
 
-// ============================================
-// SERVICE IMPLEMENTATION
-// ============================================
 
 @Injectable({
   providedIn: 'root'
@@ -139,9 +127,6 @@ export class ProductionSheetsService {
   private http = inject(HttpClient);
   private readonly API_URL = `${environment.apiUrl}/production-sheets`;
 
-  // ============================================
-  // MÉTODOS CRUD PRINCIPAIS
-  // ============================================
 
   /**
    * 📋 LISTAR - Busca fichas de produção com filtros e paginação
@@ -149,7 +134,7 @@ export class ProductionSheetsService {
   getProductionSheets(filters: ProductionSheetFilters = {}): Observable<ProductionSheetListResponse> {
     let params = new HttpParams();
 
-    // Adicionar filtros como parâmetros
+
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         params = params.set(key, value.toString());
@@ -208,9 +193,6 @@ export class ProductionSheetsService {
     return this.http.post<ProductionSheetResponse>(`${this.API_URL}/${id}/activate`, {});
   }
 
-  // ============================================
-  // MÉTODOS ESPECÍFICOS
-  // ============================================
 
   /**
    * 📊 ESTATÍSTICAS - Busca estatísticas das fichas de produção
@@ -233,9 +215,6 @@ export class ProductionSheetsService {
     return this.http.get<ProductionSheetListResponse>(`${this.API_URL}/by-machine/${machineNumber}`);
   }
 
-  // ============================================
-  // MÉTODOS UTILITÁRIOS
-  // ============================================
 
   /**
    * 🎯 LABEL ESTÁGIO - Retorna label em português para estágio
