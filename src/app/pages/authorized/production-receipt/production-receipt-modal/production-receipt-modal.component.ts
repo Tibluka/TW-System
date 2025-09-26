@@ -398,7 +398,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       this.productionReceiptService.createProductionReceipt(data)
     );
 
-    this.modalService.close('created', {
+    this.modalService.close('production-receipt-modal', {
       action: 'created',
       data: response.data
     });
@@ -416,7 +416,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
   }
 
   onCancel(): void {
-    this.modalService.close('canceled');
+    this.modalService.close('production-receipt-modal');
   }
 
 
