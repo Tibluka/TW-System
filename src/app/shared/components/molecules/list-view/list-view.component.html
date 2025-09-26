@@ -20,7 +20,25 @@
 
 <!-- Visualização em Cards -->
 <div *ngIf="currentViewMode === 'cards'" class="cards-view">
-    <div class="cards-grid" [style]="getGridStyles()">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+        <div class="loading-content">
+            <ds-icon icon="fa-solid fa-spinner" fontSize="32px" color="primary" class="spinning"></ds-icon>
+            <span class="body label mt-16">Carregando...</span>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="isEmpty" class="empty-state">
+        <div class="empty-content">
+            <ds-icon icon="fa-solid fa-inbox" fontSize="48px" color="label"></ds-icon>
+            <h3 class="title-modal primary-dark mt-16 mb-8">{{ emptyMessage }}</h3>
+            <p class="body label">Não há itens para exibir no momento.</p>
+        </div>
+    </div>
+
+    <!-- Cards Grid -->
+    <div *ngIf="hasItems && !loading" class="cards-grid" [style]="getGridStyles()">
         <!-- Cards usando template customizável -->
         <div *ngFor="let item of items; trackBy: trackByFn;let i = index" class="card-wrapper"
             [style.animation-delay]="getAnimationDelay(i)">
@@ -42,7 +60,7 @@
     </div>
 
     <!-- Paginação -->
-    <div class="pagination-container mt-32" *ngIf="showPagination && pagination">
+    <div class="pagination-container mt-32" *ngIf="showPagination && pagination && hasItems">
         <ng-content select="[slot=pagination]"></ng-content>
     </div>
 </div>

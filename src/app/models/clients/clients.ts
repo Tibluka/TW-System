@@ -6,7 +6,7 @@
  * Interface principal do Client baseada no schema MongoDB
  */
 export interface Client {
-    _id?: string;
+    _id: string;
     acronym: string;
     companyName: string;
     cnpj: string;

@@ -30,110 +30,156 @@
 
     <!-- TABELA DE RESULTADOS -->
     <div class="results mt-32">
-        <ds-table emptyMessage="Nenhuma ficha de produção encontrada" [showPagination]="true"
-            [pageSize]="currentFilters.limit" [totalPages]="pagination?.totalPages"
-            [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)" [loadingData]="loading">
+        <ds-list-view [items]="productionSheets" [config]="listViewConfig" [loading]="loading"
+            emptyMessage="Nenhuma ficha de produção encontrada">
+            <div slot="table">
+                <ds-table emptyMessage="Nenhuma ficha de produção encontrada" [showPagination]="true"
+                    [pageSize]="currentFilters.limit" [totalPages]="pagination?.totalPages"
+                    [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)"
+                    [loadingData]="loading">
 
-            <!-- Cabeçalho da tabela -->
-            <ds-table-row [isHeader]="true">
-                <ds-table-cell [isHeader]="true" align="left">Imagem</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Ref. Interna</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Ref. do Cliente</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="center">Máquina</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Entrada</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="left">Saída Prevista</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="center">Estágio</ds-table-cell>
-                <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
-            </ds-table-row>
+                    <!-- Cabeçalho da tabela -->
+                    <ds-table-row [isHeader]="true">
+                        <ds-table-cell [isHeader]="true" align="left">Imagem</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Ref. Interna</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Ref. do Cliente</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center">Máquina</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Entrada</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Saída Prevista</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center">Estágio</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
+                    </ds-table-row>
 
-            <!-- DADOS DAS FICHAS DE PRODUÇÃO -->
-            <ds-table-row *ngFor="let productionSheet of productionSheets" [clickable]="true" [data]="productionSheet"
-                (rowClick)="onProductionSheetClick(productionSheet)">
+                    <!-- DADOS DAS FICHAS DE PRODUÇÃO -->
+                    <ds-table-row *ngFor="let productionSheet of productionSheets" [clickable]="true"
+                        [data]="productionSheet" (rowClick)="onProductionSheetClick(productionSheet)">
 
-                <!-- Imagem -->
-                <ds-table-cell align="left">
-                    <div class="image-cell">
-                        <img *ngIf="productionSheet.productionOrder?.development?.pieceImage?.url"
-                            [src]="productionSheet.productionOrder?.development?.pieceImage?.url"
-                            [alt]="productionSheet.productionOrder?.development?.description || 'Imagem do desenvolvimento'"
-                            class="development-image">
-                        <div *ngIf="!productionSheet.productionOrder?.development?.pieceImage?.url" class="no-image">
-                            <ds-icon icon="fa-solid fa-image" color="label" fontSize="24px"></ds-icon>
-                        </div>
+                        <!-- Imagem -->
+                        <ds-table-cell align="left">
+                            <div class="image-cell">
+                                <img *ngIf="productionSheet.productionOrder?.development?.pieceImage?.url"
+                                    [src]="productionSheet.productionOrder?.development?.pieceImage?.url"
+                                    [alt]="productionSheet.productionOrder?.development?.description || 'Imagem do desenvolvimento'"
+                                    class="development-image">
+                                <div *ngIf="!productionSheet.productionOrder?.development?.pieceImage?.url"
+                                    class="no-image">
+                                    <ds-icon icon="fa-solid fa-image" color="label" fontSize="24px"></ds-icon>
+                                </div>
+                            </div>
+                        </ds-table-cell>
+
+                        <!-- Referência Interna -->
+                        <ds-table-cell align="left">
+                            <span class="body primary-dark font-weight-medium">{{
+                                productionSheet.internalReference }}</span>
+                            <ds-icon (click)="copy($event, productionSheet.productionOrder!.internalReference)"
+                                class="ml-4" cursorType="pointer" icon="fa-regular fa-clipboard" fontSize="16px" />
+
+                        </ds-table-cell>
+
+                        <!-- Referência do Cliente -->
+                        <ds-table-cell align="left">
+                            <span class="body primary-dark">
+                                {{ productionSheet.productionOrder?.development?.clientReference || '-' }}
+                            </span>
+                        </ds-table-cell>
+
+                        <!-- Cliente -->
+                        <ds-table-cell align="left">
+                            <div class="client-cell" *ngIf="productionSheet.productionOrder?.development?.client">
+                                <div class="body primary-dark">
+                                    {{ productionSheet.productionOrder?.development?.client?.companyName }}
+                                </div>
+                                <div class="placeholder"
+                                    *ngIf="productionSheet.productionOrder?.development?.client?.acronym">
+                                    {{ productionSheet.productionOrder?.development?.client?.acronym }}
+                                </div>
+                            </div>
+                            <span class="body label" *ngIf="!productionSheet.productionOrder?.development?.client">
+                                Cliente não encontrado
+                            </span>
+                        </ds-table-cell>
+
+                        <!-- Máquina -->
+                        <ds-table-cell align="center">
+                            <div class="machine-cell">
+                                <ds-icon icon="fa-solid fa-cogs" color="primary" fontSize="16px"></ds-icon>
+                                <span class="body primary-dark ml-8">
+                                    {{ getMachineName(productionSheet.machine) }}
+                                </span>
+                            </div>
+                        </ds-table-cell>
+
+                        <!-- Data de Entrada -->
+                        <ds-table-cell align="left">
+                            <span class="body primary-dark">
+                                {{ formatDate(productionSheet.entryDate) }}
+                            </span>
+                        </ds-table-cell>
+
+                        <!-- Data de Saída Prevista -->
+                        <ds-table-cell align="left">
+                            <span class="body primary-dark">
+                                {{ formatDate(productionSheet.expectedExitDate) }}
+                            </span>
+                        </ds-table-cell>
+
+                        <!-- Estágio -->
+                        <ds-table-cell align="center">
+                            <ds-badge [text]="getStageLabel(productionSheet.stage)" [status]="productionSheet.stage"
+                                entityType="production-sheet" />
+                        </ds-table-cell>
+
+                        <!-- Ações -->
+                        <ds-table-cell align="center">
+                            <ds-action-menu [items]="getActionMenuItems(productionSheet)"
+                                (itemSelected)="onActionMenuSelect(productionSheet, $event)">
+                            </ds-action-menu>
+                        </ds-table-cell>
+
+                    </ds-table-row>
+                </ds-table>
+            </div>
+
+            <ng-template #cardTemplate let-productionSheet>
+                <div class="card-content" (click)="onProductionSheetClick(productionSheet)">
+                    <img *ngIf="productionSheet.productionOrder?.development?.pieceImage?.url"
+                        [src]="productionSheet.productionOrder?.development?.pieceImage?.url"
+                        [alt]="productionSheet.internalReference" class="card-image" />
+
+                    <div class="card-body">
+                        <h3 class="title-modal mb-6 mt-8 secondary">{{ productionSheet.internalReference }}</h3>
+
+                        <p class="subtitle-section secondary"
+                            *ngIf="productionSheet.productionOrder?.development?.client?.companyName">{{
+                            productionSheet.productionOrder?.development?.client?.companyName
+                            }}</p>
+
+                        <p class="card-small secondary mb-8"
+                            *ngIf="productionSheet.productionOrder?.development?.clientReference">{{
+                            productionSheet.productionOrder?.development?.clientReference
+                            }}</p>
+
+                        <hr>
+
+                        <h4 class="body secondary mt-8 mb-0">Máquina {{ getMachineName(productionSheet.machine) }}</h4>
                     </div>
-                </ds-table-cell>
 
-                <!-- Referência Interna -->
-                <ds-table-cell align="left">
-                    <span class="body primary-dark font-weight-medium">{{
-                        productionSheet.internalReference }}</span>
-                    <ds-icon (click)="copy($event, productionSheet.productionOrder!.internalReference)" class="ml-4"
-                        cursorType="pointer" icon="fa-regular fa-clipboard" fontSize="16px" />
+                    <div class="card-actions">
+                        <ds-icon icon="fa-solid fa-arrow-right-arrow-left" color="label" fontSize="20px"
+                            cursorType="pointer"
+                            (click)="changeProductionSheetStatus(productionSheet); $event.stopPropagation()"
+                            title="Alterar Estágio" />
 
-                </ds-table-cell>
-
-                <!-- Referência do Cliente -->
-                <ds-table-cell align="left">
-                    <span class="body primary-dark">
-                        {{ productionSheet.productionOrder?.development?.clientReference || '-' }}
-                    </span>
-                </ds-table-cell>
-
-                <!-- Cliente -->
-                <ds-table-cell align="left">
-                    <div class="client-cell" *ngIf="productionSheet.productionOrder?.development?.client">
-                        <div class="body primary-dark">
-                            {{ productionSheet.productionOrder?.development?.client?.companyName }}
-                        </div>
-                        <div class="placeholder" *ngIf="productionSheet.productionOrder?.development?.client?.acronym">
-                            {{ productionSheet.productionOrder?.development?.client?.acronym }}
-                        </div>
+                        <ds-icon icon="fa-solid fa-trash" color="label" fontSize="20px" cursorType="pointer"
+                            (click)="deleteProductionSheet(productionSheet); $event.stopPropagation()"
+                            title="Excluir" />
                     </div>
-                    <span class="body label" *ngIf="!productionSheet.productionOrder?.development?.client">
-                        Cliente não encontrado
-                    </span>
-                </ds-table-cell>
+                </div>
+            </ng-template>
 
-                <!-- Máquina -->
-                <ds-table-cell align="center">
-                    <div class="machine-cell">
-                        <ds-icon icon="fa-solid fa-cogs" color="primary" fontSize="16px"></ds-icon>
-                        <span class="body primary-dark ml-8">
-                            {{ getMachineName(productionSheet.machine) }}
-                        </span>
-                    </div>
-                </ds-table-cell>
-
-                <!-- Data de Entrada -->
-                <ds-table-cell align="left">
-                    <span class="body primary-dark">
-                        {{ formatDate(productionSheet.entryDate) }}
-                    </span>
-                </ds-table-cell>
-
-                <!-- Data de Saída Prevista -->
-                <ds-table-cell align="left">
-                    <span class="body primary-dark">
-                        {{ formatDate(productionSheet.expectedExitDate) }}
-                    </span>
-                </ds-table-cell>
-
-                <!-- Estágio -->
-                <ds-table-cell align="center">
-                    <ds-badge [text]="getStageLabel(productionSheet.stage)" [status]="productionSheet.stage"
-                        entityType="production-sheet" />
-                </ds-table-cell>
-
-                <!-- Ações -->
-                <ds-table-cell align="center">
-                    <ds-action-menu [items]="getActionMenuItems(productionSheet)"
-                        (itemSelected)="onActionMenuSelect(productionSheet, $event)">
-                    </ds-action-menu>
-                </ds-table-cell>
-
-            </ds-table-row>
-        </ds-table>
+        </ds-list-view>
     </div>
 
 
