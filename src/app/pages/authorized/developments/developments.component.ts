@@ -20,6 +20,7 @@ import { ModalService } from '../../../shared/services/modal/modal.service';
 import { FormValidator } from '../../../shared/utils/form';
 import { copyToClipboard, translateDevelopmentStatus, translateProductionType } from '../../../shared/utils/tools';
 import { DevelopmentModalComponent } from "./development-modal/development-modal.component";
+import { BadgeComponent } from "../../../shared/components/atoms/badge/badge.component";
 
 @Component({
   selector: 'app-developments',
@@ -36,7 +37,8 @@ import { DevelopmentModalComponent } from "./development-modal/development-modal
     SelectComponent,
     IconComponent,
     ActionMenuComponent,
-    StatusUpdaterComponent
+    StatusUpdaterComponent,
+    BadgeComponent
   ],
   providers: [NgModel],
   templateUrl: './developments.component.html',

@@ -87,9 +87,9 @@
 
                 <!-- Status -->
                 <ds-table-cell align="center">
-                    <span class="body secondary">
-                        {{ getStatusLabel(development.status) }}
-                    </span>
+                    <ds-badge [text]="getStatusLabel(development.status)" [status]="development.status"
+                        entityType="development" />
+
                 </ds-table-cell>
 
                 <!-- Ações -->
