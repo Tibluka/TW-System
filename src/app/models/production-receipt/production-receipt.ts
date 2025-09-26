@@ -68,6 +68,7 @@ export interface CreateProductionReceiptRequest {
 }
 
 export interface UpdateProductionReceiptRequest extends Partial<CreateProductionReceiptRequest> {
+    _id: string;
     paymentDate?: Date | string;
 }
 

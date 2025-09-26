@@ -281,7 +281,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
           this.cdr.detectChanges();
         },
         error: (error: any) => {
-          console.error('Erro ao carregar recebimentos:', error);
+          console.error('Erro ao carregar recibos:', error);
           this.loading = false;
 
           // 🔄 FORÇA DETECÇÃO DE MUDANÇAS MESMO EM CASO DE ERRO
@@ -384,8 +384,10 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     this.isModalOpen = true;
     this.modalService.open({
       id: 'production-receipt-modal',
-      title: 'Novo Recebimento',
+      title: 'Novo Recibo',
       size: 'xl'
+    }).subscribe(result => {
+      this.handleModalResult(result);
     });
   }
 
@@ -394,11 +396,29 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     this.isModalOpen = true;
     this.modalService.open({
       id: 'production-receipt-modal',
-      title: 'Editar Recebimento',
+      title: 'Editar Recibo',
       size: 'xl',
       data: receipt
+    }).subscribe(result => {
+      this.handleModalResult(result);
     });
   }
+
+
+  /**
+   * 🏁 MODAL RESULT - Processa resultado do modal
+   */
+  private handleModalResult(result: any): void {
+    if (result && result.action) {
+      if (result.action === 'saved') {
+        console.log('Ordem de produção criada com sucesso:', result.data?.internalReference);
+        this.loadProductionReceipts(); // Recarregar lista
+        // TODO: Exibir toast de sucesso
+      }
+    }
+
+  }
+
 
   onModalClosed(result: any): void {
     this.isModalOpen = false;
@@ -408,11 +428,6 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
       this.loadProductionReceipts();
       // TODO: Implementar toast de sucesso
     }
-  }
-
-  onProductionReceiptClick(receipt: ProductionReceipt): void {
-    // Implementar navegação ou modal de detalhes se necessário
-    console.log('Receipt clicado:', receipt);
   }
 
   // ============================================

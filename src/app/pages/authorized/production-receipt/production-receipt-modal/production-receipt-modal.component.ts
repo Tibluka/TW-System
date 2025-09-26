@@ -68,7 +68,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
   isLoading = false;
   submitting = false;
   productionReceipt?: ProductionReceipt;
-
+  isEditMode = false;
   // Search e busca de ordens de produção
   searchingProductionOrder = false;
   productionOrderFound: ProductionOrder | null = null;
@@ -115,6 +115,8 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       const activeModal = this.modalService.activeModal();
       if (activeModal?.config.data) {
         const productionReceipt = activeModal.config.data;
+        this.isEditMode = true;
+        this.productionOrderFound = productionReceipt.productionOrder;
         this.populateForm(productionReceipt);
       }
 
@@ -179,7 +181,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       paymentMethod: ['PIX', [Validators.required]],
       totalAmount: [0, [Validators.required, Validators.min(0.01)]],
       dueDate: ['', [Validators.required]],
-
+      paymentDate: [''],
       // CAMPOS OPCIONAIS
       paymentStatus: ['PENDING'],
       paidAmount: [0, [Validators.min(0)]],
@@ -263,9 +265,11 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
 
     // Preencher formulário
     this.productionReceiptForm.patchValue({
-      productionOrderId: productionReceipt.productionOrderId,
+      internalReference: productionReceipt.internalReference,
+      productionOrderId: productionReceipt.productionOrder?._id,
       paymentMethod: productionReceipt.paymentMethod,
       paymentStatus: productionReceipt.paymentStatus,
+      paymentDate: productionReceipt.paymentDate,
       totalAmount: productionReceipt.totalAmount,
       paidAmount: productionReceipt.paidAmount,
       dueDate: this.formatDateForInput(productionReceipt.dueDate),
@@ -273,9 +277,13 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
     });
 
     if (productionReceipt._id) {
-      this.productionReceiptForm.patchValue({
-        _id: productionReceipt._id
-      });
+      if (!this.productionReceiptForm.contains('_id')) {
+        this.productionReceiptForm.addControl('_id', this.formBuilder.control(productionReceipt._id));
+      } else {
+        this.productionReceiptForm.get('_id')?.setValue(productionReceipt._id);
+      }
+      debugger
+      this.productionReceiptForm.get('internalReference')?.disable();
     }
   }
 
@@ -348,14 +356,16 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
 
     try {
       const formData = this.prepareFormData();
+      debugger
+      if (this.isEditMode) {
+        console.log(this.productionReceiptForm);
 
-      if (this.productionReceiptForm.get('_id')?.value) {
-        await this.updateProductionReceipt(formData);
+        await this.updateProductionReceipt({ ...formData, _id: this.productionReceiptForm.value?._id || '' });
       } else {
         await this.createProductionReceipt(formData as CreateProductionReceiptRequest);
       }
 
-      this.modalService.close('saved', {
+      this.modalService.close('production-receipt-modal', {
         action: 'saved',
         data: formData
       });
@@ -372,6 +382,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
     const formValue = this.productionReceiptForm.value;
 
     return {
+      _id: this.productionReceipt?._id || '',
       productionOrderId: formValue.productionOrderId,
       paymentMethod: formValue.paymentMethod as PaymentMethod,
       totalAmount: parseFloat(formValue.totalAmount),
@@ -395,7 +406,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
 
   private async updateProductionReceipt(data: UpdateProductionReceiptRequest): Promise<void> {
     const response = await lastValueFrom(
-      this.productionReceiptService.updateProductionReceipt(this.productionReceiptId!, data)
+      this.productionReceiptService.updateProductionReceipt(data._id!, data)
     );
 
     this.modalService.close('updated', {
@@ -408,12 +419,6 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
     this.modalService.close('canceled');
   }
 
-  // ============================================
-  // GETTERS PARA TEMPLATE
-  // ============================================
-  get isEditMode(): boolean {
-    return !!this.productionReceiptId;
-  }
 
   get modalTitle(): string {
     return this.isEditMode ? 'Editar Recebimento' : 'Novo Recebimento';
@@ -422,7 +427,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
   get submitButtonText(): string {
     return this.submitting ?
       (this.isEditMode ? 'Salvando...' : 'Criando...') :
-      (this.isEditMode ? 'Salvar Alterações' : 'Criar Recebimento');
+      (this.isEditMode ? 'Salvar Alterações' : 'Criar Recibo');
   }
 
   get selectedProductionOrderInfo(): string {

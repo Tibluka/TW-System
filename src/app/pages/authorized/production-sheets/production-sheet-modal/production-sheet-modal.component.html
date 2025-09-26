@@ -5,6 +5,11 @@
         <ds-spinner size="lg" message="Carregando recibo de produção..."></ds-spinner>
     </div>
 
+    <div class="d-flex justify-content-end" *ngIf="isEditMode">
+        <ds-print-button label="Imprimir Ficha" target=".production-sheet-modal-container" [printOptions]="printOptions"
+            [disabled]="isSaving" />
+    </div>
+
     <!-- Formulário principal -->
     <form [formGroup]="productionSheetForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
 
@@ -27,7 +32,7 @@
                 <!-- Referência não encontrado -->
                 <div class="search-not-found" *ngIf="productionOrderNotFound">
                     <ds-icon icon="fa-solid fa-triangle-exclamation" color="tertiary" fontSize="16px"></ds-icon>
-                    <span class="body tertiary ml-8">Referência não encontrada</span>
+                    <span class="body tertiary ml-8">Ordem de produção não encontrada</span>
                 </div>
 
                 <!-- Desenvolvimento encontrado -->
@@ -55,53 +60,53 @@
                                 Tipo de produção:
                                 {{productionType(productionOrderFound!.development!.productionType!.type)}}
                             </p>
-                            <!-- Tabela para tipo de produção localizada -->
-                            <div *ngIf="productionOrderFound?.productionType!.type === 'localized'">
-                                <div class="table-container"
-                                    *ngIf="productionOrderFound?.productionType?.additionalInfo?.sizes && productionOrderFound.development?.productionType?.additionalInfo?.sizes!.length > 0; else noSizes">
-                                    <table class="production-table">
-                                        <!-- Cabeçalho com os tamanhos -->
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    Variante
-                                                </th>
-                                                <th class="size-header"
-                                                    *ngFor="let sizeItem of productionOrderFound.productionType?.additionalInfo?.sizes">
-                                                    {{ sizeItem.size }}
-                                                </th>
-                                            </tr>
-                                        </thead>
-
-                                        <!-- Corpo com os valores -->
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    {{productionOrderFound.productionType.additionalInfo?.variant}}
-                                                </td>
-                                                <td class="size-value"
-                                                    *ngFor="let sizeItem of productionOrderFound.productionType?.additionalInfo?.sizes">
-                                                    <p class="body secondary">{{sizeItem.value}}</p>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <!-- Estado vazio -->
-                                <ng-template #noSizes>
-                                    <div class="empty-state">
-                                        <i class="fa-solid fa-table"></i>
-                                        <p>Nenhum tamanho definido para este desenvolvimento</p>
-                                    </div>
-                                </ng-template>
-                            </div>
                             <div class="form-field" *ngIf="productionOrderFound.productionType!.type === 'rotary'">
                                 <!-- 📏 QUANTIDADE DE METROS -->
                                 <p class="body secondary">{{productionOrderFound.productionType!.meters}}m
                                 </p>
                             </div>
                         </div>
+                    </div>
+                    <!-- Tabela para tipo de produção localizada -->
+                    <div class="mt-24" *ngIf="productionOrderFound?.productionType!.type === 'localized'">
+                        <div class="table-container"
+                            *ngIf="productionOrderFound?.productionType?.additionalInfo?.sizes && productionOrderFound.development?.productionType?.additionalInfo?.sizes!.length > 0; else noSizes">
+                            <table class="production-table">
+                                <!-- Cabeçalho com os tamanhos -->
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Variante
+                                        </th>
+                                        <th class="size-header"
+                                            *ngFor="let sizeItem of productionOrderFound.productionType?.additionalInfo?.sizes">
+                                            {{ sizeItem.size }}
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <!-- Corpo com os valores -->
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            {{productionOrderFound.productionType.additionalInfo?.variant}}
+                                        </td>
+                                        <td class="size-value"
+                                            *ngFor="let sizeItem of productionOrderFound.productionType?.additionalInfo?.sizes">
+                                            <p class="body secondary">{{sizeItem.value}}</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Estado vazio -->
+                        <ng-template #noSizes>
+                            <div class="empty-state">
+                                <i class="fa-solid fa-table"></i>
+                                <p>Nenhum tamanho definido para este desenvolvimento</p>
+                            </div>
+                        </ng-template>
                     </div>
                 </div>
 
@@ -132,15 +137,6 @@
                         [invalid]="isFormControlInvalid(productionSheetForm.get('expectedExitDate'))" width="100%" />
                 </div>
 
-                <!-- Estágio (apenas no modo edição) -->
-                <div class="field mb-24" *ngIf="isEditMode">
-                    <ds-select label="Estágio da Produção" placeholder="Selecione o estágio" formControlName="stage"
-                        [options]="stageOptions" [errorMessage]="getFieldError('stage')"
-                        [invalid]="isFormControlInvalid(productionSheetForm.get('stage'))" width="100%" />
-                </div>
-
-
-
             </div>
             <!-- Observações de Produção -->
 
@@ -156,8 +152,8 @@
         <div class="modal-actions mt-32" *ngIf="productionOrderFound || isEditMode">
             <ds-button label="Cancelar" variant="ghost" (onClickEmitter)="onCancel()" [disabled]="isSaving" />
 
-            <ds-button label="{{ isEditMode ? 'Atualizar' : 'Criar' }} Recibo" type="submit" [isLoading]="isSaving"
-                [disabled]="isSaving" />
+            <ds-button label="{{ isEditMode ? 'Atualizar' : 'Criar' }} Ficha de Produção" type="submit"
+                [isLoading]="isSaving" [disabled]="isSaving" />
         </div>
 
     </form>

@@ -61,7 +61,13 @@
                     [errorMessage]="getFieldError('dueDate')"
                     [invalid]="isFormControlInvalid(productionReceiptForm.get('dueDate' ))">
                 </ds-input>
+
+                <ds-input [fullWidth]="true" label="Data do Recebimento *" type="date" formControlName="paymentDate"
+                    [errorMessage]="getFieldError('paymentDate')"
+                    [invalid]="isFormControlInvalid(productionReceiptForm.get('paymentDate' ))">
+                </ds-input>
             </div>
+
 
             <div class="form-field mt-24" *ngIf="productionOrderFound">
                 <ds-textarea [fullWidth]="true" label="Observações Adicionais" formControlName="notes"

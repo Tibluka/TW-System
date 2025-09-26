@@ -3,7 +3,7 @@ import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/co
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
 import { Client } from '../../../../models/clients/clients';
-import { CreateDevelopmentRequest, Development, PieceImage, ProductionType, UpdateDevelopmentRequest } from '../../../../models/developments/developments';
+import { CreateDevelopmentRequest, Development, PieceImage, UpdateDevelopmentRequest } from '../../../../models/developments/developments';
 import { ButtonComponent } from '../../../../shared/components/atoms/button/button.component';
 import { InputComponent } from '../../../../shared/components/atoms/input/input.component';
 import { SelectComponent } from '../../../../shared/components/atoms/select/select.component';
@@ -77,13 +77,6 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
   ngOnInit(): void {
     this.initializeForm();
     this.loadInitialData();
-
-    // Acessar dados do modal ativo
-    const activeModal = this.modalService.activeModal();
-    if (activeModal?.config.data) {
-      const development = activeModal.config.data;
-      this.populateForm(development);
-    }
   }
 
   // ============================================

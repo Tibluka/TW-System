@@ -248,6 +248,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       } else {
         this.productionOrderForm.get('_id')?.setValue(productionOrder._id);
       }
+      this.productionOrderForm.get('internalReference')?.disable()
       this.productionOrderForm.get('status')?.setValue(productionOrder.status);
     }
 
@@ -331,7 +332,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
         const updateData: UpdateProductionOrderRequest = {
           fabricType: formData.fabricType,
           observations: formData.observations,
-          productionType: this.developmentFound!.productionType,
+          productionType: formData.productionType,
           status: formData.status
         };
 

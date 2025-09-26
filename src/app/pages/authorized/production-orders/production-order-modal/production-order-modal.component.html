@@ -23,7 +23,7 @@
                         label="Referência Interna do Desenvolvimento" placeholder="Ex: 25ABC0001"
                         formControlName="internalReference" [invalid]="isFieldInvalid('internalReference')"
                         [errorMessage]="getFieldErrorMessage('internalReference')" [fullWidth]="true" [required]="true"
-                        [disabled]="isEditMode" (input)="onInternalReferenceChange()">
+                        (input)="onInternalReferenceChange()">
                     </ds-input>
                 </div>
 
@@ -53,7 +53,9 @@
                                 <p class="subtitle-section secondary mb-0">{{developmentFound.client?.companyName}}</p>
                                 <p class="card-small secondary mb-4">{{developmentFound.clientReference}}</p>
                                 <hr>
-                                {{productionType(developmentFound!.productionType!.type)}}
+                                <p class="body secondary mt-4 mb-4">
+                                    Tipo de produção:
+                                    {{productionType(developmentFound!.productionType!.type)}}</p>
                             </div>
                         </div>
                     </div>

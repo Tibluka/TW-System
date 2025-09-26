@@ -24,6 +24,8 @@ import { FormValidator } from '../../../../shared/utils/form';
 // Models
 import { ProductionOrder, ProductionOrderStatus, ProductionTypeEnum } from '../../../../models/production-orders/production-orders';
 import { translateProductionOrderStatus, translateProductionType } from '../../../../shared/utils/tools';
+import { PrintButtonComponent } from "../../../../shared/components/atoms/print-button/print-button.component";
+import { PrintOptions } from '../../../../shared/components/print/print.service';
 
 @Component({
   selector: 'app-production-sheet-modal',
@@ -36,7 +38,8 @@ import { translateProductionOrderStatus, translateProductionType } from '../../.
     TextareaComponent,
     SpinnerComponent,
     IconComponent,
-    FormsModule
+    FormsModule,
+    PrintButtonComponent
   ],
   providers: [
     NgModel
@@ -56,6 +59,11 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
   private productionOrderService = inject(ProductionOrderService);
   private modalService = inject(ModalService);
   private cdr = inject(ChangeDetectorRef);
+
+  printOptions: PrintOptions = {
+    title: 'Ficha de Produção',
+    hideElements: ['.modal-actions', 'ds-button', '.no-print']
+  };
 
   // ============================================
   // PROPRIEDADES DO COMPONENTE
@@ -93,7 +101,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
   machineConflictWarning: string = '';
 
   // Subject para controlar subscriptions
-  private searchProductionOrderSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
   // ============================================
@@ -106,8 +113,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
 
   async ngOnInit(): Promise<void> {
     this.initializeForm();
-    this.initializeProductionOrderSearch();
-    this.setupFormSubscriptions();
     await this.loadInitialData();
   }
 
@@ -141,11 +146,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       productionNotes: ['', [Validators.maxLength(1000)]]
     };
 
-    // Adicionar campo stage apenas se for modo edição
-    if (this.isEditMode) {
-      formConfig.stage = ['PRINTING'];
-    }
-
     this.productionSheetForm = this.formBuilder.group(formConfig);
 
     console.log('📝 Formulário da ficha de produção inicializado');
@@ -156,7 +156,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
    */
   private async loadInitialData(): Promise<void> {
     this.isLoading = true;
-
     try {
       // Acessar dados do modal ativo
       const activeModal = this.modalService.activeModal();
@@ -182,9 +181,8 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
           this.productionOrderFound = productionSheet.productionOrder;
         }
 
-      } else if (this.productionSheetId) {
-        // Fallback: Se não há dados no modal, mas há ID, buscar pelos dados
-        await this.loadProductionSheetData();
+      } else {
+        this.initializeProductionOrderSearch();
       }
 
     } catch (error) {
@@ -217,7 +215,8 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       machine: productionSheet.machine,
       entryDate: this.formatDateForInput(productionSheet.entryDate),
       expectedExitDate: this.formatDateForInput(productionSheet.expectedExitDate),
-      productionNotes: productionSheet.productionNotes || ''
+      productionNotes: productionSheet.productionNotes || '',
+      stage: productionSheet.stage
     });
 
     // ✅ Definir ordem de produção encontrada ANTES de configurar stage
@@ -240,13 +239,9 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       } else {
         this.productionSheetForm.get('_id')?.setValue(productionSheet._id);
       }
+      this.productionSheetForm.get('internalReference')?.disable()
     }
 
-    console.log('✅ Dados da ficha de produção carregados para edição:', {
-      productionSheet,
-      productionOrderFound: this.productionOrderFound,
-      formValue: this.productionSheetForm.value
-    });
   }
 
   /**
@@ -270,35 +265,19 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     }
   }
 
-  private setupFormSubscriptions(): void {
-    // Monitorar mudanças na referência interna para buscar ordem de produção
-    // ✅ OTIMIZAÇÃO: Apenas no modo criação, pois no modo edição já temos os dados
-    if (!this.isEditMode) {
-      this.productionSheetForm.get('internalReference')?.valueChanges
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(internalReference => {
-          if (internalReference) {
-            this.searchProductionOrderSubject.next(internalReference);
-          } else {
-            this.resetProductionOrderSearch();
-          }
-        });
-    }
-  }
-
   // ============================================
   // MÉTODOS DE BUSCA DE ORDEM DE PRODUÇÃO
   // ============================================
 
   private initializeProductionOrderSearch(): void {
-    this.searchProductionOrderSubject
+    this.productionSheetForm.get('internalReference')?.valueChanges
       .pipe(
         debounceTime(500),
         distinctUntilChanged(),
         takeUntil(this.destroy$)
       )
       .subscribe(internalReference => {
-        if (internalReference && internalReference.length >= 3) {
+        if (internalReference) {
           this.searchProductionOrder(internalReference);
         } else {
           this.resetProductionOrderSearch();

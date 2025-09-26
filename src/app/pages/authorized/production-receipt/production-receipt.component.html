@@ -65,7 +65,7 @@
 
             <!-- DADOS DOS RECEBIMENTOS -->
             <ds-table-row *ngFor="let productionReceipt of productionReceipts" [clickable]="true"
-                [data]="productionReceipt" (rowClick)="onProductionReceiptClick(productionReceipt)">
+                [data]="productionReceipt" (rowClick)="editProductionReceipt(productionReceipt)">
 
                 <!-- Referência Interna -->
                 <ds-table-cell align="left">

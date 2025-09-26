@@ -177,7 +177,7 @@ export class ProductionSheetsService {
    * ✏️ ATUALIZAR - Atualiza ficha de produção existente
    */
   updateProductionSheet(id: string, data: UpdateProductionSheetRequest): Observable<ProductionSheetResponse> {
-    return this.http.put<ProductionSheetResponse>(`${this.API_URL}/${id}`, data);
+    return this.http.patch<ProductionSheetResponse>(`${this.API_URL}/${id}/stage`, { stage: data.stage });
   }
 
   /**
