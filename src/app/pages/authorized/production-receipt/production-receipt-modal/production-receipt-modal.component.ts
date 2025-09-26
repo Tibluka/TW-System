@@ -391,6 +391,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       paymentMethod: formValue.paymentMethod as PaymentMethod,
       totalAmount: parseFloat(formValue.totalAmount),
       dueDate: formValue.dueDate,
+      paymentDate: formValue.paymentDate,
       paymentStatus: formValue.paymentStatus as PaymentStatus,
       paidAmount: parseFloat(formValue.paidAmount) || 0,
       notes: formValue.notes?.trim() || undefined
