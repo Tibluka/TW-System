@@ -317,7 +317,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       const totalPieces = productionType.additionalInfo.sizes.reduce(
         (sum, size) => sum + size.value, 0
       );
-      calculatedAmount = totalPieces * (client.values?.valuePerPiece || 0);
+      calculatedAmount = totalPieces * (client.values?.valuePerMeter || 0);
     }
 
     if (calculatedAmount > 0) {
@@ -363,7 +363,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
   private prepareFormData(): CreateProductionReceiptRequest | UpdateProductionReceiptRequest {
     const formValue = this.productionReceiptForm.value;
 
-    return {
+    const payload: any = {
       _id: this.productionReceipt?._id || '',
       productionOrderId: formValue.productionOrderId,
       paymentMethod: formValue.paymentMethod as PaymentMethod,
@@ -372,8 +372,14 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       paymentDate: formValue.paymentDate,
       paymentStatus: formValue.paymentStatus as PaymentStatus,
       paidAmount: parseFloat(formValue.paidAmount) || 0,
-      notes: formValue.notes?.trim() || undefined
+      notes: formValue.notes?.trim() || undefined,
     };
+
+    if (!payload._id) {
+      delete payload._id;
+    }
+
+    return payload;
   }
 
   private async createProductionReceipt(data: CreateProductionReceiptRequest): Promise<void> {
@@ -392,8 +398,8 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       this.productionReceiptService.updateProductionReceipt(data._id!, data)
     );
 
-    this.modalService.close('updated', {
-      action: 'updated',
+    this.modalService.close('production-receipt-modal', {
+      action: 'created',
       data: response.data
     });
   }

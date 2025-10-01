@@ -27,7 +27,7 @@
                         <ds-table-cell [isHeader]="true" align="left">CNPJ</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="left">Telefone</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="left">Email</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="center">Preço por Metro</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center">Valor por Metro</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="left">Responsável</ds-table-cell>
                     </ds-table-row>
 
@@ -105,7 +105,7 @@
 
                         <hr>
 
-                        <h4 class="body secondary mt-8 mb-0">{{ formatCurrency(client.pricePerMeter) }}/m</h4>
+                        <h4 class="body secondary mt-8 mb-0">{{ formatCurrency(client.values.valuePerMeter) }}/m</h4>
                     </div>
 
                     <div class="card-actions">

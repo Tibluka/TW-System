@@ -166,6 +166,77 @@
     }
 
     // ========================================
+    // SEÇÃO DE PARÂMETROS DE PRODUÇÃO
+    // ========================================
+    .production-parameters-section {
+        margin: $spacing-lg 0;
+        padding: $spacing-lg;
+        background-color: var(--neutral-lighter);
+        border-radius: $border-radius-md;
+        border: 1px solid var(--stroke);
+
+        .section-title {
+            @include title-modal();
+            color: var(--text-primary);
+            margin-bottom: $spacing-md;
+            display: flex;
+            align-items: center;
+            gap: $spacing-sm;
+
+            &::before {
+                content: '⚙️';
+                font-size: 1.2em;
+            }
+        }
+
+        .parameters-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: $spacing-lg;
+
+            @media (max-width: 768px) {
+                grid-template-columns: 1fr;
+                gap: $spacing-md;
+            }
+
+            .temperature-field,
+            .velocity-field {
+                .field-group {
+                    position: relative;
+
+                    &::after {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        width: 2px;
+                        height: 100%;
+                        background: linear-gradient(135deg, var(--primary-medium), var(--secondary-medium));
+                        border-radius: 0 $border-radius-sm $border-radius-sm 0;
+                        opacity: 0.3;
+                    }
+                }
+            }
+
+            .temperature-field {
+                ds-input {
+                    ::ng-deep .icon-left {
+                        color: var(--color-error);
+                    }
+                }
+            }
+
+            .velocity-field {
+                ds-input {
+                    ::ng-deep .icon-left {
+                        color: var(--primary-medium);
+                    }
+                }
+            }
+        }
+    }
+
+    // ========================================
     // INFORMAÇÕES DA ORDEM DE PRODUÇÃO
     // ========================================
     .production-order-info {

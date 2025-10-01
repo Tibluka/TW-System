@@ -140,6 +140,27 @@
             </div>
 
 
+            <div class="production-parameters-section" *ngIf="productionOrderFound || isEditMode">
+                <h3 class="section-title mb-16">Parâmetros de Produção</h3>
+
+                <div class="parameters-grid">
+                    <div class="field-group temperature-field">
+                        <ds-input label="Temperatura (°C)" placeholder="Ex: 180" formControlName="temperature"
+                            type="number" step="0.1" min="0" max="500" icon="fa-solid fa-thermometer-half"
+                            iconPosition="left" [errorMessage]="getFieldError('temperature')"
+                            [invalid]="isFormControlInvalid(productionSheetForm.get('temperature'))" width="100%" />
+                    </div>
+
+                    <div class="field-group velocity-field">
+                        <ds-input label="Velocidade (m/min)" placeholder="Ex: 25" formControlName="velocity"
+                            type="number" step="0.1" min="0" max="1000" icon="fa-solid fa-tachometer-alt"
+                            iconPosition="left" [errorMessage]="getFieldError('velocity')"
+                            [invalid]="isFormControlInvalid(productionSheetForm.get('velocity'))" width="100%" />
+                    </div>
+                </div>
+            </div>
+
+
             <div *ngIf="productionOrderFound || isEditMode">
                 <ds-textarea label="Observações de Produção"
                     placeholder="Digite observações específicas da produção (opcional)..."

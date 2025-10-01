@@ -1,4 +1,3 @@
-
 <form [formGroup]="parentForm" class="values-form">
 
 
@@ -11,11 +10,4 @@
     </div>
 
 
-    <div class="value-per-piece-field">
-        <ds-input label="Valor por Peça (R$)" placeholder="0.00" formControlName="valuePerPiece" type="number"
-            step="0.01" min="0" [fullWidth]="true" [required]="true" [invalid]="isFieldInvalid('valuePerPiece')"
-            [errorMessage]="getErrorMessage('valuePerPiece')" icon="fa-solid fa-tags" iconPosition="left"
-            (blur)="onCurrencyBlur('valuePerPiece')" helperText="Digite o valor em reais por peça">
-        </ds-input>
-    </div>
 </form>

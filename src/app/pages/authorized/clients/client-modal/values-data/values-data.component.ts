@@ -33,7 +33,6 @@ export class ValuesDataComponent extends FormValidator implements OnInit {
       if (field.errors['required']) {
         switch (fieldName) {
           case 'valuePerMeter': return 'Valor por metro é obrigatório';
-          case 'valuePerPiece': return 'Valor por peça é obrigatório';
           default: return 'Campo obrigatório';
         }
       }
@@ -63,15 +62,4 @@ export class ValuesDataComponent extends FormValidator implements OnInit {
   }
 
 
-  getPercentageDifference(): string {
-    const meterValue = parseFloat(this.parentForm.get('valuePerMeter')?.value || '0');
-    const pieceValue = parseFloat(this.parentForm.get('valuePerPiece')?.value || '0');
-
-    if (meterValue > 0 && pieceValue > 0) {
-      const difference = ((pieceValue - meterValue) / meterValue) * 100;
-      return `${difference >= 0 ? '+' : ''}${difference.toFixed(1)}%`;
-    }
-
-    return '';
-  }
 }

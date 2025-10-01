@@ -408,10 +408,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
    */
   private handleModalResult(result: any): void {
     if (result && result.action) {
-      if (result.action === 'saved') {
-        this.loadProductionReceipts(); // Recarregar lista
-
-      }
+      this.loadProductionReceipts();
     }
 
   }

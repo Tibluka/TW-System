@@ -24,7 +24,6 @@ export interface Client {
     };
     values: {
         valuePerMeter: number;
-        valuePerPiece: number;
     };
     active: boolean;
     createdAt?: string;
@@ -129,7 +128,6 @@ export interface CreateClientRequest {
     };
     values: {
         valuePerMeter: number;
-        valuePerPiece: number;
     };
     active?: boolean;
 }
@@ -151,7 +149,6 @@ export interface ClientStats {
     ativos: number;
     inativos: number;
     valorMedioMetro: number;
-    valorMedioPeca: number;
     clientesUltimos30Dias: number;
     percentualAtivos: number;
 }

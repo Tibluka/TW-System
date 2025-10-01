@@ -121,8 +121,7 @@ export class ClientModalComponent implements OnInit {
       state: client.address.state,
 
 
-      valuePerMeter: client.values.valuePerMeter,
-      valuePerPiece: client.values.valuePerPiece
+      valuePerMeter: client.values.valuePerMeter
     });
 
 
@@ -210,11 +209,6 @@ export class ClientModalComponent implements OnInit {
         Validators.required,
         Validators.min(0),
         this.currencyValidator.bind(this)
-      ]],
-      valuePerPiece: ['', [
-        Validators.required,
-        Validators.min(0),
-        this.currencyValidator.bind(this)
       ]]
     });
   }
@@ -255,7 +249,7 @@ export class ClientModalComponent implements OnInit {
       case 'address':
         return ['zipcode', 'street', 'number', 'neighborhood', 'city', 'state'];
       case 'values':
-        return ['valuePerMeter', 'valuePerPiece'];
+        return ['valuePerMeter'];
       default:
         return [];
     }
@@ -395,8 +389,7 @@ export class ClientModalComponent implements OnInit {
         zipcode: formValues.zipcode
       },
       values: {
-        valuePerMeter: parseFloat(formValues.valuePerMeter),
-        valuePerPiece: parseFloat(formValues.valuePerPiece)
+        valuePerMeter: parseFloat(formValues.valuePerMeter)
       }
     };
 

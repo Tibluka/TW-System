@@ -63,7 +63,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     hideElements: ['.modal-actions', 'ds-button', '.no-print']
   };
 
-
   productionSheetForm!: FormGroup;
 
 
@@ -130,7 +129,9 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       machine: ['', [Validators.required]],
       entryDate: [this.getTodayDateString()],
       expectedExitDate: ['', [Validators.required]],
-      productionNotes: ['', [Validators.maxLength(1000)]]
+      productionNotes: ['', [Validators.maxLength(1000)]],
+      temperature: ['', [Validators.min(0), Validators.max(500)]],
+      velocity: ['', [Validators.min(0), Validators.max(1000)]]
     };
 
     this.productionSheetForm = this.formBuilder.group(formConfig);
@@ -201,7 +202,9 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       entryDate: this.formatDateForInput(productionSheet.entryDate),
       expectedExitDate: this.formatDateForInput(productionSheet.expectedExitDate),
       productionNotes: productionSheet.productionNotes || '',
-      stage: productionSheet.stage
+      stage: productionSheet.stage,
+      temperature: productionSheet.temperature || '',
+      velocity: productionSheet.velocity || ''
     });
 
 
@@ -325,13 +328,15 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       const formData = this.productionSheetForm.value;
 
       if (this.isEditMode && this.productionSheetId) {
-
+        debugger
         const updateData: UpdateProductionSheetRequest = {
           machine: formData.machine,
           entryDate: formData.entryDate,
           expectedExitDate: formData.expectedExitDate,
           stage: formData.stage,
-          productionNotes: formData.productionNotes || undefined
+          productionNotes: formData.productionNotes || undefined,
+          temperature: formData.temperature ? parseFloat(formData.temperature) : undefined,
+          velocity: formData.velocity ? parseFloat(formData.velocity) : undefined
         };
 
         const response = await lastValueFrom(
@@ -350,7 +355,9 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
           machine: formData.machine,
           expectedExitDate: formData.expectedExitDate,
           entryDate: formData.entryDate || undefined,
-          productionNotes: formData.productionNotes || undefined
+          productionNotes: formData.productionNotes || undefined,
+          temperature: formData.temperature ? parseFloat(formData.temperature) : undefined,
+          velocity: formData.velocity ? parseFloat(formData.velocity) : undefined
         };
 
         const response = await lastValueFrom(

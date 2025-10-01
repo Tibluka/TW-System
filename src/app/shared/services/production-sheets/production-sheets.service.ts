@@ -28,6 +28,10 @@ export interface ProductionSheet {
   productionNotes?: string;
 
 
+  temperature?: number;
+  velocity?: number;
+
+
   active?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
@@ -80,6 +84,8 @@ export interface CreateProductionSheetRequest {
   machine: 1 | 2 | 3 | 4;
   entryDate?: Date | string; // Default: Date.now no backend
   productionNotes?: string;
+  temperature?: number;
+  velocity?: number;
 }
 
 export interface UpdateProductionSheetRequest extends Partial<CreateProductionSheetRequest> {
