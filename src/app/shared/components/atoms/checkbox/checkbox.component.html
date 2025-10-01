@@ -1,1 +1,17 @@
-<p>checkbox works!</p>
+<div class="checkbox-container" [class.disabled]="disabled" [class.invalid]="invalid">
+    <label class="checkbox-label">
+        <input type="checkbox" class="checkbox-input" [checked]="value" [disabled]="disabled" [required]="required"
+            (change)="onCheckboxChange($event)" (blur)="onTouched()" />
+        <span class="checkbox-custom"></span>
+        <span class="checkbox-text" *ngIf="label">{{ label }}</span>
+    </label>
+
+    <div class="form-feedback" *ngIf="showError || showHelper">
+        <div *ngIf="showError" class="error-message">
+            {{ errorMessage }}
+        </div>
+        <div *ngIf="showHelper" class="helper-text">
+            {{ helperText }}
+        </div>
+    </div>
+</div>

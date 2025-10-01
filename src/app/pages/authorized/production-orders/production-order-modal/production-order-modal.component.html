@@ -1,5 +1,3 @@
-
-
 <div class="production-order-modal-container">
 
 
@@ -63,7 +61,7 @@
 
             <div class="form-section mb-32" *ngIf="developmentFound || isEditMode">
 
-                <div class="d-grid columns-3 mb-24 gap-24">
+                <div class="d-grid columns-4 mb-24 gap-24">
                     <div class="form-field" [formGroupName]="'productionType'"
                         *ngIf="developmentFound?.productionType?.type === 'rotary'">
 
@@ -74,7 +72,28 @@
                         </ds-input>
                     </div>
 
+                    <div class="form-field" *ngIf="developmentFound?.productionType?.type === 'rotary'">
+                        <ds-input label="Tipo de Tecido" placeholder="Ex: Algodão, Poliéster..."
+                            formControlName="fabricType" [invalid]="isFieldInvalid('fabricType')"
+                            [errorMessage]="getFieldErrorMessage('fabricType')" [fullWidth]="true" [required]="true">
+                        </ds-input>
+                    </div>
 
+                    <div class="form-field" *ngIf="developmentFound?.productionType?.type === 'rotary'">
+                        <ds-input label="Largura do Tecido (cm)" placeholder="Ex: 150" type="number" step="0.1"
+                            min="0.1" max="500" formControlName="fabricWidth" [invalid]="isFieldInvalid('fabricWidth')"
+                            [errorMessage]="getFieldErrorMessage('fabricWidth')" [fullWidth]="true">
+                        </ds-input>
+                    </div>
+
+                    <div class="form-field" *ngIf="developmentFound?.productionType?.type === 'rotary'">
+                        <ds-checkbox label="Tem Craft" formControlName="hasCraft" [invalid]="isFieldInvalid('hasCraft')"
+                            [errorMessage]="getFieldErrorMessage('hasCraft')">
+                        </ds-checkbox>
+                    </div>
+                </div>
+
+                <div class="d-grid columns-1 mb-24 gap-24" *ngIf="developmentFound?.productionType?.type !== 'rotary'">
                     <div class="form-field">
                         <ds-input label="Tipo de Tecido" placeholder="Ex: Algodão, Poliéster..."
                             formControlName="fabricType" [invalid]="isFieldInvalid('fabricType')"

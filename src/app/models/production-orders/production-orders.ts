@@ -46,6 +46,10 @@ export interface ProductionOrder {
     observations?: string;
 
 
+    hasCraft?: boolean;
+    fabricWidth?: number;
+
+
     active?: boolean;
     createdAt?: Date | string;
     updatedAt?: Date | string;
@@ -57,6 +61,8 @@ export interface CreateProductionOrderRequest {
     fabricType: string;
     productionType: ProductionType; // ✅ MUDANÇA: Usa ProductionType
     observations?: string;
+    hasCraft?: boolean;
+    fabricWidth?: number;
 }
 
 export interface UpdateProductionOrderRequest extends Partial<CreateProductionOrderRequest> {

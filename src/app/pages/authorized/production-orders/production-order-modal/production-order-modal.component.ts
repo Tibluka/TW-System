@@ -7,6 +7,7 @@ import { debounceTime, distinctUntilChanged, lastValueFrom, Subject, takeUntil }
 import { Development, ProductionTypeEnum } from '../../../../models/developments/developments';
 import { CreateProductionOrderRequest, ProductionOrder, UpdateProductionOrderRequest } from '../../../../models/production-orders/production-orders';
 import { ButtonComponent } from '../../../../shared/components/atoms/button/button.component';
+import { CheckboxComponent } from '../../../../shared/components/atoms/checkbox/checkbox.component';
 import { IconComponent } from "../../../../shared/components/atoms/icon/icon.component";
 import { InputComponent } from '../../../../shared/components/atoms/input/input.component';
 import { SpinnerComponent } from '../../../../shared/components/atoms/spinner/spinner.component';
@@ -29,11 +30,11 @@ interface SelectOption {
     CommonModule,
     ReactiveFormsModule,
     ButtonComponent,
+    CheckboxComponent,
     InputComponent,
     TextareaComponent,
     SpinnerComponent,
     FormsModule,
-
     IconComponent
   ],
   templateUrl: './production-order-modal.component.html',
@@ -121,7 +122,9 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       }),
       fabricType: ['', [Validators.required]],
       observations: [''],
-      status: ['']
+      status: [''],
+      hasCraft: [false],
+      fabricWidth: [null, [Validators.min(0.1), Validators.max(500)]]
     });
 
   }
@@ -223,7 +226,9 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       productionType: productionOrder.productionType || {},
       fabricType: productionOrder.fabricType || '',
       observations: productionOrder.observations || '',
-      status: productionOrder.status
+      status: productionOrder.status,
+      hasCraft: productionOrder.hasCraft || false,
+      fabricWidth: productionOrder.fabricWidth || null
     });
 
 
@@ -314,7 +319,9 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
           fabricType: formData.fabricType,
           observations: formData.observations,
           productionType: formData.productionType,
-          status: formData.status
+          status: formData.status,
+          hasCraft: formData.hasCraft,
+          fabricWidth: formData.fabricWidth ? parseFloat(formData.fabricWidth) : undefined
         };
 
         const response = await lastValueFrom(
@@ -329,7 +336,12 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
           developmentId: this.developmentFound!._id!,
           fabricType: formData.fabricType,
           observations: formData.observations,
-          productionType: this.developmentFound!.productionType
+          productionType: {
+            ...this.developmentFound!.productionType,
+            meters: formData.productionType.meters,
+          },
+          hasCraft: formData.hasCraft,
+          fabricWidth: formData.fabricWidth ? parseFloat(formData.fabricWidth) : undefined
         };
 
         const response = await lastValueFrom(

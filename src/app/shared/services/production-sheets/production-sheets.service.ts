@@ -168,14 +168,14 @@ export class ProductionSheetsService {
    * ✏️ ATUALIZAR - Atualiza ficha de produção existente
    */
   updateProductionSheet(id: string, data: UpdateProductionSheetRequest): Observable<ProductionSheetResponse> {
-    return this.http.patch<ProductionSheetResponse>(`${this.API_URL}/${id}/stage`, { stage: data.stage });
+    return this.http.put<ProductionSheetResponse>(`${this.API_URL}/${id}`, data);
   }
 
   /**
    * 🔄 ATUALIZAR ESTÁGIO - Atualiza apenas o estágio da ficha
    */
   updateStage(id: string, data: UpdateStageRequest): Observable<ProductionSheetResponse> {
-    return this.http.patch<ProductionSheetResponse>(`${this.API_URL}/${id}/stage`, data);
+    return this.http.patch<ProductionSheetResponse>(`${this.API_URL}/${id}/stage`, { stage: data.stage });
   }
 
   /**
