@@ -159,6 +159,13 @@ export class ProductionSheetsService {
   }
 
   /**
+   * 🔍 BUSCAR POR INTERNAL REFERENCE - Busca ficha de produção por referência interna
+   */
+  getProductionSheetByInternalReference(internalReference: string): Observable<ProductionSheetResponse> {
+    return this.http.get<ProductionSheetResponse>(`${this.API_URL}/${internalReference}`);
+  }
+
+  /**
    * ➕ CRIAR - Cria nova ficha de produção
    */
   createProductionSheet(data: CreateProductionSheetRequest): Observable<ProductionSheetResponse> {

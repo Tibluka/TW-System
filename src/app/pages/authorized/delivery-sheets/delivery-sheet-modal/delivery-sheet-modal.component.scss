@@ -1,0 +1,225 @@
+// pages/authorized/delivery-sheets/delivery-sheet-modal/delivery-sheet-modal.component.scss
+
+@use 'abstracts/variables' as *;
+@use 'abstracts/spacing' as *;
+@use 'abstracts/typography' as *;
+@use 'base/typography' as *;
+
+// ========================================
+// CONTAINER DE LOADING
+// ========================================
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+
+    p {
+        @include body();
+        color: var(--label);
+    }
+}
+
+// ========================================
+// CONTAINER PRINCIPAL
+// ========================================
+.delivery-sheet-modal-container {
+    width: 100%;
+    height: 100%;
+
+    // ========================================
+    // WRAPPER DO CONTEÚDO
+    // ========================================
+    .modal-content-wrapper {
+        width: 100%;
+        height: 100%;
+    }
+
+    // ========================================
+    // FORMULÁRIO
+    // ========================================
+    .delivery-sheet-form {
+        width: 100%;
+        max-width: none;
+
+        // ========================================
+        // SEÇÕES DO FORMULÁRIO
+        // ========================================
+        .form-section {
+            margin-bottom: $spacing-xl;
+
+            &:last-of-type {
+                margin-bottom: $spacing-lg;
+            }
+
+            .section-title {
+                color: var(--text-primary);
+                margin-bottom: $spacing-md;
+                display: flex;
+                align-items: center;
+                gap: $spacing-sm;
+
+                &::before {
+                    content: '';
+                    width: 4px;
+                    height: 20px;
+                    background: var(--primary-medium);
+                    border-radius: 2px;
+                }
+            }
+        }
+
+        // ========================================
+        // GRID DE CAMPOS
+        // ========================================
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: $spacing-lg;
+
+            @media (max-width: 768px) {
+                grid-template-columns: 1fr;
+                gap: $spacing-md;
+            }
+
+            // Campo de largura total
+            .form-field.full-width {
+                grid-column: 1 / -1;
+            }
+        }
+
+        // ========================================
+        // CAMPOS INDIVIDUAIS
+        // ========================================
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: $spacing-xs;
+
+            // Labels
+            label {
+                color: var(--text-primary);
+                font-weight: 500;
+            }
+
+            // Inputs específicos
+            ds-input,
+            ds-select,
+            ds-textarea {
+                width: 100%;
+            }
+
+            // CEP com largura menor
+            &[formControlName="deliveryZipCode"] {
+                max-width: 200px;
+            }
+
+            // Estado com largura menor
+            &[formControlName="deliveryState"] {
+                max-width: 150px;
+            }
+        }
+
+        // ========================================
+        // ESTADOS DE BUSCA
+        // ========================================
+        .search-status {
+            margin-top: $spacing-md; // 16px
+
+            .search-loading,
+            .search-not-found {
+                display: flex;
+                align-items: center;
+                padding: $spacing-md; // 16px
+                border-radius: $border-radius-md;
+
+                span {
+                    @include body();
+                }
+            }
+
+            .search-loading {
+                background: rgba(59, 130, 246, 0.1);
+                border: 1px solid rgba(59, 130, 246, 0.2);
+            }
+
+            .search-not-found {
+                background: rgba(239, 68, 68, 0.1);
+                border: 1px solid rgba(239, 68, 68, 0.2);
+            }
+
+            // ========================================
+            // CARD DA FICHA DE PRODUÇÃO ENCONTRADA
+            // ========================================
+            .production-sheet-found {
+                margin-top: 24px;
+
+                .production-sheet-card {
+                    border: 1px solid var(--stroke);
+                    border-radius: $border-radius-md;
+                    background: var(--background);
+                    padding: $spacing-md $spacing-lg; // 24px
+                    margin-top: $spacing-md; // 16px
+
+                    .production-sheet-details {
+                        display: flex;
+                        flex-direction: column;
+
+                        .title-modal {
+                            font-size: 24px;
+                        }
+
+                        .subtitle-section {
+                            font-size: 16px;
+                        }
+
+                        .card-small {
+                            font-size: 12px;
+                        }
+
+                        .body,
+                        .body-regular {
+                            font-size: 14px;
+                        }
+
+                        .production-info {
+                            p {
+                                margin: 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    // ========================================
+    // AÇÕES FIXAS NO RODAPÉ
+    // ========================================
+    .form-actions {
+        display: flex;
+        gap: $spacing-sm; // 8px
+        justify-content: flex-end;
+
+        @media (max-width: 768px) {
+            flex-direction: column-reverse;
+            gap: $spacing-sm; // 8px
+
+            ds-button {
+                width: 100%;
+            }
+        }
+    }
+
+    // ========================================
+    // RESPONSIVIDADE
+    // ========================================
+    @media (max-width: 768px) {
+        .modal-content-wrapper {
+            padding: $spacing-md;
+        }
+    }
+}

@@ -1,0 +1,195 @@
+<div class="delivery-sheet-modal-container">
+
+    <div *ngIf="isLoading" class="loading-container">
+        <ds-spinner size="32px"></ds-spinner>
+        <p class="body label mt-16">Carregando dados...</p>
+    </div>
+
+    <div *ngIf="!isLoading" class="modal-content-wrapper">
+        <form [formGroup]="deliverySheetForm" (ngSubmit)="onSubmit()" class="delivery-sheet-form">
+
+            <!-- Busca de Ficha de Produção -->
+            <div class="form-section mb-32">
+                <div class="form-field">
+                    <ds-input icon="fa-solid fa-search" iconPosition="left"
+                        label="Referência Interna da Ficha de Produção" placeholder="Ex: 25ABC0001"
+                        formControlName="internalReference"
+                        [invalid]="isFormControlInvalid(deliverySheetForm.get('internalReference'))"
+                        [errorMessage]="getFieldError('internalReference')" [fullWidth]="true" [required]="true"
+                        (input)="onInternalReferenceChange()">
+                    </ds-input>
+                </div>
+
+                <div class="search-status">
+                    <!-- Loading -->
+                    <div class="text-center p-48" *ngIf="searchingProductionSheet">
+                        <ds-spinner size="48px" variant="outline"></ds-spinner>
+                    </div>
+
+                    <!-- Not Found -->
+                    <div class="search-not-found" *ngIf="productionSheetNotFound && !searchingProductionSheet">
+                        <ds-icon icon="fa-solid fa-triangle-exclamation" color="tertiary" fontSize="16px"></ds-icon>
+                        <span class="body tertiary ml-8">Ficha de produção não encontrada</span>
+                    </div>
+
+                    <!-- Found -->
+                    <div class="production-sheet-found" *ngIf="productionSheetFound && !searchingProductionSheet">
+                        <p class="input-label">Resumo da ficha de produção</p>
+                        <div class="production-sheet-card">
+                            <div class="production-sheet-details">
+                                <h1 class="title-modal mb-6 secondary">{{productionSheetFound.internalReference}}</h1>
+                                <p class="subtitle-section secondary mb-0">
+                                    {{productionSheetFound.productionOrder?.development?.client?.companyName}}</p>
+                                <p class="card-small secondary mb-4">
+                                    {{productionSheetFound.productionOrder?.development?.clientReference}}</p>
+                                <hr>
+                                <div class="production-info">
+                                    <p class="body secondary mt-4 mb-2">
+                                        <strong>Estágio:</strong> {{getStageLabel(productionSheetFound.stage)}}
+                                    </p>
+                                    <p class="body secondary mb-2">
+                                        <strong>Máquina:</strong> {{getMachineName(productionSheetFound.machine)}}
+                                    </p>
+                                    <p class="body secondary mb-2">
+                                        <strong>Data de Entrada:</strong> {{formatDate(productionSheetFound.entryDate)}}
+                                    </p>
+                                    <p class="body secondary mb-4">
+                                        <strong>Data Prevista de Saída:</strong>
+                                        {{formatDate(productionSheetFound.expectedExitDate)}}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data de Entrega -->
+            <div class="form-section" *ngIf="productionSheetFound || isEditMode">
+                <h3 class="section-title mb-16">Data de Entrega</h3>
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <ds-input label="Data de Entrega" type="date" formControlName="deliveryDate"
+                            [invalid]="isFormControlInvalid(deliverySheetForm.get('deliveryDate'))"
+                            [errorMessage]="getFieldError('deliveryDate')" icon="fa-solid fa-calendar"
+                            iconPosition="left" width="100%">
+                        </ds-input>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Endereço de Entrega -->
+            <div class="form-section" formGroupName="address" *ngIf="productionSheetFound || isEditMode">
+                <h3 class="section-title mb-16">Endereço de Entrega</h3>
+
+                <div class="form-grid">
+                    <!-- Rua -->
+                    <div class="form-field full-width">
+                        <ds-input label="Rua *" placeholder="Rua, número, bairro..." formControlName="street"
+                            [invalid]="isFormControlInvalid(deliverySheetForm.get('address.street'))"
+                            [errorMessage]="getFieldError('address.street')" icon="fa-solid fa-map-marker-alt"
+                            iconPosition="left" width="100%">
+                        </ds-input>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <!-- Cidade -->
+                    <div class="form-field">
+                        <ds-input label="Cidade *" placeholder="Ex: São Paulo" formControlName="city"
+                            [invalid]="isFormControlInvalid(deliverySheetForm.get('address.city'))"
+                            [errorMessage]="getFieldError('address.city')" width="100%">
+                        </ds-input>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="form-field">
+                        <ds-input label="Estado *" placeholder="Ex: SP" formControlName="state"
+                            [invalid]="isFormControlInvalid(deliverySheetForm.get('address.state'))"
+                            [errorMessage]="getFieldError('address.state')" width="100%">
+                        </ds-input>
+                    </div>
+
+                    <!-- CEP -->
+                    <div class="form-field">
+                        <ds-input label="CEP *" placeholder="00000-000" formControlName="zipCode"
+                            [invalid]="isFormControlInvalid(deliverySheetForm.get('address.zipCode'))"
+                            [errorMessage]="getFieldError('address.zipCode')" width="100%">
+                        </ds-input>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <!-- Complemento -->
+                    <div class="form-field">
+                        <ds-input label="Complemento" placeholder="Apartamento, sala, etc..."
+                            formControlName="complement"
+                            [invalid]="isFormControlInvalid(deliverySheetForm.get('address.complement'))"
+                            [errorMessage]="getFieldError('address.complement')" width="100%">
+                        </ds-input>
+                    </div>
+
+                    <!-- Bairro -->
+                    <div class="form-field">
+                        <ds-input label="Bairro" placeholder="Nome do bairro" formControlName="neighborhood"
+                            [invalid]="isFormControlInvalid(deliverySheetForm.get('address.neighborhood'))"
+                            [errorMessage]="getFieldError('address.neighborhood')" width="100%">
+                        </ds-input>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Valores e Documentação -->
+            <div class="form-section" *ngIf="productionSheetFound || isEditMode">
+                <h3 class="section-title mb-16">Valores e Documentação</h3>
+
+                <div class="form-grid">
+                    <!-- Valor Total -->
+                    <div class="form-field">
+                        <ds-input label="Valor Total (R$) *" placeholder="0.00" type="number" step="0.01" min="0"
+                            formControlName="totalValue"
+                            [invalid]="isFormControlInvalid(deliverySheetForm.get('totalValue'))"
+                            [errorMessage]="getFieldError('totalValue')" icon="fa-solid fa-dollar-sign"
+                            iconPosition="left" width="100%">
+                        </ds-input>
+                    </div>
+
+                    <!-- Nota Fiscal -->
+                    <div class="form-field">
+                        <ds-input label="Número da Nota Fiscal" placeholder="Ex: 123456" formControlName="invoiceNumber"
+                            [invalid]="isFormControlInvalid(deliverySheetForm.get('invoiceNumber'))"
+                            [errorMessage]="getFieldError('invoiceNumber')" icon="fa-solid fa-receipt"
+                            iconPosition="left" width="100%">
+                        </ds-input>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Observações -->
+            <div class="form-section" *ngIf="productionSheetFound || isEditMode">
+                <h3 class="section-title mb-16">Observações</h3>
+
+                <div class="form-field">
+                    <ds-textarea label="Observações" placeholder="Instruções especiais, horário preferencial, etc..."
+                        formControlName="notes" [invalid]="isFormControlInvalid(deliverySheetForm.get('notes'))"
+                        [errorMessage]="getFieldError('notes')" width="100%">
+                    </ds-textarea>
+                </div>
+            </div>
+
+        </form>
+
+        <!-- Botões de Ação -->
+        <div class="form-actions" *ngIf="productionSheetFound || isEditMode">
+            <ds-button type="button" variant="outline" label="Cancelar" icon="fa-solid fa-times"
+                (onClickEmitter)="onCancel()" [disabled]="isSaving">
+            </ds-button>
+
+            <ds-button type="submit" variant="fill" [label]="isEditMode ? 'Atualizar Ficha' : 'Criar Ficha'"
+                icon="fa-solid fa-save" [disabled]="deliverySheetForm.invalid || isSaving">
+            </ds-button>
+        </div>
+    </div>
+
+</div>

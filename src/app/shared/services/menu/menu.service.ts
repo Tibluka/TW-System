@@ -207,6 +207,12 @@ export class MenuService {
         route: '/authorized/production-sheets'
       },
       {
+        id: 'delivery-sheets',
+        label: 'Fichas de entrega',
+        icon: 'fa-solid fa-truck',
+        route: '/authorized/delivery-sheets'
+      },
+      {
         id: 'production-receipt',
         label: 'Recibos de produção',
         icon: 'fa-solid fa-sack-dollar',

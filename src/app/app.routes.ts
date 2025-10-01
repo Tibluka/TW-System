@@ -8,6 +8,7 @@ import { DevelopmentsComponent } from './pages/authorized/developments/developme
 import { ProductionOrdersComponent } from './pages/authorized/production-orders/production-orders.component';
 import { ProductionReceiptComponent } from './pages/authorized/production-receipt/production-receipt.component';
 import { ProductionSheetsComponent } from './pages/authorized/production-sheets/production-sheets.component';
+import { DeliverySheetsComponent } from './pages/authorized/delivery-sheets/delivery-sheets.component';
 import { authenticationGuard } from './shared/services/guards/authentication.guard';
 
 export const routes: Routes = [
@@ -58,6 +59,10 @@ export const routes: Routes = [
             {
                 path: 'production-receipt',
                 component: ProductionReceiptComponent
+            },
+            {
+                path: 'delivery-sheets',
+                component: DeliverySheetsComponent
             }
         ]
     },

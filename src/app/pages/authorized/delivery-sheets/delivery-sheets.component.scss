@@ -1,0 +1,237 @@
+// pages/authorized/delivery-sheets/delivery-sheets.component.scss
+
+@use 'abstracts/variables' as *;
+@use 'abstracts/spacing' as *;
+@use 'abstracts/typography' as *;
+@use 'base/typography' as *;
+
+// ========================================
+// CONTAINER PRINCIPAL
+// ========================================
+.delivery-sheets-container {
+
+    // ========================================
+    // ÁREA DE FILTROS E BUSCA
+    // ========================================
+    .search-input {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        align-items: end;
+
+        // Desktop - 3 colunas (busca, status, cliente + data inicial, data final + botão)
+        @media (min-width: 1200px) {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        // Tablet - 2 colunas
+        @media (max-width: 1199px) and (min-width: 768px) {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        // Mobile - 1 coluna
+        @media (max-width: 767px) {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        // Garantir que o botão sempre ocupe uma linha inteira em mobile
+        ds-button {
+            @media (max-width: 767px) {
+                grid-column: 1 / -1;
+                justify-self: stretch;
+            }
+        }
+
+        // Garantir que os campos ocupem toda a largura disponível
+        .w-100 {
+            width: 100%;
+        }
+
+        // Agrupar filtros de data em seções visuais
+        .date-filter-group {
+            display: contents;
+
+            // Estilo para labels de data
+            ds-input[type="date"] {
+                .input-label {
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                    color: var(--text-primary);
+                }
+            }
+        }
+    }
+
+    // ========================================
+    // CÉLULAS DA TABELA
+    // ========================================
+
+    // Cliente
+    .client-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .placeholder {
+            color: var(--text-label);
+            font-size: 0.875rem;
+        }
+    }
+
+    // Endereço
+    .address-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        max-width: 200px;
+
+        .placeholder {
+            color: var(--text-label);
+            font-size: 0.875rem;
+        }
+    }
+
+    // Status badges com cores específicas para status
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+
+        // Status: Pendente
+        &.status-pending {
+            background-color: #FEF3C7; // yellow-100
+            color: #D97706; // yellow-600
+        }
+
+        // Status: Em Trânsito
+        &.status-in-transit {
+            background-color: #DBEAFE; // blue-100
+            color: #2563EB; // blue-600
+        }
+
+        // Status: Entregue
+        &.status-delivered {
+            background-color: #D1FAE5; // green-100
+            color: #059669; // green-600
+        }
+
+        // Status: Cancelado
+        &.status-cancelled {
+            background-color: #FEE2E2; // red-100
+            color: #DC2626; // red-600
+        }
+    }
+
+    // ========================================
+    // ESTADOS DE LOADING E ERRO
+    // ========================================
+
+    .loading-container,
+    .error-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 300px;
+        padding: 32px;
+
+        .loading-content,
+        .error-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 16px;
+        }
+    }
+
+    // ========================================
+    // RESPONSIVIDADE
+    // ========================================
+
+    @media (max-width: 1024px) {
+
+        // Em telas menores, esconder algumas colunas menos importantes
+        ds-table-cell:nth-child(3),
+        // Endereço
+        ds-table-row [isHeader]:nth-child(3) {
+            display: none;
+        }
+    }
+
+    @media (max-width: 768px) {
+
+        // Em mobile, mostrar apenas as colunas essenciais
+        ds-table-cell:nth-child(2),
+        // Cliente
+        ds-table-cell:nth-child(4),
+        // Data de Entrega
+        ds-table-row [isHeader]:nth-child(2),
+        ds-table-row [isHeader]:nth-child(4) {
+            display: none;
+        }
+
+        // Status badge menor em mobile
+        .status-badge {
+            padding: 2px 8px;
+            font-size: 0.625rem;
+        }
+    }
+
+    // ========================================
+    // UTILITÁRIOS
+    // ========================================
+
+    // Margem esquerda para ícones
+    .ml-8 {
+        margin-left: 8px;
+    }
+
+    // Margin top para elementos
+    .mt-16 {
+        margin-top: 16px;
+    }
+
+    .mt-32 {
+        margin-top: 32px;
+    }
+
+    // Hover effects para linhas da tabela
+    ds-table-row[clickable="true"]:hover {
+        cursor: pointer;
+        background-color: var(--neutral-lighter);
+        transition: background-color 0.2s ease;
+    }
+
+    // ========================================
+    // DARK MODE SUPPORT (caso necessário)
+    // ========================================
+
+    @media (prefers-color-scheme: dark) {
+        .status-badge {
+            &.status-pending {
+                background-color: rgba(217, 119, 6, 0.2);
+                color: #FBBF24;
+            }
+
+            &.status-in-transit {
+                background-color: rgba(37, 99, 235, 0.2);
+                color: #60A5FA;
+            }
+
+            &.status-delivered {
+                background-color: rgba(5, 150, 105, 0.2);
+                color: #34D399;
+            }
+
+            &.status-cancelled {
+                background-color: rgba(220, 38, 38, 0.2);
+                color: #FCA5A5;
+            }
+        }
+    }
+}
