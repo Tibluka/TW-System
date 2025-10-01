@@ -1,6 +1,6 @@
 /**
  * 📅 UTILITÁRIO DE FORMATAÇÃO DE DATAS
- * 
+ *
  * Funções centralizadas para formatação de datas em todo o sistema
  * com validação UTC e tratamento de erros robusto.
  */
@@ -9,7 +9,7 @@ export class DateFormatter {
 
     /**
      * 📅 FORMATAR DATA - Formata data para exibição (dd/MM/yyyy)
-     * 
+     *
      * @param date - Data em formato Date, string ou undefined
      * @returns String formatada em pt-BR ou '-' se inválida
      */
@@ -19,12 +19,12 @@ export class DateFormatter {
         try {
             const dateObj = typeof date === 'string' ? new Date(date) : date;
 
-            // Validação UTC: verifica se a data é válida e está no formato correto
+
             if (isNaN(dateObj.getTime())) {
                 return '-';
             }
 
-            // Sempre formata considerando UTC para evitar problemas de timezone
+
             return dateObj.toLocaleDateString('pt-BR', {
                 timeZone: 'UTC',
                 year: 'numeric',
@@ -38,7 +38,7 @@ export class DateFormatter {
 
     /**
      * ⏰ FORMATAR DATA E HORA - Formata data e hora para exibição (dd/MM/yyyy HH:mm)
-     * 
+     *
      * @param date - Data em formato Date, string ou undefined
      * @returns String formatada em pt-BR ou '-' se inválida
      */
@@ -48,12 +48,12 @@ export class DateFormatter {
         try {
             const dateObj = typeof date === 'string' ? new Date(date) : date;
 
-            // Validação UTC: verifica se a data é válida e está no formato correto
+
             if (isNaN(dateObj.getTime())) {
                 return '-';
             }
 
-            // Sempre formata considerando UTC para evitar problemas de timezone
+
             return dateObj.toLocaleString('pt-BR', {
                 timeZone: 'UTC',
                 year: 'numeric',
@@ -69,7 +69,7 @@ export class DateFormatter {
 
     /**
      * 🕐 FORMATAR HORA - Formata apenas a hora (HH:mm)
-     * 
+     *
      * @param date - Data em formato Date, string ou undefined
      * @returns String formatada em pt-BR ou '-' se inválida
      */
@@ -79,12 +79,12 @@ export class DateFormatter {
         try {
             const dateObj = typeof date === 'string' ? new Date(date) : date;
 
-            // Validação UTC: verifica se a data é válida e está no formato correto
+
             if (isNaN(dateObj.getTime())) {
                 return '-';
             }
 
-            // Sempre formata considerando UTC para evitar problemas de timezone
+
             return dateObj.toLocaleTimeString('pt-BR', {
                 timeZone: 'UTC',
                 hour: '2-digit',
@@ -97,7 +97,7 @@ export class DateFormatter {
 
     /**
      * 📅 FORMATAR DATA PARA INPUT - Converte data para formato de input HTML (yyyy-MM-dd)
-     * 
+     *
      * @param date - Data em formato Date, string ou undefined
      * @returns String no formato yyyy-MM-dd ou string vazia se inválida
      */
@@ -107,7 +107,7 @@ export class DateFormatter {
         try {
             const dateObj = typeof date === 'string' ? new Date(date) : date;
 
-            // Validação UTC: verifica se a data é válida e está no formato correto
+
             if (isNaN(dateObj.getTime())) {
                 return '';
             }
@@ -120,7 +120,7 @@ export class DateFormatter {
 
     /**
      * 🌍 FORMATAR DATA PARA ISO UTC - Converte data do input para formato ISO UTC
-     * 
+     *
      * @param dateString - Data em formato yyyy-MM-dd
      * @returns String no formato ISO UTC ou string vazia se inválida
      */
@@ -128,15 +128,15 @@ export class DateFormatter {
         if (!dateString) return '';
 
         try {
-            // Cria uma data no timezone local com a data selecionada
+
             const date = new Date(dateString + 'T00:00:00');
 
-            // Valida se a data é válida
+
             if (isNaN(date.getTime())) {
                 return '';
             }
 
-            // Retorna no formato ISO UTC
+
             return date.toISOString();
         } catch {
             return '';
@@ -145,7 +145,7 @@ export class DateFormatter {
 
     /**
      * 📅 OBTER DATA DE HOJE - Retorna data de hoje no formato de input
-     * 
+     *
      * @returns String no formato yyyy-MM-dd
      */
     static getTodayDateString(): string {
@@ -155,7 +155,7 @@ export class DateFormatter {
 
     /**
      * ✅ VALIDAR DATA - Verifica se uma data é válida
-     * 
+     *
      * @param date - Data em formato Date, string ou undefined
      * @returns true se a data é válida, false caso contrário
      */
@@ -172,7 +172,7 @@ export class DateFormatter {
 
     /**
      * 🔍 VERIFICAR SE É FORMATO ISO UTC - Verifica se a string está no formato ISO UTC
-     * 
+     *
      * @param dateString - String de data
      * @returns true se está no formato ISO UTC, false caso contrário
      */
