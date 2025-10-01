@@ -328,7 +328,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       const formData = this.productionSheetForm.value;
 
       if (this.isEditMode && this.productionSheetId) {
-        debugger
         const updateData: UpdateProductionSheetRequest = {
           machine: formData.machine,
           entryDate: formData.entryDate,
