@@ -24,6 +24,7 @@ import { ProductionReceiptModalComponent } from './production-receipt-modal/prod
 
 import { ModalService } from '../../../shared/services/modal/modal.service';
 import { ProductionReceiptService } from '../../../shared/services/production-receipt/production-receipt.service';
+import { DateFormatter } from '../../../shared/utils/date-formatter';
 
 
 import { ProductionOrderStatus } from '../../../models/production-orders/production-orders';
@@ -555,16 +556,11 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
 
 
   formatDate(date: string | Date | undefined): string {
-    if (!date) return '-';
-    return new Date(date).toLocaleDateString('pt-BR');
+    return DateFormatter.formatDate(date);
   }
 
   formatTime(date: string | Date | undefined): string {
-    if (!date) return '-';
-    return new Date(date).toLocaleTimeString('pt-BR', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return DateFormatter.formatTime(date);
   }
 
   formatCurrency(value: number | PaymentMethod): string {

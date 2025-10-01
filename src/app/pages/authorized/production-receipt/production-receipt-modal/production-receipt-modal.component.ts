@@ -31,6 +31,7 @@ import { ProductionOrder, ProductionOrderResponse, ProductionTypeEnum } from '..
 
 
 import { FormValidator } from '../../../../shared/utils/form';
+import { DateFormatter } from '../../../../shared/utils/date-formatter';
 import { translateProductionType } from '../../../../shared/utils/tools';
 
 @Component({
@@ -276,7 +277,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
   }
 
   private formatDateForInput(date: string | Date): string {
-    return new Date(date).toISOString().split('T')[0];
+    return DateFormatter.formatDateForInput(date);
   }
 
   private validatePaidAmount(): void {

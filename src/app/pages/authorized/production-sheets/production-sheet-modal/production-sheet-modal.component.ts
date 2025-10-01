@@ -20,6 +20,7 @@ import { IconComponent } from '../../../../shared/components/atoms/icon/icon.com
 
 
 import { FormValidator } from '../../../../shared/utils/form';
+import { DateFormatter } from '../../../../shared/utils/date-formatter';
 
 
 import { ProductionOrder, ProductionOrderStatus, ProductionTypeEnum } from '../../../../models/production-orders/production-orders';
@@ -330,8 +331,8 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       if (this.isEditMode && this.productionSheetId) {
         const updateData: UpdateProductionSheetRequest = {
           machine: formData.machine,
-          entryDate: formData.entryDate,
-          expectedExitDate: formData.expectedExitDate,
+          entryDate: DateFormatter.formatDateToISO(formData.entryDate),
+          expectedExitDate: DateFormatter.formatDateToISO(formData.expectedExitDate),
           stage: formData.stage,
           productionNotes: formData.productionNotes || undefined,
           temperature: formData.temperature ? parseFloat(formData.temperature) : undefined,
@@ -352,8 +353,8 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
         const createData: CreateProductionSheetRequest = {
           productionOrderId: this.productionOrderFound._id!,
           machine: formData.machine,
-          expectedExitDate: formData.expectedExitDate,
-          entryDate: formData.entryDate || undefined,
+          expectedExitDate: DateFormatter.formatDateToISO(formData.expectedExitDate),
+          entryDate: DateFormatter.formatDateToISO(formData.entryDate),
           productionNotes: formData.productionNotes || undefined,
           temperature: formData.temperature ? parseFloat(formData.temperature) : undefined,
           velocity: formData.velocity ? parseFloat(formData.velocity) : undefined
@@ -451,20 +452,13 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
   }
 
   private getTodayDateString(): string {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
+    return DateFormatter.getTodayDateString();
   }
 
   private formatDateForInput(date: Date | string): string {
-    if (!date) return '';
-
-    try {
-      const dateObj = typeof date === 'string' ? new Date(date) : date;
-      return dateObj.toISOString().split('T')[0];
-    } catch {
-      return '';
-    }
+    return DateFormatter.formatDateForInput(date);
   }
+
 
   private closeModal(action: string, data?: any): void {
     this.modalService.close('production-sheet-modal', {

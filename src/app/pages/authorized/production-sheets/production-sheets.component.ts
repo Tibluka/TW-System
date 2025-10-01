@@ -24,6 +24,7 @@ import { FormValidator } from '../../../shared/utils/form';
 import { ProductionSheetModalComponent } from './production-sheet-modal/production-sheet-modal.component';
 import { GeneralModalContentComponent } from '../../../shared/components/general/general-modal-content/general-modal-content.component';
 import { copyToClipboard } from '../../../shared/utils/tools';
+import { DateFormatter } from '../../../shared/utils/date-formatter';
 
 @Component({
   selector: 'app-production-sheets',
@@ -81,7 +82,9 @@ export class ProductionSheetsComponent extends FormValidator {
     machine: undefined,
     page: 1,
     limit: 10,
-    active: true
+    active: true,
+    dateFrom: undefined,
+    dateTo: undefined
   };
 
 
@@ -121,6 +124,7 @@ export class ProductionSheetsComponent extends FormValidator {
 
 
   private searchSubject = new Subject<string>();
+  private dateFilterSubject = new Subject<void>();
   private destroy$ = new Subject<void>();
 
 
@@ -135,6 +139,7 @@ export class ProductionSheetsComponent extends FormValidator {
 
   ngOnInit(): void {
     this.setupSearchDebounce();
+    this.setupDateFilterDebounce();
     this.loadProductionSheets();
   }
 
@@ -156,6 +161,21 @@ export class ProductionSheetsComponent extends FormValidator {
       )
       .subscribe(searchTerm => {
         this.currentFilters.search = searchTerm || undefined;
+        this.currentFilters.page = 1; // Reset para primeira página
+        this.loadProductionSheets();
+      });
+  }
+
+  /**
+   * 📅 SETUP DATE FILTER DEBOUNCE - Configura debounce para filtros de data
+   */
+  private setupDateFilterDebounce(): void {
+    this.dateFilterSubject
+      .pipe(
+        debounceTime(500), // Debounce maior para filtros de data
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
         this.currentFilters.page = 1; // Reset para primeira página
         this.loadProductionSheets();
       });
@@ -213,6 +233,13 @@ export class ProductionSheetsComponent extends FormValidator {
   onMachineFilterChange(): void {
     this.currentFilters.page = 1; // Reset para primeira página
     this.loadProductionSheets();
+  }
+
+  /**
+   * 📅 FILTRO DATA - Evento de mudança nos filtros de data
+   */
+  onDateFilterChange(): void {
+    this.dateFilterSubject.next();
   }
 
 
@@ -290,14 +317,14 @@ export class ProductionSheetsComponent extends FormValidator {
    * 📅 FORMATAR DATA - Formata data para exibição
    */
   formatDate(date: Date | string | undefined): string {
-    return this.productionSheetsService.formatDate(date);
+    return DateFormatter.formatDate(date);
   }
 
   /**
    * ⏰ FORMATAR DATA E HORA - Formata data e hora para exibição
    */
   formatDateTime(date: Date | string | undefined): string {
-    return this.productionSheetsService.formatDateTime(date);
+    return DateFormatter.formatDateTime(date);
   }
 
   /**
@@ -370,7 +397,9 @@ export class ProductionSheetsComponent extends FormValidator {
       machine: undefined,
       page: 1,
       limit: 10,
-      active: true
+      active: true,
+      dateFrom: undefined,
+      dateTo: undefined
     };
     this.loadProductionSheets();
   }

@@ -16,7 +16,7 @@ import { DevelopmentService } from '../../../../shared/services/development/deve
 import { ModalService } from '../../../../shared/services/modal/modal.service';
 import { ProductionOrderService } from '../../../../shared/services/production-order/production-order.service';
 import { FormValidator } from '../../../../shared/utils/form';
-
+import { DateFormatter } from '../../../../shared/utils/date-formatter';
 import { translateProductionType } from '../../../../shared/utils/tools';
 
 interface SelectOption {
@@ -408,8 +408,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
    * 📅 FORMATAR DATA - Formata data para exibição
    */
   formatDate(date: Date | string | undefined): string {
-    if (!date) return '-';
-    return new Date(date).toLocaleDateString('pt-BR');
+    return DateFormatter.formatDate(date);
   }
 
 

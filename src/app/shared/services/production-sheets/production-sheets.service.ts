@@ -4,6 +4,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { DateFormatter } from '../../utils/date-formatter';
 
 
 export interface ProductionSheet {
@@ -252,27 +253,13 @@ export class ProductionSheetsService {
    * 📅 FORMATAR DATA - Formata data para exibição
    */
   formatDate(date: Date | string | undefined): string {
-    if (!date) return '-';
-
-    try {
-      const dateObj = typeof date === 'string' ? new Date(date) : date;
-      return dateObj.toLocaleDateString('pt-BR');
-    } catch {
-      return '-';
-    }
+    return DateFormatter.formatDate(date);
   }
 
   /**
    * ⏰ FORMATAR DATA E HORA - Formata data e hora para exibição
    */
   formatDateTime(date: Date | string | undefined): string {
-    if (!date) return '-';
-
-    try {
-      const dateObj = typeof date === 'string' ? new Date(date) : date;
-      return dateObj.toLocaleString('pt-BR');
-    } catch {
-      return '-';
-    }
+    return DateFormatter.formatDateTime(date);
   }
 }

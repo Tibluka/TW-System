@@ -80,10 +80,8 @@ export interface ProductionSheetFilters {
     active?: boolean;
 
 
-    entryDateFrom?: Date | string;
-    entryDateTo?: Date | string;
-    expectedExitDateFrom?: Date | string;
-    expectedExitDateTo?: Date | string;
+    dateFrom?: Date | string;
+    dateTo?: Date | string;
 
 
     page?: number;

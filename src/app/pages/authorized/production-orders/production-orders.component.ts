@@ -23,6 +23,7 @@ import { ModalService } from '../../../shared/services/modal/modal.service';
 import { ProductionOrderService } from '../../../shared/services/production-order/production-order.service';
 import { FormValidator } from '../../../shared/utils/form';
 import { copyToClipboard, translateProductionType } from '../../../shared/utils/tools';
+import { DateFormatter } from '../../../shared/utils/date-formatter';
 import { ProductionOrderModalComponent } from "./production-order-modal/production-order-modal.component";
 import { DsListViewComponent, ViewMode } from "../../../shared/components/molecules/list-view/list-view.component";
 import { ListViewConfig } from '../../../models/list-view/list-view';
@@ -311,14 +312,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
    * 📅 FORMATAR DATA - Formata data para exibição
    */
   formatDate(date: Date | string | undefined): string {
-    if (!date) return '-';
-
-    try {
-      const dateObj = typeof date === 'string' ? new Date(date) : date;
-      return dateObj.toLocaleDateString('pt-BR');
-    } catch {
-      return '-';
-    }
+    return DateFormatter.formatDate(date);
   }
 
   /**

@@ -4,6 +4,7 @@
 
 
     <div class="search-input">
+        <!-- Filtros Básicos -->
         <div class="w-100">
             <ds-input label="Buscar ficha de produção" placeholder="Digite referência interna, observações..."
                 icon="fa-solid fa-magnifying-glass" iconPosition="left" [(ngModel)]="currentFilters.search"
@@ -23,6 +24,20 @@
             </ds-select>
         </div>
 
+        <!-- Filtro de Data - Range Único (busca por data de entrada ou saída prevista) -->
+        <div class="w-100 date-filter-group">
+            <ds-input label="Data Inicial" type="date" [(ngModel)]="currentFilters.dateFrom"
+                (ngModelChange)="onDateFilterChange()" width="100%">
+            </ds-input>
+        </div>
+
+        <div class="w-100 date-filter-group">
+            <ds-input label="Data Final" type="date" [(ngModel)]="currentFilters.dateTo"
+                (ngModelChange)="onDateFilterChange()" width="100%">
+            </ds-input>
+        </div>
+
+        <!-- Botão de Ação -->
         <ds-button label="Nova Ficha de Produção" variant="fill" icon="fa-solid fa-plus"
             (onClickEmitter)="createProductionSheet()">
         </ds-button>
@@ -117,7 +132,6 @@
                                 {{ formatDate(productionSheet.entryDate) }}
                             </span>
                         </ds-table-cell>
-
 
                         <ds-table-cell align="left">
                             <span class="body primary-dark">
