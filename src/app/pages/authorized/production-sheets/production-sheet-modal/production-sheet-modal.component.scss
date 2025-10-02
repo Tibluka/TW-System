@@ -506,3 +506,69 @@
     font-size: 16px;
     font-weight: 500;
 }
+
+// ========================================
+// ESTILOS ESPECÍFICOS DA TABELA DE VARIANTES
+// ========================================
+.variant-header {
+    min-width: 120px;
+    text-align: left !important;
+    background-color: var(--surface);
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+.fabric-header {
+    min-width: 100px;
+    text-align: left !important;
+    background-color: var(--surface);
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+.size-header {
+    min-width: 60px;
+    font-size: 0.875rem;
+    background-color: var(--surface);
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+.variant-name {
+    text-align: left !important;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.fabric-type {
+    text-align: left !important;
+    font-weight: 400;
+    color: var(--text-secondary);
+}
+
+.size-value {
+    min-width: 60px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-secondary);
+
+    i {
+        font-size: 2rem;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+
+    p {
+        font-size: 0.875rem;
+        margin: 0;
+    }
+}

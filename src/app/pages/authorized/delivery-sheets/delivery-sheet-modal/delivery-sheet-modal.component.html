@@ -39,9 +39,9 @@
                             <div class="production-sheet-details">
                                 <h1 class="title-modal mb-6 secondary">{{productionSheetFound.internalReference}}</h1>
                                 <p class="subtitle-section secondary mb-0">
-                                    {{productionSheetFound.productionOrder?.development?.client?.companyName}}</p>
+                                    {{productionSheetFound.productionOrder.development.client.companyName}}</p>
                                 <p class="card-small secondary mb-4">
-                                    {{productionSheetFound.productionOrder?.development?.clientReference}}</p>
+                                    {{productionSheetFound.productionOrder.development.clientReference}}</p>
                                 <hr>
 
 
@@ -54,7 +54,7 @@
                                         </p>
                                         <p class="body secondary mb-2">
                                             <strong>Tipo de Tecido:</strong>
-                                            {{productionSheetFound.productionOrder.fabricType}}
+                                            {{getFabricType(productionSheetFound.productionOrder)}}
                                         </p>
                                         <p class="body secondary mb-2">
                                             <strong>Tipo de Produção:</strong>
@@ -63,7 +63,7 @@
                                         <p class="body secondary mb-2"
                                             *ngIf="productionSheetFound.productionOrder.productionType?.type === 'rotary' && productionSheetFound.productionOrder.productionType?.meters">
                                             <strong>Metragem:</strong>
-                                            {{productionSheetFound.productionOrder.productionType.meters}}m
+                                            {{productionSheetFound.productionOrder.productionType?.meters}}m
                                         </p>
                                         <p class="body secondary mb-2"
                                             *ngIf="productionSheetFound.productionOrder.productionType?.type === 'localized' && productionSheetFound.productionOrder.productionType?.variants">
@@ -72,7 +72,8 @@
                                         </p>
                                         <p class="body secondary mb-2"
                                             *ngIf="productionSheetFound.productionOrder.hasCraft !== undefined">
-                                            <strong>Tem Craft:</strong> {{productionSheetFound.productionOrder.hasCraft
+                                            <strong>Tem Craft:</strong>
+                                            {{productionSheetFound.productionOrder.hasCraft
                                             ? 'Sim' : 'Não'}}
                                         </p>
                                         <p class="body secondary mb-2"

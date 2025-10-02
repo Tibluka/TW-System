@@ -75,25 +75,29 @@
 
                                 <thead>
                                     <tr>
-                                        <th>
+                                        <th class="variant-header">
                                             Variante
                                         </th>
-                                        <th class="size-header"
-                                            *ngFor="let variant of productionOrderFound.productionType?.variants; let i = index">
-                                            {{ variant.variantName || 'Variante ' + (i + 1) }}
+                                        <th class="fabric-header">
+                                            Tipo de Tecido
+                                        </th>
+                                        <th class="size-header" *ngFor="let size of sizeOptions">
+                                            {{ size.label }}
                                         </th>
                                     </tr>
                                 </thead>
 
-
                                 <tbody>
                                     <tr
                                         *ngFor="let variant of productionOrderFound.productionType?.variants; let i = index">
-                                        <td>
+                                        <td class="variant-name">
                                             {{ variant.variantName }}
                                         </td>
-                                        <td class="size-value" *ngFor="let quantity of variant.quantities">
-                                            <p class="body secondary">{{ quantity.value }}</p>
+                                        <td class="fabric-type">
+                                            {{ variant.fabricType }}
+                                        </td>
+                                        <td class="size-value" *ngFor="let size of sizeOptions">
+                                            <p class="body secondary">{{ getQuantityForSize(variant, size.value) }}</p>
                                         </td>
                                     </tr>
                                 </tbody>

@@ -80,6 +80,15 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
   productionOrderNotFound = false;
   searchingProductionOrder = false;
 
+  // 📏 OPÇÕES DE TAMANHOS
+  sizeOptions = [
+    { value: 'PP', label: 'PP' },
+    { value: 'P', label: 'P' },
+    { value: 'M', label: 'M' },
+    { value: 'G', label: 'G' },
+    { value: 'G1', label: 'G1' },
+    { value: 'G2', label: 'G2' }
+  ];
 
   machineOptions: SelectOption[] = [
     { value: 1, label: 'Máquina 1' },
@@ -308,6 +317,18 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
     this.productionOrderFound = null;
     this.productionOrderNotFound = false;
     this.searchingProductionOrder = false;
+  }
+
+  /**
+   * 📏 OBTER QUANTIDADE POR TAMANHO - Retorna a quantidade para um tamanho específico
+   */
+  getQuantityForSize(variant: any, size: string): number {
+    if (!variant.quantities || !Array.isArray(variant.quantities)) {
+      return 0;
+    }
+
+    const quantity = variant.quantities.find((q: any) => q.size === size);
+    return quantity ? quantity.value : 0;
   }
 
 

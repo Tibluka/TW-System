@@ -223,12 +223,18 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
      * 📋 POPULAR FORMULÁRIO COM DADOS DO MODAL - Preenche dados da ficha de entrega para edição
      */
     private populateFormFromData(deliverySheet: any): void {
-
         if (deliverySheet.productionSheet) {
             this.productionSheetFound = deliverySheet.productionSheet;
             this.deliverySheetForm.get('internalReference')?.disable();
             this.productionSheetNotFound = false;
             this.searchingProductionSheet = false;
+
+            // Debug: verificar estrutura dos dados
+            console.log('Delivery Sheet Data:', deliverySheet);
+            console.log('Production Sheet Found:', this.productionSheetFound);
+            console.log('Production Order:', this.productionSheetFound?.productionOrder);
+            console.log('Production Order ProductionType:', this.productionSheetFound?.productionOrder?.productionType);
+            console.log('Development ProductionType:', this.productionSheetFound?.productionOrder?.development?.productionType);
         }
 
 
@@ -259,7 +265,6 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
      * 📝 POPULAR FORMULÁRIO - Preenche formulário com dados da ficha
      */
     private populateForm(deliverySheet: DeliverySheet): void {
-
         if (deliverySheet.productionSheet) {
             this.productionSheetFound = deliverySheet.productionSheet;
             this.productionSheetNotFound = false;
@@ -490,11 +495,47 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
      * 📊 TOTAL DE PEÇAS - Calcula total de peças para produção localizada
      */
     getTotalPieces(productionType: any): string {
-        if (!productionType || productionType.type !== 'localized' || !productionType.additionalInfo?.sizes) {
+        if (!productionType || productionType.type !== 'localized' || !productionType.variants) {
             return '0';
         }
 
-        const total = productionType.additionalInfo.sizes.reduce((sum: number, item: any) => sum + (item.value || 0), 0);
+        let total = 0;
+        productionType.variants.forEach((variant: any) => {
+            if (variant.quantities && Array.isArray(variant.quantities)) {
+                variant.quantities.forEach((quantity: any) => {
+                    total += quantity.value || 0;
+                });
+            }
+        });
+
         return `${total} pç${total !== 1 ? 's' : ''}`;
+    }
+
+    /**
+     * 🧵 TIPO DE TECIDO - Retorna o tipo de tecido baseado no tipo de produção
+     */
+    getFabricType(productionOrder: any): string {
+        if (!productionOrder) return '-';
+
+        // Para produção rotary, usar fabricType do productionType
+        if (productionOrder.productionType?.type === 'rotary') {
+            return productionOrder.productionType.fabricType || productionOrder.fabricType || '-';
+        }
+
+        // Para produção localized, mostrar "Vários" se houver múltiplas variantes com tipos diferentes
+        if (productionOrder.productionType?.type === 'localized' && productionOrder.productionType.variants) {
+            const fabricTypes = productionOrder.productionType.variants
+                .map((variant: any) => variant.fabricType)
+                .filter((type: any) => type && typeof type === 'string' && type.trim() !== '');
+
+            const uniqueFabricTypes = [...new Set(fabricTypes)];
+
+            if (uniqueFabricTypes.length === 0) return '-';
+            if (uniqueFabricTypes.length === 1) return uniqueFabricTypes[0] as string;
+            return 'Vários tipos';
+        }
+
+        // Fallback para fabricType direto da ordem de produção
+        return productionOrder.fabricType || '-';
     }
 }
