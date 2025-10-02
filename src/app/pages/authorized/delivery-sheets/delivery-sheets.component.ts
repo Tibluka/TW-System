@@ -99,10 +99,9 @@ export class DeliverySheetsComponent extends FormValidator {
     ];
 
     deliverySheetStatusOptions: StatusOption[] = [
-        { value: 'PENDING', label: 'Pendente', color: 'warning' },
-        { value: 'IN_TRANSIT', label: 'Em Trânsito', color: 'info' },
-        { value: 'DELIVERED', label: 'Entregue', color: 'success' },
-        { value: 'CANCELLED', label: 'Cancelado', color: 'error' }
+        { value: 'CREATED', label: 'Criada', icon: 'fa-solid fa-plus', color: 'info' },
+        { value: 'ON_ROUTE', label: 'Em Rota', icon: 'fa-solid fa-truck', color: 'warning' },
+        { value: 'DELIVERED', label: 'Entregue', icon: 'fa-solid fa-check-circle', color: 'success' }
     ];
 
 
@@ -432,6 +431,11 @@ export class DeliverySheetsComponent extends FormValidator {
     changeDeliverySheetStatus(deliverySheet: DeliverySheet): void {
         this.selectedDeliverySheetForStatusUpdate = deliverySheet;
 
+        setTimeout(() => {
+            if (this.statusUpdaterComponent) {
+                this.statusUpdaterComponent.openStatusModal();
+            }
+        }, 0);
     }
 
     /**

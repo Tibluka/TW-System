@@ -111,7 +111,7 @@ export class DeliverySheetsService {
     /**
      * 🔄 ATUALIZAR STATUS - Atualiza apenas o status da ficha
      */
-    updateDeliverySheetStatus(id: string, status: DeliverySheetStatus): Observable<DeliverySheetResponse> {
+    updateDeliverySheetStatus(id: string, status: string): Observable<DeliverySheetResponse> {
         return this.http.patch<DeliverySheetResponse>(`${this.baseUrl}/${id}/status`, { status });
     }
 

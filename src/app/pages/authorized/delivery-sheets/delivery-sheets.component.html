@@ -196,7 +196,7 @@
 </ds-modal>
 
 
-<ds-status-updater *ngIf="selectedDeliverySheetForStatusUpdate" #statusUpdaterRef
+<ds-status-updater *ngIf="selectedDeliverySheetForStatusUpdate" #statusUpdaterRef entityType="delivery-sheet"
     [entityId]="selectedDeliverySheetForStatusUpdate._id!" [currentStatus]="selectedDeliverySheetForStatusUpdate.status"
     [availableStatuses]="deliverySheetStatusOptions"
     [entityReference]="selectedDeliverySheetForStatusUpdate.internalReference"

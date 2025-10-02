@@ -24,13 +24,14 @@ export interface StatusUpdateResult {
     error?: string;
 }
 
-export type EntityType = 'development' | 'production-order' | 'production-sheet' | 'production-receipt';
+export type EntityType = 'development' | 'production-order' | 'production-sheet' | 'production-receipt' | 'delivery-sheet';
 
 
 import { DevelopmentService } from '../../../services/development/development.service';
 import { ProductionOrderService } from '../../../services/production-order/production-order.service';
 import { ProductionSheetsService } from '../../../services/production-sheets/production-sheets.service';
 import { ProductionReceiptService } from '../../../services/production-receipt/production-receipt.service';
+import { DeliverySheetsService } from '../../../services/delivery-sheets/delivery-sheets.service';
 import { ModalService } from '../../../services/modal/modal.service';
 import { SelectComponent } from "../../atoms/select/select.component";
 import { FormsModule, NgModel } from '@angular/forms';
@@ -77,6 +78,7 @@ export class StatusUpdaterComponent {
     private productionOrderService = inject(ProductionOrderService);
     private productionSheetsService = inject(ProductionSheetsService);
     private productionReceiptService = inject(ProductionReceiptService);
+    private deliverySheetsService = inject(DeliverySheetsService);
     private modalService = inject(ModalService);
 
 
@@ -219,6 +221,9 @@ export class StatusUpdaterComponent {
             case 'production-receipt':
                 return this.productionReceiptService.updateStatus(entityId, newStatus).toPromise();
 
+            case 'delivery-sheet':
+                return this.deliverySheetsService.updateDeliverySheetStatus(entityId, newStatus).toPromise();
+
             default:
                 throw new Error(`Tipo de entidade não suportado: ${this.entityType}`);
         }
@@ -232,7 +237,8 @@ export class StatusUpdaterComponent {
             'development': 'Desenvolvimento',
             'production-order': 'Ordem de Produção',
             'production-sheet': 'Ficha de Produção',
-            'production-receipt': 'Recebimento de Produção'
+            'production-receipt': 'Recibo de Produção',
+            'delivery-sheet': 'Ficha de Entrega'
         };
 
         const entityName = entityNames[this.entityType];
