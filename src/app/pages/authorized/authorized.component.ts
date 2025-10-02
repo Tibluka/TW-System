@@ -31,7 +31,7 @@ export class AuthorizedComponent implements OnInit {
   private checkScreenSize(): void {
     this.isMobile = window.innerWidth <= 600;
 
-    // Fechar menu quando voltar para desktop
+
     if (!this.isMobile) {
       this.isMenuOpen = false;
     }
@@ -42,7 +42,6 @@ export class AuthorizedComponent implements OnInit {
   }
 
   onMenuClose(): void {
-    console.log('Menu close clicked!', this.isMenuOpen);
     this.isMenuOpen = false;
   }
 }
