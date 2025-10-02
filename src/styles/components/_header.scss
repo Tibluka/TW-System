@@ -12,7 +12,7 @@
     left: 0;
     right: 0;
     height: 80px;
-    background: var(--white);
+    background: var(--primary-gradient);
     border-bottom: 1px solid var(--stroke);
     z-index: 1000;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -54,7 +54,7 @@
 
 .header-title {
     @include title-modal();
-    color: var(--primary-dark);
+    color: var(--white);
     margin: 0;
     font-size: 1.25rem;
     font-weight: 600;
@@ -71,22 +71,23 @@
     border-radius: $border-radius-sm;
     cursor: pointer;
     transition: all 0.2s ease;
+    color: var(--white);
 
     &:hover {
-        background: var(--neutral-lighter);
+        background: rgba(255, 255, 255, 0.1);
     }
 
     &:active {
-        background: var(--neutral-light);
+        background: rgba(255, 255, 255, 0.2);
     }
 
     &.active {
-        background: var(--primary-lighter);
-        color: var(--primary-dark);
+        background: rgba(255, 255, 255, 0.2);
+        color: var(--white);
     }
 
     &:focus {
-        outline: 2px solid var(--primary-medium);
+        outline: 2px solid var(--white);
         outline-offset: 2px;
     }
 }
@@ -115,21 +116,27 @@
 // ========================================
 @media (prefers-color-scheme: dark) {
     .ds-header {
-        background: var(--background-tertiary);
+        background: var(--primary-gradient);
         border-bottom-color: var(--neutral-dark);
     }
 
+    .header-title {
+        color: var(--white);
+    }
+
     .menu-button {
+        color: var(--white);
+
         &:hover {
-            background: var(--neutral-dark);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         &:active {
-            background: var(--neutral);
+            background: rgba(255, 255, 255, 0.2);
         }
 
         &.active {
-            background: var(--primary-dark);
+            background: rgba(255, 255, 255, 0.2);
             color: var(--white);
         }
     }

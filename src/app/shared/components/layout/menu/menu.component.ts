@@ -64,7 +64,14 @@ export class MenuComponent implements OnInit, OnDestroy {
    */
   toggleMenu(): void {
     if (this.menuService.isAnimating()) return;
-    this.menuService.toggle();
+
+    // Em mobile, sempre fechar o menu quando clicar no hamburger
+    if (window.innerWidth <= 600) {
+      this.menuClose.emit();
+    } else {
+      // Em desktop, comportamento normal de toggle
+      this.menuService.toggle();
+    }
   }
 
   /**

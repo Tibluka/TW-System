@@ -42,6 +42,7 @@ export class AuthorizedComponent implements OnInit {
   }
 
   onMenuClose(): void {
+    console.log('Menu close clicked!', this.isMenuOpen);
     this.isMenuOpen = false;
   }
 }

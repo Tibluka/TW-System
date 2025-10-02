@@ -32,6 +32,7 @@
                 left: 0;
                 height: 100vh;
                 z-index: 1001;
+                max-width: 280px;
                 transform: translateX(0);
             }
         }
@@ -56,21 +57,25 @@
         }
     }
 
-    // Overlay para fechar menu no mobile
-    .menu-overlay {
-        display: none;
+}
 
-        @media (max-width: 600px) {
-            display: block;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            animation: fadeIn 0.3s ease;
-        }
+// ========================================
+// OVERLAY PARA FECHAR MENU NO MOBILE
+// ========================================
+.menu-overlay {
+    display: none;
+
+    @media (max-width: 600px) {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000; // Abaixo do menu (z-index: 1001)
+        animation: fadeIn 0.3s ease;
+        cursor: pointer;
     }
 }
 
