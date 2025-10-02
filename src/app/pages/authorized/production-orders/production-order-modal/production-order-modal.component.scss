@@ -6,6 +6,42 @@
 @use 'base/typography' as *;
 
 // ========================================
+// TABELA DE QUANTIDADES
+// ========================================
+.production-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: $spacing-md;
+
+    th,
+    td {
+        padding: $spacing-sm;
+        text-align: center;
+        border: 1px solid $stroke;
+    }
+
+    th {
+        background-color: var(--surface);
+        font-weight: 600;
+        color: var(--primary-dark);
+    }
+
+    .size-header {
+        min-width: 60px;
+        font-size: 0.875rem;
+    }
+
+    .quantity-input {
+        width: 60px;
+        text-align: center;
+    }
+
+    .size-value {
+        min-width: 60px;
+    }
+}
+
+// ========================================
 // CONTAINER DE LOADING
 // ========================================
 .loading-container {

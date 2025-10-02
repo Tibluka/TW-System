@@ -84,6 +84,113 @@
     }
 
     // ============================================
+    // PRODUCTION TYPE FIELDS
+    // ============================================
+    .rotary-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: $spacing-md;
+
+        @media (max-width: 768px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .localized-fields {
+        .variants-section {
+            .section-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: $spacing-md;
+
+                h3 {
+                    margin: 0;
+                    color: var(--primary-dark);
+                    font-size: $font-lg;
+                    font-weight: 600;
+                }
+            }
+
+            .variants-list {
+                display: flex;
+                flex-direction: column;
+                gap: $spacing-lg;
+
+                .variant-card {
+                    border: 1px solid var(--stroke);
+                    border-radius: $border-radius-md;
+                    padding: $spacing-lg;
+                    background: var(--background-secondary);
+
+                    .variant-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: $spacing-md;
+
+                        h4 {
+                            margin: 0;
+                            color: var(--primary-medium);
+                            font-size: $font-md;
+                            font-weight: 500;
+                        }
+                    }
+
+                    .variant-fields {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: $spacing-md;
+                        margin-bottom: $spacing-lg;
+
+                        @media (max-width: 768px) {
+                            grid-template-columns: 1fr;
+                        }
+                    }
+
+                    .quantities-section {
+                        .quantities-header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            margin-bottom: $spacing-sm;
+
+                            h5 {
+                                margin: 0;
+                                color: var(--label);
+                                font-size: $font-sm;
+                                font-weight: 500;
+                            }
+                        }
+
+                        .quantities-list {
+                            display: flex;
+                            flex-direction: column;
+                            gap: $spacing-sm;
+
+                            .quantity-item {
+                                display: flex;
+                                align-items: end;
+                                gap: $spacing-sm;
+
+                                ds-select,
+                                ds-input {
+                                    flex: 0 0 auto;
+                                }
+
+                                ds-button {
+                                    flex: 0 0 auto;
+                                    align-self: flex-end;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // ============================================
     // MODAL ACTIONS
     // ============================================
     .modal-actions {

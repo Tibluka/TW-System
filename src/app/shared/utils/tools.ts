@@ -1,5 +1,6 @@
-import { DevelopmentStatus, ProductionTypeEnum } from "../../models/developments/developments";
+import { DevelopmentStatus } from "../../models/developments/developments";
 import { ProductionOrderStatus } from "../../models/production-orders/production-orders";
+import { ProductionTypeEnum } from "../../models/production-type";
 
 export function copyToClipboard(internalReference: string, event?: MouseEvent) {
     if (event) {

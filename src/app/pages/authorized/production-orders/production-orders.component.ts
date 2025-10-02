@@ -6,7 +6,7 @@ import { FormsModule, NgModel } from "@angular/forms";
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
 
-import { PaginationInfo, ProductionOrder, ProductionOrderFilters, ProductionTypeEnum } from '../../../models/production-orders/production-orders';
+import { PaginationInfo, ProductionOrder, ProductionOrderFilters } from '../../../models/production-orders/production-orders';
 import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
 import { BadgeComponent } from "../../../shared/components/atoms/badge/badge.component";
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
@@ -28,6 +28,7 @@ import { ProductionOrderModalComponent } from "./production-order-modal/producti
 import { DsListViewComponent, ViewMode } from "../../../shared/components/molecules/list-view/list-view.component";
 import { ListViewConfig } from '../../../models/list-view/list-view';
 import { ListViewService } from '../../../shared/services/list-view/list-view.service';
+import { ProductionTypeEnum } from '../../../models/production-type/production-type';
 
 @Component({
   selector: 'app-production-orders',

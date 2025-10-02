@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
 import { Client } from '../../../../models/clients/clients';
 import { CreateDevelopmentRequest, Development, PieceImage, UpdateDevelopmentRequest } from '../../../../models/developments/developments';
+import { ProductionType, ProductionVariant, QuantityItem, SIZE_OPTIONS } from '../../../../models/production-type';
 import { ButtonComponent } from '../../../../shared/components/atoms/button/button.component';
 import { InputComponent } from '../../../../shared/components/atoms/input/input.component';
 import { SelectComponent } from '../../../../shared/components/atoms/select/select.component';
@@ -25,6 +26,7 @@ interface SelectOption {
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     ButtonComponent,
     InputComponent,
     SelectComponent,
@@ -47,6 +49,10 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
 
   isLoading = false;
   isSaving = false;
+
+  // Propriedades para gerenciar variantes
+  variants: ProductionVariant[] = [];
+  sizeOptions: SelectOption[] = [...SIZE_OPTIONS];
 
 
   developmentForm: FormGroup = new FormGroup({});
@@ -92,9 +98,7 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
     this.developmentForm = this.formBuilder.group({
       clientId: ['', [Validators.required]],
       description: [''],
-      productionType: this.formBuilder.group({
-        type: ['', [Validators.required]]
-      }),
+      productionType: ['', [Validators.required]],
       clientReference: ['']
     });
 
@@ -152,19 +156,9 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
  * 📋 POPULAR FORMULÁRIO - Preenche dados do desenvolvimento para edição
  */
   private populateForm(development: Development): void {
+    let variants: ProductionVariant[] = [];
 
-    let productionTypeValue = '';
-
-    if (development.productionType) {
-
-      if (typeof development.productionType === 'object' && development.productionType.type) {
-        productionTypeValue = development.productionType.type;
-      }
-
-      else if (typeof development.productionType === 'string') {
-        productionTypeValue = development.productionType;
-      }
-    }
+    this.variants = variants;
 
     if (development.pieceImage?.url) {
       this.existingFile = development.pieceImage;
@@ -173,9 +167,7 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
     this.developmentForm.patchValue({
       clientId: development.client?._id || development.clientId,
       description: development.description || '',
-      productionType: {
-        type: productionTypeValue // ✅ Usar o valor extraído
-      },
+      productionType: development.productionType,
       clientReference: development.clientReference || ''
     });
 
@@ -240,6 +232,84 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
    */
   onCancel(): void {
     this.modalService.close('development-modal', { success: false });
+  }
+
+  /**
+   * 🎯 MÉTODOS PARA GERENCIAR VARIANTES
+   */
+
+  /**
+   * ➕ ADICIONAR VARIANTE - Adiciona nova variante para produção localizada
+   */
+  addVariant(): void {
+    const newVariant: ProductionVariant = {
+      variantName: '',
+      fabricType: '',
+      quantities: [{ size: '', value: 0 }]
+    };
+    this.variants.push(newVariant);
+    this.updateVariantsInForm();
+
+    // Garantir que meters seja 0 para localized
+    if (this.getProductionType() === 'localized') {
+      this.developmentForm.get('productionType.meters')?.setValue(0);
+    }
+  }
+
+  /**
+   * ➖ REMOVER VARIANTE - Remove variante específica
+   */
+  removeVariant(index: number): void {
+    if (this.variants.length > 1) {
+      this.variants.splice(index, 1);
+      this.updateVariantsInForm();
+    }
+  }
+
+  /**
+   * ➕ ADICIONAR QUANTIDADE - Adiciona nova quantidade para uma variante
+   */
+  addQuantity(variantIndex: number): void {
+    this.variants[variantIndex].quantities.push({ size: '', value: 0 });
+    this.updateVariantsInForm();
+  }
+
+  /**
+   * ➖ REMOVER QUANTIDADE - Remove quantidade específica
+   */
+  removeQuantity(variantIndex: number, quantityIndex: number): void {
+    if (this.variants[variantIndex].quantities.length > 1) {
+      this.variants[variantIndex].quantities.splice(quantityIndex, 1);
+      this.updateVariantsInForm();
+    }
+  }
+
+  /**
+   * 🔄 ATUALIZAR VARIANTES NO FORM - Sincroniza variantes com o formulário
+   */
+  private updateVariantsInForm(): void {
+    this.developmentForm.get('productionType.variants')?.setValue(this.variants);
+  }
+
+  /**
+   * 🎯 OBTER TIPO DE PRODUÇÃO - Retorna o tipo de produção selecionado
+   */
+  getProductionType(): string {
+    return this.developmentForm.get('productionType.type')?.value || '';
+  }
+
+  /**
+   * 🎯 OBTER METROS - Retorna os metros para produção rotativa
+   */
+  getMeters(): number {
+    return this.developmentForm.get('productionType.meters')?.value || 0;
+  }
+
+  /**
+   * 🎯 OBTER TIPO DE TECIDO - Retorna o tipo de tecido para produção rotativa
+   */
+  getFabricType(): string {
+    return this.developmentForm.get('productionType.fabricType')?.value || '';
   }
 
 

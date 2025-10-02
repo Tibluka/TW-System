@@ -4,7 +4,7 @@ import { FormsModule, NgModel } from "@angular/forms";
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 
 
-import { Development, DevelopmentFilters, DevelopmentListResponse, DevelopmentStatus, PaginationInfo, ProductionTypeEnum } from '../../../models/developments/developments';
+import { Development, DevelopmentFilters, DevelopmentListResponse, DevelopmentStatus, PaginationInfo } from '../../../models/developments/developments';
 import { ListViewConfig } from '../../../models/list-view/list-view';
 import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
 import { BadgeComponent } from "../../../shared/components/atoms/badge/badge.component";
@@ -25,6 +25,7 @@ import { ModalService } from '../../../shared/services/modal/modal.service';
 import { FormValidator } from '../../../shared/utils/form';
 import { copyToClipboard, translateDevelopmentStatus, translateProductionType } from '../../../shared/utils/tools';
 import { DevelopmentModalComponent } from "./development-modal/development-modal.component";
+import { ProductionTypeEnum } from '../../../models/production-type';
 
 @Component({
   selector: 'app-developments',

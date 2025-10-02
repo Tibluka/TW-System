@@ -35,12 +35,11 @@
                 </div>
 
 
-                <div class="field-group production-type-field" formGroupName="productionType">
-                    <ds-select label="Tipo de Produção" placeholder="Selecione o tipo" formControlName="type"
+                <div class="field-group production-type-field">
+                    <ds-select label="Tipo de Produção" placeholder="Selecione o tipo" formControlName="productionType"
                         [options]="productionTypeOptions" [required]="true" placement="top"
                         [errorMessage]="getFieldError('productionType')"
-                        [invalid]="isFormControlInvalid(developmentForm.get('productionType')?.get('type'))"
-                        width="100%" />
+                        [invalid]="isFormControlInvalid(developmentForm.get('productionType'))" width="100%" />
                 </div>
 
                 <div class="field-group client-reference-field">

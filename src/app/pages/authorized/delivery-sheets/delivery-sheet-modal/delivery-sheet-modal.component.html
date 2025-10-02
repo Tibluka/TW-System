@@ -66,7 +66,7 @@
                                             {{productionSheetFound.productionOrder.productionType.meters}}m
                                         </p>
                                         <p class="body secondary mb-2"
-                                            *ngIf="productionSheetFound.productionOrder.productionType?.type === 'localized' && productionSheetFound.productionOrder.productionType?.additionalInfo?.sizes">
+                                            *ngIf="productionSheetFound.productionOrder.productionType?.type === 'localized' && productionSheetFound.productionOrder.productionType?.variants">
                                             <strong>Total de Peças:</strong>
                                             {{getTotalPieces(productionSheetFound.productionOrder.productionType)}}
                                         </p>

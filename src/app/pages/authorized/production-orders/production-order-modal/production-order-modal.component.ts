@@ -2,9 +2,10 @@
 
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, lastValueFrom, Subject, takeUntil } from 'rxjs';
-import { Development, ProductionTypeEnum } from '../../../../models/developments/developments';
+import { Development } from '../../../../models/developments/developments';
+import { ProductionTypeEnum, ProductionVariant } from '../../../../models/production-type';
 import { CreateProductionOrderRequest, ProductionOrder, UpdateProductionOrderRequest } from '../../../../models/production-orders/production-orders';
 import { ButtonComponent } from '../../../../shared/components/atoms/button/button.component';
 import { CheckboxComponent } from '../../../../shared/components/atoms/checkbox/checkbox.component';
@@ -61,6 +62,16 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
   developmentFound: Development | null = null;
   developmentNotFound = false;
 
+  // 📏 OPÇÕES DE TAMANHOS
+  sizeOptions = [
+    { value: 'PP', label: 'PP' },
+    { value: 'P', label: 'P' },
+    { value: 'M', label: 'M' },
+    { value: 'G', label: 'G' },
+    { value: 'G1', label: 'G1' },
+    { value: 'G2', label: 'G2' }
+  ];
+
 
   statusOptions: SelectOption[] = [
     { value: 'CREATED', label: 'Criado' },
@@ -71,10 +82,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     { value: 'FINALIZED', label: 'Finalizado' }
   ];
 
-  productionTypeOptions: SelectOption[] = [
-    { value: 'rotary', label: 'Rotativa' },
-    { value: 'localized', label: 'Localizada' }
-  ];
 
   variantOptions: SelectOption[] = [
     { value: 'COR123', label: 'Cor 1' }
@@ -114,11 +121,9 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       internalReference: ['', [Validators.required]],
       productionType: this.formBuilder.group({
         type: ['', [Validators.required]],
-        meters: [null],
-        additionalInfo: this.formBuilder.group({
-          variant: ['']
-
-        })
+        meters: [0, [Validators.required, Validators.min(0)]],
+        fabricType: [''],
+        variants: this.formBuilder.array([])
       }),
       fabricType: ['', [Validators.required]],
       observations: [''],
@@ -126,7 +131,158 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       hasCraft: [false],
       fabricWidth: [null, [Validators.min(0.1), Validators.max(500)]]
     });
+  }
 
+  /**
+   * 🏗️ CRIAR PRODUCTION TYPE COMPLETO - Cria objeto productionType baseado no tipo
+   */
+  private createProductionType(type: 'rotary' | 'localized'): any {
+    if (type === 'rotary') {
+      return {
+        type: 'rotary',
+        meters: 1000,
+        fabricType: 'algodao'
+      };
+    } else {
+      return {
+        type: 'localized',
+        variants: [
+          {
+            variantName: 'COR_AZUL',
+            fabricType: 'algodao',
+            quantities: [
+              { size: 'PP', value: 10 },
+              { size: 'P', value: 20 }
+            ]
+          }
+        ]
+      };
+    }
+  }
+
+  /**
+   * 🎯 INICIALIZAR PRODUCTION TYPE DO DESENVOLVIMENTO - Detecta tipo e preenche estrutura
+   */
+  private initializeProductionTypeFromDevelopment(development: Development): void {
+    const productionType = development.productionType;
+
+    if (productionType === 'rotary') {
+      const rotaryData = {
+        type: 'rotary',
+        meters: 0, // Valor padrão
+        fabricType: '' // Valor padrão
+      };
+      this.productionOrderForm.patchValue({
+        productionType: rotaryData
+      });
+
+      this.productionOrderForm.get('fabricType')?.setValidators([Validators.required]);
+      this.productionOrderForm.get('fabricType')?.updateValueAndValidity();
+
+
+      this.variantsArray.clear();
+    } else if (productionType === 'localized') {
+      this.productionOrderForm.patchValue({
+        productionType: {
+          type: 'localized'
+        }
+      });
+      this.productionOrderForm.get('fabricType')?.clearValidators();
+      this.productionOrderForm.get('fabricType')?.updateValueAndValidity();
+
+      this.variantsArray.clear();
+
+      // Criar FormGroup para cada variante
+      const variantGroup = this.formBuilder.group({
+        variantName: ['COR_AZUL'],
+        fabricType: ['algodao'],
+        quantities: this.formBuilder.array([
+          this.formBuilder.group({ size: 'PP', value: 10 }),
+          this.formBuilder.group({ size: 'P', value: 20 }),
+          this.formBuilder.group({ size: 'M', value: 0 }),
+          this.formBuilder.group({ size: 'G', value: 0 }),
+          this.formBuilder.group({ size: 'G1', value: 0 }),
+          this.formBuilder.group({ size: 'G2', value: 0 })
+        ])
+      });
+
+      this.variantsArray.push(variantGroup);
+    }
+  }
+
+  /**
+   * 🔄 ATUALIZAR PRODUCTION TYPE - Atualiza o productionType quando o tipo muda
+   */
+  onProductionTypeChange(event: any): void {
+    const type = event.value;
+    const productionTypeData = this.createProductionType(type);
+    this.productionOrderForm.patchValue({
+      productionType: productionTypeData
+    });
+  }
+
+  /**
+   * 📋 GETTERS - Acesso aos FormArrays
+   */
+  get variantsArray(): FormArray {
+    return this.productionOrderForm.get('productionType.variants') as FormArray;
+  }
+
+  get productionTypeValue(): any {
+    return this.productionOrderForm.get('productionType')?.value;
+  }
+
+  /**
+   * ➕ ADICIONAR VARIANTE - Adiciona nova variante ao FormArray
+   */
+  addVariant(): void {
+    const variantGroup = this.formBuilder.group({
+      variantName: [''],
+      fabricType: [''],
+      quantities: this.formBuilder.array([
+        this.formBuilder.group({ size: 'PP', value: 0 }),
+        this.formBuilder.group({ size: 'P', value: 0 }),
+        this.formBuilder.group({ size: 'M', value: 0 }),
+        this.formBuilder.group({ size: 'G', value: 0 }),
+        this.formBuilder.group({ size: 'G1', value: 0 }),
+        this.formBuilder.group({ size: 'G2', value: 0 })
+      ])
+    });
+    this.variantsArray.push(variantGroup);
+  }
+
+  /**
+   * ➖ REMOVER VARIANTE - Remove variante do FormArray
+   */
+  removeVariant(index: number): void {
+    this.variantsArray.removeAt(index);
+  }
+
+  /**
+   * 📏 OBTER VALOR DE QUANTIDADE - Retorna o valor da quantidade para um tamanho específico
+   */
+  getQuantityValue(variant: any, size: string): number {
+    const quantities = variant.value.quantities || [];
+    const quantity = quantities.find((q: any) => q.size === size);
+    return quantity ? quantity.value : 0;
+  }
+
+  /**
+   * 📏 ATUALIZAR VALOR DE QUANTIDADE - Atualiza o valor da quantidade para um tamanho específico
+   */
+  updateQuantityValue(variant: any, size: string, value: number): void {
+    const quantities = variant.value.quantities || [];
+    const quantityIndex = quantities.findIndex((q: any) => q.size === size);
+
+    if (quantityIndex >= 0) {
+      quantities[quantityIndex].value = value;
+    } else {
+      quantities.push({ size, value });
+    }
+
+    // Atualizar o FormArray
+    const quantitiesArray = variant.get('quantities') as FormArray;
+    quantitiesArray.patchValue(quantities);
   }
 
   /**
@@ -185,7 +341,10 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       if (response) {
 
         this.developmentFound = response;
-        this.productionOrderForm.get('productionType')!.patchValue(response.productionType || {});
+
+        // 🎯 DETECTAR TIPO E PREENCHER PRODUCTION TYPE AUTOMATICAMENTE
+        this.initializeProductionTypeFromDevelopment(response);
+        this.populateFormFromDevelopment(response);
       } else {
         this.developmentNotFound = true;
         this.developmentFound = null;
@@ -198,6 +357,20 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       this.searchingDevelopment = false;
       this.cdr.detectChanges();
     }
+  }
+
+  /**
+   * 📝 PREENCHER FORMULÁRIO DO DESENVOLVIMENTO - Popula campos do formulário
+   */
+  private populateFormFromDevelopment(development: Development): void {
+    this.productionOrderForm.patchValue({
+      internalReference: development.internalReference,
+      fabricType: '', // Será preenchido pelo usuário
+      observations: '',
+      status: 'CREATED',
+      hasCraft: false,
+      fabricWidth: null
+    });
   }
 
   /**
@@ -216,8 +389,8 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
 
     if (productionOrder.development) {
       this.developmentFound = productionOrder.development;
-      if (productionOrder.productionType.additionalInfo && productionOrder.productionType.additionalInfo.sizes) {
-        this.developmentFound.productionType = productionOrder.productionType;
+      if (productionOrder.productionType.variants && productionOrder.productionType.variants.length > 0) {
+        this.developmentFound.productionType = productionOrder.productionType.type;
       }
     }
 
@@ -277,13 +450,12 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
     }
 
     if (productionTypeValue?.type === 'localized') {
-
-      const additionalInfoControl = productionTypeControl?.get('additionalInfo');
-      if (!additionalInfoControl || !additionalInfoControl.value) {
-        additionalInfoControl?.setErrors({ required: true });
+      const variantsControl = productionTypeControl?.get('variants');
+      if (!variantsControl || !variantsControl.value || variantsControl.value.length === 0) {
+        variantsControl?.setErrors({ required: true });
         return false;
       } else {
-        additionalInfoControl.setErrors(null);
+        variantsControl.setErrors(null);
       }
     }
 
@@ -296,9 +468,9 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
   async onSave(): Promise<void> {
     this.validate();
     this.productionOrderForm.markAllAsTouched();
+    console.log(this.productionOrderForm);
 
     if (this.productionOrderForm.invalid) {
-
       return;
     }
 
@@ -334,15 +506,15 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
 
         const createData: CreateProductionOrderRequest = {
           developmentId: this.developmentFound!._id!,
-          fabricType: formData.fabricType,
           observations: formData.observations,
-          productionType: {
-            ...this.developmentFound!.productionType,
-            meters: formData.productionType.meters,
-          },
+          productionType: formData.productionType,
           hasCraft: formData.hasCraft,
           fabricWidth: formData.fabricWidth ? parseFloat(formData.fabricWidth) : undefined
         };
+
+        if (this.developmentFound?.productionType === 'localized') {
+          delete createData.productionType?.fabricType;
+        }
 
         const response = await lastValueFrom(
           this.productionOrderService.createProductionOrder(createData)
@@ -416,16 +588,18 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
    * 📊 CALCULAR TOTAL DE PEÇAS - Soma todos os valores dos tamanhos
    */
   getTotalPieces(): number {
-    if (!this.developmentFound?.productionType?.additionalInfo?.sizes) {
+    if (!this.productionOrderForm.get('productionType')?.get('variants')?.value) {
       return 0;
     }
 
-    return this.developmentFound.productionType.additionalInfo?.sizes.reduce((total, sizeItem) => {
-      return total + (sizeItem.value || 0);
+    return this.productionOrderForm.get('productionType')?.get('variants')?.value.reduce((total: number, variant: ProductionVariant) => {
+      return total + variant.quantities.reduce((variantTotal, quantity) => {
+        return variantTotal + (quantity.value || 0);
+      }, 0);
     }, 0);
   }
 
-  productionType(productionType: ProductionTypeEnum): string {
-    return translateProductionType(productionType);
+  productionType(productionType: string): string {
+    return translateProductionType(productionType as ProductionTypeEnum);
   }
 }

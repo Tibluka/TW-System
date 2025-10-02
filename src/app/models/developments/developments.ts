@@ -1,6 +1,7 @@
 
 
 import { Client } from '../clients/clients';
+import { ProductionType, ProductionTypeEnum, ProductionVariant, QuantityItem, ProductionTypeUtils } from '../production-type';
 
 
 export type DevelopmentStatus =
@@ -8,21 +9,6 @@ export type DevelopmentStatus =
     | 'AWAITING_APPROVAL'
     | 'APPROVED'
     | 'CANCELED';
-
-export type ProductionTypeEnum = 'rotary' | 'localized';
-
-
-export interface ProductionType {
-    type: 'rotary' | 'localized';
-    meters?: number;
-    additionalInfo?: {
-        variant: string;
-        sizes: {
-            size: string;
-            value: number;
-        }[];
-    };
-}
 
 
 export interface Development {
@@ -63,7 +49,7 @@ export interface Development {
     };
 
 
-    productionType: ProductionType;
+    productionType: ProductionTypeEnum;
 
 
     active?: boolean;
@@ -192,19 +178,14 @@ export class DevelopmentUtils {
      * 🏭 Retorna label do tipo de produção
      */
     static getProductionTypeLabel(type: ProductionTypeEnum): string {
-        const labels: Record<ProductionTypeEnum, string> = {
-            'rotary': 'Rotativa',
-            'localized': 'Localizada'
-        };
-
-        return labels[type] || type;
+        return ProductionTypeUtils.getProductionTypeLabel(type);
     }
 
     /**
      * 🎯 Retorna classe CSS para tipo de produção
      */
     static getProductionTypeClass(type: ProductionTypeEnum): string {
-        return `production-type-${type}`;
+        return ProductionTypeUtils.getProductionTypeClass(type);
     }
 
     /**
@@ -214,42 +195,5 @@ export class DevelopmentUtils {
         return !!development.pieceImage?.url;
     }
 
-    /**
-     * ✅ NOVA FUNÇÃO - Extrai apenas o tipo do productionType
-     */
-    static getProductionTypeEnum(development: Development): ProductionTypeEnum {
-        return development.productionType.type;
-    }
 
-    /**
-     * ✅ NOVA FUNÇÃO - Verifica se tem informações adicionais
-     */
-    static hasAdditionalInfo(development: Development): boolean {
-        return !!development.productionType.additionalInfo;
-    }
-
-    /**
-     * ✅ NOVA FUNÇÃO - Calcula total de peças para localized
-     */
-    static getTotalPieces(development: Development): number {
-        if (development.productionType.type !== 'localized' || !development.productionType.additionalInfo?.sizes) {
-            return 0;
-        }
-
-        return development.productionType.additionalInfo.sizes.reduce((total, item) => {
-            return total + (item.value || 0);
-        }, 0);
-    }
-
-    /**
-     * ✅ NOVA FUNÇÃO - Retorna string formatada da quantidade
-     */
-    static getQuantityDisplay(development: Development): string {
-        if (development.productionType.type === 'rotary') {
-            return development.productionType.meters ? `${development.productionType.meters}m` : '0m';
-        }
-
-        const totalPieces = this.getTotalPieces(development);
-        return `${totalPieces} pç${totalPieces !== 1 ? 's' : ''}`;
-    }
 }

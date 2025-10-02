@@ -70,7 +70,7 @@
 
                     <div class="mt-24" *ngIf="productionOrderFound?.productionType!.type === 'localized'">
                         <div class="table-container"
-                            *ngIf="productionOrderFound?.productionType?.additionalInfo?.sizes && productionOrderFound.development.productionType?.additionalInfo?.sizes!.length > 0; else noSizes">
+                            *ngIf="productionOrderFound?.productionType?.variants && productionOrderFound.productionType?.variants!.length > 0; else noVariants">
                             <table class="production-table">
 
                                 <thead>
@@ -79,21 +79,21 @@
                                             Variante
                                         </th>
                                         <th class="size-header"
-                                            *ngFor="let sizeItem of productionOrderFound.productionType?.additionalInfo?.sizes">
-                                            {{ sizeItem.size }}
+                                            *ngFor="let variant of productionOrderFound.productionType?.variants; let i = index">
+                                            {{ variant.variantName || 'Variante ' + (i + 1) }}
                                         </th>
                                     </tr>
                                 </thead>
 
 
                                 <tbody>
-                                    <tr>
+                                    <tr
+                                        *ngFor="let variant of productionOrderFound.productionType?.variants; let i = index">
                                         <td>
-                                            {{productionOrderFound.productionType.additionalInfo?.variant}}
+                                            {{ variant.variantName }}
                                         </td>
-                                        <td class="size-value"
-                                            *ngFor="let sizeItem of productionOrderFound.productionType?.additionalInfo?.sizes">
-                                            <p class="body secondary">{{sizeItem.value}}</p>
+                                        <td class="size-value" *ngFor="let quantity of variant.quantities">
+                                            <p class="body secondary">{{ quantity.value }}</p>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -101,7 +101,7 @@
                         </div>
 
 
-                        <ng-template #noSizes>
+                        <ng-template #noVariants>
                             <div class="empty-state">
                                 <i class="fa-solid fa-table"></i>
                                 <p>Nenhum tamanho definido para este desenvolvimento</p>

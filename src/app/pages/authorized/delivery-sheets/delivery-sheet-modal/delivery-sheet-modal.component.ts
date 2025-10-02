@@ -7,7 +7,8 @@ import { CreateDeliverySheetRequest, DeliverySheet, UpdateDeliverySheetRequest }
 import { DeliverySheetsService } from '../../../../shared/services/delivery-sheets/delivery-sheets.service';
 import { ModalService } from '../../../../shared/services/modal/modal.service';
 import { ProductionSheet, ProductionSheetsService } from '../../../../shared/services/production-sheets/production-sheets.service';
-import { ProductionOrderStatus, ProductionTypeEnum } from '../../../../models/production-orders/production-orders';
+import { ProductionOrderStatus } from '../../../../models/production-orders/production-orders';
+import { ProductionTypeEnum } from '../../../../models/production-type';
 
 import { ButtonComponent } from '../../../../shared/components/atoms/button/button.component';
 import { IconComponent } from '../../../../shared/components/atoms/icon/icon.component';

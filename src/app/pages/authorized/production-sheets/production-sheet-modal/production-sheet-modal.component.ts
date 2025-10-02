@@ -23,10 +23,11 @@ import { FormValidator } from '../../../../shared/utils/form';
 import { DateFormatter } from '../../../../shared/utils/date-formatter';
 
 
-import { ProductionOrder, ProductionOrderStatus, ProductionTypeEnum } from '../../../../models/production-orders/production-orders';
+import { ProductionOrder, ProductionOrderStatus } from '../../../../models/production-orders/production-orders';
 import { translateProductionOrderStatus, translateProductionType } from '../../../../shared/utils/tools';
 import { PrintButtonComponent } from "../../../../shared/components/atoms/print-button/print-button.component";
 import { PrintOptions } from '../../../../shared/components/print/print.service';
+import { ProductionTypeEnum } from '../../../../models/production-type';
 
 @Component({
   selector: 'app-production-sheet-modal',

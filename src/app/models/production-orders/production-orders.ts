@@ -1,6 +1,7 @@
 
 
-import { Development, ProductionType, ProductionTypeEnum } from '../developments/developments';
+import { Development } from '../developments/developments';
+import { ProductionType, ProductionTypeEnum, QuantityItem, ProductionVariant, ProductionTypeUtils } from '../production-type';
 
 
 export type ProductionOrderStatus =
@@ -12,13 +13,9 @@ export type ProductionOrderStatus =
     | 'FINALIZED';
 
 
-export type { ProductionTypeEnum } from '../developments/developments';
 
-
-export interface SizeItem {
-    size: string;
-    value: number;
-}
+// Re-export para compatibilidade
+export type SizeItem = QuantityItem;
 
 
 export interface ProductionTypeWithQuantities extends ProductionType {
@@ -41,7 +38,7 @@ export interface ProductionOrder {
     status: ProductionOrderStatus;
 
 
-    fabricType: string;
+    fabricType?: string; // Opcional para localized (está dentro das variantes)
     productionType: ProductionType; // ✅ MUDANÇA: Usa ProductionType diretamente
     observations?: string;
 
@@ -58,8 +55,8 @@ export interface ProductionOrder {
 
 export interface CreateProductionOrderRequest {
     developmentId: string;
-    fabricType: string;
-    productionType: ProductionType; // ✅ MUDANÇA: Usa ProductionType
+    fabricType?: string; // Opcional para localized
+    productionType: ProductionType | null; // ✅ MUDANÇA: Usa ProductionType
     observations?: string;
     hasCraft?: boolean;
     fabricWidth?: number;
@@ -140,16 +137,7 @@ export class ProductionOrderUtils {
 
 
     static getTotalQuantity(productionType: ProductionType): string {
-        if (productionType.type === 'rotary' && productionType.meters) {
-            return `${productionType.meters}m`;
-        }
-
-        if (productionType.type === 'localized' && productionType.additionalInfo?.sizes) {
-            const total = productionType.additionalInfo.sizes.reduce((sum, item) => sum + item.value, 0);
-            return `${total} pç${total !== 1 ? 's' : ''}`;
-        }
-
-        return '0';
+        return ProductionTypeUtils.getTotalQuantity(productionType);
     }
 
     static getStatusBadge(status: ProductionOrderStatus): { label: string; class: string; color: string } {
@@ -179,38 +167,21 @@ export class ProductionOrderUtils {
 export class ProductionOrderFormUtils {
 
 
-    static initializeFromDevelopment(development: Development): Partial<CreateProductionOrderRequest> {
-        return {
-            developmentId: development._id!,
-            productionType: {
-                type: development.productionType.type,
-                meters: development.productionType.type === 'rotary' ? development.productionType.meters || 0 : undefined,
-                additionalInfo: development.productionType.type === 'localized' ? {
-                    variant: development.productionType.additionalInfo?.variant || '',
-                    sizes: development.productionType.additionalInfo?.sizes || []
-                } : undefined
-            }
-        };
-    }
-
-
     static buildProductionTypeFromForm(
         type: ProductionTypeEnum,
         meters?: number,
-        variant?: string,
-        sizes?: SizeItem[]
+        fabricType?: string,
+        variants?: ProductionVariant[]
     ): ProductionType {
         const productionType: ProductionType = { type };
 
-        if (type === 'rotary') {
+        if (type === 'rotary' && meters) {
             productionType.meters = meters;
+            productionType.fabricType = fabricType;
         }
 
         if (type === 'localized') {
-            productionType.additionalInfo = {
-                variant: variant || '',
-                sizes: sizes || []
-            };
+            productionType.variants = variants || [];
         }
 
         return productionType;
@@ -218,39 +189,39 @@ export class ProductionOrderFormUtils {
 
 
     static calculateTotalPieces(productionType: ProductionType): number {
-        if (productionType.type === 'localized' && productionType.additionalInfo?.sizes) {
-            return productionType.additionalInfo.sizes.reduce((sum, item) => sum + (item.value || 0), 0);
+        return ProductionTypeUtils.calculateTotalPieces(productionType);
+    }
+
+    static createEmptyQuantity(): QuantityItem {
+        return ProductionTypeUtils.createEmptyQuantity();
+    }
+
+    static createEmptyVariant(): ProductionVariant {
+        return ProductionTypeUtils.createEmptyVariant();
+    }
+
+    static removeEmptyQuantities(quantities: QuantityItem[]): QuantityItem[] {
+        return ProductionTypeUtils.removeEmptyQuantities(quantities);
+    }
+
+    static validateUniqueQuantity(quantities: QuantityItem[], newSize: string, currentIndex: number): boolean {
+        return ProductionTypeUtils.validateUniqueQuantity(quantities, newSize, currentIndex);
+    }
+
+    static getVariants(productionType: ProductionType): ProductionVariant[] {
+        return productionType.variants || [];
+    }
+
+    static hasVariants(productionType: ProductionType): boolean {
+        return productionType.type === 'localized' &&
+            !!productionType.variants &&
+            productionType.variants.length > 0;
+    }
+
+    static getFabricType(productionType: ProductionType): string {
+        if (productionType.type === 'rotary') {
+            return productionType.fabricType || '';
         }
-        return 0;
-    }
-
-    static createEmptySize(): SizeItem {
-        return { size: '', value: 0 };
-    }
-
-    static removeEmptySizes(sizes: SizeItem[]): SizeItem[] {
-        return sizes.filter(item => item.size.trim() && item.value > 0);
-    }
-
-    static validateUniqueSize(sizes: SizeItem[], newSize: string, currentIndex: number): boolean {
-        return !sizes.some((item, index) =>
-            index !== currentIndex &&
-            item.size.trim().toUpperCase() === newSize.trim().toUpperCase()
-        );
-    }
-
-
-    static getVariant(productionType: ProductionType): string {
-        return productionType.additionalInfo?.variant || '';
-    }
-
-
-    static getSizes(productionType: ProductionType): SizeItem[] {
-        return productionType.additionalInfo?.sizes || [];
-    }
-
-
-    static hasAdditionalInfo(productionType: ProductionType): boolean {
-        return !!productionType.additionalInfo;
+        return '';
     }
 }
