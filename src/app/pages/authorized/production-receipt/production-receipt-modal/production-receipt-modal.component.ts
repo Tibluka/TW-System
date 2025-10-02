@@ -228,8 +228,6 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
   }
 
 
-
-
   private populateForm(productionReceipt: ProductionReceipt): void {
 
     if (productionReceipt.deliverySheet) {
