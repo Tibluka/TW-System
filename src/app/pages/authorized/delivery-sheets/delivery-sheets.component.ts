@@ -15,6 +15,7 @@ import { IconComponent } from '../../../shared/components/atoms/icon/icon.compon
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
 import { SelectComponent, SelectOption } from '../../../shared/components/atoms/select/select.component';
 import { ModalComponent } from '../../../shared/components/organisms/modal/modal.component';
+import { GeneralModalContentComponent } from '../../../shared/components/general/general-modal-content/general-modal-content.component';
 import { TableCellComponent } from '../../../shared/components/organisms/table/table-cell/table-cell.component';
 import { TableRowComponent } from '../../../shared/components/organisms/table/table-row/table-row.component';
 import { ModalService } from '../../../shared/services/modal/modal.service';
@@ -40,6 +41,7 @@ import { DateFormatter } from '../../../shared/utils/date-formatter';
         DsListViewComponent,
         FormsModule,
         ModalComponent,
+        GeneralModalContentComponent,
         DeliverySheetModalComponent,
         ActionMenuComponent,
         StatusUpdaterComponent
@@ -487,19 +489,42 @@ export class DeliverySheetsComponent extends FormValidator {
      * 🗑️ EXCLUIR FICHA - Exclui ficha de entrega
      */
     deleteDeliverySheet(deliverySheet: DeliverySheet): void {
-        if (!deliverySheet._id) return;
+        if (!deliverySheet._id) {
+            return;
+        }
 
         this.modalService.open({
             id: 'general-modal',
-            title: 'Confirmar Exclusão',
+            title: 'Excluir Ficha de Entrega',
             size: 'md',
+            showHeader: true,
+            showCloseButton: true,
+            closeOnBackdropClick: true,
+            closeOnEscapeKey: true,
             data: {
-                message: `Tem certeza que deseja excluir a ficha de entrega ${deliverySheet.internalReference}?`,
-                confirmText: 'Excluir',
-                cancelText: 'Cancelar',
-                type: 'warning',
-                onConfirm: () => {
-                    this.deliverySheetsService.deleteDeliverySheet(deliverySheet._id!).subscribe({
+                text: `Tem certeza que deseja excluir a ficha de entrega "${deliverySheet.internalReference}"?`,
+                icon: 'fa-solid fa-triangle-exclamation',
+                iconColor: 'tertiary',
+                textAlign: 'center',
+                buttons: [
+                    {
+                        label: 'Cancelar',
+                        action: false,
+                        variant: 'outline'
+                    },
+                    {
+                        label: 'Excluir',
+                        action: true,
+                        variant: 'fill',
+                        icon: 'fa-solid fa-trash'
+                    }
+                ]
+            }
+        }).subscribe(result => {
+            if (result && result.action === true) {
+                this.deliverySheetsService.deleteDeliverySheet(deliverySheet._id!)
+                    .pipe(takeUntil(this.destroy$))
+                    .subscribe({
                         next: () => {
                             this.showSuccessMessage(`Ficha de entrega ${deliverySheet.internalReference} excluída com sucesso.`);
                             this.loadDeliverySheets(); // Recarregar lista
@@ -508,7 +533,6 @@ export class DeliverySheetsComponent extends FormValidator {
                             this.showErrorMessage(error.message || 'Erro ao excluir ficha de entrega.');
                         }
                     });
-                }
             }
         });
     }

@@ -40,7 +40,7 @@
                     <p class="input-label">Resumo da Ordem de Produção</p>
                     <div class="development-card">
                         <div class="image">
-                            <img [src]="productionOrderFound.development?.pieceImage?.url" alt="">
+                            <img [src]="productionOrderFound.development.pieceImage?.url" alt="">
                         </div>
                         <div class="development-details">
                             <div class="d-flex justify-content-between">
@@ -52,8 +52,8 @@
                                 </h1>
                             </div>
                             <p class="subtitle-section secondary mb-0">
-                                {{productionOrderFound.development!.client?.companyName}}</p>
-                            <p class="card-small secondary mb-4">{{productionOrderFound!.development?.clientReference}}
+                                {{productionOrderFound.development.client.companyName}}</p>
+                            <p class="card-small secondary mb-4">{{productionOrderFound.development.clientReference}}
                             </p>
                             <hr>
                             <p class="body secondary mt-4 mb-4">
@@ -70,7 +70,7 @@
 
                     <div class="mt-24" *ngIf="productionOrderFound?.productionType!.type === 'localized'">
                         <div class="table-container"
-                            *ngIf="productionOrderFound?.productionType?.additionalInfo?.sizes && productionOrderFound.development?.productionType?.additionalInfo?.sizes!.length > 0; else noSizes">
+                            *ngIf="productionOrderFound?.productionType?.additionalInfo?.sizes && productionOrderFound.development.productionType?.additionalInfo?.sizes!.length > 0; else noSizes">
                             <table class="production-table">
 
                                 <thead>
