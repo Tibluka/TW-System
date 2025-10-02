@@ -78,10 +78,10 @@
                         <ds-table-cell align="left">
                             <div class="client-info">
                                 <span class="body secondary">
-                                    {{ development.client?.companyName || 'Cliente não encontrado' }}
+                                    {{ development.client.companyName || 'Cliente não encontrado' }}
                                 </span>
-                                <div class="body-small label" *ngIf="development.client?.acronym">
-                                    {{ development.client?.acronym }}
+                                <div class="body-small label" *ngIf="development.client.acronym">
+                                    {{ development.client.acronym }}
                                 </div>
                             </div>
                         </ds-table-cell>
