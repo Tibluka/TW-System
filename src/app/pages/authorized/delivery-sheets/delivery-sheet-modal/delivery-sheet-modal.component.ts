@@ -229,12 +229,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
             this.productionSheetNotFound = false;
             this.searchingProductionSheet = false;
 
-            // Debug: verificar estrutura dos dados
-            console.log('Delivery Sheet Data:', deliverySheet);
-            console.log('Production Sheet Found:', this.productionSheetFound);
-            console.log('Production Order:', this.productionSheetFound?.productionOrder);
-            console.log('Production Order ProductionType:', this.productionSheetFound?.productionOrder?.productionType);
-            console.log('Development ProductionType:', this.productionSheetFound?.productionOrder?.development?.productionType);
+
         }
 
 
@@ -517,12 +512,12 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
     getFabricType(productionOrder: any): string {
         if (!productionOrder) return '-';
 
-        // Para produção rotary, usar fabricType do productionType
+
         if (productionOrder.productionType?.type === 'rotary') {
             return productionOrder.productionType.fabricType || productionOrder.fabricType || '-';
         }
 
-        // Para produção localized, mostrar "Vários" se houver múltiplas variantes com tipos diferentes
+
         if (productionOrder.productionType?.type === 'localized' && productionOrder.productionType.variants) {
             const fabricTypes = productionOrder.productionType.variants
                 .map((variant: any) => variant.fabricType)
@@ -535,7 +530,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
             return 'Vários tipos';
         }
 
-        // Fallback para fabricType direto da ordem de produção
+
         return productionOrder.fabricType || '-';
     }
 }

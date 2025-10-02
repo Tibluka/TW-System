@@ -80,7 +80,7 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
   productionOrderNotFound = false;
   searchingProductionOrder = false;
 
-  // 📏 OPÇÕES DE TAMANHOS
+
   sizeOptions = [
     { value: 'PP', label: 'PP' },
     { value: 'P', label: 'P' },
