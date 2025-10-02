@@ -50,7 +50,7 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
   isLoading = false;
   isSaving = false;
 
-  // Propriedades para gerenciar variantes
+
   variants: ProductionVariant[] = [];
   sizeOptions: SelectOption[] = [...SIZE_OPTIONS];
 
@@ -250,7 +250,7 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
     this.variants.push(newVariant);
     this.updateVariantsInForm();
 
-    // Garantir que meters seja 0 para localized
+
     if (this.getProductionType() === 'localized') {
       this.developmentForm.get('productionType.meters')?.setValue(0);
     }

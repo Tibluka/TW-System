@@ -62,7 +62,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
   developmentFound: Development | null = null;
   developmentNotFound = false;
 
-  // 📏 OPÇÕES DE TAMANHOS
+
   sizeOptions = [
     { value: 'PP', label: 'PP' },
     { value: 'P', label: 'P' },
@@ -191,7 +191,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
 
       this.variantsArray.clear();
 
-      // Criar FormGroup para cada variante
+
       const variantGroup = this.formBuilder.group({
         variantName: ['COR_AZUL'],
         fabricType: ['algodao'],
@@ -279,7 +279,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       quantities.push({ size, value });
     }
 
-    // Atualizar o FormArray
+
     const quantitiesArray = variant.get('quantities') as FormArray;
     quantitiesArray.patchValue(quantities);
   }
@@ -341,7 +341,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
 
         this.developmentFound = response;
 
-        // 🎯 DETECTAR TIPO E PREENCHER PRODUCTION TYPE AUTOMATICAMENTE
+
         this.initializeProductionTypeFromDevelopment(response);
         this.populateFormFromDevelopment(response);
       } else {
@@ -393,10 +393,10 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       }
     }
 
-    // Limpar variantes existentes
+
     this.variantsArray.clear();
 
-    // Preencher dados básicos
+
     this.productionOrderForm.patchValue({
       internalReference: productionOrder?.internalReference || '',
       productionType: {
@@ -411,9 +411,9 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       fabricWidth: productionOrder.fabricWidth || null
     });
 
-    // Carregar variantes se for tipo localized
+
     if (productionOrder.productionType?.type === 'localized' && productionOrder.productionType.variants) {
-      // Limpar variantes existentes no FormArray principal
+
       const variantsFormArray = this.productionOrderForm.get('productionType.variants') as FormArray;
       variantsFormArray.clear();
 
@@ -497,7 +497,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
   async onSave(): Promise<void> {
     this.validate();
     this.productionOrderForm.markAllAsTouched();
-    console.log(this.productionOrderForm);
 
     if (this.productionOrderForm.invalid) {
       return;
@@ -513,8 +512,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
 
     try {
       const formData = this.productionOrderForm.value;
-      debugger
-      console.log(formData);
 
       if (this.isEditMode) {
 

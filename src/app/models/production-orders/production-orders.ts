@@ -13,8 +13,6 @@ export type ProductionOrderStatus =
     | 'FINALIZED';
 
 
-
-// Re-export para compatibilidade
 export type SizeItem = QuantityItem;
 
 

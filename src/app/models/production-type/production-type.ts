@@ -1,20 +1,14 @@
 /**
  * 🏭 PRODUCTION TYPE MODELS
  * =========================
- * 
+ *
  * Modelos para gerenciar tipos de produção (rotary e localized)
  * com suporte a múltiplas variantes e diferentes tipos de tecido.
  */
 
-// ============================================
-// TIPOS BÁSICOS
-// ============================================
 
 export type ProductionTypeEnum = 'rotary' | 'localized';
 
-// ============================================
-// INTERFACES PRINCIPAIS
-// ============================================
 
 /**
  * Interface para quantidades de cada tamanho
@@ -43,11 +37,6 @@ export interface ProductionType {
     variants?: ProductionVariant[]; // Apenas para localized
 }
 
-// ============================================
-// OPÇÕES E CONSTANTES
-// ============================================
-
-// Removido - fabricType é um input de texto livre
 
 /**
  * Opções de tamanhos disponíveis
@@ -66,11 +55,6 @@ export const SIZE_OPTIONS = [
  */
 export const VALID_SIZES = ['PP', 'P', 'M', 'G', 'G1', 'G2'] as const;
 
-// Removido - fabricType é um input de texto livre, sem validação de valores específicos
-
-// ============================================
-// UTILITÁRIOS
-// ============================================
 
 export class ProductionTypeUtils {
 
@@ -135,7 +119,7 @@ export class ProductionTypeUtils {
     static validateProductionType(productionType: ProductionType): { isValid: boolean; errors: string[] } {
         const errors: string[] = [];
 
-        // Validar meters (sempre obrigatório)
+
         if (productionType.meters === undefined || productionType.meters === null) {
             errors.push('Metros são obrigatórios');
         }
@@ -147,7 +131,7 @@ export class ProductionTypeUtils {
             if (!productionType.fabricType) {
                 errors.push('Tipo de tecido é obrigatório para produção rotativa');
             }
-            // fabricType é texto livre, sem validação de valores específicos
+
         } else if (productionType.type === 'localized') {
             if (productionType.meters !== 0) {
                 errors.push('Metros devem ser 0 para produção localizada');
@@ -162,7 +146,7 @@ export class ProductionTypeUtils {
                     if (!variant.fabricType) {
                         errors.push(`Variante ${index + 1}: Tipo de tecido é obrigatório`);
                     }
-                    // fabricType é texto livre, sem validação de valores específicos
+
                     if (!variant.quantities || variant.quantities.length === 0) {
                         errors.push(`Variante ${index + 1}: Pelo menos uma quantidade é obrigatória`);
                     } else {
@@ -234,7 +218,7 @@ export class ProductionTypeUtils {
                 fabricType: oldProductionType.fabricType
             };
         } else if (oldProductionType.type === 'localized') {
-            // Migrar da estrutura antiga (additionalInfo) para nova (variants)
+
             if (oldProductionType.additionalInfo) {
                 return {
                     type: 'localized',
@@ -248,7 +232,7 @@ export class ProductionTypeUtils {
             }
         }
 
-        // Fallback para estrutura vazia
+
         return {
             type: oldProductionType.type || 'rotary',
             meters: oldProductionType.meters || 0,
