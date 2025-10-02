@@ -125,7 +125,6 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
         fabricType: [''],
         variants: this.formBuilder.array([])
       }),
-      fabricType: ['', [Validators.required]],
       observations: [''],
       status: [''],
       hasCraft: [false],
@@ -394,9 +393,17 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       }
     }
 
+    // Limpar variantes existentes
+    this.variantsArray.clear();
+
+    // Preencher dados básicos
     this.productionOrderForm.patchValue({
       internalReference: productionOrder?.internalReference || '',
-      productionType: productionOrder.productionType || {},
+      productionType: {
+        type: productionOrder.productionType?.type || 'rotary',
+        meters: productionOrder.productionType?.meters || 0,
+        fabricType: productionOrder.productionType?.fabricType || ''
+      },
       fabricType: productionOrder.fabricType || '',
       observations: productionOrder.observations || '',
       status: productionOrder.status,
@@ -404,6 +411,28 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       fabricWidth: productionOrder.fabricWidth || null
     });
 
+    // Carregar variantes se for tipo localized
+    if (productionOrder.productionType?.type === 'localized' && productionOrder.productionType.variants) {
+      // Limpar variantes existentes no FormArray principal
+      const variantsFormArray = this.productionOrderForm.get('productionType.variants') as FormArray;
+      variantsFormArray.clear();
+
+      productionOrder.productionType.variants.forEach(variant => {
+        const variantGroup = this.formBuilder.group({
+          variantName: [variant.variantName || ''],
+          fabricType: [variant.fabricType || ''],
+          quantities: this.formBuilder.array(
+            variant.quantities?.map(q =>
+              this.formBuilder.group({
+                size: [q.size],
+                value: [q.value || 0]
+              })
+            ) || []
+          )
+        });
+        variantsFormArray.push(variantGroup);
+      });
+    }
 
     if (productionOrder._id) {
       if (!this.productionOrderForm.contains('_id')) {
@@ -484,17 +513,22 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
 
     try {
       const formData = this.productionOrderForm.value;
+      debugger
+      console.log(formData);
 
       if (this.isEditMode) {
 
         const updateData: UpdateProductionOrderRequest = {
-          fabricType: formData.fabricType,
           observations: formData.observations,
           productionType: formData.productionType,
           status: formData.status,
           hasCraft: formData.hasCraft,
           fabricWidth: formData.fabricWidth ? parseFloat(formData.fabricWidth) : undefined
         };
+
+        if (this.developmentFound?.productionType === 'localized') {
+          delete updateData.productionType?.fabricType;
+        }
 
         const response = await lastValueFrom(
           this.productionOrderService.updateProductionOrder(formData._id, updateData)

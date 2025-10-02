@@ -55,7 +55,6 @@ export interface ProductionOrder {
 
 export interface CreateProductionOrderRequest {
     developmentId: string;
-    fabricType?: string; // Opcional para localized
     productionType: ProductionType | null; // ✅ MUDANÇA: Usa ProductionType
     observations?: string;
     hasCraft?: boolean;
