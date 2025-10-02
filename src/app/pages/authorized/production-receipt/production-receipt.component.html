@@ -87,25 +87,30 @@
 
                         <ds-table-cell align="left">
                             <span class="body primary-dark">
-                                {{ productionReceipt.deliverySheet.productionOrder.development.clientReference}}
+                                {{
+                                productionReceipt.deliverySheet.productionSheet?.productionOrder?.development?.clientReference
+                                || '-' }}
                             </span>
                         </ds-table-cell>
 
 
                         <ds-table-cell align="left">
                             <div class="client-cell"
-                                *ngIf="productionReceipt.deliverySheet.productionOrder.development.client">
+                                *ngIf="productionReceipt.deliverySheet?.productionSheet?.productionOrder?.development?.client">
                                 <div class="body primary-dark">
-                                    {{ productionReceipt.deliverySheet.productionOrder.development.client.companyName
+                                    {{
+                                    productionReceipt.deliverySheet.productionSheet.productionOrder.development.client.companyName
                                     }}
                                 </div>
                                 <div class="placeholder"
-                                    *ngIf="productionReceipt.deliverySheet.productionOrder.development.client.acronym">
-                                    {{ productionReceipt.deliverySheet.productionOrder.development.client.acronym }}
+                                    *ngIf="productionReceipt.deliverySheet.productionSheet.productionOrder.development.client.acronym">
+                                    {{
+                                    productionReceipt.deliverySheet.productionSheet.productionOrder.development.client.acronym
+                                    }}
                                 </div>
                             </div>
                             <span class="body label"
-                                *ngIf="!productionReceipt.deliverySheet.productionOrder.development.client">
+                                *ngIf="!productionReceipt.deliverySheet?.productionSheet?.productionOrder?.development?.client">
                                 Cliente não encontrado
                             </span>
                         </ds-table-cell>
@@ -168,13 +173,15 @@
                         <h3 class="title-modal mb-6 mt-8 secondary">{{ productionReceipt.internalReference }}</h3>
 
                         <p class="subtitle-section secondary"
-                            *ngIf="productionReceipt.deliverySheet.productionOrder.development.client.companyName">{{
-                            productionReceipt.deliverySheet.productionOrder.development.client.companyName
+                            *ngIf="productionReceipt.deliverySheet?.productionSheet?.productionOrder?.development?.client?.companyName">
+                            {{
+                            productionReceipt.deliverySheet.productionSheet.productionOrder.development.client.companyName
                             }}</p>
 
                         <p class="card-small secondary mb-8"
-                            *ngIf="productionReceipt.deliverySheet.productionOrder.development.clientReference">{{
-                            productionReceipt.deliverySheet.productionOrder.development.clientReference
+                            *ngIf="productionReceipt.deliverySheet?.productionSheet?.productionOrder?.development?.clientReference">
+                            {{
+                            productionReceipt.deliverySheet.productionSheet.productionOrder.development.clientReference
                             }}</p>
 
                         <hr>
