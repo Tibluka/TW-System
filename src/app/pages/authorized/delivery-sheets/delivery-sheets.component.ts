@@ -55,9 +55,6 @@ export class DeliverySheetsComponent extends FormValidator {
     private deliverySheetsService = inject(DeliverySheetsService);
     private clientsService = inject(ClientService);
 
-    // ========================================
-    // PROPRIEDADES
-    // ========================================
 
     deliverySheets: DeliverySheet[] = [];
     pagination: PaginationInfo | null = null;
@@ -70,10 +67,10 @@ export class DeliverySheetsComponent extends FormValidator {
     selectedDeliverySheetId?: string;
     selectedDeliverySheetForStatusUpdate?: DeliverySheet;
 
-    // Dados para filtros
+
     clients: any[] = [];
 
-    // Mensagens de feedback
+
     successMessage: string = '';
     errorMessage: string = '';
     showError = false;
@@ -108,7 +105,7 @@ export class DeliverySheetsComponent extends FormValidator {
         { value: 'CANCELLED', label: 'Cancelado', color: 'error' }
     ];
 
-    // Configuração da lista
+
     listViewConfig: ListViewConfig = {
         showToggle: true,
         defaultView: 'table',
@@ -118,7 +115,7 @@ export class DeliverySheetsComponent extends FormValidator {
         }
     };
 
-    // Itens do menu de ações
+
     actionMenuItems: ActionMenuItem[] = [
         { value: 'change-status', label: 'Alterar Status', icon: 'fa-solid fa-arrow-right' },
         { value: 'edit', label: 'Editar', icon: 'fa-solid fa-edit' },
@@ -126,7 +123,7 @@ export class DeliverySheetsComponent extends FormValidator {
         { value: 'delete', label: 'Excluir', icon: 'fa-solid fa-trash' }
     ];
 
-    // Debounce para busca
+
     private searchSubject = new Subject<string>();
     private dateFilterSubject = new Subject<void>();
     private destroy$ = new Subject<void>();
@@ -154,9 +151,6 @@ export class DeliverySheetsComponent extends FormValidator {
         this.destroy$.complete();
     }
 
-    // ========================================
-    // MÉTODOS PRIVADOS
-    // ========================================
 
     /**
      * 🔍 SETUP SEARCH DEBOUNCE - Configura debounce para busca
@@ -234,13 +228,9 @@ export class DeliverySheetsComponent extends FormValidator {
                 ];
             }
         } catch (error) {
-            console.error('Erro ao carregar clientes:', error);
         }
     }
 
-    // ========================================
-    // MÉTODOS PÚBLICOS
-    // ========================================
 
     /**
      * 🔍 BUSCA - Evento de mudança no campo de busca
@@ -441,7 +431,7 @@ export class DeliverySheetsComponent extends FormValidator {
      */
     changeDeliverySheetStatus(deliverySheet: DeliverySheet): void {
         this.selectedDeliverySheetForStatusUpdate = deliverySheet;
-        // O componente StatusUpdater será ativado via ViewChild
+
     }
 
     /**

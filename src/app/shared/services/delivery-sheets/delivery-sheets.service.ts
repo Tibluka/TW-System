@@ -29,7 +29,7 @@ export class DeliverySheetsService {
     getDeliverySheets(filters: DeliverySheetFilters = {}): Observable<DeliverySheetListResponse> {
         let params = new HttpParams();
 
-        // Filtros de busca
+
         if (filters.search) {
             params = params.set('search', filters.search);
         }
@@ -50,7 +50,7 @@ export class DeliverySheetsService {
             params = params.set('active', filters.active.toString());
         }
 
-        // Filtros de data
+
         if (filters.deliveryDateFrom) {
             params = params.set('deliveryDateFrom', this.formatDateToISO(filters.deliveryDateFrom));
         }
@@ -59,7 +59,7 @@ export class DeliverySheetsService {
             params = params.set('deliveryDateTo', this.formatDateToISO(filters.deliveryDateTo));
         }
 
-        // Paginação
+
         if (filters.page) {
             params = params.set('page', filters.page.toString());
         }
@@ -68,7 +68,7 @@ export class DeliverySheetsService {
             params = params.set('limit', filters.limit.toString());
         }
 
-        // Ordenação
+
         if (filters.sortBy) {
             params = params.set('sortBy', filters.sortBy);
         }

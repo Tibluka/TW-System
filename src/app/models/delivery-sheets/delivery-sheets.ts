@@ -1,6 +1,6 @@
 /**
  * 📦 MODELO DE DADOS - FICHAS DE ENTREGA
- * 
+ *
  * Interfaces e tipos para gerenciamento de fichas de entrega
  */
 

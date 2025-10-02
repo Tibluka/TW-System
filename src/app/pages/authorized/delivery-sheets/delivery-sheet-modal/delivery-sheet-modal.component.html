@@ -8,7 +8,7 @@
     <div *ngIf="!isLoading" class="modal-content-wrapper">
         <form [formGroup]="deliverySheetForm" (ngSubmit)="onSubmit()" class="delivery-sheet-form">
 
-            <!-- Busca de Ficha de Produção -->
+
             <div class="form-section mb-32">
                 <div class="form-field">
                     <ds-input icon="fa-solid fa-search" iconPosition="left"
@@ -21,18 +21,18 @@
                 </div>
 
                 <div class="search-status">
-                    <!-- Loading -->
+
                     <div class="text-center p-48" *ngIf="searchingProductionSheet">
                         <ds-spinner size="48px" variant="outline"></ds-spinner>
                     </div>
 
-                    <!-- Not Found -->
+
                     <div class="search-not-found" *ngIf="productionSheetNotFound && !searchingProductionSheet">
                         <ds-icon icon="fa-solid fa-triangle-exclamation" color="tertiary" fontSize="16px"></ds-icon>
                         <span class="body tertiary ml-8">Ficha de produção não encontrada</span>
                     </div>
 
-                    <!-- Found -->
+
                     <div class="production-sheet-found" *ngIf="productionSheetFound && !searchingProductionSheet">
                         <p class="input-label">Resumo da ficha de produção</p>
                         <div class="production-sheet-card">
@@ -44,7 +44,7 @@
                                     {{productionSheetFound.productionOrder?.development?.clientReference}}</p>
                                 <hr>
 
-                                <!-- Dados da Ordem de Produção -->
+
                                 <div class="production-order-info" *ngIf="productionSheetFound.productionOrder">
                                     <h3 class="section-subtitle mb-4">Ordem de Produção</h3>
                                     <div class="info-grid">
@@ -84,7 +84,7 @@
                                     <hr class="mt-4 mb-4">
                                 </div>
 
-                                <!-- Dados da Ficha de Produção -->
+
                                 <div class="production-info">
                                     <h3 class="section-subtitle mb-4">Ficha de Produção</h3>
                                     <div class="info-grid">
@@ -113,7 +113,7 @@
                 </div>
             </div>
 
-            <!-- Data de Entrega -->
+
             <div class="form-section" *ngIf="productionSheetFound || isEditMode">
                 <h3 class="section-title mb-16">Data de Entrega</h3>
 
@@ -128,7 +128,7 @@
                 </div>
             </div>
 
-            <!-- Endereço de Entrega -->
+
             <div class="form-section" formGroupName="address" *ngIf="productionSheetFound || isEditMode">
                 <h3 class="section-title mb-16">
                     Endereço de Entrega
@@ -139,7 +139,7 @@
                 </h3>
 
                 <div class="form-grid street-number-grid">
-                    <!-- Rua -->
+
                     <div class="form-field">
                         <ds-input label="Rua *" placeholder="Nome da rua" formControlName="street"
                             [invalid]="isFormControlInvalid(deliverySheetForm.get('address.street'))"
@@ -148,7 +148,7 @@
                         </ds-input>
                     </div>
 
-                    <!-- Número -->
+
                     <div class="form-field">
                         <ds-input label="Número *" placeholder="123" formControlName="number"
                             [invalid]="isFormControlInvalid(deliverySheetForm.get('address.number'))"
@@ -158,7 +158,7 @@
                 </div>
 
                 <div class="form-grid">
-                    <!-- Cidade -->
+
                     <div class="form-field">
                         <ds-input label="Cidade *" placeholder="Ex: São Paulo" formControlName="city"
                             [invalid]="isFormControlInvalid(deliverySheetForm.get('address.city'))"
@@ -166,7 +166,7 @@
                         </ds-input>
                     </div>
 
-                    <!-- Estado -->
+
                     <div class="form-field">
                         <ds-input label="Estado *" placeholder="Ex: SP" formControlName="state"
                             [invalid]="isFormControlInvalid(deliverySheetForm.get('address.state'))"
@@ -174,7 +174,7 @@
                         </ds-input>
                     </div>
 
-                    <!-- CEP -->
+
                     <div class="form-field">
                         <ds-input label="CEP *" placeholder="00000-000" formControlName="zipCode"
                             [invalid]="isFormControlInvalid(deliverySheetForm.get('address.zipCode'))"
@@ -184,7 +184,7 @@
                 </div>
 
                 <div class="form-grid">
-                    <!-- Complemento -->
+
                     <div class="form-field">
                         <ds-input label="Complemento" placeholder="Apartamento, sala, etc..."
                             formControlName="complement"
@@ -193,7 +193,7 @@
                         </ds-input>
                     </div>
 
-                    <!-- Bairro -->
+
                     <div class="form-field">
                         <ds-input label="Bairro" placeholder="Nome do bairro" formControlName="neighborhood"
                             [invalid]="isFormControlInvalid(deliverySheetForm.get('address.neighborhood'))"
@@ -203,12 +203,12 @@
                 </div>
             </div>
 
-            <!-- Valores e Documentação -->
+
             <div class="form-section" *ngIf="productionSheetFound || isEditMode">
                 <h3 class="section-title mb-16">Valores e Documentação</h3>
 
                 <div class="form-grid">
-                    <!-- Valor Total -->
+
                     <div class="form-field">
                         <ds-input label="Valor Total (R$) *" placeholder="0.00" type="number" step="0.01" min="0"
                             formControlName="totalValue"
@@ -218,7 +218,7 @@
                         </ds-input>
                     </div>
 
-                    <!-- Nota Fiscal -->
+
                     <div class="form-field">
                         <ds-input label="Número da Nota Fiscal" placeholder="Ex: 123456" formControlName="invoiceNumber"
                             [invalid]="isFormControlInvalid(deliverySheetForm.get('invoiceNumber'))"
@@ -229,7 +229,7 @@
                 </div>
             </div>
 
-            <!-- Observações -->
+
             <div class="form-section" *ngIf="productionSheetFound || isEditMode">
                 <h3 class="section-title mb-16">Observações</h3>
 
@@ -241,7 +241,7 @@
                 </div>
             </div>
 
-            <!-- Botões de Ação -->
+
             <div class="form-actions" *ngIf="productionSheetFound || isEditMode">
                 <ds-button type="button" variant="outline" label="Cancelar" icon="fa-solid fa-times"
                     (onClickEmitter)="onCancel()" [disabled]="isSaving">

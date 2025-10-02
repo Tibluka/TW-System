@@ -48,40 +48,31 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
     private productionSheetsService = inject(ProductionSheetsService);
     private cdr = inject(ChangeDetectorRef);
 
-    // ========================================
-    // PROPRIEDADES
-    // ========================================
 
     deliverySheetForm!: FormGroup;
     isEditMode = false;
     isSaving = false;
     isLoading = false;
 
-    // Estados de busca de ficha de produção
+
     searchingProductionSheet = false;
     productionSheetFound: ProductionSheet | null = null;
     productionSheetNotFound = false;
 
-    // Dados relacionados
-    // Removido: clientOptions não é mais necessário
 
-    // Controle de ciclo de vida
     private destroy$ = new Subject<void>();
     private searchProductionSheetSubject = new Subject<string>();
 
-    // ========================================
-    // LIFECYCLE
-    // ========================================
 
     ngOnInit(): void {
         this.initializeForm();
         this.initializeProductionSheetSearch();
-        // Carregar apenas clientes após um pequeno delay para garantir que o formulário foi inicializado
+
         setTimeout(() => {
             this.loadRelatedData();
         }, 100);
 
-        // Verificar se há dados do modal (modo de edição sem ID)
+
         const activeModal = this.modalService.activeModal();
         if (activeModal?.config.data) {
             const deliverySheet = activeModal.config.data;
@@ -94,10 +85,6 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
         this.destroy$.next();
         this.destroy$.complete();
     }
-
-    // ========================================
-    // MÉTODOS PRIVADOS
-    // ========================================
 
 
     /**
@@ -128,7 +115,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
      * 📊 CARREGAR DADOS RELACIONADOS - Removido: não é mais necessário
      */
     private loadRelatedData(): void {
-        // Método removido: não há mais dados relacionados para carregar
+
     }
 
     /**
@@ -235,7 +222,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
      * 📋 POPULAR FORMULÁRIO COM DADOS DO MODAL - Preenche dados da ficha de entrega para edição
      */
     private populateFormFromData(deliverySheet: any): void {
-        // Definir a ficha de produção encontrada se existir
+
         if (deliverySheet.productionSheet) {
             this.productionSheetFound = deliverySheet.productionSheet;
             this.deliverySheetForm.get('internalReference')?.disable();
@@ -243,7 +230,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
             this.searchingProductionSheet = false;
         }
 
-        // Popular o formulário
+
         this.deliverySheetForm.patchValue({
             internalReference: deliverySheet.internalReference || '',
             totalValue: deliverySheet.totalValue || 0,
@@ -261,7 +248,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
             }
         });
 
-        // Adicionar ID para modo de edição
+
         if (deliverySheet._id) {
             this.deliverySheetForm.addControl('_id', this.formBuilder.control(deliverySheet._id));
         }
@@ -271,7 +258,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
      * 📝 POPULAR FORMULÁRIO - Preenche formulário com dados da ficha
      */
     private populateForm(deliverySheet: DeliverySheet): void {
-        // Definir a ficha de produção encontrada se existir
+
         if (deliverySheet.productionSheet) {
             this.productionSheetFound = deliverySheet.productionSheet;
             this.productionSheetNotFound = false;
@@ -296,10 +283,6 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
         });
     }
 
-
-    // ========================================
-    // MÉTODOS PÚBLICOS
-    // ========================================
 
     /**
      * 🔍 BUSCA DE FICHA DE PRODUÇÃO - Evento quando usuário digita referência
@@ -426,8 +409,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
      * ❌ MOSTRAR MENSAGEM DE ERRO
      */
     private showErrorMessage(message: string): void {
-        // Implementar exibição de erro se necessário
-        console.error(message);
+
     }
 
     /**
