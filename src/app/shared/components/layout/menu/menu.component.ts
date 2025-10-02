@@ -1,5 +1,5 @@
 
-import { Component, OnInit, OnDestroy, HostListener, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, inject, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, takeUntil } from 'rxjs/operators';
@@ -24,6 +24,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   protected menuService = inject(MenuService);
   private authService = inject(AuthService);
 
+  @Output() menuClose = new EventEmitter<void>();
 
   private destroy$ = new Subject<void>();
 
@@ -86,6 +87,8 @@ export class MenuComponent implements OnInit, OnDestroy {
   onMenuItemClick(item: MenuItem, index: number): void {
     if (item.disabled || this.menuService.isAnimating()) return;
 
+    // Emitir evento para fechar menu em mobile
+    this.menuClose.emit();
 
     if (item.route) {
       this.router.navigate([item.route]).then(success => {

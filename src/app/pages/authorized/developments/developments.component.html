@@ -35,13 +35,17 @@
 
 
                     <ds-table-row [isHeader]="true">
-                        <ds-table-cell [isHeader]="true" align="left">Imagem</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="left">Referência Interna</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="left">Referência Cliente</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="left">Tipo Produção</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left"
+                            class="cell-narrow hide-mobile">Imagem</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left" class="cell-normal">Referência
+                            Interna</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left" class="cell-normal hide-mobile">Referência
+                            Cliente</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left" class="cell-wide">Cliente</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left" class="cell-normal hide-small">Tipo
+                            Produção</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center" class="cell-narrow">Status</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center" class="cell-fixed">Ações</ds-table-cell>
                     </ds-table-row>
 
 
@@ -49,7 +53,7 @@
                         (rowClick)="onDevelopmentClick(development)">
 
 
-                        <ds-table-cell align="left">
+                        <ds-table-cell align="left" class="cell-narrow hide-mobile">
                             <div class="image-cell">
                                 <img *ngIf="development.pieceImage?.url; else noImage"
                                     [src]="development.pieceImage?.url" [alt]="development.internalReference"
@@ -63,19 +67,19 @@
                         </ds-table-cell>
 
 
-                        <ds-table-cell align="left">
+                        <ds-table-cell align="left" class="cell-normal">
                             <span class="body secondary font-weight-medium">{{ development.internalReference }}</span>
                             <ds-icon (click)="copy($event, development.internalReference)" class="ml-4"
                                 cursorType="pointer" icon="fa-regular fa-clipboard" fontSize="16px" />
                         </ds-table-cell>
 
 
-                        <ds-table-cell align="left">
+                        <ds-table-cell align="left" class="cell-normal hide-mobile">
                             <span class="body secondary">{{ development.clientReference || '-' }}</span>
                         </ds-table-cell>
 
 
-                        <ds-table-cell align="left">
+                        <ds-table-cell align="left" class="cell-wide">
                             <div class="client-info">
                                 <span class="body secondary">
                                     {{ development.client.companyName || 'Cliente não encontrado' }}
@@ -87,7 +91,7 @@
                         </ds-table-cell>
 
 
-                        <ds-table-cell align="left">
+                        <ds-table-cell align="left" class="cell-normal hide-small">
                             <div class="production-types">
                                 <span class="body secondary">
                                     {{productionType(development.productionType)}}
@@ -96,13 +100,13 @@
                         </ds-table-cell>
 
 
-                        <ds-table-cell align="center">
+                        <ds-table-cell align="center" class="cell-narrow">
                             <ds-badge [text]="getStatusLabel(development.status)" [status]="development.status"
                                 entityType="development" />
                         </ds-table-cell>
 
 
-                        <ds-table-cell align="center">
+                        <ds-table-cell align="center" class="cell-fixed">
                             <ds-action-menu [items]="actionMenuItems"
                                 (itemSelected)="onActionMenuSelect(development, $event)">
                             </ds-action-menu>

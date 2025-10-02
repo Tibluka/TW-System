@@ -1,7 +1,19 @@
-
 <div class="authorized-layout">
-    <app-menu></app-menu>
-    <main class="main-content">
+    <!-- Header para mobile -->
+    <ds-header title="TW System" [showMenuButton]="isMobile" [isMenuOpen]="isMenuOpen" (menuToggle)="onMenuToggle()">
+    </ds-header>
+
+    <!-- Menu lateral -->
+    <app-menu [class.menu-hidden]="isMobile && !isMenuOpen" [class.menu-overlay]="isMobile && isMenuOpen"
+        (menuClose)="onMenuClose()">
+    </app-menu>
+
+    <!-- Conteúdo principal -->
+    <main class="main-content" [class.mobile-padding]="isMobile">
         <router-outlet></router-outlet>
     </main>
+
+    <!-- Overlay para fechar menu no mobile -->
+    <div *ngIf="isMobile && isMenuOpen" class="menu-overlay" (click)="onMenuClose()">
+    </div>
 </div>
