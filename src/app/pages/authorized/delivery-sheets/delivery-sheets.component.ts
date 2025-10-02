@@ -405,6 +405,17 @@ export class DeliverySheetsComponent extends FormValidator {
         this.loadDeliverySheets();
     }
 
+    hasActiveFilters(): boolean {
+        return !!(
+            this.currentFilters.search ||
+            this.currentFilters.status ||
+            this.currentFilters.clientId ||
+            this.currentFilters.deliveryDateFrom ||
+            this.currentFilters.deliveryDateTo ||
+            this.currentFilters.active === false
+        );
+    }
+
     /**
      * 🎯 MENU DE AÇÕES - Processa ação selecionada no menu
      */

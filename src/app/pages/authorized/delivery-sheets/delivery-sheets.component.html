@@ -49,9 +49,15 @@
         </div>
 
 
-        <ds-button label="Nova Ficha de Entrega" variant="fill" icon="fa-solid fa-plus"
-            (onClickEmitter)="createDeliverySheet()">
-        </ds-button>
+        <div class="d-flex gap-16">
+            <ds-button label="Limpar Filtros" variant="outline" icon="fa-solid fa-eraser"
+                (onClickEmitter)="clearFilters()" [disabled]="!hasActiveFilters()">
+            </ds-button>
+
+            <ds-button label="Nova Ficha de Entrega" variant="fill" icon="fa-solid fa-plus"
+                (onClickEmitter)="createDeliverySheet()">
+            </ds-button>
+        </div>
     </div>
 
 

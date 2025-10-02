@@ -34,7 +34,7 @@ export interface Development {
 
 
     clientId: string; // ID de referência obrigatório
-    client?: Client; // Pode vir populado da API via populate
+    client: Client; // Pode vir populado da API via populate
 
 
     description?: string;

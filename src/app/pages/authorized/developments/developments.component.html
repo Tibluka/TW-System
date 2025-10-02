@@ -15,7 +15,14 @@
                 (ngModelChange)="onSearchChange()" [options]="statusOption" [fullWidth]="true" />
         </div>
 
-        <ds-button label="Novo desenvolvimento" icon="fa-solid fa-circle-plus" (onClickEmitter)="createDevelopment()" />
+        <div class="d-flex gap-16">
+            <ds-button label="Limpar Filtros" variant="outline" icon="fa-solid fa-eraser"
+                (onClickEmitter)="clearFilters()" [disabled]="!hasActiveFilters()">
+            </ds-button>
+
+            <ds-button label="Novo desenvolvimento" icon="fa-solid fa-circle-plus"
+                (onClickEmitter)="createDevelopment()" />
+        </div>
     </div>
 
     <div class="results mt-32">

@@ -386,8 +386,23 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
     this.loadProductionOrders();
   }
 
-  clearFilters() {
+  clearFilters(): void {
+    this.currentFilters = {
+      search: undefined,
+      status: undefined,
+      page: 1,
+      limit: 10,
+      active: true
+    };
+    this.loadProductionOrders();
+  }
 
+  hasActiveFilters(): boolean {
+    return !!(
+      this.currentFilters.search ||
+      this.currentFilters.status ||
+      this.currentFilters.active === false
+    );
   }
 
   copy(event: MouseEvent, internalReference: string): void {

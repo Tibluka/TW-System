@@ -234,6 +234,23 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
     this.loadDevelopments();
   }
 
+  clearFilters(): void {
+    this.currentFilters = {
+      search: undefined,
+      status: undefined,
+      page: 1,
+      limit: 10
+    };
+    this.loadDevelopments();
+  }
+
+  hasActiveFilters(): boolean {
+    return !!(
+      this.currentFilters.search ||
+      this.currentFilters.status
+    );
+  }
+
 
   /**
    * 🏷️ STATUS LABEL - Retorna label do status

@@ -40,9 +40,15 @@
         </div>
 
 
-        <ds-button label="Novo Recibo" variant="fill" icon="fa-solid fa-plus"
-            (onClickEmitter)="createProductionReceipt()">
-        </ds-button>
+        <div class="d-flex gap-16">
+            <ds-button label="Limpar Filtros" variant="outline" icon="fa-solid fa-eraser"
+                (onClickEmitter)="clearAllFilters()" [disabled]="!hasActiveFilters">
+            </ds-button>
+
+            <ds-button label="Novo Recibo" variant="fill" icon="fa-solid fa-plus"
+                (onClickEmitter)="createProductionReceipt()">
+            </ds-button>
+        </div>
     </div>
 
 

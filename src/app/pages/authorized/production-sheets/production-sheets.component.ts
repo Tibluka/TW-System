@@ -404,6 +404,17 @@ export class ProductionSheetsComponent extends FormValidator {
     this.loadProductionSheets();
   }
 
+  hasActiveFilters(): boolean {
+    return !!(
+      this.currentFilters.search ||
+      this.currentFilters.stage ||
+      this.currentFilters.machine ||
+      this.currentFilters.dateFrom ||
+      this.currentFilters.dateTo ||
+      this.currentFilters.active === false
+    );
+  }
+
   /**
    * 🎯 MENU DE AÇÕES - Processa ação selecionada no menu
    */

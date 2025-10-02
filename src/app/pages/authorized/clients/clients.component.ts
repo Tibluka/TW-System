@@ -286,6 +286,19 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
     }
   }
 
+  clearFilters(): void {
+    this.currentFilters = {
+      search: '',
+      page: 1,
+      limit: 10
+    };
+    this.loadClients();
+  }
+
+  hasActiveFilters(): boolean {
+    return !!(this.currentFilters.search && this.currentFilters.search.trim());
+  }
+
 
   /**
    * 🏁 MODAL RESULT - Processa resultado do modal

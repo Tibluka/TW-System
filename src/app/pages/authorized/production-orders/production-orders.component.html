@@ -16,9 +16,15 @@
             </ds-select>
         </div>
 
-        <ds-button label="Nova Ordem de Produção" variant="fill" icon="fa-solid fa-plus"
-            (onClickEmitter)="createProductionOrder()">
-        </ds-button>
+        <div class="d-flex gap-16">
+            <ds-button label="Limpar Filtros" variant="outline" icon="fa-solid fa-eraser"
+                (onClickEmitter)="clearFilters()" [disabled]="!hasActiveFilters()">
+            </ds-button>
+
+            <ds-button label="Nova Ordem de Produção" variant="fill" icon="fa-solid fa-plus"
+                (onClickEmitter)="createProductionOrder()">
+            </ds-button>
+        </div>
     </div>
 
     <div class="results mt-32">
@@ -48,11 +54,11 @@
 
                         <ds-table-cell align="left">
                             <div class="image-cell">
-                                <img *ngIf="productionOrder.development?.pieceImage?.url"
-                                    [src]="productionOrder.development?.pieceImage?.url"
-                                    [alt]="productionOrder.development?.description || 'Imagem do desenvolvimento'"
+                                <img *ngIf="productionOrder.development.pieceImage?.url"
+                                    [src]="productionOrder.development.pieceImage?.url"
+                                    [alt]="productionOrder.development.description || 'Imagem do desenvolvimento'"
                                     class="development-image">
-                                <div *ngIf="!productionOrder.development?.pieceImage?.url" class="no-image">
+                                <div *ngIf="!productionOrder.development.pieceImage?.url" class="no-image">
                                     <ds-icon icon="fa-solid fa-image" color="label" fontSize="24px"></ds-icon>
                                 </div>
                             </div>
@@ -71,21 +77,21 @@
 
                         <ds-table-cell align="left">
                             <span class="body primary-dark">
-                                {{ productionOrder.development?.clientReference || '-' }}
+                                {{ productionOrder.development.clientReference || '-' }}
                             </span>
                         </ds-table-cell>
 
 
                         <ds-table-cell align="left">
-                            <div class="client-cell" *ngIf="productionOrder.development?.client">
+                            <div class="client-cell" *ngIf="productionOrder.development.client">
                                 <div class="body primary-dark">
-                                    {{ productionOrder.development?.client?.companyName }}
+                                    {{ productionOrder.development.client.companyName }}
                                 </div>
-                                <div class="placeholder" *ngIf="productionOrder.development?.client?.acronym">
-                                    {{ productionOrder.development?.client?.acronym }}
+                                <div class="placeholder" *ngIf="productionOrder.development.client?.acronym">
+                                    {{ productionOrder.development.client.acronym }}
                                 </div>
                             </div>
-                            <span class="body label" *ngIf="!productionOrder.development?.client">
+                            <span class="body label" *ngIf="!productionOrder.development.client">
                                 Cliente não encontrado
                             </span>
                         </ds-table-cell>
