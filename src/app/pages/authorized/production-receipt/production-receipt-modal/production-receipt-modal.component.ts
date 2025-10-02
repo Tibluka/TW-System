@@ -145,6 +145,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       if (response.data) {
 
         this.productionOrderFound = response.data;
+        this.productionOrderNotFound = false;
         this.productionReceiptForm.patchValue({
           productionOrderId: response.data._id,
         });

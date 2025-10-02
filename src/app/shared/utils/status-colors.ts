@@ -4,11 +4,12 @@ import { DevelopmentStatus } from '../../models/developments/developments';
 import { ProductionOrderStatus } from '../../models/production-orders/production-orders';
 import { ProductionSheetStage } from '../../models/production-sheet/production-sheet';
 import { PaymentStatus } from '../../models/production-receipt/production-receipt';
+import { DeliverySheetStatus } from '../../models/delivery-sheets/delivery-sheets';
 
 
 export type BadgeColor = 'green' | 'yellow' | 'orange' | 'red' | 'blue' | 'purple' | 'gray';
 
-export type StatusType = DevelopmentStatus | ProductionOrderStatus | ProductionSheetStage | PaymentStatus;
+export type StatusType = DevelopmentStatus | ProductionOrderStatus | ProductionSheetStage | PaymentStatus | DeliverySheetStatus;
 
 
 /**
@@ -57,11 +58,20 @@ export class StatusColorMapper {
         'PAID': 'green'      // Verde - Pago
     };
 
+    /**
+     * 📦 FICHAS DE ENTREGA - Cores para status de entrega
+     */
+    private static readonly DELIVERY_SHEET_COLORS: Record<DeliverySheetStatus, BadgeColor> = {
+        'CREATED': 'blue',    // Azul - Criada
+        'ON_ROUTE': 'orange', // Laranja - Em Rota
+        'DELIVERED': 'green'  // Verde - Entregue
+    };
+
 
     /**
      * 🎨 OBTER COR POR STATUS - Retorna a cor apropriada para um status
      */
-    static getColorForStatus(status: string, entityType?: 'development' | 'production-order' | 'production-sheet' | 'production-receipt'): BadgeColor {
+    static getColorForStatus(status: string, entityType?: 'development' | 'production-order' | 'production-sheet' | 'production-receipt' | 'delivery-sheet'): BadgeColor {
 
         if (!entityType) {
             return this.detectColorByStatus(status);
@@ -80,6 +90,9 @@ export class StatusColorMapper {
 
             case 'production-receipt':
                 return this.PAYMENT_COLORS[status as PaymentStatus] || 'gray';
+
+            case 'delivery-sheet':
+                return this.DELIVERY_SHEET_COLORS[status as DeliverySheetStatus] || 'gray';
 
             default:
                 return this.detectColorByStatus(status);
@@ -162,14 +175,14 @@ export class StatusColorMapper {
 /**
  * 🎨 FUNÇÃO HELPER - Obtém cor para um status
  */
-export function getStatusColor(status: string, entityType?: 'development' | 'production-order' | 'production-sheet' | 'production-receipt'): BadgeColor {
+export function getStatusColor(status: string, entityType?: 'development' | 'production-order' | 'production-sheet' | 'production-receipt' | 'delivery-sheet'): BadgeColor {
     return StatusColorMapper.getColorForStatus(status, entityType);
 }
 
 /**
  * 🏷️ FUNÇÃO HELPER - Obtém classe CSS para um status
  */
-export function getStatusClass(status: string, entityType?: 'development' | 'production-order' | 'production-sheet' | 'production-receipt'): string {
+export function getStatusClass(status: string, entityType?: 'development' | 'production-order' | 'production-sheet' | 'production-receipt' | 'delivery-sheet'): string {
     const color = getStatusColor(status, entityType);
     return `status-${color}`;
 }

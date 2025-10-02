@@ -1,4 +1,3 @@
-
 <ds-modal *ngIf="isModalOpen" modalId="status-updater-modal" (modalClosed)="closeModal()">
 
     <div class="status-updater-content">
@@ -23,7 +22,8 @@
             </ds-button>
 
             <ds-button label="Atualizar Status" variant="fill" icon="fa-solid fa-check" [isLoading]="isLoading"
-                [disabled]="!selectedStatus || selectedStatus === currentStatus" (onClickEmitter)="confirmUpdate()">
+                [disabled]="!selectedStatus || selectedStatus === currentStatus || isLoading"
+                (onClickEmitter)="confirmUpdate()">
             </ds-button>
         </div>
 

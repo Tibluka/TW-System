@@ -96,7 +96,7 @@ export const DELIVERY_SHEET_STATUS_LABELS: Record<DeliverySheetStatus, string> =
  * 🎨 CORES DOS STATUS
  */
 export const DELIVERY_SHEET_STATUS_COLORS: Record<DeliverySheetStatus, string> = {
-    'CREATED': 'info',
+    'CREATED': 'primary',
     'ON_ROUTE': 'warning',
     'DELIVERED': 'success'
 };
@@ -111,7 +111,7 @@ export interface DeliverySheetStatusOption {
 }
 
 export const DELIVERY_SHEET_STATUS_OPTIONS: DeliverySheetStatusOption[] = [
-    { value: 'CREATED', label: 'Criada', color: 'info' },
+    { value: 'CREATED', label: 'Criada', color: 'primary' },
     { value: 'ON_ROUTE', label: 'Em Rota', color: 'warning' },
     { value: 'DELIVERED', label: 'Entregue', color: 'success' }
 ];

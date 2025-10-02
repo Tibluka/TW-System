@@ -14,7 +14,7 @@ export class BadgeComponent {
   @Input() text: string = '';
   @Input() color: BadgeColor = 'gray';
   @Input() status: string = ''; // Status para mapeamento automático
-  @Input() entityType: 'development' | 'production-order' | 'production-sheet' | 'production-receipt' | undefined = undefined;
+  @Input() entityType: 'development' | 'production-order' | 'production-sheet' | 'production-receipt' | 'delivery-sheet' | undefined = undefined;
 
 
   computedColor = computed(() => {

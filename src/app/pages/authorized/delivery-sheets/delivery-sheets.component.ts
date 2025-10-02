@@ -99,7 +99,7 @@ export class DeliverySheetsComponent extends FormValidator {
     ];
 
     deliverySheetStatusOptions: StatusOption[] = [
-        { value: 'CREATED', label: 'Criada', icon: 'fa-solid fa-plus', color: 'info' },
+        { value: 'CREATED', label: 'Criada', icon: 'fa-solid fa-plus', color: 'primary' },
         { value: 'ON_ROUTE', label: 'Em Rota', icon: 'fa-solid fa-truck', color: 'warning' },
         { value: 'DELIVERED', label: 'Entregue', icon: 'fa-solid fa-check-circle', color: 'success' }
     ];
@@ -535,4 +535,10 @@ export class DeliverySheetsComponent extends FormValidator {
             currency: 'BRL'
         }).format(value);
     }
+
+
+    copy(event: MouseEvent, internalReference: string): void {
+        copyToClipboard(internalReference, event);
+    }
+
 }

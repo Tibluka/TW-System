@@ -80,8 +80,11 @@
 
 
                         <ds-table-cell align="left">
-                            <span class="body primary-dark font-weight-medium">
-                                {{ deliverySheet.internalReference }}
+                            <span class="body primary-dark">
+                                <span class="body primary-dark font-weight-medium">{{
+                                    deliverySheet.internalReference }}</span>
+                                <ds-icon (click)="copy($event, deliverySheet.internalReference)" class="ml-4"
+                                    cursorType="pointer" icon="fa-regular fa-clipboard" fontSize="16px" />
                             </span>
                         </ds-table-cell>
 
@@ -142,9 +145,8 @@
 
 
                         <ds-table-cell align="center">
-                            <ds-badge [text]="getStatusLabel(deliverySheet.status)"
-                                [status]="getStatusColor(deliverySheet.status)">
-                            </ds-badge>
+                            <ds-badge [text]="getStatusLabel(deliverySheet.status)" [status]="deliverySheet.status"
+                                entityType="delivery-sheet" />
                         </ds-table-cell>
 
 
@@ -163,9 +165,8 @@
                 <div class="delivery-sheet-card">
                     <div class="card-header">
                         <h3 class="card-title">{{ deliverySheet.internalReference }}</h3>
-                        <ds-badge [text]="getStatusLabel(deliverySheet.status)"
-                            [status]="getStatusColor(deliverySheet.status)">
-                        </ds-badge>
+                        <ds-badge [text]="getStatusLabel(deliverySheet.status)" [status]="deliverySheet.status"
+                            entityType="delivery-sheet" />
                     </div>
                     <div class="card-content">
                         <div class="info-row">
