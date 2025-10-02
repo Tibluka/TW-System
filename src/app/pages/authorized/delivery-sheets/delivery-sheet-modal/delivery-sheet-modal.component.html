@@ -43,20 +43,69 @@
                                 <p class="card-small secondary mb-4">
                                     {{productionSheetFound.productionOrder?.development?.clientReference}}</p>
                                 <hr>
+
+                                <!-- Dados da Ordem de Produção -->
+                                <div class="production-order-info" *ngIf="productionSheetFound.productionOrder">
+                                    <h3 class="section-subtitle mb-4">Ordem de Produção</h3>
+                                    <div class="info-grid">
+                                        <p class="body secondary mb-2">
+                                            <strong>Status:</strong>
+                                            {{getProductionOrderStatusLabel(productionSheetFound.productionOrder.status)}}
+                                        </p>
+                                        <p class="body secondary mb-2">
+                                            <strong>Tipo de Tecido:</strong>
+                                            {{productionSheetFound.productionOrder.fabricType}}
+                                        </p>
+                                        <p class="body secondary mb-2">
+                                            <strong>Tipo de Produção:</strong>
+                                            {{getProductionTypeLabel(productionSheetFound.productionOrder.productionType?.type)}}
+                                        </p>
+                                        <p class="body secondary mb-2"
+                                            *ngIf="productionSheetFound.productionOrder.productionType?.type === 'rotary' && productionSheetFound.productionOrder.productionType?.meters">
+                                            <strong>Metragem:</strong>
+                                            {{productionSheetFound.productionOrder.productionType.meters}}m
+                                        </p>
+                                        <p class="body secondary mb-2"
+                                            *ngIf="productionSheetFound.productionOrder.productionType?.type === 'localized' && productionSheetFound.productionOrder.productionType?.additionalInfo?.sizes">
+                                            <strong>Total de Peças:</strong>
+                                            {{getTotalPieces(productionSheetFound.productionOrder.productionType)}}
+                                        </p>
+                                        <p class="body secondary mb-2"
+                                            *ngIf="productionSheetFound.productionOrder.hasCraft !== undefined">
+                                            <strong>Tem Craft:</strong> {{productionSheetFound.productionOrder.hasCraft
+                                            ? 'Sim' : 'Não'}}
+                                        </p>
+                                        <p class="body secondary mb-2"
+                                            *ngIf="productionSheetFound.productionOrder.fabricWidth">
+                                            <strong>Largura do Tecido:</strong>
+                                            {{productionSheetFound.productionOrder.fabricWidth}}cm
+                                        </p>
+                                    </div>
+                                    <hr class="mt-4 mb-4">
+                                </div>
+
+                                <!-- Dados da Ficha de Produção -->
                                 <div class="production-info">
-                                    <p class="body secondary mt-4 mb-2">
-                                        <strong>Estágio:</strong> {{getStageLabel(productionSheetFound.stage)}}
-                                    </p>
-                                    <p class="body secondary mb-2">
-                                        <strong>Máquina:</strong> {{getMachineName(productionSheetFound.machine)}}
-                                    </p>
-                                    <p class="body secondary mb-2">
-                                        <strong>Data de Entrada:</strong> {{formatDate(productionSheetFound.entryDate)}}
-                                    </p>
-                                    <p class="body secondary mb-4">
-                                        <strong>Data Prevista de Saída:</strong>
-                                        {{formatDate(productionSheetFound.expectedExitDate)}}
-                                    </p>
+                                    <h3 class="section-subtitle mb-4">Ficha de Produção</h3>
+                                    <div class="info-grid">
+                                        <p class="body secondary mb-2">
+                                            <strong>Estágio:</strong> {{getStageLabel(productionSheetFound.stage)}}
+                                        </p>
+                                        <p class="body secondary mb-2">
+                                            <strong>Máquina:</strong> {{getMachineName(productionSheetFound.machine)}}
+                                        </p>
+                                        <p class="body secondary mb-2">
+                                            <strong>Data de Entrada:</strong>
+                                            {{formatDate(productionSheetFound.entryDate)}}
+                                        </p>
+                                        <p class="body secondary mb-2">
+                                            <strong>Data Prevista de Saída:</strong>
+                                            {{formatDate(productionSheetFound.expectedExitDate)}}
+                                        </p>
+                                        <p class="body secondary mb-2" *ngIf="productionSheetFound.productionNotes">
+                                            <strong>Observações:</strong> {{productionSheetFound.productionNotes}}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -81,15 +130,29 @@
 
             <!-- Endereço de Entrega -->
             <div class="form-section" formGroupName="address" *ngIf="productionSheetFound || isEditMode">
-                <h3 class="section-title mb-16">Endereço de Entrega</h3>
+                <h3 class="section-title mb-16">
+                    Endereço de Entrega
+                    <span class="auto-filled-badge" *ngIf="productionSheetFound && !isEditMode">
+                        <ds-icon icon="fa-solid fa-magic" fontSize="12px" color="success"></ds-icon>
+                        Preenchido automaticamente
+                    </span>
+                </h3>
 
-                <div class="form-grid">
+                <div class="form-grid street-number-grid">
                     <!-- Rua -->
-                    <div class="form-field full-width">
-                        <ds-input label="Rua *" placeholder="Rua, número, bairro..." formControlName="street"
+                    <div class="form-field">
+                        <ds-input label="Rua *" placeholder="Nome da rua" formControlName="street"
                             [invalid]="isFormControlInvalid(deliverySheetForm.get('address.street'))"
                             [errorMessage]="getFieldError('address.street')" icon="fa-solid fa-map-marker-alt"
                             iconPosition="left" width="100%">
+                        </ds-input>
+                    </div>
+
+                    <!-- Número -->
+                    <div class="form-field">
+                        <ds-input label="Número *" placeholder="123" formControlName="number"
+                            [invalid]="isFormControlInvalid(deliverySheetForm.get('address.number'))"
+                            [errorMessage]="getFieldError('address.number')" width="100%">
                         </ds-input>
                     </div>
                 </div>
@@ -107,7 +170,7 @@
                     <div class="form-field">
                         <ds-input label="Estado *" placeholder="Ex: SP" formControlName="state"
                             [invalid]="isFormControlInvalid(deliverySheetForm.get('address.state'))"
-                            [errorMessage]="getFieldError('address.state')" width="100%">
+                            [errorMessage]="getFieldError('address.state')" [maxlength]="2" width="100%">
                         </ds-input>
                     </div>
 
@@ -178,18 +241,19 @@
                 </div>
             </div>
 
+            <!-- Botões de Ação -->
+            <div class="form-actions" *ngIf="productionSheetFound || isEditMode">
+                <ds-button type="button" variant="outline" label="Cancelar" icon="fa-solid fa-times"
+                    (onClickEmitter)="onCancel()" [disabled]="isSaving">
+                </ds-button>
+
+                <ds-button type="submit" variant="fill" [label]="isEditMode ? 'Atualizar Ficha' : 'Criar Ficha'"
+                    icon="fa-solid fa-save" [disabled]="isSaving">
+                </ds-button>
+            </div>
+
         </form>
 
-        <!-- Botões de Ação -->
-        <div class="form-actions" *ngIf="productionSheetFound || isEditMode">
-            <ds-button type="button" variant="outline" label="Cancelar" icon="fa-solid fa-times"
-                (onClickEmitter)="onCancel()" [disabled]="isSaving">
-            </ds-button>
-
-            <ds-button type="submit" variant="fill" [label]="isEditMode ? 'Atualizar Ficha' : 'Criar Ficha'"
-                icon="fa-solid fa-save" [disabled]="deliverySheetForm.invalid || isSaving">
-            </ds-button>
-        </div>
     </div>
 
 </div>

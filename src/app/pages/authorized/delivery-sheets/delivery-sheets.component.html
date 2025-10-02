@@ -56,126 +56,138 @@
 
     <!-- Resultados -->
     <div class="results mt-32">
-        <ds-list-view [items]="deliverySheets" [loading]="loading" emptyMessage="Nenhuma ficha de entrega encontrada">
+        <ds-list-view [items]="deliverySheets" [config]="listViewConfig">
+            <div slot="table">
+                <ds-table emptyMessage="Nenhuma ficha de entrega encontrada" [showPagination]="true"
+                    [pageSize]="currentFilters.limit" [totalPages]="pagination?.totalPages"
+                    [currentPage]="pagination?.currentPage || 1" (pageChanged)="onPageChange($event)"
+                    [loadingData]="shouldShowSpinner">
 
-            <!-- Cabeçalho da tabela -->
-            <ds-table-cell [isHeader]="true" align="left">Ref. Interna</ds-table-cell>
-            <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
-            <ds-table-cell [isHeader]="true" align="left" class="hide-on-tablet">Endereço</ds-table-cell>
-            <ds-table-cell [isHeader]="true" align="center">Data de Entrega</ds-table-cell>
-            <ds-table-cell [isHeader]="true" align="center">Valor Total</ds-table-cell>
-            <ds-table-cell [isHeader]="true" align="center" class="hide-on-mobile">Nota Fiscal</ds-table-cell>
-            <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
-            <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
+                    <ds-table-row [isHeader]="true">
+                        <ds-table-cell [isHeader]="true" align="left">Ref. Interna</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left" class="hide-on-tablet">Endereço</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center">Data de Entrega</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center">Valor Total</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center" class="hide-on-mobile">Nota
+                            Fiscal</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
+                    </ds-table-row>
 
-            <!-- Linhas da tabela -->
-            <ds-table-row *ngFor="let deliverySheet of deliverySheets" [clickable]="true" [data]="deliverySheet"
-                (rowClick)="onDeliverySheetClick(deliverySheet)">
+                    <ds-table-row *ngFor="let deliverySheet of deliverySheets" [clickable]="true" [data]="deliverySheet"
+                        (rowClick)="onDeliverySheetClick(deliverySheet)">
 
-                <!-- Referência Interna -->
-                <ds-table-cell align="left">
-                    <span class="body primary-dark font-weight-medium">
-                        {{ deliverySheet.internalReference }}
-                    </span>
-                </ds-table-cell>
+                        <!-- Referência Interna -->
+                        <ds-table-cell align="left">
+                            <span class="body primary-dark font-weight-medium">
+                                {{ deliverySheet.internalReference }}
+                            </span>
+                        </ds-table-cell>
 
-                <!-- Cliente -->
-                <ds-table-cell align="left">
-                    <div class="client-cell">
-                        <span class="body primary-dark">
-                            {{ deliverySheet.client?.name || '-' }}
-                        </span>
-                        <span class="caption secondary" *ngIf="deliverySheet.client?.email">
-                            {{ deliverySheet.client.email }}
-                        </span>
+                        <!-- Cliente -->
+                        <ds-table-cell align="left">
+                            <div class="client-cell">
+                                <span class="body primary-dark">
+                                    {{ deliverySheet.client?.name || '-' }}
+                                </span>
+                                <span class="caption secondary" *ngIf="deliverySheet.client?.email">
+                                    {{ deliverySheet.client.email }}
+                                </span>
+                            </div>
+                        </ds-table-cell>
+
+                        <!-- Endereço -->
+                        <ds-table-cell align="left" class="hide-on-tablet">
+                            <div class="address-cell">
+                                <span class="body primary-dark">
+                                    {{ deliverySheet.address.street }}
+                                </span>
+                                <span class="caption secondary">
+                                    {{ deliverySheet.address.city }}, {{ deliverySheet.address.state }}
+                                </span>
+                            </div>
+                        </ds-table-cell>
+
+                        <!-- Data de Entrega -->
+                        <ds-table-cell align="center">
+                            <span class="body primary-dark" *ngIf="deliverySheet.deliveryDate; else noDeliveryDate">
+                                {{ formatDate(deliverySheet.deliveryDate) }}
+                            </span>
+                            <ng-template #noDeliveryDate>
+                                <span class="caption secondary">-</span>
+                            </ng-template>
+                        </ds-table-cell>
+
+                        <!-- Valor Total -->
+                        <ds-table-cell align="center">
+                            <span class="body primary-dark font-weight-medium">
+                                {{ formatCurrency(deliverySheet.totalValue) }}
+                            </span>
+                        </ds-table-cell>
+
+                        <!-- Nota Fiscal -->
+                        <ds-table-cell align="center" class="hide-on-mobile">
+                            <span class="body secondary" *ngIf="deliverySheet.invoiceNumber; else noInvoice">
+                                {{ deliverySheet.invoiceNumber }}
+                            </span>
+                            <ng-template #noInvoice>
+                                <span class="caption secondary">-</span>
+                            </ng-template>
+                        </ds-table-cell>
+
+                        <!-- Status -->
+                        <ds-table-cell align="center">
+                            <ds-badge [text]="getStatusLabel(deliverySheet.status)"
+                                [status]="getStatusColor(deliverySheet.status)">
+                            </ds-badge>
+                        </ds-table-cell>
+
+                        <!-- Ações -->
+                        <ds-table-cell align="center">
+                            <ds-action-menu [items]="actionMenuItems"
+                                (itemSelected)="onActionMenuSelect(deliverySheet, $event)">
+                            </ds-action-menu>
+                        </ds-table-cell>
+
+                    </ds-table-row>
+                </ds-table>
+            </div>
+
+            <ng-template #cardTemplate let-deliverySheet>
+                <!-- Card template para mobile -->
+                <div class="delivery-sheet-card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ deliverySheet.internalReference }}</h3>
+                        <ds-badge [text]="getStatusLabel(deliverySheet.status)"
+                            [status]="getStatusColor(deliverySheet.status)">
+                        </ds-badge>
                     </div>
-                </ds-table-cell>
-
-                <!-- Endereço -->
-                <ds-table-cell align="left" class="hide-on-tablet">
-                    <div class="address-cell">
-                        <span class="body primary-dark">
-                            {{ deliverySheet.address.street }}
-                        </span>
-                        <span class="caption secondary">
-                            {{ deliverySheet.address.city }}, {{ deliverySheet.address.state }}
-                        </span>
+                    <div class="card-content">
+                        <div class="info-row">
+                            <span class="label">Cliente:</span>
+                            <span class="value">{{ deliverySheet.client?.name || '-' }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Data de Entrega:</span>
+                            <span class="value">{{ formatDate(deliverySheet.deliveryDate) }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Valor Total:</span>
+                            <span class="value">{{ formatCurrency(deliverySheet.totalValue) }}</span>
+                        </div>
                     </div>
-                </ds-table-cell>
-
-                <!-- Data de Entrega -->
-                <ds-table-cell align="center">
-                    <span class="body primary-dark" *ngIf="deliverySheet.deliveryDate; else noDeliveryDate">
-                        {{ formatDate(deliverySheet.deliveryDate) }}
-                    </span>
-                    <ng-template #noDeliveryDate>
-                        <span class="caption secondary">-</span>
-                    </ng-template>
-                </ds-table-cell>
-
-                <!-- Valor Total -->
-                <ds-table-cell align="center">
-                    <span class="body primary-dark font-weight-medium">
-                        {{ formatCurrency(deliverySheet.totalValue) }}
-                    </span>
-                </ds-table-cell>
-
-                <!-- Nota Fiscal -->
-                <ds-table-cell align="center" class="hide-on-mobile">
-                    <span class="body secondary" *ngIf="deliverySheet.invoiceNumber; else noInvoice">
-                        {{ deliverySheet.invoiceNumber }}
-                    </span>
-                    <ng-template #noInvoice>
-                        <span class="caption secondary">-</span>
-                    </ng-template>
-                </ds-table-cell>
-
-                <!-- Status -->
-                <ds-table-cell align="center">
-                    <ds-badge [text]="getStatusLabel(deliverySheet.status)"
-                        [status]="getStatusColor(deliverySheet.status)">
-                    </ds-badge>
-                </ds-table-cell>
-
-                <!-- Ações -->
-                <ds-table-cell align="center">
-                    <ds-action-menu [items]="[
-                        { value: 'change-status', label: 'Alterar Status', icon: 'fa-solid fa-arrow-right' },
-                        { value: 'edit', label: 'Editar', icon: 'fa-solid fa-edit' },
-                        { value: 'copy-reference', label: 'Copiar Referência', icon: 'fa-solid fa-copy' },
-                        { value: 'delete', label: 'Excluir', icon: 'fa-solid fa-trash' }
-                    ]" (itemSelected)="onActionMenuSelect(deliverySheet, $event)">
-                    </ds-action-menu>
-                </ds-table-cell>
-
-            </ds-table-row>
-
+                </div>
+            </ng-template>
         </ds-list-view>
     </div>
 
-    <!-- Paginação -->
-    <div class="pagination-container mt-32" *ngIf="pagination && pagination.totalPages > 1">
-        <div class="pagination-info">
-            <span class="body secondary">
-                Página {{ pagination.currentPage }} de {{ pagination.totalPages }}
-                ({{ pagination.totalItems }} itens)
-            </span>
-            <div class="pagination-buttons">
-                <ds-button variant="outline" label="Anterior" icon="fa-solid fa-chevron-left"
-                    [disabled]="pagination.currentPage <= 1" (onClickEmitter)="previousPage()">
-                </ds-button>
-                <ds-button variant="outline" label="Próxima" icon="fa-solid fa-chevron-right"
-                    [disabled]="pagination.currentPage >= pagination.totalPages" (onClickEmitter)="nextPage()">
-                </ds-button>
-            </div>
-        </div>
-    </div>
 
 </div>
 
 <!-- Modal de Ficha de Entrega -->
-<ds-modal modalId="delivery-sheet-modal" (modalClosed)="onModalClosed($event)">
-    <app-delivery-sheet-modal [deliverySheetId]="selectedDeliverySheetId" [clients]="clients">
+<ds-modal *ngIf="isModalOpen" modalId="delivery-sheet-modal" (modalClosed)="onModalClosed($event)">
+    <app-delivery-sheet-modal [clients]="clients">
     </app-delivery-sheet-modal>
 </ds-modal>
 

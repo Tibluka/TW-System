@@ -7,6 +7,7 @@ import { CreateDeliverySheetRequest, DeliverySheet, UpdateDeliverySheetRequest }
 import { DeliverySheetsService } from '../../../../shared/services/delivery-sheets/delivery-sheets.service';
 import { ModalService } from '../../../../shared/services/modal/modal.service';
 import { ProductionSheet, ProductionSheetsService } from '../../../../shared/services/production-sheets/production-sheets.service';
+import { ProductionOrderStatus, ProductionTypeEnum } from '../../../../models/production-orders/production-orders';
 
 import { ButtonComponent } from '../../../../shared/components/atoms/button/button.component';
 import { IconComponent } from '../../../../shared/components/atoms/icon/icon.component';
@@ -75,15 +76,17 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
     ngOnInit(): void {
         this.initializeForm();
         this.initializeProductionSheetSearch();
-
         // Carregar apenas clientes após um pequeno delay para garantir que o formulário foi inicializado
         setTimeout(() => {
             this.loadRelatedData();
         }, 100);
 
-        if (this.deliverySheetId) {
+        // Verificar se há dados do modal (modo de edição sem ID)
+        const activeModal = this.modalService.activeModal();
+        if (activeModal?.config.data) {
+            const deliverySheet = activeModal.config.data;
             this.isEditMode = true;
-            this.loadDeliverySheet();
+            this.populateFormFromData(deliverySheet);
         }
     }
 
@@ -109,8 +112,9 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
             deliveryDate: [this.getTodayDateString()],
             address: this.formBuilder.group({
                 street: ['', [Validators.required, Validators.minLength(10)]],
+                number: ['', [Validators.required]],
                 city: ['', [Validators.required, Validators.minLength(2)]],
-                state: ['', [Validators.required, Validators.minLength(2)]],
+                state: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(2)]],
                 zipCode: ['', [Validators.required, Validators.pattern(/^\d{5}-?\d{3}$/)]],
                 complement: [''],
                 neighborhood: ['']
@@ -160,6 +164,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
 
             if (response.data) {
                 this.productionSheetFound = response.data;
+                this.populateAddressFromClient();
             } else {
                 this.productionSheetNotFound = true;
                 this.productionSheetFound = null;
@@ -180,6 +185,29 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
         this.productionSheetFound = null;
         this.productionSheetNotFound = false;
         this.searchingProductionSheet = false;
+    }
+
+    /**
+     * 🏠 PREENCHER ENDEREÇO - Preenche automaticamente o endereço com dados do cliente
+     */
+    private populateAddressFromClient(): void {
+        if (!this.productionSheetFound?.productionOrder?.development?.client?.address) {
+            return;
+        }
+
+        const clientAddress = this.productionSheetFound.productionOrder.development.client.address;
+
+        this.deliverySheetForm.patchValue({
+            address: {
+                street: clientAddress.street,
+                number: clientAddress.number,
+                city: clientAddress.city,
+                state: clientAddress.state,
+                zipCode: clientAddress.zipcode,
+                complement: clientAddress.complement || '',
+                neighborhood: clientAddress.neighborhood
+            }
+        });
     }
 
     /**
@@ -204,9 +232,52 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
     }
 
     /**
+     * 📋 POPULAR FORMULÁRIO COM DADOS DO MODAL - Preenche dados da ficha de entrega para edição
+     */
+    private populateFormFromData(deliverySheet: any): void {
+        // Definir a ficha de produção encontrada se existir
+        if (deliverySheet.productionSheet) {
+            this.productionSheetFound = deliverySheet.productionSheet;
+            this.deliverySheetForm.get('internalReference')?.disable();
+            this.productionSheetNotFound = false;
+            this.searchingProductionSheet = false;
+        }
+
+        // Popular o formulário
+        this.deliverySheetForm.patchValue({
+            internalReference: deliverySheet.internalReference || '',
+            totalValue: deliverySheet.totalValue || 0,
+            notes: deliverySheet.notes || '',
+            invoiceNumber: deliverySheet.invoiceNumber || '',
+            deliveryDate: this.formatDateForInput(deliverySheet.deliveryDate),
+            address: {
+                street: deliverySheet.address?.street || '',
+                number: deliverySheet.address?.number || '',
+                city: deliverySheet.address?.city || '',
+                state: deliverySheet.address?.state || '',
+                zipCode: deliverySheet.address?.zipCode || '',
+                complement: deliverySheet.address?.complement || '',
+                neighborhood: deliverySheet.address?.neighborhood || ''
+            }
+        });
+
+        // Adicionar ID para modo de edição
+        if (deliverySheet._id) {
+            this.deliverySheetForm.addControl('_id', this.formBuilder.control(deliverySheet._id));
+        }
+    }
+
+    /**
      * 📝 POPULAR FORMULÁRIO - Preenche formulário com dados da ficha
      */
     private populateForm(deliverySheet: DeliverySheet): void {
+        // Definir a ficha de produção encontrada se existir
+        if (deliverySheet.productionSheet) {
+            this.productionSheetFound = deliverySheet.productionSheet;
+            this.productionSheetNotFound = false;
+            this.searchingProductionSheet = false;
+        }
+
         this.deliverySheetForm.patchValue({
             internalReference: deliverySheet.internalReference,
             totalValue: deliverySheet.totalValue || 0,
@@ -215,6 +286,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
             deliveryDate: this.formatDateForInput(deliverySheet.deliveryDate),
             address: {
                 street: deliverySheet.address?.street || '',
+                number: deliverySheet.address?.number || '',
                 city: deliverySheet.address?.city || '',
                 state: deliverySheet.address?.state || '',
                 zipCode: deliverySheet.address?.zipCode || '',
@@ -257,7 +329,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
         try {
             const formData = this.deliverySheetForm.value;
 
-            if (this.isEditMode && this.deliverySheetId) {
+            if (this.isEditMode && (this.deliverySheetId || formData._id)) {
                 const updateData: UpdateDeliverySheetRequest = {
                     internalReference: formData.internalReference,
                     totalValue: parseFloat(formData.totalValue) || 0,
@@ -266,6 +338,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
                     deliveryDate: formData.deliveryDate ? DateFormatter.formatDateToISO(formData.deliveryDate) : undefined,
                     address: {
                         street: formData.address.street,
+                        number: formData.address.number,
                         city: formData.address.city,
                         state: formData.address.state,
                         zipCode: formData.address.zipCode,
@@ -275,7 +348,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
                 };
 
                 const response = await lastValueFrom(
-                    this.deliverySheetsService.updateDeliverySheet(this.deliverySheetId, updateData)
+                    this.deliverySheetsService.updateDeliverySheet(this.deliverySheetId || formData._id, updateData)
                 );
 
                 if (response?.success) {
@@ -292,6 +365,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
                     deliveryDate: formData.deliveryDate ? DateFormatter.formatDateToISO(formData.deliveryDate) : undefined,
                     address: {
                         street: formData.address.street,
+                        number: formData.address.number,
                         city: formData.address.city,
                         state: formData.address.state,
                         zipCode: formData.address.zipCode,
@@ -400,5 +474,44 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
      */
     formatDate(date: Date | string | undefined): string {
         return this.productionSheetsService.formatDate(date);
+    }
+
+    /**
+     * 🏷️ LABEL STATUS ORDEM DE PRODUÇÃO - Retorna label em português para status
+     */
+    getProductionOrderStatusLabel(status: ProductionOrderStatus): string {
+        const statusMap: { [key in ProductionOrderStatus]: string } = {
+            'CREATED': 'Criado',
+            'PILOT_PRODUCTION': 'Produção Piloto',
+            'PILOT_SENT': 'Piloto Enviado',
+            'PILOT_APPROVED': 'Piloto Aprovado',
+            'PRODUCTION_STARTED': 'Produção Iniciada',
+            'FINALIZED': 'Finalizado'
+        };
+        return statusMap[status] || status;
+    }
+
+    /**
+     * 🏷️ LABEL TIPO DE PRODUÇÃO - Retorna label em português para tipo de produção
+     */
+    getProductionTypeLabel(type: ProductionTypeEnum | undefined): string {
+        if (!type) return '-';
+        const typeMap: { [key in ProductionTypeEnum]: string } = {
+            'rotary': 'Rotativa',
+            'localized': 'Localizada'
+        };
+        return typeMap[type] || type;
+    }
+
+    /**
+     * 📊 TOTAL DE PEÇAS - Calcula total de peças para produção localizada
+     */
+    getTotalPieces(productionType: any): string {
+        if (!productionType || productionType.type !== 'localized' || !productionType.additionalInfo?.sizes) {
+            return '0';
+        }
+
+        const total = productionType.additionalInfo.sizes.reduce((sum: number, item: any) => sum + (item.value || 0), 0);
+        return `${total} pç${total !== 1 ? 's' : ''}`;
     }
 }

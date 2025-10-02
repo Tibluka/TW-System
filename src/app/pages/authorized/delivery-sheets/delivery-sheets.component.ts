@@ -6,8 +6,10 @@ import { PaginationInfo } from '../../../models/delivery-sheets/delivery-sheets'
 import { DeliverySheet, DeliverySheetFilters, DeliverySheetStatus } from '../../../models/delivery-sheets/delivery-sheets';
 import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
 import { BadgeComponent } from '../../../shared/components/atoms/badge/badge.component';
-import { DsListViewComponent } from '../../../shared/components/molecules/list-view/list-view.component';
+import { DsListViewComponent, ViewMode } from '../../../shared/components/molecules/list-view/list-view.component';
 import { StatusUpdaterComponent, StatusOption } from '../../../shared/components/molecules/status-updater/status-updater.component';
+import { TableComponent } from '../../../shared/components/organisms/table/table.component';
+import { ListViewConfig } from '../../../models/list-view/list-view';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { IconComponent } from '../../../shared/components/atoms/icon/icon.component';
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
@@ -29,6 +31,7 @@ import { DateFormatter } from '../../../shared/utils/date-formatter';
         CommonModule,
         InputComponent,
         SelectComponent,
+        TableComponent,
         TableCellComponent,
         IconComponent,
         TableRowComponent,
@@ -60,6 +63,10 @@ export class DeliverySheetsComponent extends FormValidator {
     pagination: PaginationInfo | null = null;
     loading = false;
     isModalOpen = false;
+
+    get shouldShowSpinner(): boolean {
+        return this.loading;
+    }
     selectedDeliverySheetId?: string;
     selectedDeliverySheetForStatusUpdate?: DeliverySheet;
 
@@ -102,12 +109,22 @@ export class DeliverySheetsComponent extends FormValidator {
     ];
 
     // Configuração da lista
-    listViewConfig = {
-        showSearch: false,
-        showFilters: false,
-        showPagination: false,
-        itemsPerPage: 10
+    listViewConfig: ListViewConfig = {
+        showToggle: true,
+        defaultView: 'table',
+        cardConfig: {
+            minWidth: '350px',
+            gap: '24px'
+        }
     };
+
+    // Itens do menu de ações
+    actionMenuItems: ActionMenuItem[] = [
+        { value: 'change-status', label: 'Alterar Status', icon: 'fa-solid fa-arrow-right' },
+        { value: 'edit', label: 'Editar', icon: 'fa-solid fa-edit' },
+        { value: 'copy-reference', label: 'Copiar Referência', icon: 'fa-solid fa-copy' },
+        { value: 'delete', label: 'Excluir', icon: 'fa-solid fa-trash' }
+    ];
 
     // Debounce para busca
     private searchSubject = new Subject<string>();
@@ -267,10 +284,9 @@ export class DeliverySheetsComponent extends FormValidator {
             id: 'delivery-sheet-modal',
             title: `Editar Ficha de Entrega - ${deliverySheet.internalReference}`,
             size: 'xl',
-            data: {
-                deliverySheetId: deliverySheet._id,
-                mode: 'edit'
-            }
+            data: deliverySheet
+        }).subscribe(result => {
+            this.handleModalResult(result);
         });
     }
 
@@ -286,6 +302,8 @@ export class DeliverySheetsComponent extends FormValidator {
             data: {
                 mode: 'create'
             }
+        }).subscribe(result => {
+            this.handleModalResult(result);
         });
     }
 

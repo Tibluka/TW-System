@@ -68,6 +68,19 @@
                     background: var(--primary-medium);
                     border-radius: 2px;
                 }
+
+                .auto-filled-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: $spacing-xs;
+                    background: rgba(34, 197, 94, 0.1);
+                    color: var(--success);
+                    padding: $spacing-xs $spacing-sm;
+                    border-radius: $border-radius-sm;
+                    font-size: 12px;
+                    font-weight: 500;
+                    margin-left: $spacing-sm;
+                }
             }
         }
 
@@ -87,6 +100,15 @@
             // Campo de largura total
             .form-field.full-width {
                 grid-column: 1 / -1;
+            }
+
+            // Grid específico para rua e número (2 colunas)
+            &.street-number-grid {
+                grid-template-columns: 2fr 1fr;
+
+                @media (max-width: 768px) {
+                    grid-template-columns: 1fr;
+                }
             }
         }
 
@@ -184,6 +206,31 @@
                             font-size: 14px;
                         }
 
+                        .section-subtitle {
+                            @include input-label();
+                            color: var(--primary-dark);
+                            font-size: 16px;
+                            font-weight: 600;
+                            margin: 0;
+                        }
+
+
+                        .info-grid {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: $spacing-sm;
+                            margin-bottom: $spacing-md;
+
+                            @media (max-width: 768px) {
+                                grid-template-columns: 1fr;
+                            }
+
+                            p {
+                                margin: 0;
+                            }
+                        }
+
+                        .production-order-info,
                         .production-info {
                             p {
                                 margin: 0;

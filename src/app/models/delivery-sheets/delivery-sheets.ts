@@ -24,6 +24,7 @@ export interface DeliverySheet {
 
 export interface DeliveryAddress {
     street: string;
+    number: string;
     city: string;
     state: string;
     zipCode: string;
