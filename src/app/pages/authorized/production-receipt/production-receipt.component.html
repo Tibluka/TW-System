@@ -60,11 +60,11 @@
                         <ds-table-cell [isHeader]="true" align="left">Ref. Interna</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="left">Ref. do Cliente</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="left">Data de Pagamento</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="center">Quantidade</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="right">Valor Total</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
                     </ds-table-row>
 
 
@@ -116,10 +116,7 @@
                         </ds-table-cell>
 
 
-                        <ds-table-cell align="center">
-                            <ds-badge [text]="getReceiptStatusLabel(productionReceipt.paymentStatus)"
-                                [status]="productionReceipt.paymentStatus" entityType="production-receipt" />
-                        </ds-table-cell>
+
 
 
                         <ds-table-cell align="center">
@@ -156,6 +153,10 @@
                             </div>
                         </ds-table-cell>
 
+                        <ds-table-cell align="center">
+                            <ds-badge [text]="getReceiptStatusLabel(productionReceipt.paymentStatus)"
+                                [status]="productionReceipt.paymentStatus" entityType="production-receipt" />
+                        </ds-table-cell>
 
                         <ds-table-cell align="center">
                             <ds-action-menu [items]="getActionMenuItems(productionReceipt)"

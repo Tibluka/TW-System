@@ -234,13 +234,12 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       this.deliverySheetFound = productionReceipt.deliverySheet || null;
     }
 
-
     this.productionReceiptForm.patchValue({
       internalReference: productionReceipt.internalReference,
       deliverySheetId: productionReceipt.deliverySheet?._id,
       paymentMethod: productionReceipt.paymentMethod,
       paymentStatus: productionReceipt.paymentStatus,
-      paymentDate: productionReceipt.paymentDate,
+      paymentDate: this.formatDateForInput(productionReceipt?.paymentDate || ''),
       totalAmount: productionReceipt.totalAmount,
       paidAmount: productionReceipt.paidAmount,
       dueDate: this.formatDateForInput(productionReceipt.dueDate),
