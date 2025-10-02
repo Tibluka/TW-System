@@ -74,7 +74,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
 
 
         const activeModal = this.modalService.activeModal();
-        if (activeModal?.config.data) {
+        if (activeModal?.config.data && activeModal.config.data.mode !== 'create') {
             const deliverySheet = activeModal.config.data;
             this.isEditMode = true;
             this.populateFormFromData(deliverySheet);
@@ -314,7 +314,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
 
             if (this.isEditMode && (this.deliverySheetId || formData._id)) {
                 const updateData: UpdateDeliverySheetRequest = {
-                    internalReference: formData.internalReference,
+                    productionSheetId: this.productionSheetFound?._id || '',
                     totalValue: parseFloat(formData.totalValue) || 0,
                     notes: formData.notes || undefined,
                     invoiceNumber: formData.invoiceNumber || undefined,
@@ -341,7 +341,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
                 }
             } else {
                 const createData: CreateDeliverySheetRequest = {
-                    internalReference: formData.internalReference,
+                    productionSheetId: this.productionSheetFound?._id || '',
                     totalValue: parseFloat(formData.totalValue) || 0,
                     notes: formData.notes || undefined,
                     invoiceNumber: formData.invoiceNumber || undefined,

@@ -1,6 +1,6 @@
 
 
-import { ProductionOrder } from '../production-orders/production-orders';
+import { DeliverySheet } from '../delivery-sheets/delivery-sheets';
 
 
 export type PaymentMethod =
@@ -18,8 +18,8 @@ export interface ProductionReceipt {
     _id: string;
 
 
-    productionOrderId: string;
-    productionOrder?: ProductionOrder;
+    deliverySheetId: string;
+    deliverySheet: DeliverySheet;
 
 
     internalReference: string;
@@ -49,7 +49,7 @@ export interface ProductionReceipt {
 
 
 export interface CreateProductionReceiptRequest {
-    productionOrderId: string;
+    deliverySheetId: string;
     paymentMethod: PaymentMethod;
     totalAmount: number;
     dueDate: Date | string;
@@ -66,7 +66,7 @@ export interface UpdateProductionReceiptRequest extends Partial<CreateProduction
 
 export interface ProductionReceiptFilters {
     search?: string; // Busca em internalReference e notes
-    productionOrderId?: string;
+    deliverySheetId?: string;
     paymentStatus?: PaymentStatus;
     paymentMethod?: PaymentMethod;
     active?: boolean;
@@ -216,12 +216,12 @@ export class ProductionReceiptFormUtils {
         ];
     }
 
-    static initializeFromProductionOrder(productionOrder: ProductionOrder): Partial<CreateProductionReceiptRequest> {
+    static initializeFromDeliverySheet(deliverySheet: DeliverySheet): Partial<CreateProductionReceiptRequest> {
         const dueDate = new Date();
         dueDate.setDate(dueDate.getDate() + 30); // Vencimento padrão de 30 dias
 
         return {
-            productionOrderId: productionOrder._id!,
+            deliverySheetId: deliverySheet._id!,
             totalAmount: 0, // Deve ser preenchido pelo usuário
             dueDate: dueDate.toISOString().split('T')[0], // Format YYYY-MM-DD
             paymentMethod: 'PIX', // Método padrão
@@ -233,8 +233,8 @@ export class ProductionReceiptFormUtils {
     static validateReceiptData(data: CreateProductionReceiptRequest): { valid: boolean; errors: string[] } {
         const errors: string[] = [];
 
-        if (!data.productionOrderId) {
-            errors.push('Ordem de produção é obrigatória');
+        if (!data.deliverySheetId) {
+            errors.push('Ficha de entrega é obrigatória');
         }
 
         if (!data.totalAmount || data.totalAmount <= 0) {

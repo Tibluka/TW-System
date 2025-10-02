@@ -15,7 +15,7 @@ import { IconComponent } from '../../../../shared/components/atoms/icon/icon.com
 
 
 import { ProductionReceiptService } from '../../../../shared/services/production-receipt/production-receipt.service';
-import { ProductionOrderService } from '../../../../shared/services/production-order/production-order.service';
+import { DeliverySheetsService } from '../../../../shared/services/delivery-sheets/delivery-sheets.service';
 import { ModalService } from '../../../../shared/services/modal/modal.service';
 
 
@@ -27,12 +27,11 @@ import {
   PaymentStatus,
   ProductionReceiptFormUtils
 } from '../../../../models/production-receipt/production-receipt';
-import { ProductionOrder, ProductionOrderResponse, ProductionTypeEnum } from '../../../../models/production-orders/production-orders';
+import { DeliverySheet, DeliverySheetResponse } from '../../../../models/delivery-sheets/delivery-sheets';
 
 
 import { FormValidator } from '../../../../shared/utils/form';
 import { DateFormatter } from '../../../../shared/utils/date-formatter';
-import { translateProductionType } from '../../../../shared/utils/tools';
 
 @Component({
   selector: 'app-production-receipt-modal',
@@ -56,7 +55,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
 
   private formBuilder = inject(FormBuilder);
   private productionReceiptService = inject(ProductionReceiptService);
-  private productionOrderService = inject(ProductionOrderService);
+  private deliverySheetsService = inject(DeliverySheetsService);
   private modalService = inject(ModalService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -67,14 +66,9 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
   productionReceipt?: ProductionReceipt;
   isEditMode = false;
 
-  searchingProductionOrder = false;
-  productionOrderFound: ProductionOrder | null = null;
-  productionOrderNotFound = false;
-
-
-  searchingOrders = false;
-  productionOrders: ProductionOrder[] = [];
-  selectedProductionOrder?: ProductionOrder;
+  searchingDeliverySheet = false;
+  deliverySheetFound: DeliverySheet | null = null;
+  deliverySheetNotFound = false;
 
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
@@ -82,14 +76,13 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
 
   paymentMethodOptions: SelectOption[] = [];
   paymentStatusOptions: SelectOption[] = [];
-  productionOrderOptions: SelectOption[] = [];
 
 
   ngOnInit(): void {
     this.setupForm();
     this.setupSelectOptions();
     this.loadInitialData();
-    this.initializeProductionOrderSearch();
+    this.initializeDeliverySheetSearch();
   }
 
   ngOnDestroy(): void {
@@ -109,7 +102,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       if (activeModal?.config.data) {
         const productionReceipt = activeModal.config.data;
         this.isEditMode = true;
-        this.productionOrderFound = productionReceipt.productionOrder;
+        this.deliverySheetFound = productionReceipt.deliverySheet || null;
         this.populateForm(productionReceipt);
       }
 
@@ -120,7 +113,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
     }
   }
 
-  private initializeProductionOrderSearch(): void {
+  private initializeDeliverySheetSearch(): void {
     this.searchSubject
       .pipe(
         debounceTime(500),
@@ -128,37 +121,38 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
         takeUntil(this.destroy$)
       )
       .subscribe(internalReference => {
-        this.searchProductionOrder(internalReference);
+        this.searchDeliverySheet(internalReference);
       });
   }
 
-  async searchProductionOrder(internalReference: string) {
-    this.searchingProductionOrder = true;
-    this.productionOrderFound = null;
+  async searchDeliverySheet(internalReference: string) {
+    this.searchingDeliverySheet = true;
+    this.deliverySheetFound = null;
 
     try {
 
-      const response: ProductionOrderResponse = await lastValueFrom(
-        this.productionOrderService.getProductionOrderById(internalReference)
+      const response: DeliverySheetResponse = await lastValueFrom(
+        this.deliverySheetsService.getDeliverySheetById(internalReference)
       );
 
       if (response.data) {
 
-        this.productionOrderFound = response.data;
-        this.productionOrderNotFound = false;
+        this.deliverySheetFound = response.data;
+        this.deliverySheetNotFound = false;
         this.productionReceiptForm.patchValue({
-          productionOrderId: response.data._id,
+          deliverySheetId: response.data._id,
         });
+        this.calculateDefaultAmount();
       } else {
-        this.productionOrderNotFound = true;
-        this.productionOrderFound = null;
+        this.deliverySheetNotFound = true;
+        this.deliverySheetFound = null;
       }
 
     } catch (error) {
-      this.productionOrderNotFound = true;
-      this.productionOrderFound = null;
+      this.deliverySheetNotFound = true;
+      this.deliverySheetFound = null;
     } finally {
-      this.searchingProductionOrder = false;
+      this.searchingDeliverySheet = false;
       this.cdr.detectChanges();
     }
   }
@@ -168,7 +162,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
     this.productionReceiptForm = this.formBuilder.group({
 
       internalReference: ['', [Validators.required]],
-      productionOrderId: ['', [Validators.required]],
+      deliverySheetId: ['', [Validators.required]],
       paymentMethod: ['PIX', [Validators.required]],
       totalAmount: [0, [Validators.required, Validators.min(0.01)]],
       dueDate: ['', [Validators.required]],
@@ -224,6 +218,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       );
 
       this.productionReceipt = response.data;
+      this.deliverySheetFound = this.productionReceipt.deliverySheet || null;
       this.populateForm(this.productionReceipt);
     } catch (error) {
 
@@ -233,26 +228,18 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
   }
 
 
-  private formatProductionOrderLabel(order: ProductionOrder): string {
-    const clientName = order.development?.client?.companyName || 'Cliente não informado';
-    const reference = order.internalReference || order._id;
-    const productionType = order.productionType ?
-      translateProductionType(order.productionType.type) : '';
-
-    return `${reference} - ${clientName} (${productionType})`;
-  }
 
 
   private populateForm(productionReceipt: ProductionReceipt): void {
 
-    if (productionReceipt.productionOrder) {
-      this.selectedProductionOrder = productionReceipt.productionOrder;
+    if (productionReceipt.deliverySheet) {
+      this.deliverySheetFound = productionReceipt.deliverySheet || null;
     }
 
 
     this.productionReceiptForm.patchValue({
       internalReference: productionReceipt.internalReference,
-      productionOrderId: productionReceipt.productionOrder?._id,
+      deliverySheetId: productionReceipt.deliverySheet?._id,
       paymentMethod: productionReceipt.paymentMethod,
       paymentStatus: productionReceipt.paymentStatus,
       paymentDate: productionReceipt.paymentDate,
@@ -293,23 +280,16 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
   }
 
 
-  onProductionOrderSearch(): void {
+  onDeliverySheetSearch(): void {
     this.searchSubject.next(this.productionReceiptForm.value.internalReference);
   }
 
-  onProductionOrderSelected(orderId: string): void {
-    const selectedOrder = this.productionOrders.find(order => order._id === orderId);
-    if (selectedOrder) {
-      this.selectedProductionOrder = selectedOrder;
-      this.calculateDefaultAmount();
-    }
-  }
 
   private calculateDefaultAmount(): void {
-    if (!this.selectedProductionOrder?.development?.client) return;
+    if (!this.deliverySheetFound?.productionSheet?.productionOrder?.development?.client) return;
 
-    const client = this.selectedProductionOrder.development.client;
-    const productionType = this.selectedProductionOrder.productionType;
+    const client = this.deliverySheetFound.productionSheet.productionOrder.development.client;
+    const productionType = this.deliverySheetFound.productionSheet.productionOrder.productionType;
 
     let calculatedAmount = 0;
 
@@ -317,7 +297,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       calculatedAmount = productionType.meters * (client.values?.valuePerMeter || 0);
     } else if (productionType.type === 'localized' && productionType.additionalInfo?.sizes) {
       const totalPieces = productionType.additionalInfo.sizes.reduce(
-        (sum, size) => sum + size.value, 0
+        (sum: number, size: any) => sum + size.value, 0
       );
       calculatedAmount = totalPieces * (client.values?.valuePerMeter || 0);
     }
@@ -367,7 +347,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
 
     const payload: any = {
       _id: this.productionReceipt?._id || '',
-      productionOrderId: formValue.productionOrderId,
+      deliverySheetId: formValue.deliverySheetId,
       paymentMethod: formValue.paymentMethod as PaymentMethod,
       totalAmount: parseFloat(formValue.totalAmount),
       dueDate: formValue.dueDate,
@@ -421,12 +401,12 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       (this.isEditMode ? 'Salvar Alterações' : 'Criar Recibo');
   }
 
-  get selectedProductionOrderInfo(): string {
-    if (!this.selectedProductionOrder) return '';
+  get selectedDeliverySheetInfo(): string {
+    if (!this.deliverySheetFound) return '';
 
-    const client = this.selectedProductionOrder.development?.client?.companyName || 'Cliente não informado';
-    const type = this.selectedProductionOrder.productionType ?
-      translateProductionType(this.selectedProductionOrder.productionType.type) : '';
+    const client = this.deliverySheetFound.productionSheet?.productionOrder?.development?.client?.companyName || 'Cliente não informado';
+    const type = this.deliverySheetFound.productionSheet?.productionOrder?.productionType ?
+      this.deliverySheetFound.productionSheet.productionOrder.productionType.type : '';
 
     return `${client} - ${type}`;
   }
@@ -510,7 +490,4 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
-  translateProductionType(type: string | undefined): string {
-    return translateProductionType(type as ProductionTypeEnum);
-  }
 }

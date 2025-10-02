@@ -113,7 +113,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     createdTo: undefined,
 
 
-    productionOrderId: undefined,
+    deliverySheetId: undefined,
 
 
     active: true,        // Por padrão, apenas ativos
@@ -361,7 +361,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
       paymentMethod: undefined,
       createdFrom: undefined,
       createdTo: undefined,
-      productionOrderId: undefined,
+      deliverySheetId: undefined,
       active: true, // Manter apenas ativos como padrão
       sortBy: 'createdAt',
       sortOrder: 'desc'
@@ -606,7 +606,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
       this.currentFilters.paymentMethod ||
       this.currentFilters.createdFrom ||
       this.currentFilters.createdTo ||
-      this.currentFilters.productionOrderId ||
+      this.currentFilters.deliverySheetId ||
       this.currentFilters.active === false // Consideramos false como filtro ativo
     );
   }
@@ -617,7 +617,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
     if (this.currentFilters.paymentStatus) count++;
     if (this.currentFilters.paymentMethod) count++;
     if (this.currentFilters.createdFrom || this.currentFilters.createdTo) count++;
-    if (this.currentFilters.productionOrderId) count++;
+    if (this.currentFilters.deliverySheetId) count++;
     if (this.currentFilters.active === false) count++;
     return count;
   }

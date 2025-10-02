@@ -4,6 +4,8 @@
  * Interfaces e tipos para gerenciamento de fichas de entrega
  */
 
+import { ProductionOrder } from "../production-orders/production-orders";
+
 export interface DeliverySheet {
     _id: string;
     internalReference: string;
@@ -20,6 +22,7 @@ export interface DeliverySheet {
     active?: boolean;
     createdAt: Date | string;
     updatedAt: Date | string;
+    productionOrder: ProductionOrder; // Populated automaticamente pelo backend
 }
 
 export interface DeliveryAddress {
@@ -35,7 +38,7 @@ export interface DeliveryAddress {
 export type DeliverySheetStatus = 'CREATED' | 'ON_ROUTE' | 'DELIVERED';
 
 export interface CreateDeliverySheetRequest {
-    internalReference: string;
+    productionSheetId: string;
     totalValue: number;
     notes?: string;
     invoiceNumber?: string;

@@ -32,7 +32,7 @@ export interface ProductionOrder {
 
 
     developmentId: string;
-    development?: Development;
+    development: Development;
 
 
     internalReference: string;

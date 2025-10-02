@@ -1,4 +1,3 @@
-
 <div class="modal-content">
 
 
@@ -12,27 +11,27 @@
         <form [formGroup]="productionReceiptForm" (ngSubmit)="onSubmit()" class="receipt-form">
 
             <div class="form-field">
-                <ds-input icon="fa-solid fa-search" iconPosition="left" label="Referência Interna do Desenvolvimento"
+                <ds-input icon="fa-solid fa-search" iconPosition="left" label="Referência Interna da Ficha de Entrega"
                     placeholder="Ex: 25ABC0001" formControlName="internalReference"
                     [invalid]="isFieldInvalid('internalReference')" [errorMessage]="getFieldError('internalReference')"
-                    [fullWidth]="true" [required]="true" [disabled]="isEditMode" (input)="onProductionOrderSearch()">
+                    [fullWidth]="true" [required]="true" [disabled]="isEditMode" (input)="onDeliverySheetSearch()">
                 </ds-input>
             </div>
 
             <div class="search-status">
 
-                <div class="text-center p-48" *ngIf="searchingProductionOrder">
+                <div class="text-center p-48" *ngIf="searchingDeliverySheet">
                     <ds-spinner size="48px" variant="outline"></ds-spinner>
                 </div>
 
 
-                <div class="search-not-found" *ngIf="productionOrderNotFound && !searchingProductionOrder">
+                <div class="search-not-found" *ngIf="deliverySheetNotFound && !searchingDeliverySheet">
                     <ds-icon icon="fa-solid fa-triangle-exclamation" color="tertiary" fontSize="16px"></ds-icon>
-                    <span class="body tertiary ml-8">Ordem de produção não encontrada</span>
+                    <span class="body tertiary ml-8">Ficha de entrega não encontrada</span>
                 </div>
             </div>
 
-            <div class="d-grid columns-2 gap-24" *ngIf="productionOrderFound">
+            <div class="d-grid columns-2 gap-24" *ngIf="deliverySheetFound">
                 <ds-select [fullWidth]="true" label="Método de Pagamento *" formControlName="paymentMethod"
                     [options]="paymentMethodOptions" placeholder="Selecione o método"
                     [errorMessage]="getFieldError('paymentMethod')"
@@ -56,7 +55,7 @@
                     [invalid]="isFormControlInvalid(productionReceiptForm.get('paidAmount' ))">
                 </ds-input>
             </div>
-            <div class="d-grid columns-2 gap-24 mt-24" *ngIf="productionOrderFound">
+            <div class="d-grid columns-2 gap-24 mt-24" *ngIf="deliverySheetFound">
                 <ds-input [fullWidth]="true" label="Data de Vencimento *" type="date" formControlName="dueDate"
                     [errorMessage]="getFieldError('dueDate')"
                     [invalid]="isFormControlInvalid(productionReceiptForm.get('dueDate' ))">
@@ -69,7 +68,7 @@
             </div>
 
 
-            <div class="form-field mt-24" *ngIf="productionOrderFound">
+            <div class="form-field mt-24" *ngIf="deliverySheetFound">
                 <ds-textarea [fullWidth]="true" label="Observações Adicionais" formControlName="notes"
                     placeholder="Digite observações sobre este recebimento..." [maxlength]="1000" [rows]="3"
                     [errorMessage]="getFieldError('notes')"
@@ -80,7 +79,7 @@
 
         </form>
 
-        <div class="modal-actions mt-32" *ngIf="productionOrderFound">
+        <div class="modal-actions mt-32" *ngIf="deliverySheetFound">
             <ds-button label="Cancelar" type="button" variant="ghost" size="medium" [disabled]="submitting"
                 (onClickEmitter)="onCancel()">
             </ds-button>
