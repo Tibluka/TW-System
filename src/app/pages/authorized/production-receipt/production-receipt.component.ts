@@ -544,7 +544,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   }
 
   onStatusUpdateFailed(error: any): void {
-    // Toast já é mostrado pelo status-updater, não precisa duplicar
+
   }
 
   clearStatusUpdateSelection(): void {

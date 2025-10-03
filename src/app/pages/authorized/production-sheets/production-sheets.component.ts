@@ -650,7 +650,7 @@ export class ProductionSheetsComponent extends FormValidator {
    * ❌ STATUS UPDATE FALHOU - Callback quando atualização falha
    */
   onStatusUpdateFailed(result: any): void {
-    // Toast já é mostrado pelo status-updater, não precisa duplicar
+
     this.showErrorMessage(result.error || 'Erro ao atualizar estágio');
   }
 
