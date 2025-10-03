@@ -42,7 +42,7 @@ export class PrintService {
       });
 
     } catch (error) {
-      alert('Erro ao imprimir. Tente novamente.');
+      this.showToast('error', 'Erro ao imprimir', 'Tente novamente.');
     }
   }
 
@@ -57,7 +57,7 @@ export class PrintService {
       const printWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes');
 
       if (!printWindow) {
-        alert('Bloqueador de pop-up ativo. Permita pop-ups para imprimir.');
+        this.showToast('warning', 'Bloqueador de pop-up', 'Permita pop-ups para imprimir.');
         return;
       }
 
@@ -81,7 +81,7 @@ export class PrintService {
       };
 
     } catch (error) {
-      alert('Erro ao imprimir. Tente novamente.');
+      this.showToast('error', 'Erro ao imprimir', 'Tente novamente.');
     }
   }
 
@@ -103,7 +103,7 @@ export class PrintService {
       }
 
     } catch (error) {
-      alert('Erro ao imprimir. Tente novamente.');
+      this.showToast('error', 'Erro ao imprimir', 'Tente novamente.');
     }
   }
 
@@ -738,6 +738,24 @@ export class PrintService {
         input.parentNode.replaceChild(fieldWrapper, input);
       }
     });
+  }
+
+  /**
+   * 🍞 MOSTRAR TOAST
+   */
+  private showToast(type: 'success' | 'error' | 'warning' | 'info', title: string, message: string): void {
+    const container = (window as any).toastContainer;
+    if (container) {
+      container.addToast({
+        type,
+        title,
+        message,
+        duration: type === 'error' ? 7000 : 5000,
+        closable: true
+      });
+    } else {
+      console.warn('Toast container not available:', `${title}: ${message}`);
+    }
   }
 
   /**

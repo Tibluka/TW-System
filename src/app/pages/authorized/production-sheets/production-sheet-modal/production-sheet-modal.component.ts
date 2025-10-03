@@ -9,6 +9,7 @@ import { debounceTime, distinctUntilChanged, lastValueFrom, Subject, takeUntil }
 import { ProductionSheetsService, ProductionSheet, CreateProductionSheetRequest, UpdateProductionSheetRequest } from '../../../../shared/services/production-sheets/production-sheets.service';
 import { ProductionOrderService } from '../../../../shared/services/production-order/production-order.service';
 import { ModalService } from '../../../../shared/services/modal/modal.service';
+import { ToastService } from '../../../../shared/services/toast/toast.service';
 
 
 import { ButtonComponent } from '../../../../shared/components/atoms/button/button.component';
@@ -58,6 +59,7 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
   private productionSheetsService = inject(ProductionSheetsService);
   private productionOrderService = inject(ProductionOrderService);
   private modalService = inject(ModalService);
+  private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
   printOptions: PrintOptions = {
@@ -366,6 +368,7 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
         );
 
         if (response?.success) {
+          this.toastService.success('Ficha de produção atualizada com sucesso!', 'Sucesso');
           this.closeModal('updated', response.data);
         } else {
           throw new Error(response?.message || 'Erro ao atualizar ficha');
@@ -387,6 +390,7 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
         );
 
         if (response?.success) {
+          this.toastService.success('Ficha de produção criada com sucesso!', 'Sucesso');
           this.closeModal('created', response.data);
         } else {
           throw new Error(response?.message || 'Erro ao criar ficha');
@@ -403,7 +407,9 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
         errorMessage = error.message;
       }
 
-      alert(error.message)
+      this.toastService.error('Erro ao salvar', 'Falha na operação', {
+        message: error.message || 'Não foi possível salvar a ficha de produção.'
+      });
 
     } finally {
       this.isSaving = false;
@@ -436,7 +442,7 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       });
       const nextStageIndex = stageList.findIndex(s => s === currentStage) + 1;
       if (nextStageIndex >= stageList.length) {
-        alert('Já está no ultimo status');
+        this.toastService.warning('Atenção', 'Já está no último status');
         return;
       }
       await lastValueFrom(

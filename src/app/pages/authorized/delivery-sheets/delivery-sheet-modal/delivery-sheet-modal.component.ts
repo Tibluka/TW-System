@@ -7,6 +7,7 @@ import { CreateDeliverySheetRequest, DeliverySheet, UpdateDeliverySheetRequest }
 import { DeliverySheetsService } from '../../../../shared/services/delivery-sheets/delivery-sheets.service';
 import { ModalService } from '../../../../shared/services/modal/modal.service';
 import { ProductionSheet, ProductionSheetsService } from '../../../../shared/services/production-sheets/production-sheets.service';
+import { ToastService } from '../../../../shared/services/toast/toast.service';
 import { ProductionOrderStatus } from '../../../../models/production-orders/production-orders';
 import { ProductionTypeEnum } from '../../../../models/production-type';
 
@@ -47,6 +48,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
     private modalService = inject(ModalService);
     private deliverySheetsService = inject(DeliverySheetsService);
     private productionSheetsService = inject(ProductionSheetsService);
+    private toastService = inject(ToastService);
     private cdr = inject(ChangeDetectorRef);
 
 
@@ -336,6 +338,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
                 );
 
                 if (response?.success) {
+                    this.toastService.success('Ficha de entrega atualizada com sucesso!', 'Sucesso');
                     this.closeModal('updated', response.data);
                 } else {
                     throw new Error(response?.message || 'Erro ao atualizar ficha de entrega');
@@ -363,12 +366,16 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
                 );
 
                 if (response?.success) {
+                    this.toastService.success('Ficha de entrega criada com sucesso!', 'Sucesso');
                     this.closeModal('created', response.data);
                 } else {
                     throw new Error(response?.message || 'Erro ao criar ficha de entrega');
                 }
             }
         } catch (error: any) {
+            this.toastService.error('Erro ao salvar', 'Falha na operação', {
+                message: error.message || 'Erro ao salvar ficha de entrega.'
+            });
             this.showErrorMessage(error.message || 'Erro ao salvar ficha de entrega.');
         } finally {
             this.isSaving = false;

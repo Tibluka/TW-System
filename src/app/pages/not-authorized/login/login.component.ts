@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../shared/services/auth/auth-service';
+import { ToastService } from '../../../shared/services/toast/toast.service';
 
 
 @Component({
@@ -20,6 +21,7 @@ export class LoginComponent {
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
+    private toastService: ToastService,
     private router: Router,
     private route: ActivatedRoute
   ) {
@@ -43,12 +45,15 @@ export class LoginComponent {
     this.authService.login(email, password).subscribe({
       next: (response) => {
         this.isLoading = false;
-
+        this.toastService.success('Login realizado com sucesso!', 'Bem-vindo');
         this.router.navigate(['authorized/clients']);
       },
       error: (error) => {
         this.isLoading = false;
         this.errorMessage = 'Credenciais inválidas. Tente novamente.';
+        this.toastService.error('Erro no login', 'Credenciais inválidas', {
+          message: 'Verifique seu email e senha e tente novamente.'
+        });
       }
     });
   }

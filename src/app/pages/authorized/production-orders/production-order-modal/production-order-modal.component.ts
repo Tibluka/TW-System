@@ -16,6 +16,7 @@ import { TextareaComponent } from '../../../../shared/components/atoms/textarea/
 import { DevelopmentService } from '../../../../shared/services/development/development.service';
 import { ModalService } from '../../../../shared/services/modal/modal.service';
 import { ProductionOrderService } from '../../../../shared/services/production-order/production-order.service';
+import { ToastService } from '../../../../shared/services/toast/toast.service';
 import { FormValidator } from '../../../../shared/utils/form';
 import { DateFormatter } from '../../../../shared/utils/date-formatter';
 import { translateProductionType } from '../../../../shared/utils/tools';
@@ -50,6 +51,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
   private productionOrderService = inject(ProductionOrderService);
   private developmentService = inject(DevelopmentService);
   private modalService = inject(ModalService);
+  private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
 
@@ -504,7 +506,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
 
 
     if (!this.developmentFound && !this.isEditMode) {
-      alert('É necessário selecionar um desenvolvimento válido.');
+      this.toastService.warning('Atenção', 'É necessário selecionar um desenvolvimento válido.');
       return;
     }
 
@@ -531,6 +533,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
           this.productionOrderService.updateProductionOrder(formData._id, updateData)
         );
 
+        this.toastService.success('Ordem de produção atualizada com sucesso!', 'Sucesso');
         this.modalService.close('production-order-modal', { action: 'updated', data: response.data });
 
       } else {
@@ -551,13 +554,16 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
           this.productionOrderService.createProductionOrder(createData)
         );
 
+        this.toastService.success('Ordem de produção criada com sucesso!', 'Sucesso');
         this.modalService.close('production-order-modal', { action: 'created', data: response.data });
       }
 
     } catch (error: any) {
 
       const errorMessage = error.error?.message || error.message || 'Erro ao salvar ordem de produção.';
-      alert(errorMessage);
+      this.toastService.error('Erro ao salvar', 'Falha na operação', {
+        message: errorMessage
+      });
 
     } finally {
       this.isSaving = false;
