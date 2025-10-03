@@ -1,5 +1,5 @@
 
-import { Component, OnInit, OnDestroy, HostListener, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, inject, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, takeUntil } from 'rxjs/operators';
@@ -24,6 +24,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   protected menuService = inject(MenuService);
   private authService = inject(AuthService);
 
+  @Output() menuClose = new EventEmitter<void>();
 
   private destroy$ = new Subject<void>();
 
@@ -39,7 +40,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   @HostListener('window:resize')
   onWindowResize(): void {
 
-    if (window.innerWidth <= 768 && this.menuService.isCollapsed()) {
+    if (window.innerWidth <= 600 && this.menuService.isCollapsed()) {
       this.menuService.expand();
     }
   }
@@ -63,7 +64,14 @@ export class MenuComponent implements OnInit, OnDestroy {
    */
   toggleMenu(): void {
     if (this.menuService.isAnimating()) return;
-    this.menuService.toggle();
+
+
+    if (window.innerWidth <= 600) {
+      this.menuClose.emit();
+    } else {
+
+      this.menuService.toggle();
+    }
   }
 
   /**
@@ -86,6 +94,8 @@ export class MenuComponent implements OnInit, OnDestroy {
   onMenuItemClick(item: MenuItem, index: number): void {
     if (item.disabled || this.menuService.isAnimating()) return;
 
+
+    this.menuClose.emit();
 
     if (item.route) {
       this.router.navigate([item.route]).then(success => {
@@ -148,7 +158,7 @@ export class MenuComponent implements OnInit, OnDestroy {
    * Verifica se está em modo mobile
    */
   isMobile(): boolean {
-    return window.innerWidth <= 768;
+    return window.innerWidth <= 600;
   }
 
   /**

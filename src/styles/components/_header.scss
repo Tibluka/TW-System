@@ -1,0 +1,143 @@
+@use 'abstracts/variables' as *;
+@use 'abstracts/spacing' as *;
+@use 'base/typography' as *;
+
+// ========================================
+// HEADER RESPONSIVO GLOBAL
+// ========================================
+.ds-header {
+    display: none; // Escondido por padrão
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: var(--primary-gradient);
+    border-bottom: 1px solid var(--stroke);
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    // Mostrar apenas em mobile (até 600px)
+    @media (max-width: 600px) {
+        display: block;
+    }
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    padding: 0 $spacing-lg;
+    max-width: 100%;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    min-width: 60px;
+}
+
+.header-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    min-width: 60px;
+    justify-content: flex-end;
+}
+
+.header-title {
+    @include title-modal();
+    color: var(--white);
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.menu-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: transparent;
+    border-radius: $border-radius-sm;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--white);
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    &:active {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    &.active {
+        background: rgba(255, 255, 255, 0.2);
+        color: var(--white);
+    }
+
+    &:focus {
+        outline: 2px solid var(--white);
+        outline-offset: 2px;
+    }
+}
+
+// ========================================
+// ANIMAÇÕES
+// ========================================
+.ds-header {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+// ========================================
+// DARK MODE SUPPORT
+// ========================================
+@media (prefers-color-scheme: dark) {
+    .ds-header {
+        background: var(--primary-gradient);
+        border-bottom-color: var(--neutral-dark);
+    }
+
+    .header-title {
+        color: var(--white);
+    }
+
+    .menu-button {
+        color: var(--white);
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        &:active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        &.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--white);
+        }
+    }
+}
