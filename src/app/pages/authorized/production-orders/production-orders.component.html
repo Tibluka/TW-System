@@ -3,26 +3,26 @@
     <h1 class="title-semibold primary-dark mb-48">Ordens de produção</h1>
 
     <div class="search-input">
-        <div class="w-100">
-            <ds-input label="Buscar ordem de produção" placeholder="Digite referência, tipo de tecido ou observações..."
-                icon="fa-solid fa-magnifying-glass" iconPosition="left" [(ngModel)]="currentFilters.search"
-                (input)="onSearchChange()" width="100%">
+        <div class="search-field">
+            <ds-input [fullWidth]="true" label="Buscar"
+                placeholder="Digite referência, tipo de tecido ou observações..." icon="fa-solid fa-magnifying-glass"
+                iconPosition="left" [(ngModel)]="currentFilters.search" (input)="onSearchChange()">
             </ds-input>
         </div>
 
-        <div class="w-100">
-            <ds-select label="Filtrar por Status" [options]="statusOptions" [(ngModel)]="currentFilters.status"
-                (ngModelChange)="onStatusFilterChange()" width="100%">
+        <div class="status-field">
+            <ds-select [fullWidth]="true" label="Status" [options]="statusOptions" [(ngModel)]="currentFilters.status"
+                (ngModelChange)="onStatusFilterChange()">
             </ds-select>
         </div>
 
-        <div class="d-flex gap-16">
+        <div class="action-buttons">
             <ds-button label="Limpar Filtros" variant="outline" icon="fa-solid fa-eraser"
-                (onClickEmitter)="clearFilters()" [disabled]="!hasActiveFilters()">
+                (onClickEmitter)="clearFilters()" [disabled]="!hasActiveFilters()" class="clear-btn">
             </ds-button>
 
             <ds-button label="Nova Ordem de Produção" variant="fill" icon="fa-solid fa-plus"
-                (onClickEmitter)="createProductionOrder()">
+                (onClickEmitter)="createProductionOrder()" class="create-btn">
             </ds-button>
         </div>
     </div>
@@ -37,12 +37,14 @@
 
 
                     <ds-table-row [isHeader]="true">
-                        <ds-table-cell [isHeader]="true" align="left">Imagem</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left" class="hide-mobile">Imagem</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="left">Referência Interna</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="left">Referência do Cliente</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left" class="hide-mobile">Referência do
+                            Cliente</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="left">Tipo de Produção</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="left">Tecido</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left" class="hide-small">Tipo de
+                            Produção</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left" class="hide-small">Tecido</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
                     </ds-table-row>
@@ -52,7 +54,7 @@
                         [data]="productionOrder" (rowClick)="onProductionOrderClick(productionOrder)">
 
 
-                        <ds-table-cell align="left">
+                        <ds-table-cell align="left" class="hide-mobile">
                             <div class="image-cell">
                                 <img *ngIf="productionOrder.development.pieceImage?.url"
                                     [src]="productionOrder.development.pieceImage?.url"
@@ -75,7 +77,7 @@
                         </ds-table-cell>
 
 
-                        <ds-table-cell align="left">
+                        <ds-table-cell align="left" class="hide-mobile">
                             <span class="body primary-dark">
                                 {{ productionOrder.development.clientReference || '-' }}
                             </span>
@@ -97,7 +99,7 @@
                         </ds-table-cell>
 
 
-                        <ds-table-cell align="left">
+                        <ds-table-cell align="left" class="hide-small">
                             <span class="body primary-dark" *ngIf="productionOrder.productionType.type === 'rotary'">
                                 Rotativo
                             </span>
@@ -109,7 +111,7 @@
                         </ds-table-cell>
 
 
-                        <ds-table-cell align="left">
+                        <ds-table-cell align="left" class="hide-small">
                             <span class="body primary-dark">{{ productionOrder.fabricType || '-' }}</span>
                         </ds-table-cell>
 
@@ -133,25 +135,56 @@
 
             <ng-template #cardTemplate let-productionOrder>
                 <div class="card-content" (click)="onProductionOrderClick(productionOrder)">
-                    <img *ngIf="productionOrder.development.pieceImage.url"
-                        [src]="productionOrder.development.pieceImage.url" [alt]="productionOrder.internalReference"
-                        class="card-image" />
+                    <div class="card-header">
+                        <div class="card-image-container">
+                            <img *ngIf="productionOrder.development.pieceImage?.url"
+                                [src]="productionOrder.development.pieceImage.url"
+                                [alt]="productionOrder.internalReference" class="card-image" />
+                            <div *ngIf="!productionOrder.development.pieceImage?.url" class="no-image-placeholder">
+                                <i class="fa-solid fa-image"></i>
+                            </div>
+                        </div>
+
+                        <div class="card-title-section">
+                            <h3 class="title-modal mb-4 secondary">{{ productionOrder.internalReference }}</h3>
+                            <ds-badge [text]="getStatusLabel(productionOrder.status)" [status]="productionOrder.status"
+                                entityType="production-order" class="status-badge-mobile" />
+                        </div>
+                    </div>
 
                     <div class="card-body">
-                        <h3 class="title-modal mb-6 mt-8 secondary">{{ productionOrder.internalReference }}</h3>
+                        <div class="card-info">
+                            <div class="info-item" *ngIf="productionOrder.development.client.companyName">
+                                <i class="fa-solid fa-building"></i>
+                                <span>{{ productionOrder.development.client.companyName }}</span>
+                            </div>
 
-                        <p class="subtitle-section secondary" *ngIf="productionOrder.development.client.companyName">{{
-                            productionOrder.development.client.companyName
-                            }}</p>
+                            <div class="info-item" *ngIf="productionOrder.development.client.acronym">
+                                <i class="fa-solid fa-tag"></i>
+                                <span>{{ productionOrder.development.client.acronym }}</span>
+                            </div>
 
-                        <p class="card-small secondary mb-8" *ngIf="productionOrder.development.clientReference">{{
-                            productionOrder.development.clientReference
-                            }}</p>
+                            <div class="info-item" *ngIf="productionOrder.development.clientReference">
+                                <i class="fa-solid fa-hashtag"></i>
+                                <span>{{ productionOrder.development.clientReference }}</span>
+                            </div>
 
-                        <hr>
+                            <div class="info-item">
+                                <i class="fa-solid fa-cogs"></i>
+                                <span>{{ productionType(productionOrder.productionType!.type) }}</span>
+                            </div>
 
-                        <h4 class="body secondary mt-8 mb-0"> {{ productionType(productionOrder.productionType!.type) }}
-                        </h4>
+                            <div class="info-item" *ngIf="productionOrder.fabricType">
+                                <i class="fa-solid fa-tshirt"></i>
+                                <span>{{ productionOrder.fabricType }}</span>
+                            </div>
+
+                            <div class="info-item"
+                                *ngIf="productionOrder.productionType.type === 'rotary' && productionOrder.productionType.meters">
+                                <i class="fa-solid fa-ruler"></i>
+                                <span>{{ productionOrder.productionType.meters }}m</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="card-actions">

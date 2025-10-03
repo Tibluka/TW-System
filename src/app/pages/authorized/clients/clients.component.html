@@ -4,16 +4,20 @@
 
 
     <div class="search-input">
-        <ds-input width="400px" label="Buscar" placeholder="Digite o nome, CNPJ, etc."
-            [(ngModel)]="currentFilters.search" (ngModelChange)="onSearchChange()" icon="fa-solid fa-search"
-            iconPosition="left" />
+        <div class="search-field">
+            <ds-input [fullWidth]="true" label="Buscar" placeholder="Digite o nome, CNPJ, etc."
+                [(ngModel)]="currentFilters.search" (ngModelChange)="onSearchChange()" icon="fa-solid fa-search"
+                iconPosition="left" />
+        </div>
 
-        <div class="d-flex gap-16">
+        <div class="action-buttons">
             <ds-button label="Limpar Filtros" variant="outline" icon="fa-solid fa-eraser"
-                (onClickEmitter)="clearFilters()" [disabled]="!hasActiveFilters()">
+                (onClickEmitter)="clearFilters()" [disabled]="!hasActiveFilters()" class="clear-btn"
+                [fullWidth]="false">
             </ds-button>
 
-            <ds-button label="Novo cliente" icon="fa-solid fa-circle-plus" (onClickEmitter)="createClient()" />
+            <ds-button label="Novo cliente" icon="fa-solid fa-circle-plus" (onClickEmitter)="createClient()"
+                class="create-btn" [fullWidth]="false" />
         </div>
     </div>
 

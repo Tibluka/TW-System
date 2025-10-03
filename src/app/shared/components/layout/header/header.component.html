@@ -1,0 +1,19 @@
+<header class="ds-header">
+    <div class="header-content">
+        <div class="header-left">
+            <button *ngIf="showMenuButton" class="menu-button" (click)="onMenuToggle()" [class.active]="isMenuOpen"
+                aria-label="Toggle menu">
+                <ds-icon [icon]="isMenuOpen ? 'fa-solid fa-times' : 'fa-solid fa-bars'" fontSize="20px" color="primary">
+                </ds-icon>
+            </button>
+        </div>
+
+        <div class="header-center">
+            <h1 class="header-title">{{ title }}</h1>
+        </div>
+
+        <div class="header-right">
+            <img src="assets/logo/logo.png" alt="Logo" width="100" class="logo">
+        </div>
+    </div>
+</header>

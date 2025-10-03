@@ -14,50 +14,82 @@
     // ÁREA DE FILTROS E BUSCA
     // ========================================
     .search-input {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 16px;
-        align-items: end;
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-md;
 
-        // Desktop - 3 colunas (busca, status, cliente + data inicial, data final + botão)
-        @media (min-width: 1200px) {
-            grid-template-columns: repeat(3, 1fr);
-        }
-
-        // Tablet - 2 colunas
-        @media (max-width: 1199px) and (min-width: 768px) {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        // Mobile - 1 coluna
-        @media (max-width: 767px) {
-            grid-template-columns: 1fr;
-            gap: 12px;
-        }
-
-        // Garantir que o botão sempre ocupe uma linha inteira em mobile
-        ds-button {
-            @media (max-width: 767px) {
-                grid-column: 1 / -1;
-                justify-self: stretch;
-            }
-        }
-
-        // Garantir que os campos ocupem toda a largura disponível
-        .w-100 {
+        .search-field {
             width: 100%;
         }
 
-        // Agrupar filtros de data em seções visuais
-        .date-filter-group {
-            display: contents;
+        .filters-row {
+            display: flex;
+            gap: $spacing-md;
+            flex-wrap: wrap;
 
-            // Estilo para labels de data
-            ds-input[type="date"] {
-                .input-label {
-                    font-size: 0.875rem;
-                    font-weight: 500;
-                    color: var(--text-primary);
+            .filter-field {
+                flex: 1;
+                min-width: 200px;
+            }
+        }
+
+        .date-filters {
+            display: flex;
+            gap: $spacing-md;
+            flex-wrap: wrap;
+
+            .date-field {
+                flex: 1;
+                min-width: 200px;
+            }
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: $spacing-sm;
+            flex-wrap: wrap;
+            align-items: center;
+
+            .clear-btn,
+            .create-btn {
+                white-space: nowrap;
+                min-width: fit-content;
+            }
+        }
+
+        // Responsividade para tablets e mobile (abaixo de 769px)
+        @media (max-width: 768px) {
+            gap: $spacing-sm;
+
+            .filters-row,
+            .date-filters {
+                flex-direction: column;
+                gap: $spacing-sm;
+
+                .filter-field,
+                .date-field {
+                    min-width: unset;
+                    width: 100%;
+                }
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: $spacing-xs;
+                width: 100%;
+
+                .clear-btn,
+                .create-btn {
+                    width: 100%;
+                }
+
+                // Força os botões a ocuparem 100% da largura
+                ::ng-deep ds-button {
+                    width: 100% !important;
+
+                    .btn {
+                        width: 100% !important;
+                    }
                 }
             }
         }
@@ -150,30 +182,131 @@
     }
 
     // ========================================
-    // RESPONSIVIDADE
+    // CLASSES DE RESPONSIVIDADE
     // ========================================
-
-    @media (max-width: 1024px) {
-
-        // Em telas menores, esconder algumas colunas menos importantes
-        ds-table-cell:nth-child(3),
-        // Endereço
-        ds-table-row [isHeader]:nth-child(3) {
-            display: none;
+    .hide-mobile {
+        @media (max-width: 768px) {
+            display: none !important;
         }
     }
 
-    @media (max-width: 768px) {
-
-        // Em mobile, mostrar apenas as colunas essenciais
-        ds-table-cell:nth-child(2),
-        // Cliente
-        ds-table-cell:nth-child(4),
-        // Data de Entrega
-        ds-table-row [isHeader]:nth-child(2),
-        ds-table-row [isHeader]:nth-child(4) {
-            display: none;
+    .hide-small {
+        @media (max-width: 1024px) {
+            display: none !important;
         }
+    }
+
+    .show-mobile-only {
+        display: none !important;
+
+        @media (max-width: 768px) {
+            display: block !important;
+        }
+    }
+
+    .show-small-only {
+        display: none !important;
+
+        @media (max-width: 1024px) and (min-width: 769px) {
+            display: block !important;
+        }
+    }
+
+    // ========================================
+    // CARD STYLES - Para ds-list-view
+    // ========================================
+    ::ng-deep .cards-view {
+        .card-content {
+            // Reset dos estilos do ds-card
+            border: none !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            background: transparent !important;
+            transition: all 0.2s ease;
+            cursor: pointer;
+
+            .card-header {
+                margin-bottom: $spacing-sm;
+
+                .card-title-section {
+                    h3 {
+                        margin: 0 0 $spacing-xs 0;
+                        font-size: 1.1rem;
+                        font-weight: 600;
+                        color: var(--primary-dark);
+                        word-break: break-word;
+                    }
+
+                    .status-badge-mobile {
+                        display: inline-block;
+                    }
+                }
+            }
+
+            .card-body {
+                margin-bottom: $spacing-sm;
+
+                .card-info {
+                    display: flex;
+                    flex-direction: column;
+                    gap: $spacing-xs;
+
+                    .info-item {
+                        display: flex;
+                        align-items: center;
+                        gap: $spacing-xs;
+                        font-size: 0.9rem;
+                        color: var(--neutral-dark);
+
+                        i {
+                            width: 16px;
+                            color: var(--neutral-medium);
+                            font-size: 14px;
+                        }
+
+                        span {
+                            flex: 1;
+                            word-break: break-word;
+                        }
+                    }
+                }
+            }
+
+            .card-actions {
+                display: flex;
+                justify-content: flex-end;
+                gap: $spacing-sm;
+                padding-top: $spacing-sm;
+                border-top: 1px solid var(--neutral-light);
+
+                ds-icon {
+                    padding: $spacing-xs;
+                    border-radius: var(--border-radius-sm);
+                    transition: background-color 0.2s ease;
+
+                    &:hover {
+                        background-color: var(--neutral-light);
+                    }
+                }
+            }
+
+            @media (max-width: 768px) {
+                .card-header .card-title-section h3 {
+                    font-size: 1rem;
+                }
+
+                .card-body .card-info .info-item {
+                    font-size: 0.85rem;
+                }
+            }
+        }
+    }
+
+    // ========================================
+    // RESPONSIVIDADE
+    // ========================================
+
+    @media (max-width: 768px) {
 
         // Status badge menor em mobile
         .status-badge {

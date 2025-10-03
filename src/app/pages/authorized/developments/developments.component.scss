@@ -14,22 +14,70 @@
     .search-input {
         display: flex;
         align-items: flex-end;
-        gap: 16px; // 16px
+        gap: $spacing-md;
+        flex-wrap: wrap;
 
-        // Responsive
+        .search-field {
+            flex: 1;
+            min-width: 250px;
+            max-width: 400px;
+        }
+
+        .status-field {
+            flex: 0 0 200px;
+            min-width: 180px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: $spacing-sm;
+            flex-wrap: wrap;
+            align-items: center;
+
+            .clear-btn,
+            .create-btn {
+                white-space: nowrap;
+                min-width: fit-content;
+            }
+        }
+
+        // Responsividade para tablets e mobile (abaixo de 769px)
         @media (max-width: 768px) {
             flex-direction: column;
             align-items: stretch;
-            gap: var(--spacing-sm); // 8px
+            gap: $spacing-sm;
 
-            ds-input {
+            .search-field {
+                min-width: unset;
+                max-width: unset;
+                width: 100%;
+            }
+
+            .status-field {
+                flex: none;
                 min-width: unset;
                 width: 100%;
             }
 
-            ds-select {
-                min-width: unset;
+            .action-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: $spacing-xs;
                 width: 100%;
+
+                .clear-btn,
+                .create-btn {
+                    width: 100%;
+                }
+
+                // Força os botões a ocuparem 100% da largura
+                ::ng-deep ds-button {
+                    width: 100% !important;
+
+                    .btn {
+                        width: 100% !important;
+                    }
+                }
             }
         }
     }
@@ -147,33 +195,215 @@
     // ============================================
     // RESPONSIVE
     // ============================================
+
+    // Classes utilitárias para responsividade
+    .hide-mobile {
+        @media (max-width: 768px) {
+            display: none !important;
+        }
+    }
+
+    .hide-small {
+        @media (max-width: 480px) {
+            display: none !important;
+        }
+    }
+
+    .show-mobile-only {
+        display: none;
+
+        @media (max-width: 768px) {
+            display: block !important;
+        }
+    }
+
+    .show-small-only {
+        display: none;
+
+        @media (max-width: 480px) {
+            display: block !important;
+        }
+    }
+
     @media (max-width: 768px) {
-        padding: var(--spacing-md);
 
         h1 {
-            font-size: var(--font-size-xl);
-            margin-bottom: var(--spacing-lg);
+            font-size: 1.5rem;
+            margin-bottom: $spacing-md;
         }
 
-        // Esconder algumas colunas em mobile
-        ds-table-cell:nth-child(n+5) {
-            display: none;
+        // Melhorar espaçamento dos cards
+        .card-content {
+            .card-body {
+                padding: $spacing-sm;
+            }
+
+            .card-actions {
+                padding: $spacing-xs $spacing-sm;
+                gap: $spacing-sm;
+            }
+        }
+    }
+
+    // ============================================
+    // CARD STYLES
+    // ============================================
+    .card-content {
+        border: 1px solid var(--neutral-light);
+        border-radius: var(--border-radius-md);
+        padding: $spacing-md;
+        background: white;
+        transition: all 0.2s ease;
+        cursor: pointer;
+
+        &:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
         }
 
-        .progress-container {
-            min-width: 80px;
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: $spacing-sm;
+            margin-bottom: $spacing-sm;
+
+            .card-image-container {
+                flex-shrink: 0;
+                width: 60px;
+                height: 60px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: var(--border-radius-sm);
+                overflow: hidden;
+                background: var(--neutral-light);
+
+                .card-image {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+
+                .no-image-placeholder {
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: var(--neutral-light);
+                    color: var(--neutral-medium);
+                    font-size: 20px;
+                }
+            }
+
+            .card-title-section {
+                flex: 1;
+                min-width: 0;
+
+                h3 {
+                    margin: 0 0 $spacing-xs 0;
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    color: var(--primary-dark);
+                    word-break: break-word;
+                }
+
+                .status-badge-mobile {
+                    display: inline-block;
+                }
+            }
         }
 
-        .progress-text {
-            min-width: 30px;
+        .card-body {
+            margin-bottom: $spacing-sm;
+
+            .card-info {
+                display: flex;
+                flex-direction: column;
+                gap: $spacing-xs;
+
+                .info-item {
+                    display: flex;
+                    align-items: center;
+                    gap: $spacing-xs;
+                    font-size: 0.9rem;
+                    color: var(--neutral-dark);
+
+                    i {
+                        width: 16px;
+                        color: var(--neutral-medium);
+                        font-size: 14px;
+                    }
+
+                    span {
+                        flex: 1;
+                        word-break: break-word;
+                    }
+                }
+            }
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: $spacing-sm;
+            padding-top: $spacing-sm;
+            border-top: 1px solid var(--neutral-light);
+
+            ds-icon {
+                padding: $spacing-xs;
+                border-radius: var(--border-radius-sm);
+                transition: background-color 0.2s ease;
+
+                &:hover {
+                    background-color: var(--neutral-light);
+                }
+            }
+        }
+
+        @media (max-width: 768px) {
+            padding: $spacing-sm;
+
+            .card-header {
+                .card-image-container {
+                    width: 50px;
+                    height: 50px;
+                }
+
+                .card-title-section h3 {
+                    font-size: 1rem;
+                }
+            }
+
+            .card-body .card-info .info-item {
+                font-size: 0.85rem;
+            }
         }
     }
 
     @media (max-width: 480px) {
+        padding: $spacing-sm;
 
-        // Esconder mais colunas em telas muito pequenas
-        ds-table-cell:nth-child(n+4) {
-            display: none;
+        h1 {
+            font-size: 1.25rem;
+            margin-bottom: $spacing-sm;
+        }
+
+        // Ajustes para telas muito pequenas
+        .image-cell {
+            width: 40px;
+            height: 40px;
+        }
+
+        .development-image {
+            width: 35px;
+            height: 35px;
+        }
+
+        .no-image-placeholder {
+            width: 35px;
+            height: 35px;
+            font-size: 14px;
         }
     }
 }

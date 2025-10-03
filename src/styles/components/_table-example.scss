@@ -1,0 +1,101 @@
+// ========================================
+// EXEMPLO DE USO DA DS-TABLE RESPONSIVA
+// ========================================
+
+// Exemplo de como usar as classes de responsividade
+.example-table-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; // Duas tabelas lado a lado
+    gap: 24px;
+
+    // Cada .ds-table se adapta independentemente ao seu container
+    .table-wrapper {
+
+        // Wrapper necessário para scroll horizontal
+        .ds-table {
+            // A responsividade é baseada no tamanho do container, não da tela
+            // Container queries são aplicadas automaticamente
+        }
+    }
+}
+
+// Exemplo de uso das classes de responsividade
+.example-table {
+    .column-important {
+        // Sempre visível
+    }
+
+    .column-secondary {
+        @extend .hide-mobile; // Escondida em containers pequenos (até 600px)
+    }
+
+    .column-optional {
+        @extend .hide-small; // Escondida em containers muito pequenos (até 400px)
+    }
+
+    .column-extra {
+        @extend .hide-extra-small; // Escondida em containers extra pequenos (até 300px)
+    }
+}
+
+// Exemplo de uso das classes de largura
+.example-table-widths {
+    .cell-id {
+        @extend .cell-narrow; // Para IDs (80-120px)
+    }
+
+    .cell-name {
+        @extend .cell-wide; // Para nomes (200-300px)
+    }
+
+    .cell-status {
+        @extend .cell-normal; // Para status (120-200px)
+    }
+
+    .cell-description {
+        @extend .cell-extra-wide; // Para descrições (300-400px)
+    }
+
+    .cell-actions {
+        @extend .cell-fixed; // Para ações (150px fixo)
+    }
+}
+
+// ========================================
+// BREAKPOINTS DAS CONTAINER QUERIES
+// ========================================
+// 
+// 600px+  : Tabela normal com todas as colunas
+// 400-600px: Tabela compacta, esconde .hide-mobile
+// 300-400px: Tabela muito compacta, esconde .hide-small
+// <300px  : Modo card, esconde .hide-extra-small
+
+// ========================================
+// EXEMPLO DE HTML
+// ========================================
+/*
+<div class="table-wrapper">
+    <table class="ds-table">
+        <thead>
+            <tr>
+                <th class="cell-narrow hide-mobile">ID</th>
+                <th class="cell-wide">Nome</th>
+                <th class="cell-normal">Status</th>
+                <th class="cell-extra-wide hide-small">Descrição</th>
+                <th class="cell-fixed">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="cell-narrow hide-mobile">001</td>
+                <td class="cell-wide">João Silva</td>
+                <td class="cell-normal">Ativo</td>
+                <td class="cell-extra-wide hide-small">Descrição longa do usuário</td>
+                <td class="cell-fixed">
+                    <button>Editar</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+*/
