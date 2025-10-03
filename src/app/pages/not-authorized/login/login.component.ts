@@ -1,15 +1,28 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../shared/services/auth/auth-service';
 import { ToastService } from '../../../shared/services/toast/toast.service';
 
+// DS Components
+import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
+import { InputComponent } from '../../../shared/components/atoms/input/input.component';
+import { CardComponent } from '../../../shared/components/organisms/card/card.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ButtonComponent,
+    InputComponent,
+    CardComponent
+  ],
+  providers: [
+    NgModel
+  ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
@@ -72,5 +85,36 @@ export class LoginComponent {
   isFieldInvalid(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);
     return !!(field && field.invalid && field.touched);
+  }
+
+  getFieldError(fieldName: string): string {
+    const field = this.loginForm.get(fieldName);
+    if (!field || !field.errors || !field.touched) {
+      return '';
+    }
+
+    const errors = field.errors;
+
+    if (errors['required']) {
+      return `${this.getFieldLabel(fieldName)} é obrigatório`;
+    }
+
+    if (errors['email']) {
+      return 'Email inválido';
+    }
+
+    if (errors['minlength']) {
+      return `${this.getFieldLabel(fieldName)} deve ter pelo menos ${errors['minlength'].requiredLength} caracteres`;
+    }
+
+    return '';
+  }
+
+  private getFieldLabel(fieldName: string): string {
+    const labels: { [key: string]: string } = {
+      'email': 'Email',
+      'password': 'Senha'
+    };
+    return labels[fieldName] || fieldName;
   }
 }

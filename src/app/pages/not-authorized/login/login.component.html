@@ -1,129 +1,41 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="UTF-8">
-    <title>Login Template</title>
-    <style>
-        .login-container {
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 2rem;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-
-        .form-control.invalid {
-            border-color: #dc3545;
-        }
-
-        .error-message {
-            color: #dc3545;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            cursor: pointer;
-        }
-
-        .btn:disabled {
-            background-color: #6c757d;
-            cursor: not-allowed;
-        }
-
-        .alert {
-            padding: 0.75rem;
-            margin-bottom: 1rem;
-            border-radius: 4px;
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-    </style>
-</head>
-
-<body>
-
+<div class="login-page">
     <div class="login-container">
-        <h2>Login</h2>
-
-
-        <div *ngIf="errorMessage" class="alert">
-            {{ errorMessage }}
+        <div class="login-header">
+            <div class="logo">
+                <img src="assets/logo/logo.png" alt="TW System" class="logo-image" />
+            </div>
+            <h1 class="login-title">Bem-vindo de volta</h1>
+            <p class="login-subtitle">Faça login para acessar sua conta</p>
         </div>
 
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <ds-card variant="filled" size="lg" [elevated]="true" borderRadius="lg" class="login-card">
 
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" formControlName="email" class="form-control"
-                    [class.invalid]="isFieldInvalid('email')" placeholder="Digite seu email" />
-                <div *ngIf="isFieldInvalid('email')" class="error-message">
-                    <div *ngIf="email?.errors?.['required']">Email é obrigatório</div>
-                    <div *ngIf="email?.errors?.['email']">Email inválido</div>
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+                <div class="form-field">
+                    <ds-input label="Email" type="email" formControlName="email" placeholder="Digite seu email"
+                        [required]="true" [invalid]="isFieldInvalid('email')" [errorMessage]="getFieldError('email')"
+                        icon="fa-solid fa-envelope" iconPosition="left" [fullWidth]="true">
+                    </ds-input>
                 </div>
-            </div>
 
-
-            <div class="form-group">
-                <label for="password">Senha:</label>
-                <input type="password" id="password" formControlName="password" class="form-control"
-                    [class.invalid]="isFieldInvalid('password')" placeholder="Digite sua senha" />
-                <div *ngIf="isFieldInvalid('password')" class="error-message">
-                    <div *ngIf="password?.errors?.['required']">Senha é obrigatória</div>
-                    <div *ngIf="password?.errors?.['minlength']">Senha deve ter pelo menos 6 caracteres</div>
+                <div class="form-field">
+                    <ds-input label="Senha" type="password" formControlName="password" placeholder="Digite sua senha"
+                        [required]="true" [invalid]="isFieldInvalid('password')"
+                        [errorMessage]="getFieldError('password')" icon="fa-solid fa-lock" iconPosition="left"
+                        [fullWidth]="true">
+                    </ds-input>
                 </div>
-            </div>
 
+                <div class="form-actions">
+                    <ds-button [label]="isLoading ? 'Entrando...' : 'Entrar'" type="submit" variant="fill"
+                        [fullWidth]="true" [isLoading]="isLoading" [disabled]="isLoading || loginForm.invalid">
+                    </ds-button>
+                </div>
+            </form>
+        </ds-card>
 
-            <button type="submit" class="btn" [disabled]="isLoading">
-                <span *ngIf="isLoading" class="loading"></span>
-                <span *ngIf="!isLoading">Entrar</span>
-                <span *ngIf="isLoading">Entrando...</span>
-            </button>
-        </form>
+        <div class="login-footer">
+            <p class="footer-text">© 2025 TW System. Todos os direitos reservados.</p>
+        </div>
     </div>
-</body>
-
-</html>
+</div>
