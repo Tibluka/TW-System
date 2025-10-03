@@ -1,3 +1,8 @@
+@use 'abstracts/variables' as *;
+@use 'abstracts/spacing' as *;
+@use 'abstracts/typography' as *;
+@use 'base/typography' as *;
+
 /* production-receipts.component.scss */
 /* Seguindo o mesmo padrão de estilos das outras telas */
 .production-receipts-container {
@@ -44,15 +49,84 @@
     /* ============================================ */
 
     .search-input {
-        margin-bottom: 2rem;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        align-items: end;
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-md;
 
+        .search-field {
+            width: 100%;
+        }
+
+        .filters-row {
+            display: flex;
+            gap: $spacing-md;
+            flex-wrap: wrap;
+
+            .filter-field {
+                flex: 1;
+                min-width: 200px;
+            }
+        }
+
+        .date-filters {
+            display: flex;
+            gap: $spacing-md;
+            flex-wrap: wrap;
+
+            .date-field {
+                flex: 1;
+                min-width: 200px;
+            }
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: $spacing-sm;
+            flex-wrap: wrap;
+            align-items: center;
+
+            .clear-btn,
+            .create-btn {
+                white-space: nowrap;
+                min-width: fit-content;
+            }
+        }
+
+        // Responsividade para tablets e mobile (abaixo de 769px)
         @media (max-width: 768px) {
-            grid-template-columns: 1fr;
-            padding: 1rem;
+            gap: $spacing-sm;
+
+            .filters-row,
+            .date-filters {
+                flex-direction: column;
+                gap: $spacing-sm;
+
+                .filter-field,
+                .date-field {
+                    min-width: unset;
+                    width: 100%;
+                }
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: $spacing-xs;
+                width: 100%;
+
+                .clear-btn,
+                .create-btn {
+                    width: 100%;
+                }
+
+                // Força os botões a ocuparem 100% da largura
+                ::ng-deep ds-button {
+                    width: 100% !important;
+
+                    .btn {
+                        width: 100% !important;
+                    }
+                }
+            }
         }
     }
 
@@ -282,6 +356,127 @@
 
         ds-table-cell {
             color: var(--text-secondary);
+        }
+    }
+
+    /* ============================================ */
+    /* CLASSES DE RESPONSIVIDADE */
+    /* ============================================ */
+    .hide-mobile {
+        @media (max-width: 768px) {
+            display: none !important;
+        }
+    }
+
+    .hide-small {
+        @media (max-width: 1024px) {
+            display: none !important;
+        }
+    }
+
+    .show-mobile-only {
+        display: none !important;
+
+        @media (max-width: 768px) {
+            display: block !important;
+        }
+    }
+
+    .show-small-only {
+        display: none !important;
+
+        @media (max-width: 1024px) and (min-width: 769px) {
+            display: block !important;
+        }
+    }
+
+    /* ============================================ */
+    /* CARD STYLES - Para ds-list-view */
+    /* ============================================ */
+    ::ng-deep .cards-view {
+        .card-content {
+            // Reset dos estilos do ds-card
+            border: none !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            background: transparent !important;
+            transition: all 0.2s ease;
+            cursor: pointer;
+
+            .card-header {
+                margin-bottom: $spacing-sm;
+
+                .card-title-section {
+                    h3 {
+                        margin: 0 0 $spacing-xs 0;
+                        font-size: 1.1rem;
+                        font-weight: 600;
+                        color: var(--primary-dark);
+                        word-break: break-word;
+                    }
+
+                    .status-badge-mobile {
+                        display: inline-block;
+                    }
+                }
+            }
+
+            .card-body {
+                margin-bottom: $spacing-sm;
+
+                .card-info {
+                    display: flex;
+                    flex-direction: column;
+                    gap: $spacing-xs;
+
+                    .info-item {
+                        display: flex;
+                        align-items: center;
+                        gap: $spacing-xs;
+                        font-size: 0.9rem;
+                        color: var(--neutral-dark);
+
+                        i {
+                            width: 16px;
+                            color: var(--neutral-medium);
+                            font-size: 14px;
+                        }
+
+                        span {
+                            flex: 1;
+                            word-break: break-word;
+                        }
+                    }
+                }
+            }
+
+            .card-actions {
+                display: flex;
+                justify-content: flex-end;
+                gap: $spacing-sm;
+                padding-top: $spacing-sm;
+                border-top: 1px solid var(--neutral-light);
+
+                ds-icon {
+                    padding: $spacing-xs;
+                    border-radius: var(--border-radius-sm);
+                    transition: background-color 0.2s ease;
+
+                    &:hover {
+                        background-color: var(--neutral-light);
+                    }
+                }
+            }
+
+            @media (max-width: 768px) {
+                .card-header .card-title-section h3 {
+                    font-size: 1rem;
+                }
+
+                .card-body .card-info .info-item {
+                    font-size: 0.85rem;
+                }
+            }
         }
     }
 

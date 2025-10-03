@@ -6,6 +6,22 @@
         opacity: 0.5;
         pointer-events: none;
     }
+
+    // Garantir que o dropdown sempre seja visível
+    .action-menu-dropdown {
+        // Aumentar z-index para garantir que apareça sobre tabelas
+        z-index: 9999 !important;
+
+        // Garantir que o dropdown não seja cortado por overflow
+        .dropdown-content {
+            // Adicionar sombra mais forte para melhor visibilidade
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+
+            // Garantir que o conteúdo não seja cortado
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    }
 }
 
 .action-menu-trigger {
@@ -44,11 +60,19 @@
 
 .action-menu-dropdown {
     position: absolute;
-    top: 100%;
     right: 0;
     z-index: 1000;
-    margin-top: 4px;
     min-width: 200px;
+
+    &.dropdown-bottom {
+        top: 100%;
+        margin-top: 4px;
+    }
+
+    &.dropdown-top {
+        bottom: 100%;
+        margin-bottom: 4px;
+    }
 }
 
 .dropdown-content {
@@ -98,5 +122,47 @@
 
     span {
         flex: 1;
+    }
+}
+
+// Estilos específicos para action-menu dentro de tabelas
+ds-table {
+    .action-menu-container {
+
+        // Garantir que o dropdown seja renderizado fora do contexto da tabela
+        .action-menu-dropdown {
+            // Usar position fixed para evitar problemas com overflow
+            position: fixed !important;
+            z-index: 9999 !important;
+
+            // Calcular posição baseada no trigger
+            &.dropdown-bottom {
+                top: auto;
+                bottom: auto;
+                margin-top: 0;
+            }
+
+            &.dropdown-top {
+                top: auto;
+                bottom: auto;
+                margin-bottom: 0;
+            }
+        }
+    }
+}
+
+// Garantir que o dropdown seja visível em qualquer contexto
+.action-menu-dropdown {
+
+    // Fallback para casos onde o posicionamento automático falha
+    &.dropdown-bottom {
+
+        // Se não há espaço abaixo, tentar posicionar para cima
+        @media (max-height: 600px) {
+            bottom: 100%;
+            top: auto;
+            margin-bottom: 4px;
+            margin-top: 0;
+        }
     }
 }

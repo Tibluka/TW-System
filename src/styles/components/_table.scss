@@ -2,14 +2,46 @@
 @use 'abstracts/spacing' as *;
 
 // ========================================
+// WRAPPER DA TABELA PARA SCROLL
+// ========================================
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch; // Scroll suave no iOS
+
+    // Scrollbar customizada
+    &::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--neutral-lighter);
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--neutral-light);
+        border-radius: 4px;
+
+        &:hover {
+            background: var(--neutral);
+        }
+    }
+}
+
+// ========================================
 // COMPONENTE DS-TABLE (PRINCIPAL)
 // ========================================
 .ds-table {
     width: 100%;
+    min-width: 100%; // Força largura mínima
     border-collapse: separate;
     border-spacing: 0 12px; // Separação vertical de 12px entre os TRs
     border: none;
     background: transparent;
+    container-type: inline-size; // Habilita container queries
+    table-layout: auto; // Largura automática baseada no conteúdo
 
     // Estado vazio
     .empty-state {
@@ -21,6 +53,118 @@
             background-color: transparent;
             border: none;
             border-radius: 0;
+        }
+    }
+
+    // ========================================
+    // CONTAINER QUERIES PARA RESPONSIVIDADE
+    // ========================================
+
+    // Container pequeno (até 600px)
+    @container (max-width: 600px) {
+        font-size: 12px;
+        min-width: 600px; // Largura mínima para forçar scroll
+
+        ds-table-cell {
+            padding: $spacing-sm $spacing-xs;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 100px; // Largura mínima reduzida
+            max-width: 250px; // Largura máxima reduzida
+
+            &.header-cell {
+                padding: $spacing-md $spacing-sm;
+            }
+
+            &:first-child {
+                padding-left: $spacing-sm;
+            }
+
+            &:last-child {
+                padding-right: $spacing-sm;
+            }
+        }
+
+        // Esconder algumas colunas em containers pequenos
+        .hide-mobile {
+            display: none;
+        }
+
+        .user-info,
+        .client-info {
+            gap: $spacing-xs;
+
+            .avatar,
+            .client-avatar {
+                width: 32px;
+                height: 32px;
+            }
+        }
+    }
+
+    // Container muito pequeno (até 400px)
+    @container (max-width: 400px) {
+        font-size: 11px;
+        min-width: 500px; // Largura mínima para forçar scroll
+
+        ds-table-cell {
+            padding: $spacing-xs;
+            font-size: 11px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 80px; // Largura mínima ainda menor
+            max-width: 200px; // Largura máxima ainda menor
+
+            &.header-cell {
+                padding: $spacing-sm $spacing-xs;
+            }
+        }
+
+        // Esconder mais colunas em containers muito pequenos
+        .hide-small {
+            display: none;
+        }
+    }
+
+    // Container extra pequeno (até 300px) - Modo card
+    @container (max-width: 300px) {
+        display: block;
+
+        ds-table-row {
+            display: block;
+            margin-bottom: $spacing-md;
+            border: 1px solid $stroke;
+            border-radius: $border-radius-md;
+            background: white;
+            padding: $spacing-sm;
+
+            &:not(.header-row) {
+                ds-table-cell {
+                    display: block;
+                    border: none;
+                    padding: $spacing-xs 0;
+                    border-radius: 0;
+                    white-space: normal; // Permite quebra de linha no modo card
+                    overflow: visible;
+                    text-overflow: initial;
+                    max-width: none;
+
+                    &:before {
+                        content: attr(data-label) ": ";
+                        font-weight: 600;
+                        color: $secondary;
+                        display: inline-block;
+                        width: 40%;
+                    }
+                }
+            }
+
+            &.header-row {
+                display: none;
+            }
         }
     }
 }
@@ -39,6 +183,11 @@ ds-table-cell {
     background-color: var(--white);
     color: $primary-dark;
     font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 120px; // Largura mínima para mostrar conteúdo
+    max-width: 300px; // Largura máxima antes do ellipsis
 
     &:first-child {
         border-left: 1px solid $stroke;
@@ -148,43 +297,47 @@ ds-table-row {
 
 
 // ========================================
-// RESPONSIVIDADE
+// UTILITÁRIOS PARA RESPONSIVIDADE
 // ========================================
-@media (max-width: 768px) {
-    .ds-table {
-        font-size: 12px;
-    }
 
-    ds-table-cell {
-        padding: $spacing-sm $spacing-xs;
-        font-size: 12px;
+// Classes para esconder colunas em diferentes tamanhos de container
+// Estas classes são controladas pelas container queries acima
 
-        &.header-cell {
-            padding: $spacing-md $spacing-sm;
-        }
+// ========================================
+// CLASSES DE LARGURA PARA CÉLULAS
+// ========================================
 
-        &:first-child {
-            padding-left: $spacing-sm;
-        }
+// Larguras específicas para diferentes tipos de conteúdo
+.cell-narrow {
+    min-width: 80px;
+    max-width: 120px;
+}
 
-        &:last-child {
-            padding-right: $spacing-sm;
-        }
-    }
+.cell-normal {
+    min-width: 120px;
+    max-width: 200px;
+}
 
-    // Esconder algumas colunas em mobile
-    .hide-mobile {
-        display: none;
-    }
+.cell-wide {
+    min-width: 200px;
+    max-width: 300px;
+}
 
-    .user-info,
-    .client-info {
-        gap: $spacing-xs;
+.cell-extra-wide {
+    min-width: 300px;
+    max-width: 400px;
+}
 
-        .avatar,
-        .client-avatar {
-            width: 32px;
-            height: 32px;
-        }
-    }
+// Larguras flexíveis
+.cell-flex {
+    min-width: 100px;
+    max-width: none;
+    width: auto;
+}
+
+// Largura fixa
+.cell-fixed {
+    width: 150px;
+    min-width: 150px;
+    max-width: 150px;
 }

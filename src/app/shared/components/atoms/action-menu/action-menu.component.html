@@ -4,7 +4,8 @@
         <i class="{{triggerIcon}}"></i>
     </button>
 
-    <div class="action-menu-dropdown" *ngIf="isOpen">
+    <div class="action-menu-dropdown" [class.dropdown-top]="dropdownPosition === 'top'"
+        [class.dropdown-bottom]="dropdownPosition === 'bottom'" *ngIf="isOpen" #dropdown>
         <div class="dropdown-content">
             <button *ngFor="let item of items" class="dropdown-item" [class.disabled]="item.disabled"
                 (click)="selectItem(item, $event)" type="button">

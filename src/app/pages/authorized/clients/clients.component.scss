@@ -6,226 +6,322 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
-    }
-}
+        gap: $spacing-md;
+        flex-wrap: wrap;
 
-// Resumo do cliente
-.client-summary {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    text-align: right;
-
-    .summary-item {
-        display: flex;
-        flex-direction: column;
-        gap: 1px;
-
-        strong {
-            color: $primary-dark;
-            font-size: 13px;
-            font-weight: 600;
+        .search-field {
+            flex: 1;
+            min-width: 250px;
+            max-width: 500px;
         }
 
-        small {
-            color: $label;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .action-buttons {
+            display: flex;
+            gap: $spacing-sm;
+            flex-wrap: wrap;
+            align-items: center;
+
+            .clear-btn,
+            .create-btn {
+                white-space: nowrap;
+                min-width: fit-content;
+            }
+        }
+
+        // Responsividade para tablets e mobile (abaixo de 769px)
+        @media (max-width: 768px) {
+            flex-direction: column;
+            align-items: stretch;
+            gap: $spacing-sm;
+
+            .search-field {
+                min-width: unset;
+                max-width: unset;
+                width: 100%;
+            }
+
+            .action-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: $spacing-xs;
+                width: 100%;
+
+                .clear-btn,
+                .create-btn {
+                    width: 100%;
+                }
+
+                ::ng-deep ds-button {
+                    width: 100% !important;
+
+                    .btn {
+                        width: 100% !important;
+                    }
+                }
+            }
+        }
+
+        // Responsividade para a seção de resultados
+        .results {
+            @media (max-width: 768px) {
+                margin-top: $spacing-md;
+            }
         }
     }
 
-    .last-contact {
-        color: $placeholder;
-        font-size: 10px;
-        margin-top: 2px;
-    }
-}
-
-// Botões de ação
-.action-buttons,
-.actions {
-    display: flex;
-    justify-content: center;
-    gap: 4px;
-
-    ds-button {
-        min-width: auto;
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        &:hover {
-            transform: scale(1.1);
-        }
-    }
-}
-
-
-// ========================================
-// CLASSES UTILITÁRIAS PARA CONTEÚDO DAS CÉLULAS
-// ========================================
-
-// Info do usuário/cliente
-.user-info,
-.client-info {
-    display: flex;
-    align-items: center;
-    gap: $spacing-sm;
-
-    .avatar,
-    .client-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 2px solid $stroke;
-    }
-
-    .user-details,
-    .client-details {
+    // Resumo do cliente
+    .client-summary {
         display: flex;
         flex-direction: column;
         gap: 2px;
+        text-align: right;
 
-        .user-name,
-        .client-name {
-            color: $primary-dark;
-            font-weight: 600;
-            font-size: 14px;
-            line-height: 1.2;
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+
+            strong {
+                color: $primary-dark;
+                font-size: 13px;
+                font-weight: 600;
+            }
+
+            small {
+                color: $label;
+                font-size: 10px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
         }
 
-        .company,
-        .client-company {
+        .last-contact {
+            color: $placeholder;
+            font-size: 10px;
+            margin-top: 2px;
+        }
+    }
+
+    // Botões de ação
+    .action-buttons,
+    .actions {
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+
+        ds-button {
+            min-width: auto;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &:hover {
+                transform: scale(1.1);
+            }
+        }
+    }
+
+
+    // ========================================
+    // CLASSES UTILITÁRIAS PARA CONTEÚDO DAS CÉLULAS
+    // ========================================
+
+    // Info do usuário/cliente
+    .user-info,
+    .client-info {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+
+        .avatar,
+        .client-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid $stroke;
+        }
+
+        .user-details,
+        .client-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+
+            .user-name,
+            .client-name {
+                color: $primary-dark;
+                font-weight: 600;
+                font-size: 14px;
+                line-height: 1.2;
+            }
+
+            .company,
+            .client-company {
+                color: $label;
+                font-size: 12px;
+                line-height: 1.2;
+            }
+        }
+    }
+
+    // Informações de contato
+    .contact-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .client-email {
+            color: $primary-medium;
+            text-decoration: none;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+
+            &:hover {
+                text-decoration: underline;
+            }
+
+            i {
+                color: $label;
+                font-size: 11px;
+            }
+        }
+
+        .client-phone {
             color: $label;
             font-size: 12px;
-            line-height: 1.2;
+            display: flex;
+            align-items: center;
+
+            i {
+                font-size: 10px;
+            }
         }
     }
-}
 
-// Informações de contato
-.contact-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    // Badges de categoria
+    .category-badge {
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
 
-    .client-email {
-        color: $primary-medium;
-        text-decoration: none;
-        font-size: 13px;
+        &.category-premium {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #8B4513;
+        }
+
+        &.category-vip {
+            background: linear-gradient(135deg, #9B59B6, #8E44AD);
+            color: white;
+        }
+
+        &.category-corporate {
+            background: linear-gradient(135deg, #3498DB, #2980B9);
+            color: white;
+        }
+
+        &.category-standard {
+            background: linear-gradient(135deg, #95A5A6, #7F8C8D);
+            color: white;
+        }
+
+        &.category-basic {
+            background: linear-gradient(135deg, #BDC3C7, #95A5A6);
+            color: $primary-dark;
+        }
+    }
+
+    // Badges de status
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
         display: flex;
         align-items: center;
-
-        &:hover {
-            text-decoration: underline;
-        }
-
-        i {
-            color: $label;
-            font-size: 11px;
-        }
-    }
-
-    .client-phone {
-        color: $label;
-        font-size: 12px;
-        display: flex;
-        align-items: center;
-
-        i {
-            font-size: 10px;
-        }
-    }
-}
-
-// Badges de categoria
-.category-badge {
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-
-    &.category-premium {
-        background: linear-gradient(135deg, #FFD700, #FFA500);
-        color: #8B4513;
-    }
-
-    &.category-vip {
-        background: linear-gradient(135deg, #9B59B6, #8E44AD);
-        color: white;
-    }
-
-    &.category-corporate {
-        background: linear-gradient(135deg, #3498DB, #2980B9);
-        color: white;
-    }
-
-    &.category-standard {
-        background: linear-gradient(135deg, #95A5A6, #7F8C8D);
-        color: white;
-    }
-
-    &.category-basic {
-        background: linear-gradient(135deg, #BDC3C7, #95A5A6);
-        color: $primary-dark;
-    }
-}
-
-// Badges de status
-.status-badge {
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-transform: capitalize;
-
-    .status-icon {
-        font-size: 6px;
-    }
-
-    &.status-ativo {
-        background: rgba(46, 204, 113, 0.1);
-        color: #27AE60;
+        justify-content: center;
+        text-transform: capitalize;
 
         .status-icon {
+            font-size: 6px;
+        }
+
+        &.status-ativo {
+            background: rgba(46, 204, 113, 0.1);
             color: #27AE60;
+
+            .status-icon {
+                color: #27AE60;
+            }
         }
-    }
 
-    &.status-inativo {
-        background: rgba(231, 76, 60, 0.1);
-        color: #E74C3C;
-
-        .status-icon {
+        &.status-inativo {
+            background: rgba(231, 76, 60, 0.1);
             color: #E74C3C;
+
+            .status-icon {
+                color: #E74C3C;
+            }
         }
-    }
 
-    &.status-pendente {
-        background: rgba(230, 126, 34, 0.1);
-        color: #E67E22;
-
-        .status-icon {
+        &.status-pendente {
+            background: rgba(230, 126, 34, 0.1);
             color: #E67E22;
+
+            .status-icon {
+                color: #E67E22;
+            }
+        }
+
+        &.status-bloqueado {
+            background: rgba(149, 165, 166, 0.1);
+            color: #95A5A6;
+
+            .status-icon {
+                color: #95A5A6;
+            }
         }
     }
 
-    &.status-bloqueado {
-        background: rgba(149, 165, 166, 0.1);
-        color: #95A5A6;
+    // Estilos responsivos para cards
+    .card-content {
+        @media (max-width: 480px) {
+            .card-body {
+                padding: $spacing-sm;
+            }
 
-        .status-icon {
-            color: #95A5A6;
+            .card-actions {
+                padding: $spacing-xs $spacing-sm;
+                gap: $spacing-sm;
+            }
+        }
+    }
+
+    // Melhorias gerais de responsividade
+    @media (max-width: 768px) {
+        .clients-container {
+            padding: $spacing-sm;
+
+            .title-semibold {
+                font-size: 1.5rem;
+                margin-bottom: $spacing-md;
+            }
+        }
+    }
+
+    @media (max-width: 480px) {
+        .clients-container {
+            padding: $spacing-xs;
+
+            .title-semibold {
+                font-size: 1.25rem;
+                margin-bottom: $spacing-sm;
+            }
         }
     }
 }
