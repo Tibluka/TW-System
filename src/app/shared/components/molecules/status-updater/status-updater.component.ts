@@ -134,7 +134,7 @@ export class StatusUpdaterComponent {
         try {
             await this.updateEntityStatus(this.entityId, this.selectedStatus);
 
-            // Toast de sucesso
+
             this.toastService.success(
                 `Status atualizado com sucesso para: ${this.getStatusLabel(this.selectedStatus)}`,
                 'Status Atualizado'
@@ -154,7 +154,7 @@ export class StatusUpdaterComponent {
                 error: error.message || 'Erro ao atualizar status'
             };
 
-            // Toast de erro
+
             this.toastService.error(
                 'Erro ao atualizar status',
                 'Falha na operação',

@@ -42,8 +42,7 @@ function showToast(type: 'success' | 'error' | 'warning' | 'info', title: string
             closable: true
         });
     } else {
-        // Log no console se o toast não estiver disponível
-        console.warn('Toast container not available:', `${title}: ${message}`);
+
     }
 }
 
