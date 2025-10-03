@@ -1,0 +1,4 @@
+<div class="toast-container" *ngIf="toasts.length > 0">
+    <ds-toast *ngFor="let toast of toasts; trackBy: trackByToast" [config]="toast" (close)="removeToast(toast)">
+    </ds-toast>
+</div>

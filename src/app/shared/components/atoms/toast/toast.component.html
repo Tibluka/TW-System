@@ -1,0 +1,18 @@
+<div [class]="getToastClass()">
+    <i *ngIf="config.icon || getIconClass()" class="toast-icon" [class]="getIconClass()">
+    </i>
+
+    <div class="toast-content">
+        <h4 *ngIf="config.title" class="toast-title">
+            {{ config.title }}
+        </h4>
+        <p class="toast-message">
+            {{ config.message }}
+        </p>
+    </div>
+
+    <button *ngIf="config.closable !== false" class="toast-close" (click)="closeToast()" type="button"
+        aria-label="Fechar notificação">
+        <i class="fa-solid fa-times"></i>
+    </button>
+</div>

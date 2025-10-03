@@ -16,6 +16,7 @@ import { TableRowComponent } from '../../../shared/components/organisms/table/ta
 import { TableComponent } from '../../../shared/components/organisms/table/table.component';
 import { ClientService } from '../../../shared/services/clients/clients.service';
 import { ModalService } from '../../../shared/services/modal/modal.service';
+import { ToastService } from '../../../shared/services/toast/toast.service';
 import { FormValidator } from '../../../shared/utils/form';
 import { ClientModalComponent } from "./client-modal/client-modal.component";
 
@@ -46,6 +47,7 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
 
   private clientService = inject(ClientService);
   private modalService = inject(ModalService);
+  private toastService = inject(ToastService);
 
 
   cnpjMask: string = '00.000.000/0000-00';
@@ -110,9 +112,13 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: () => {
+              this.toastService.success('Cliente excluído com sucesso!', 'Sucesso');
               this.loadClients(); // Recarregar lista
             },
             error: (error) => {
+              this.toastService.error('Erro ao excluir cliente', 'Erro', {
+                message: error.message || 'Não foi possível excluir o cliente.'
+              });
             }
           });
       }
@@ -209,6 +215,7 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
    * ➕ CRIAR - Abre modal para criar novo cliente
    */
   createClient(): void {
+    this.toastService.info('Abrindo formulário para novo cliente...', 'Informação');
 
     this.selectedClientId = undefined;
 
