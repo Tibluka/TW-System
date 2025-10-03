@@ -56,12 +56,11 @@ export class LoginComponent {
     const { email, password } = this.loginForm.value;
 
     this.authService.login(email, password).subscribe({
-      next: (response) => {
+      next: () => {
         this.isLoading = false;
-        this.toastService.success('Login realizado com sucesso!', 'Bem-vindo');
         this.router.navigate(['authorized/clients']);
       },
-      error: (error) => {
+      error: () => {
         this.isLoading = false;
         this.errorMessage = 'Credenciais inválidas. Tente novamente.';
         this.toastService.error('Erro no login', 'Credenciais inválidas', {
