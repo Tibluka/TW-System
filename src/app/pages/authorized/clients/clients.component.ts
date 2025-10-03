@@ -17,8 +17,10 @@ import { TableCellComponent } from '../../../shared/components/organisms/table/t
 import { TableRowComponent } from '../../../shared/components/organisms/table/table-row/table-row.component';
 import { TableComponent } from '../../../shared/components/organisms/table/table.component';
 import { ClientService } from '../../../shared/services/clients/clients.service';
+import { ErrorHandlerService } from '../../../shared/services/error-handler/error-handler.service';
 import { ModalService } from '../../../shared/services/modal/modal.service';
 import { ToastService } from '../../../shared/services/toast/toast.service';
+import { ErrorHandlerUtil } from '../../../shared/utils/error-handler.util';
 import { FormValidator } from '../../../shared/utils/form';
 import { ClientModalComponent } from "./client-modal/client-modal.component";
 
@@ -50,6 +52,7 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
   isModalOpen: boolean = false;
 
   private clientService = inject(ClientService);
+  private errorHandlerService = inject(ErrorHandlerService);
   private modalService = inject(ModalService);
   private toastService = inject(ToastService);
 
@@ -134,9 +137,12 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
               this.loadClients(); // Recarregar lista
             },
             error: (error) => {
-              this.toastService.error('Erro ao excluir cliente', 'Erro', {
-                message: error.message || 'Não foi possível excluir o cliente.'
-              });
+              ErrorHandlerUtil.handleSubscriptionError(
+                error,
+                this.errorHandlerService,
+                this.toastService,
+                'Exclusão de cliente'
+              );
             }
           });
       }

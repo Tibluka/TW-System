@@ -416,9 +416,8 @@ export class ClientModalComponent implements OnInit {
       },
       error: (error) => {
         this.isSaving = false;
-        this.toastService.error('Erro ao criar cliente', 'Falha na operação', {
-          message: error.error?.message || error.message || 'Não foi possível criar o cliente.'
-        });
+        // O interceptor já processa o erro e mostra o toast automaticamente
+        console.error('Erro ao criar cliente:', error);
       }
     });
   }
@@ -439,9 +438,8 @@ export class ClientModalComponent implements OnInit {
       },
       error: (error) => {
         this.isSaving = false;
-        this.toastService.error('Erro ao atualizar cliente', 'Falha na operação', {
-          message: error.error?.message || error.message || 'Não foi possível atualizar o cliente.'
-        });
+        // O interceptor já processa o erro e mostra o toast automaticamente
+        console.error('Erro ao atualizar cliente:', error);
       }
     });
   }

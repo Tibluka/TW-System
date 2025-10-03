@@ -559,11 +559,9 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       }
 
     } catch (error: any) {
-
-      const errorMessage = error.error?.message || error.message || 'Erro ao salvar ordem de produção.';
-      this.toastService.error('Erro ao salvar', 'Falha na operação', {
-        message: errorMessage
-      });
+      // O interceptor já processa o erro e mostra o toast automaticamente
+      // Não precisamos mostrar toast manual aqui
+      console.error('Erro ao salvar ordem de produção:', error);
 
     } finally {
       this.isSaving = false;

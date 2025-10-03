@@ -336,9 +336,8 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
       });
 
     } catch (error: any) {
-      this.toastService.error('Erro ao salvar', 'Falha na operação', {
-        message: error.message || 'Não foi possível salvar o recibo de produção.'
-      });
+      // O interceptor já processa o erro e mostra o toast automaticamente
+      console.error('Erro ao salvar recibo de produção:', error);
     } finally {
       this.submitting = false;
     }

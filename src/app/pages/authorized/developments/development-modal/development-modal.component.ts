@@ -371,9 +371,8 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
       }
 
     } catch (error: any) {
-      this.toastService.error('Erro ao salvar', 'Falha na operação', {
-        message: error.message || 'Erro ao salvar desenvolvimento. Tente novamente.'
-      });
+      // O interceptor já processa o erro e mostra o toast automaticamente
+      console.error('Erro ao salvar desenvolvimento:', error);
     } finally {
       this.isSaving = false;
     }

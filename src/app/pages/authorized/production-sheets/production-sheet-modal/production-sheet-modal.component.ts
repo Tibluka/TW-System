@@ -407,9 +407,8 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
         errorMessage = error.message;
       }
 
-      this.toastService.error('Erro ao salvar', 'Falha na operação', {
-        message: error.message || 'Não foi possível salvar a ficha de produção.'
-      });
+      // O interceptor já processa o erro e mostra o toast automaticamente
+      console.error('Erro ao salvar ficha de produção:', error);
 
     } finally {
       this.isSaving = false;
