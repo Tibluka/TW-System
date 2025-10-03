@@ -39,6 +39,7 @@
                         <ds-table-cell [isHeader]="true" align="left">Email</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="center">Valor por Metro</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="left">Responsável</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
                     </ds-table-row>
 
 
@@ -95,6 +96,12 @@
                                     </div>
                                 </div>
                             </div>
+                        </ds-table-cell>
+
+                        <ds-table-cell align="center">
+                            <ds-action-menu [items]="actionMenuItems"
+                                (itemSelected)="onActionMenuSelect(client, $event)">
+                            </ds-action-menu>
                         </ds-table-cell>
                     </ds-table-row>
                 </ds-table>

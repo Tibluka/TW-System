@@ -429,11 +429,6 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   getActionMenuItems(receipt: ProductionReceipt): ActionMenuItem[] {
     const items: ActionMenuItem[] = [
       {
-        label: 'Editar',
-        value: 'edit',
-        icon: 'fa-solid fa-edit'
-      },
-      {
         label: 'Atualizar Status',
         value: 'update-status',
         icon: 'fa-solid fa-refresh',

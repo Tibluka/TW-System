@@ -6,6 +6,7 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
 
 import { Client, ClientFilters, ClientListResponse, PaginationInfo } from '../../../models/clients/clients';
+import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { IconComponent } from '../../../shared/components/atoms/icon/icon.component';
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
@@ -24,6 +25,7 @@ import { ClientModalComponent } from "./client-modal/client-modal.component";
   selector: 'app-clients',
   imports: [
     CommonModule,
+    ActionMenuComponent,
     ButtonComponent,
     IconComponent,
     ReactiveFormsModule,
@@ -57,6 +59,20 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
   clients: Client[] = [];
   pagination: PaginationInfo | null = null;
   loading = false;
+
+  // Action Menu
+  actionMenuItems: ActionMenuItem[] = [
+    {
+      label: 'Editar',
+      value: 'edit',
+      icon: 'fa-solid fa-edit'
+    },
+    {
+      label: 'Excluir',
+      value: 'delete',
+      icon: 'fa-solid fa-trash'
+    }
+  ];
 
 
   listViewConfig = {
@@ -374,5 +390,21 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
    */
   get totalPages(): number {
     return this.pagination?.totalPages || 0;
+  }
+
+  /**
+   * 🎯 ON ACTION MENU SELECT - Manipula seleção do menu de ações
+   */
+  onActionMenuSelect(client: Client, item: ActionMenuItem): void {
+    switch (item.value) {
+      case 'edit':
+        this.editClient(client);
+        break;
+      case 'delete':
+        this.deleteClient(client);
+        break;
+      default:
+        console.warn('Ação não reconhecida:', item.value);
+    }
   }
 }
