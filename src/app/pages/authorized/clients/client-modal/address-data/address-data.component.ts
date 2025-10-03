@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { IconComponent } from '../../../../../shared/components/atoms/icon/icon.component';
 import { InputComponent } from '../../../../../shared/components/atoms/input/input.component';
 import { SelectComponent, SelectOption } from '../../../../../shared/components/atoms/select/select.component';
-import { AddressService, AddressFormatted } from '../../../../../shared/services/address/address.service';
+import { AddressFormatted, AddressService } from '../../../../../shared/services/address/address.service';
 import { ToastService } from '../../../../../shared/services/toast/toast.service';
 import { AddressUtil } from '../../../../../shared/utils/address.util';
 
@@ -13,7 +12,6 @@ import { AddressUtil } from '../../../../../shared/utils/address.util';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    IconComponent,
     InputComponent,
     SelectComponent
   ],

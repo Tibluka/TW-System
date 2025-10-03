@@ -480,7 +480,7 @@ export class ProductionSheetsComponent extends FormValidator {
   /**
    * ⬆️ AVANÇAR ESTÁGIO - Avança para o próximo estágio da produção
    */
-  private advanceProductionSheetStage(productionSheet: ProductionSheet): void {
+  advanceProductionSheetStage(productionSheet: ProductionSheet): void {
     const nextStage = this.getNextStage(productionSheet.stage);
 
     if (!nextStage) {
@@ -578,7 +578,7 @@ export class ProductionSheetsComponent extends FormValidator {
   /**
    * ⬇️ RETROCEDER ESTÁGIO - Retrocede para o estágio anterior da produção
    */
-  private retrocedeProductionSheetStage(productionSheet: ProductionSheet): void {
+  retrocedeProductionSheetStage(productionSheet: ProductionSheet): void {
     const previousStage = this.getPreviousStage(productionSheet.stage);
 
     if (!previousStage) {

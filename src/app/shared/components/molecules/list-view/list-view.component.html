@@ -1,4 +1,3 @@
-
 <div class="view-toggle-container" *ngIf="config.showToggle !== false">
     <div class="view-toggle">
         <button type="button" class="toggle-btn" [class.active]="currentViewMode === 'table'"
@@ -43,8 +42,7 @@
         <div *ngFor="let item of items; trackBy: trackByFn;let i = index" class="card-wrapper"
             [style.animation-delay]="getAnimationDelay(i)">
 
-            <ds-card [clickable]="true" [elevated]="true" size="md" class="list-item-card" padding="24px"
-                (click)="onItemClick(item)">
+            <ds-card [clickable]="true" size="md" class="list-item-card" padding="24px" (click)="onItemClick(item)">
 
 
                 <ng-container *ngTemplateOutlet="cardTemplate; context: { $implicit: item, index: i }">

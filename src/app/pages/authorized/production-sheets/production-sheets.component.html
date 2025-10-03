@@ -222,6 +222,16 @@
                             (click)="changeProductionSheetStatus(productionSheet); $event.stopPropagation()"
                             title="Alterar Estágio" />
 
+                        <ds-icon *ngIf="productionSheet.stage !== 'FINISHED'" icon="fa-solid fa-arrow-right"
+                            color="label" fontSize="20px" cursorType="pointer"
+                            (click)="advanceProductionSheetStage(productionSheet); $event.stopPropagation()"
+                            title="Avançar Estágio" />
+
+                        <ds-icon *ngIf="productionSheet.stage !== 'PRINTING'" icon="fa-solid fa-arrow-left"
+                            color="label" fontSize="20px" cursorType="pointer"
+                            (click)="retrocedeProductionSheetStage(productionSheet); $event.stopPropagation()"
+                            title="Retroceder Estágio" />
+
                         <ds-icon icon="fa-solid fa-trash" color="label" fontSize="20px" cursorType="pointer"
                             (click)="deleteProductionSheet(productionSheet); $event.stopPropagation()"
                             title="Excluir" />

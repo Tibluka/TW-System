@@ -391,7 +391,7 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
 
       const response = await this.developmentService.uploadImage(developmentId, this.uploadedFiles[0].file).toPromise();
 
-      this.toastService.success('Imagem enviada com sucesso!', 'Upload Concluído');
+
       this.uploadedFiles = [];
 
     } catch (uploadError) {
