@@ -4,49 +4,45 @@
 
 
     <div class="search-input">
-
-
-        <div class="w-100">
-            <ds-select label="Cliente" placeholder="Selecione o cliente" [(ngModel)]="currentFilters.clientId"
-                [fullWidth]="true" [options]="clientOptions" (ngModelChange)="onClientChange()" />
-        </div>
-
-        <div class="w-100">
-            <ds-input label="Buscar recibo" placeholder="Digite referência interna, cliente, observações..."
+        <div class="search-field">
+            <ds-input [fullWidth]="true" label="Buscar" placeholder="Digite referência interna, cliente, observações..."
                 icon="fa-solid fa-magnifying-glass" iconPosition="left" [(ngModel)]="currentFilters.search"
-                (input)="onSearchChange()" width="100%">
-            </ds-input>
+                (ngModelChange)="onSearchChange()" />
         </div>
 
+        <div class="filters-row">
+            <div class="filter-field">
+                <ds-select [fullWidth]="true" label="Cliente" placeholder="Selecione o cliente"
+                    [(ngModel)]="currentFilters.clientId" [options]="clientOptions"
+                    (ngModelChange)="onClientChange()" />
+            </div>
 
-        <div class="w-100">
-            <ds-input label="Data inicial" type="date" [(ngModel)]="currentFilters.createdFrom"
-                (ngModelChange)="onDateFilterChange()" width="100%">
-            </ds-input>
+            <div class="filter-field">
+                <ds-select [fullWidth]="true" label="Status" [options]="statusOptions"
+                    [(ngModel)]="currentFilters.paymentStatus" (ngModelChange)="onStatusFilterChange()" />
+            </div>
         </div>
 
+        <div class="date-filters">
+            <div class="date-field">
+                <ds-input [fullWidth]="true" label="Data Inicial" type="date" [(ngModel)]="currentFilters.createdFrom"
+                    (ngModelChange)="onDateFilterChange()" />
+            </div>
 
-        <div class="w-100">
-            <ds-input label="Data final" type="date" [(ngModel)]="currentFilters.createdTo"
-                (ngModelChange)="onDateFilterChange()" width="100%">
-            </ds-input>
+            <div class="date-field">
+                <ds-input [fullWidth]="true" label="Data Final" type="date" [(ngModel)]="currentFilters.createdTo"
+                    (ngModelChange)="onDateFilterChange()" />
+            </div>
         </div>
 
-
-        <div class="w-100">
-            <ds-select label="Filtrar por Status" [options]="statusOptions" [(ngModel)]="currentFilters.paymentStatus"
-                (ngModelChange)="onStatusFilterChange()" width="100%">
-            </ds-select>
-        </div>
-
-
-        <div class="d-flex gap-16">
+        <div class="action-buttons">
             <ds-button label="Limpar Filtros" variant="outline" icon="fa-solid fa-eraser"
-                (onClickEmitter)="clearAllFilters()" [disabled]="!hasActiveFilters">
+                (onClickEmitter)="clearAllFilters()" [disabled]="!hasActiveFilters" class="clear-btn"
+                [fullWidth]="false">
             </ds-button>
 
             <ds-button label="Novo Recibo" variant="fill" icon="fa-solid fa-plus"
-                (onClickEmitter)="createProductionReceipt()">
+                (onClickEmitter)="createProductionReceipt()" class="create-btn" [fullWidth]="false">
             </ds-button>
         </div>
     </div>
@@ -63,14 +59,15 @@
 
 
                     <ds-table-row [isHeader]="true">
-                        <ds-table-cell [isHeader]="true" align="left">Ref. Interna</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="left">Ref. do Cliente</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="left">Data de Pagamento</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="center">Quantidade</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left" class="hide-mobile">Ref. Interna</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left" class="hide-small">Ref. do Cliente</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left" class="hide-mobile">Cliente</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left" class="hide-small">Data de
+                            Pagamento</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center" class="hide-small">Quantidade</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="right">Valor Total</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
                     </ds-table-row>
 
 
@@ -78,7 +75,7 @@
                         [data]="productionReceipt" (rowClick)="editProductionReceipt(productionReceipt)">
 
 
-                        <ds-table-cell align="left">
+                        <ds-table-cell align="left" class="hide-mobile">
                             <div class="reference-cell">
                                 <span class="body primary-dark">
                                     <span class="body primary-dark font-weight-medium">{{
@@ -91,7 +88,7 @@
                         </ds-table-cell>
 
 
-                        <ds-table-cell align="left">
+                        <ds-table-cell align="left" class="hide-small">
                             <span class="body primary-dark">
                                 {{
                                 productionReceipt.deliverySheet.productionSheet?.productionOrder?.development?.clientReference
@@ -100,7 +97,7 @@
                         </ds-table-cell>
 
 
-                        <ds-table-cell align="left">
+                        <ds-table-cell align="left" class="hide-mobile">
                             <div class="client-cell"
                                 *ngIf="productionReceipt.deliverySheet?.productionSheet?.productionOrder?.development?.client">
                                 <div class="body primary-dark">
@@ -122,7 +119,7 @@
                         </ds-table-cell>
 
 
-                        <ds-table-cell align="center">
+                        <ds-table-cell align="center" class="hide-small">
                             <div class="date-cell">
                                 <span class="body primary-dark">
                                     {{ formatDate(productionReceipt.paymentDate) }}
@@ -131,7 +128,7 @@
                         </ds-table-cell>
 
 
-                        <ds-table-cell align="center">
+                        <ds-table-cell align="center" class="hide-small">
                             <div class="quantity-cell">
                                 <span class="body primary-dark">
                                     {{ productionReceipt.totalAmount }}
@@ -173,24 +170,53 @@
 
             <ng-template #cardTemplate let-productionReceipt>
                 <div class="card-content" (click)="editProductionReceipt(productionReceipt)">
+                    <div class="card-header">
+                        <div class="card-title-section">
+                            <h3 class="title-modal mb-4 secondary">{{ productionReceipt.internalReference }}</h3>
+                            <ds-badge [text]="getReceiptStatusLabel(productionReceipt.paymentStatus)"
+                                [status]="productionReceipt.paymentStatus" entityType="production-receipt"
+                                class="status-badge-mobile" />
+                        </div>
+                    </div>
+
                     <div class="card-body">
-                        <h3 class="title-modal mb-6 mt-8 secondary">{{ productionReceipt.internalReference }}</h3>
+                        <div class="card-info">
+                            <div class="info-item"
+                                *ngIf="productionReceipt.deliverySheet?.productionSheet?.productionOrder?.development?.client?.companyName">
+                                <i class="fa-solid fa-building"></i>
+                                <span>{{
+                                    productionReceipt.deliverySheet.productionSheet.productionOrder.development.client.companyName
+                                    }}</span>
+                            </div>
 
-                        <p class="subtitle-section secondary"
-                            *ngIf="productionReceipt.deliverySheet?.productionSheet?.productionOrder?.development?.client?.companyName">
-                            {{
-                            productionReceipt.deliverySheet.productionSheet.productionOrder.development.client.companyName
-                            }}</p>
+                            <div class="info-item"
+                                *ngIf="productionReceipt.deliverySheet?.productionSheet?.productionOrder?.development?.clientReference">
+                                <i class="fa-solid fa-hashtag"></i>
+                                <span>{{
+                                    productionReceipt.deliverySheet.productionSheet.productionOrder.development.clientReference
+                                    }}</span>
+                            </div>
 
-                        <p class="card-small secondary mb-8"
-                            *ngIf="productionReceipt.deliverySheet?.productionSheet?.productionOrder?.development?.clientReference">
-                            {{
-                            productionReceipt.deliverySheet.productionSheet.productionOrder.development.clientReference
-                            }}</p>
+                            <div class="info-item" *ngIf="productionReceipt.paymentDate">
+                                <i class="fa-solid fa-calendar-check"></i>
+                                <span>Pagamento: {{ formatDate(productionReceipt.paymentDate) }}</span>
+                            </div>
 
-                        <hr>
+                            <div class="info-item" *ngIf="productionReceipt.totalAmount">
+                                <i class="fa-solid fa-dollar-sign"></i>
+                                <span>Valor: {{ formatCurrency(productionReceipt.totalAmount) }}</span>
+                            </div>
 
-                        <h4 class="body secondary mt-8 mb-0">{{ formatCurrency(productionReceipt.totalAmount) }}</h4>
+                            <div class="info-item" *ngIf="productionReceipt.paymentMethod">
+                                <i class="fa-solid fa-credit-card"></i>
+                                <span>Método: {{ getPaymentMethodLabel(productionReceipt.paymentMethod) }}</span>
+                            </div>
+
+                            <div class="info-item" *ngIf="productionReceipt.totalAmount">
+                                <i class="fa-solid fa-calculator"></i>
+                                <span>Quantidade: {{ productionReceipt.totalAmount }}</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="card-actions">

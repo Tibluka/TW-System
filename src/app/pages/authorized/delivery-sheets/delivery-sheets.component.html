@@ -15,47 +15,44 @@
 
 
     <div class="search-input">
-
-        <div class="w-100">
-            <ds-input label="Buscar ficha de entrega" placeholder="Digite referência interna, endereço..."
+        <div class="search-field">
+            <ds-input [fullWidth]="true" label="Buscar" placeholder="Digite referência interna, endereço..."
                 icon="fa-solid fa-magnifying-glass" iconPosition="left" [(ngModel)]="currentFilters.search"
-                (input)="onSearchChange()" width="100%">
-            </ds-input>
+                (ngModelChange)="onSearchChange()" />
         </div>
 
-        <div class="w-100">
-            <ds-select label="Filtrar por Status" [options]="statusOptions" [(ngModel)]="currentFilters.status"
-                (ngModelChange)="onStatusFilterChange()" width="100%">
-            </ds-select>
+        <div class="filters-row">
+            <div class="filter-field">
+                <ds-select [fullWidth]="true" label="Status" [options]="statusOptions"
+                    [(ngModel)]="currentFilters.status" (ngModelChange)="onStatusFilterChange()" />
+            </div>
+
+            <div class="filter-field">
+                <ds-select [fullWidth]="true" label="Cliente" [options]="clientOptions"
+                    [(ngModel)]="currentFilters.clientId" (ngModelChange)="onClientFilterChange()" />
+            </div>
         </div>
 
-        <div class="w-100">
-            <ds-select label="Filtrar por Cliente" [options]="clientOptions" [(ngModel)]="currentFilters.clientId"
-                (ngModelChange)="onClientFilterChange()" width="100%">
-            </ds-select>
+        <div class="date-filters">
+            <div class="date-field">
+                <ds-input [fullWidth]="true" label="Data Inicial" type="date"
+                    [(ngModel)]="currentFilters.deliveryDateFrom" (ngModelChange)="onDateFilterChange()" />
+            </div>
+
+            <div class="date-field">
+                <ds-input [fullWidth]="true" label="Data Final" type="date" [(ngModel)]="currentFilters.deliveryDateTo"
+                    (ngModelChange)="onDateFilterChange()" />
+            </div>
         </div>
 
-
-        <div class="w-100 date-filter-group">
-            <ds-input label="Data Inicial" type="date" [(ngModel)]="currentFilters.deliveryDateFrom"
-                (ngModelChange)="onDateFilterChange()" width="100%">
-            </ds-input>
-        </div>
-
-        <div class="w-100 date-filter-group">
-            <ds-input label="Data Final" type="date" [(ngModel)]="currentFilters.deliveryDateTo"
-                (ngModelChange)="onDateFilterChange()" width="100%">
-            </ds-input>
-        </div>
-
-
-        <div class="d-flex gap-16">
+        <div class="action-buttons">
             <ds-button label="Limpar Filtros" variant="outline" icon="fa-solid fa-eraser"
-                (onClickEmitter)="clearFilters()" [disabled]="!hasActiveFilters()">
+                (onClickEmitter)="clearFilters()" [disabled]="!hasActiveFilters()" class="clear-btn"
+                [fullWidth]="false">
             </ds-button>
 
             <ds-button label="Nova Ficha de Entrega" variant="fill" icon="fa-solid fa-plus"
-                (onClickEmitter)="createDeliverySheet()">
+                (onClickEmitter)="createDeliverySheet()" class="create-btn" [fullWidth]="false">
             </ds-button>
         </div>
     </div>
@@ -70,13 +67,12 @@
                     [loadingData]="shouldShowSpinner">
 
                     <ds-table-row [isHeader]="true">
-                        <ds-table-cell [isHeader]="true" align="left">Ref. Interna</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="left">Cliente</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="left" class="hide-on-tablet">Endereço</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left" class="hide-mobile">Ref. Interna</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left" class="hide-mobile">Cliente</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="left" class="hide-small">Endereço</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="center">Data de Entrega</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="center">Valor Total</ds-table-cell>
-                        <ds-table-cell [isHeader]="true" align="center" class="hide-on-mobile">Nota
-                            Fiscal</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center" class="hide-small">Valor Total</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center" class="hide-mobile">Nota Fiscal</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="center">Status</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
                     </ds-table-row>
@@ -85,7 +81,7 @@
                         (rowClick)="onDeliverySheetClick(deliverySheet)">
 
 
-                        <ds-table-cell align="left">
+                        <ds-table-cell align="left" class="hide-mobile">
                             <span class="body primary-dark">
                                 <span class="body primary-dark font-weight-medium">{{
                                     deliverySheet.internalReference }}</span>
@@ -95,7 +91,7 @@
                         </ds-table-cell>
 
 
-                        <ds-table-cell align="left">
+                        <ds-table-cell align="left" class="hide-mobile">
                             <div class="client-cell">
                                 <span class="body primary-dark">
                                     {{ deliverySheet.productionSheet?.productionOrder?.development?.client?.companyName
@@ -111,7 +107,7 @@
                         </ds-table-cell>
 
 
-                        <ds-table-cell align="left" class="hide-on-tablet">
+                        <ds-table-cell align="left" class="hide-small">
                             <div class="address-cell">
                                 <span class="body primary-dark">
                                     {{ deliverySheet.address.street }}
@@ -133,14 +129,14 @@
                         </ds-table-cell>
 
 
-                        <ds-table-cell align="center">
+                        <ds-table-cell align="center" class="hide-small">
                             <span class="body primary-dark font-weight-medium">
                                 {{ formatCurrency(deliverySheet.totalValue) }}
                             </span>
                         </ds-table-cell>
 
 
-                        <ds-table-cell align="center" class="hide-on-mobile">
+                        <ds-table-cell align="center" class="hide-mobile">
                             <span class="body secondary" *ngIf="deliverySheet.invoiceNumber; else noInvoice">
                                 {{ deliverySheet.invoiceNumber }}
                             </span>
@@ -167,26 +163,60 @@
             </div>
 
             <ng-template #cardTemplate let-deliverySheet>
-
-                <div class="delivery-sheet-card">
+                <div class="card-content" (click)="onDeliverySheetClick(deliverySheet)">
                     <div class="card-header">
-                        <h3 class="card-title">{{ deliverySheet.internalReference }}</h3>
-                        <ds-badge [text]="getStatusLabel(deliverySheet.status)" [status]="deliverySheet.status"
-                            entityType="delivery-sheet" />
+                        <div class="card-title-section">
+                            <h3 class="title-modal mb-4 secondary">{{ deliverySheet.internalReference }}</h3>
+                            <ds-badge [text]="getStatusLabel(deliverySheet.status)" [status]="deliverySheet.status"
+                                entityType="delivery-sheet" class="status-badge-mobile" />
+                        </div>
                     </div>
-                    <div class="card-content">
-                        <div class="info-row">
-                            <span class="label">Cliente:</span>
-                            <span class="value">{{ deliverySheet.client?.name || '-' }}</span>
+
+                    <div class="card-body">
+                        <div class="card-info">
+                            <div class="info-item"
+                                *ngIf="deliverySheet.productionSheet?.productionOrder?.development?.client?.companyName || deliverySheet.client?.companyName">
+                                <i class="fa-solid fa-building"></i>
+                                <span>{{
+                                    deliverySheet.productionSheet?.productionOrder?.development?.client?.companyName ||
+                                    deliverySheet.client?.companyName }}</span>
+                            </div>
+
+                            <div class="info-item" *ngIf="deliverySheet.address?.street">
+                                <i class="fa-solid fa-map-marker-alt"></i>
+                                <span>{{ deliverySheet.address.street }}</span>
+                            </div>
+
+                            <div class="info-item" *ngIf="deliverySheet.address?.city && deliverySheet.address?.state">
+                                <i class="fa-solid fa-city"></i>
+                                <span>{{ deliverySheet.address.city }}, {{ deliverySheet.address.state }}</span>
+                            </div>
+
+                            <div class="info-item" *ngIf="deliverySheet.deliveryDate">
+                                <i class="fa-solid fa-calendar-check"></i>
+                                <span>Entrega: {{ formatDate(deliverySheet.deliveryDate) }}</span>
+                            </div>
+
+                            <div class="info-item" *ngIf="deliverySheet.totalValue">
+                                <i class="fa-solid fa-dollar-sign"></i>
+                                <span>Valor: {{ formatCurrency(deliverySheet.totalValue) }}</span>
+                            </div>
+
+                            <div class="info-item" *ngIf="deliverySheet.invoiceNumber">
+                                <i class="fa-solid fa-file-invoice"></i>
+                                <span>NF: {{ deliverySheet.invoiceNumber }}</span>
+                            </div>
                         </div>
-                        <div class="info-row">
-                            <span class="label">Data de Entrega:</span>
-                            <span class="value">{{ formatDate(deliverySheet.deliveryDate) }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">Valor Total:</span>
-                            <span class="value">{{ formatCurrency(deliverySheet.totalValue) }}</span>
-                        </div>
+                    </div>
+
+                    <div class="card-actions">
+                        <ds-icon icon="fa-solid fa-arrow-right-arrow-left" color="label" fontSize="20px"
+                            cursorType="pointer"
+                            (click)="changeDeliverySheetStatus(deliverySheet); $event.stopPropagation()"
+                            title="Alterar Status" />
+
+                        <ds-icon icon="fa-solid fa-trash" color="label" fontSize="20px" cursorType="pointer"
+                            (click)="deleteDeliverySheet(deliverySheet); $event.stopPropagation()" title="Excluir" />
                     </div>
                 </div>
             </ng-template>
