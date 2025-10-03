@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../shared/services/auth/auth-service';
 import { ToastService } from '../../../shared/services/toast/toast.service';
 
-// DS Components
+
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
 import { CardComponent } from '../../../shared/components/organisms/card/card.component';
