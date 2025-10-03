@@ -44,15 +44,15 @@
         overflow-y: auto; // Permite scroll vertical no conteúdo
         overflow-x: hidden;
         background: var(--background); // Cor de fundo suave
-        padding: $spacing-xl $spacing-xxl;
+        padding: $spacing-lg $spacing-lg;
         transition: padding-top 0.3s ease;
 
         // Padding para mobile com header
         &.mobile-padding {
             @media (max-width: 600px) {
                 padding-top: calc(80px + #{$spacing-xl}); // Header height + padding
-                padding-left: $spacing-lg;
-                padding-right: $spacing-lg;
+                padding-left: $spacing-md;
+                padding-right: $spacing-md;
             }
         }
     }

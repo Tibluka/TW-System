@@ -4,24 +4,24 @@
 
 
     <div class="search-input">
-        <div class="w-100">
+        <div class="search-field">
             <ds-input [fullWidth]="true" label="Buscar" placeholder="Digite o nome do desenvolvimento, cliente, etc."
                 [(ngModel)]="currentFilters.search" (ngModelChange)="onSearchChange()" icon="fa-solid fa-search"
                 iconPosition="left" />
         </div>
 
-        <div class="w-100">
-            <ds-select label="Status" placeholder="Selecione o cliente" [(ngModel)]="currentFilters.status"
+        <div class="status-field">
+            <ds-select label="Status" placeholder="Selecione o status" [(ngModel)]="currentFilters.status"
                 (ngModelChange)="onSearchChange()" [options]="statusOption" [fullWidth]="true" />
         </div>
 
-        <div class="d-flex gap-16">
+        <div class="action-buttons">
             <ds-button label="Limpar Filtros" variant="outline" icon="fa-solid fa-eraser"
-                (onClickEmitter)="clearFilters()" [disabled]="!hasActiveFilters()">
+                (onClickEmitter)="clearFilters()" [disabled]="!hasActiveFilters()" class="clear-btn">
             </ds-button>
 
             <ds-button label="Novo desenvolvimento" icon="fa-solid fa-circle-plus"
-                (onClickEmitter)="createDevelopment()" />
+                (onClickEmitter)="createDevelopment()" class="create-btn" />
         </div>
     </div>
 
@@ -117,23 +117,45 @@
             </div>
             <ng-template #cardTemplate let-development>
                 <div class="card-content" (click)="onDevelopmentClick(development)">
-                    <img *ngIf="development.pieceImage.url" [src]="development.pieceImage.url"
-                        [alt]="development.internalReference" class="card-image" />
+                    <div class="card-header">
+                        <div class="card-image-container">
+                            <img *ngIf="development.pieceImage?.url" [src]="development.pieceImage.url"
+                                [alt]="development.internalReference" class="card-image" />
+                            <div *ngIf="!development.pieceImage?.url" class="no-image-placeholder">
+                                <i class="fa-solid fa-image"></i>
+                            </div>
+                        </div>
 
-                    <h3 class="title-modal mb-6 mt-8 secondary">{{ development.internalReference }}</h3>
+                        <div class="card-title-section">
+                            <h3 class="title-modal mb-4 secondary">{{ development.internalReference }}</h3>
+                            <ds-badge [text]="getStatusLabel(development.status)" [status]="development.status"
+                                entityType="development" class="status-badge-mobile" />
+                        </div>
+                    </div>
 
-                    <p class="subtitle-section secondary" *ngIf="development.client.companyName">{{
-                        development.client.companyName
-                        }}</p>
+                    <div class="card-body">
+                        <div class="card-info">
+                            <div class="info-item" *ngIf="development.client.companyName">
+                                <i class="fa-solid fa-building"></i>
+                                <span>{{ development.client.companyName }}</span>
+                            </div>
 
-                    <p class="card-small secondary mb-8" *ngIf="development.clientReference">{{
-                        development.clientReference
-                        }}</p>
+                            <div class="info-item" *ngIf="development.client.acronym">
+                                <i class="fa-solid fa-tag"></i>
+                                <span>{{ development.client.acronym }}</span>
+                            </div>
 
-                    <hr>
+                            <div class="info-item" *ngIf="development.clientReference">
+                                <i class="fa-solid fa-hashtag"></i>
+                                <span>{{ development.clientReference }}</span>
+                            </div>
 
-                    <h4 class="body secondary mt-8 mb-0"> {{ productionType(development.productionType!.type) }}
-                    </h4>
+                            <div class="info-item">
+                                <i class="fa-solid fa-cogs"></i>
+                                <span>{{ productionType(development.productionType!.type) }}</span>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="card-actions">
                         <ds-icon icon="fa-solid fa-arrow-right-arrow-left" color="label" fontSize="20px"
