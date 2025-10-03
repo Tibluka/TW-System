@@ -40,7 +40,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   @HostListener('window:resize')
   onWindowResize(): void {
 
-    if (window.innerWidth <= 768 && this.menuService.isCollapsed()) {
+    if (window.innerWidth <= 600 && this.menuService.isCollapsed()) {
       this.menuService.expand();
     }
   }
@@ -158,7 +158,7 @@ export class MenuComponent implements OnInit, OnDestroy {
    * Verifica se está em modo mobile
    */
   isMobile(): boolean {
-    return window.innerWidth <= 768;
+    return window.innerWidth <= 600;
   }
 
   /**
