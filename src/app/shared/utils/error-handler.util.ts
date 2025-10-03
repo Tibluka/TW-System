@@ -17,10 +17,10 @@ export class ErrorHandlerUtil {
     ): ErrorMapping {
         const processedError = errorHandlerService.processError(error);
 
-        // Usa título customizado se fornecido
+
         const finalError = customTitle ? { ...processedError, title: customTitle } : processedError;
 
-        // Mostra toast baseado no tipo
+
         switch (finalError.type) {
             case 'warning':
                 toastService.warning(finalError.message, finalError.title);
@@ -69,7 +69,7 @@ export class ErrorHandlerUtil {
     ): ErrorMapping {
         let processedError = errorHandlerService.processError(error);
 
-        // Adiciona contexto se fornecido
+
         if (context) {
             processedError = {
                 ...processedError,
@@ -77,7 +77,7 @@ export class ErrorHandlerUtil {
             };
         }
 
-        // Mostra toast
+
         switch (processedError.type) {
             case 'warning':
                 toastService.warning(processedError.message, processedError.title);

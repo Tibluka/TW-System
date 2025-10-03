@@ -16,13 +16,13 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return next.handle(request).pipe(
             catchError((error: HttpErrorResponse) => {
-                // Processa o erro usando o ErrorHandlerService
+
                 const processedError = this.errorHandlerService.processError(error);
 
-                // Mostra toast baseado no tipo de erro
+
                 this.showErrorToast(processedError);
 
-                // Retorna erro processado
+
                 return throwError(() => processedError);
             })
         );

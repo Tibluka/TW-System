@@ -412,7 +412,6 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
         this.deleteClient(client);
         break;
       default:
-        console.warn('Ação não reconhecida:', item.value);
     }
   }
 }

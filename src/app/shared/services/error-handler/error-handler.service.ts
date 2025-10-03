@@ -19,7 +19,7 @@ export interface ErrorMapping {
 export class ErrorHandlerService {
 
     private errorMappings: ErrorMapping[] = [
-        // === VALIDAÇÃO (1xxx) ===
+
         {
             code: '1001',
             message: 'Erro de validação nos dados fornecidos',
@@ -99,7 +99,7 @@ export class ErrorHandlerService {
             type: 'warning'
         },
 
-        // === NEGÓCIO (2xxx) ===
+
         {
             code: '2001',
             message: 'O desenvolvimento deve ser aprovado para criar ordem de produção',
@@ -173,7 +173,7 @@ export class ErrorHandlerService {
             type: 'warning'
         },
 
-        // === AUTENTICAÇÃO (3xxx) ===
+
         {
             code: '3001',
             message: 'Autenticação necessária para acessar este recurso',
@@ -217,7 +217,7 @@ export class ErrorHandlerService {
             type: 'warning'
         },
 
-        // === AUTORIZAÇÃO (4xxx) ===
+
         {
             code: '4001',
             message: 'Permissões insuficientes para realizar esta ação',
@@ -243,7 +243,7 @@ export class ErrorHandlerService {
             type: 'error'
         },
 
-        // === RECURSOS (5xxx) ===
+
         {
             code: '5001',
             message: 'Usuário não encontrado',
@@ -299,7 +299,7 @@ export class ErrorHandlerService {
             type: 'error'
         },
 
-        // === SISTEMA (6xxx) ===
+
         {
             code: '6001',
             message: 'Erro interno do banco de dados. Tente novamente mais tarde',
@@ -361,7 +361,7 @@ export class ErrorHandlerService {
             type: 'warning'
         },
 
-        // === ERRO DESCONHECIDO ===
+
         {
             code: 'UNKNOWN_SERVER_ERROR',
             message: 'Erro desconhecido do servidor. Tente novamente mais tarde.',
@@ -374,39 +374,22 @@ export class ErrorHandlerService {
      * 🎯 PROCESS ERROR - Processa erro do backend e retorna mensagem tratada
      */
     processError(error: any): ErrorMapping {
-        // Debug: log da estrutura do erro para entender melhor
-        console.log('🔍 ErrorHandler - Estrutura do erro:', {
-            hasOriginalError: !!error.originalError,
-            originalErrorCode: error.originalError?.code,
-            originalErrorMessage: error.originalError?.message,
-            errorCode: error.code,
-            errorMessage: error.message,
-            fullError: error
-        });
 
-        // Se já é um ErrorMapping, retorna como está
+
         if (error.code && error.message && error.title && error.type) {
             return error as ErrorMapping;
         }
 
-        // Estrutura específica do seu erro: error.originalError contém os dados reais
+
         if (error.originalError && error.originalError.code) {
             const originalError = error.originalError;
             const errorCode = originalError.code.toString(); // Converte para string
             const originalMessage = originalError.message || 'Erro desconhecido';
 
-            console.log('🔍 ErrorHandler - Processando originalError:', {
-                errorCode,
-                originalMessage,
-                title: originalError.title,
-                type: originalError.type
-            });
 
-            // Busca mapeamento pelo código
             const mapping = this.errorMappings.find(m => m.code === errorCode);
 
             if (mapping) {
-                console.log('✅ ErrorHandler - Mapeamento encontrado:', mapping);
                 return {
                     ...mapping,
                     message: mapping.message,
@@ -415,15 +398,13 @@ export class ErrorHandlerService {
                 };
             }
 
-            // Se não encontrou mapeamento, tenta mapear por mensagem em inglês
+
             const messageMapping = this.mapByEnglishMessage(originalMessage);
             if (messageMapping) {
-                console.log('✅ ErrorHandler - Mapeamento por mensagem encontrado:', messageMapping);
                 return messageMapping;
             }
 
-            // Fallback: retorna erro genérico com dados do originalError
-            console.log('⚠️ ErrorHandler - Usando fallback com originalError');
+
             return {
                 code: errorCode || 'UNKNOWN_SERVER_ERROR',
                 message: originalMessage || 'Erro desconhecido do servidor. Tente novamente mais tarde.',
@@ -432,21 +413,15 @@ export class ErrorHandlerService {
             };
         }
 
-        // Estrutura padrão: extrai código e mensagem do erro
+
         const errorCode = error.code || error.error?.code;
         const originalMessage = error.message || error.error?.message || 'Erro desconhecido';
 
-        console.log('🔍 ErrorHandler - Processando estrutura padrão:', {
-            errorCode,
-            originalMessage
-        });
 
-        // Se tem código, busca mapeamento
         if (errorCode) {
             const mapping = this.errorMappings.find(m => m.code === errorCode.toString());
 
             if (mapping) {
-                console.log('✅ ErrorHandler - Mapeamento padrão encontrado:', mapping);
                 return {
                     ...mapping,
                     message: mapping.message,
@@ -456,15 +431,13 @@ export class ErrorHandlerService {
             }
         }
 
-        // Se não encontrou mapeamento por código, tenta mapear por mensagem em inglês
+
         const messageMapping = this.mapByEnglishMessage(originalMessage);
         if (messageMapping) {
-            console.log('✅ ErrorHandler - Mapeamento por mensagem padrão encontrado:', messageMapping);
             return messageMapping;
         }
 
-        // Fallback: erro desconhecido do servidor
-        console.log('⚠️ ErrorHandler - Usando fallback para erro desconhecido');
+
         return {
             code: 'UNKNOWN_SERVER_ERROR',
             message: 'Erro desconhecido do servidor. Tente novamente mais tarde.',
@@ -478,7 +451,7 @@ export class ErrorHandlerService {
      */
     private mapByEnglishMessage(englishMessage: string): ErrorMapping | null {
         const messageMappings: { [key: string]: ErrorMapping } = {
-            // Validação
+
             'Invalid data': {
                 code: '1002',
                 message: 'Dados fornecidos são inválidos',
@@ -558,7 +531,7 @@ export class ErrorHandlerService {
                 type: 'warning'
             },
 
-            // Negócio
+
             'Development must be approved to create production order': {
                 code: '2001',
                 message: 'O desenvolvimento deve ser aprovado para criar ordem de produção',
@@ -632,7 +605,7 @@ export class ErrorHandlerService {
                 type: 'warning'
             },
 
-            // Autenticação
+
             'Authentication required': {
                 code: '3001',
                 message: 'Autenticação necessária para acessar este recurso',
@@ -676,7 +649,7 @@ export class ErrorHandlerService {
                 type: 'warning'
             },
 
-            // Autorização
+
             'Role required': {
                 code: '4002',
                 message: 'Função específica necessária para esta operação',
@@ -696,7 +669,7 @@ export class ErrorHandlerService {
                 type: 'error'
             },
 
-            // Recursos
+
             'User not found': {
                 code: '5001',
                 message: 'Usuário não encontrado',
@@ -752,7 +725,7 @@ export class ErrorHandlerService {
                 type: 'error'
             },
 
-            // Sistema
+
             'Database error': {
                 code: '6001',
                 message: 'Erro interno do banco de dados. Tente novamente mais tarde',

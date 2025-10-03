@@ -373,8 +373,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
                 }
             }
         } catch (error: any) {
-            // O interceptor já processa o erro e mostra o toast automaticamente
-            console.error('Erro ao salvar ficha de entrega:', error);
+
             this.showErrorMessage(error.message || 'Erro ao salvar ficha de entrega.');
         } finally {
             this.isSaving = false;

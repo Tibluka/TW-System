@@ -26,7 +26,7 @@ interface SelectOption {
   label: string;
 }
 
-/*  */
+
 @Component({
   selector: 'app-production-order-modal',
   imports: [
@@ -560,9 +560,7 @@ export class ProductionOrderModalComponent extends FormValidator implements OnIn
       }
 
     } catch (error: any) {
-      // O interceptor já processa o erro e mostra o toast automaticamente
-      // Não precisamos mostrar toast manual aqui
-      console.error('Erro ao salvar ordem de produção:', error);
+
 
     } finally {
       this.isSaving = false;

@@ -407,8 +407,6 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
         errorMessage = error.message;
       }
 
-      // O interceptor já processa o erro e mostra o toast automaticamente
-      console.error('Erro ao salvar ficha de produção:', error);
 
     } finally {
       this.isSaving = false;

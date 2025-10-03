@@ -416,8 +416,7 @@ export class ClientModalComponent implements OnInit {
       },
       error: (error) => {
         this.isSaving = false;
-        // O interceptor já processa o erro e mostra o toast automaticamente
-        console.error('Erro ao criar cliente:', error);
+
       }
     });
   }
@@ -438,8 +437,7 @@ export class ClientModalComponent implements OnInit {
       },
       error: (error) => {
         this.isSaving = false;
-        // O interceptor já processa o erro e mostra o toast automaticamente
-        console.error('Erro ao atualizar cliente:', error);
+
       }
     });
   }
