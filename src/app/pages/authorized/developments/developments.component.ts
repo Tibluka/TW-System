@@ -59,6 +59,7 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
   private developmentService = inject(DevelopmentService);
   private modalService = inject(ModalService);
   private listViewService = inject(ListViewService);
+  private toastService = inject(ToastService);
 
 
   developments: Development[] = [];
@@ -402,6 +403,7 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
    */
   onStatusUpdated(result: any): void {
     if (result.success) {
+      this.toastService.success('Status atualizado com sucesso!', 'Sucesso');
       this.showSuccessMessage(result.message);
       this.loadDevelopments(); // Recarregar lista
     }
@@ -411,6 +413,9 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
    * ❌ STATUS UPDATE FALHOU - Callback quando atualização falha
    */
   onStatusUpdateFailed(result: any): void {
+    this.toastService.error('Erro ao atualizar status', 'Falha na operação', {
+      message: result.error || 'Não foi possível atualizar o status.'
+    });
     this.showErrorMessage(result.error || 'Erro ao atualizar status');
   }
 
@@ -463,10 +468,14 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: () => {
+              this.toastService.success('Desenvolvimento excluído com sucesso!', 'Sucesso');
               this.showSuccessMessage(`Desenvolvimento ${development.internalReference} excluído com sucesso.`);
               this.loadDevelopments(); // Recarregar lista
             },
             error: (error) => {
+              this.toastService.error('Erro ao excluir desenvolvimento', 'Falha na operação', {
+                message: error.message || 'Não foi possível excluir o desenvolvimento.'
+              });
               this.showErrorMessage(error.message || 'Erro ao excluir desenvolvimento.');
             }
           });

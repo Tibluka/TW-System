@@ -24,6 +24,7 @@ import { ProductionReceiptModalComponent } from './production-receipt-modal/prod
 
 import { ModalService } from '../../../shared/services/modal/modal.service';
 import { ProductionReceiptService } from '../../../shared/services/production-receipt/production-receipt.service';
+import { ToastService } from '../../../shared/services/toast/toast.service';
 import { DateFormatter } from '../../../shared/utils/date-formatter';
 
 
@@ -78,6 +79,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   private productionReceiptService = inject(ProductionReceiptService);
   private modalService = inject(ModalService);
   private clientService = inject(ClientService);
+  private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
 
@@ -519,9 +521,13 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: () => {
+              this.toastService.success('Recibo de produção excluído com sucesso!', 'Sucesso');
               this.loadProductionReceipts(); // Recarregar lista
             },
             error: (error) => {
+              this.toastService.error('Erro ao excluir recibo de produção', 'Falha na operação', {
+                message: error.message || 'Não foi possível excluir o recibo de produção.'
+              });
             }
           });
       }
@@ -541,13 +547,15 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
 
   onStatusUpdated(result: any): void {
     if (result.success) {
+      this.toastService.success('Status atualizado com sucesso!', 'Sucesso');
       this.loadProductionReceipts();
-
     }
   }
 
   onStatusUpdateFailed(error: any): void {
-
+    this.toastService.error('Erro ao atualizar status', 'Falha na operação', {
+      message: error.error || 'Não foi possível atualizar o status.'
+    });
   }
 
   clearStatusUpdateSelection(): void {

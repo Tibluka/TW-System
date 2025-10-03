@@ -21,6 +21,7 @@ import { TableRowComponent } from '../../../shared/components/organisms/table/ta
 import { TableComponent } from '../../../shared/components/organisms/table/table.component';
 import { ModalService } from '../../../shared/services/modal/modal.service';
 import { ProductionOrderService } from '../../../shared/services/production-order/production-order.service';
+import { ToastService } from '../../../shared/services/toast/toast.service';
 import { FormValidator } from '../../../shared/utils/form';
 import { copyToClipboard, translateProductionType } from '../../../shared/utils/tools';
 import { DateFormatter } from '../../../shared/utils/date-formatter';
@@ -61,6 +62,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
   private productionOrderService = inject(ProductionOrderService);
   private modalService = inject(ModalService);
   private listViewService = inject(ListViewService);
+  private toastService = inject(ToastService);
 
 
   productionOrders: ProductionOrder[] = [];
@@ -444,6 +446,7 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
    */
   onStatusUpdated(result: any): void {
     if (result.success) {
+      this.toastService.success('Status atualizado com sucesso!', 'Sucesso');
       this.showSuccessMessage(result.message);
       this.loadProductionOrders(); // Recarregar lista
     }
@@ -453,6 +456,9 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
    * ❌ STATUS UPDATE FALHOU - Callback quando atualização falha
    */
   onStatusUpdateFailed(result: any): void {
+    this.toastService.error('Erro ao atualizar status', 'Falha na operação', {
+      message: result.error || 'Não foi possível atualizar o status.'
+    });
     this.showErrorMessage(result.error || 'Erro ao atualizar status');
   }
 
@@ -504,10 +510,14 @@ export class ProductionOrdersComponent extends FormValidator implements OnInit, 
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: () => {
+              this.toastService.success('Ordem de produção excluída com sucesso!', 'Sucesso');
               this.showSuccessMessage(`Ordem de produção ${productionOrder.internalReference} excluída com sucesso.`);
               this.loadProductionOrders(); // Recarregar lista
             },
             error: (error) => {
+              this.toastService.error('Erro ao excluir ordem de produção', 'Falha na operação', {
+                message: error.message || 'Não foi possível excluir a ordem de produção.'
+              });
               this.showErrorMessage(error.message || 'Erro ao excluir ordem de produção.');
             }
           });

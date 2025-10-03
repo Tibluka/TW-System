@@ -393,10 +393,13 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
 
       const response = await this.developmentService.uploadImage(developmentId, this.uploadedFiles[0].file).toPromise();
 
-
+      this.toastService.success('Imagem enviada com sucesso!', 'Upload Concluído');
       this.uploadedFiles = [];
 
     } catch (uploadError) {
+      this.toastService.error('Erro ao fazer upload da imagem', 'Falha no Upload', {
+        message: 'Desenvolvimento salvo mas imagem não foi enviada.'
+      });
       throw new Error('Erro ao fazer upload da imagem. Desenvolvimento salvo mas imagem não foi enviada.');
     }
   }
