@@ -30,7 +30,7 @@ export class ActionMenuComponent implements AfterViewInit {
     constructor(private elementRef: ElementRef) { }
 
     ngAfterViewInit() {
-        // Detectar quando o dropdown é aberto para calcular posição
+
     }
 
     toggleMenu(event: Event) {
@@ -38,7 +38,7 @@ export class ActionMenuComponent implements AfterViewInit {
         if (!this.disabled) {
             this.isOpen = !this.isOpen;
             if (this.isOpen) {
-                // Aguardar o próximo ciclo para que o DOM seja atualizado
+
                 setTimeout(() => {
                     this.calculateDropdownPosition();
                 }, 0);
@@ -66,21 +66,21 @@ export class ActionMenuComponent implements AfterViewInit {
         const viewportHeight = window.innerHeight;
         const viewportWidth = window.innerWidth;
 
-        // Estimar altura do dropdown baseada no número de itens
+
         const estimatedDropdownHeight = this.items.length * 40 + 16; // 40px por item + padding
 
-        // Calcular espaço disponível abaixo e acima do trigger
+
         const spaceBelow = viewportHeight - triggerRect.bottom;
         const spaceAbove = triggerRect.top;
 
-        // Determinar posição vertical
+
         if (spaceBelow < estimatedDropdownHeight && spaceAbove > estimatedDropdownHeight) {
             this.dropdownPosition = 'top';
         } else {
             this.dropdownPosition = 'bottom';
         }
 
-        // Aplicar posicionamento fixo para evitar problemas com overflow
+
         this.applyFixedPosition(triggerRect, dropdownElement);
     }
 
@@ -97,17 +97,17 @@ export class ActionMenuComponent implements AfterViewInit {
             top = triggerRect.bottom + 4;
         }
 
-        // Centralizar horizontalmente em relação ao trigger
+
         left = triggerRect.right - dropdownWidth;
 
-        // Ajustar se sair da tela
+
         if (left < 8) {
             left = 8;
         } else if (left + dropdownWidth > window.innerWidth - 8) {
             left = window.innerWidth - dropdownWidth - 8;
         }
 
-        // Aplicar posição fixa
+
         dropdownElement.style.position = 'fixed';
         dropdownElement.style.top = `${top}px`;
         dropdownElement.style.left = `${left}px`;
@@ -117,7 +117,7 @@ export class ActionMenuComponent implements AfterViewInit {
 
     @HostListener('document:click', ['$event'])
     onDocumentClick(event: Event) {
-        // Verificar se o clique foi fora do componente
+
         if (!this.elementRef.nativeElement.contains(event.target)) {
             this.isOpen = false;
         }
