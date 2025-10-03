@@ -403,7 +403,6 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
    */
   onStatusUpdated(result: any): void {
     if (result.success) {
-      this.toastService.success('Status atualizado com sucesso!', 'Sucesso');
       this.showSuccessMessage(result.message);
       this.loadDevelopments(); // Recarregar lista
     }
@@ -413,9 +412,7 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
    * ❌ STATUS UPDATE FALHOU - Callback quando atualização falha
    */
   onStatusUpdateFailed(result: any): void {
-    this.toastService.error('Erro ao atualizar status', 'Falha na operação', {
-      message: result.error || 'Não foi possível atualizar o status.'
-    });
+    // Toast já é mostrado pelo status-updater, não precisa duplicar
     this.showErrorMessage(result.error || 'Erro ao atualizar status');
   }
 

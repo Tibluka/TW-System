@@ -641,7 +641,6 @@ export class ProductionSheetsComponent extends FormValidator {
    */
   onStatusUpdated(result: any): void {
     if (result.success) {
-      this.toastService.success('Status atualizado com sucesso!', 'Sucesso');
       this.showSuccessMessage(result.message);
       this.loadProductionSheets(); // Recarregar lista
     }
@@ -651,9 +650,7 @@ export class ProductionSheetsComponent extends FormValidator {
    * ❌ STATUS UPDATE FALHOU - Callback quando atualização falha
    */
   onStatusUpdateFailed(result: any): void {
-    this.toastService.error('Erro ao atualizar status', 'Falha na operação', {
-      message: result.error || 'Não foi possível atualizar o status.'
-    });
+    // Toast já é mostrado pelo status-updater, não precisa duplicar
     this.showErrorMessage(result.error || 'Erro ao atualizar estágio');
   }
 

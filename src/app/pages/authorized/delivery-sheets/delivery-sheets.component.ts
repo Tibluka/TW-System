@@ -121,8 +121,6 @@ export class DeliverySheetsComponent extends FormValidator {
 
     actionMenuItems: ActionMenuItem[] = [
         { value: 'change-status', label: 'Alterar Status', icon: 'fa-solid fa-arrow-right' },
-        { value: 'edit', label: 'Editar', icon: 'fa-solid fa-edit' },
-        { value: 'copy-reference', label: 'Copiar Referência', icon: 'fa-solid fa-copy' },
         { value: 'delete', label: 'Excluir', icon: 'fa-solid fa-trash' }
     ];
 
@@ -458,7 +456,6 @@ export class DeliverySheetsComponent extends FormValidator {
      */
     onStatusUpdated(result: any): void {
         if (result.success) {
-            this.toastService.success('Status atualizado com sucesso!', 'Sucesso');
             this.showSuccessMessage(result.message);
             this.loadDeliverySheets(); // Recarregar lista
         }
@@ -468,9 +465,7 @@ export class DeliverySheetsComponent extends FormValidator {
      * ❌ STATUS UPDATE FALHOU - Callback quando atualização falha
      */
     onStatusUpdateFailed(result: any): void {
-        this.toastService.error('Erro ao atualizar status', 'Falha na operação', {
-            message: result.error || 'Não foi possível atualizar o status.'
-        });
+        // Toast já é mostrado pelo status-updater, não precisa duplicar
         this.showErrorMessage(result.error || 'Erro ao atualizar status');
     }
 

@@ -101,7 +101,7 @@ export class StatusUpdaterComponent {
             showCloseButton: true,
             closeOnBackdropClick: true,
             closeOnEscapeKey: true
-        }).subscribe(result => {
+        }).subscribe(() => {
             this.closeModal();
         });
 

@@ -287,10 +287,8 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
 
           this.cdr.detectChanges();
         },
-        error: (error: any) => {
+        error: () => {
           this.loading = false;
-
-
           this.cdr.detectChanges();
 
         }
@@ -440,12 +438,6 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
         value: 'update-status',
         icon: 'fa-solid fa-refresh',
         disabled: false
-      },
-      {
-        label: 'Excluir',
-        value: 'delete',
-        icon: 'fa-solid fa-trash',
-        disabled: false
       }
     ];
 
@@ -547,15 +539,12 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
 
   onStatusUpdated(result: any): void {
     if (result.success) {
-      this.toastService.success('Status atualizado com sucesso!', 'Sucesso');
       this.loadProductionReceipts();
     }
   }
 
   onStatusUpdateFailed(error: any): void {
-    this.toastService.error('Erro ao atualizar status', 'Falha na operação', {
-      message: error.error || 'Não foi possível atualizar o status.'
-    });
+    // Toast já é mostrado pelo status-updater, não precisa duplicar
   }
 
   clearStatusUpdateSelection(): void {
