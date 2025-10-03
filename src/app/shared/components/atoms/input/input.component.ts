@@ -36,17 +36,15 @@ export class InputComponent implements OnInit, OnDestroy, ControlValueAccessor {
   @Input() helperText: string = '';
   @Input() fullWidth: boolean = false;
   @Input() width: string = 'fit-content';
-
-
   @Input() mask: string = '';
   @Input() dropSpecialCharacters: boolean = false;
-
-
   @Input() ngModel: any;
+
   @Output() ngModelChange = new EventEmitter<any>();
-
-
   @Output() valueChanged = new EventEmitter<string>();
+  @Output() keyup = new EventEmitter<any>();
+  @Output() keydown = new EventEmitter<any>();
+  @Output() keypress = new EventEmitter<any>();
 
 
   value: string = '';

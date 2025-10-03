@@ -1,14 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { IconComponent } from '../../../../../shared/components/atoms/icon/icon.component';
 import { InputComponent } from '../../../../../shared/components/atoms/input/input.component';
 import { SelectComponent, SelectOption } from '../../../../../shared/components/atoms/select/select.component';
+import { AddressService, AddressFormatted } from '../../../../../shared/services/address/address.service';
+import { ToastService } from '../../../../../shared/services/toast/toast.service';
+import { AddressUtil } from '../../../../../shared/utils/address.util';
 
 @Component({
   selector: 'app-address-data',
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    IconComponent,
     InputComponent,
     SelectComponent
   ],
@@ -18,6 +23,11 @@ import { SelectComponent, SelectOption } from '../../../../../shared/components/
 export class AddressDataComponent implements OnInit {
 
   @Input() parentForm!: FormGroup;
+
+  private addressService = inject(AddressService);
+  private toastService = inject(ToastService);
+
+  isLoadingCep = false;
 
   brazilianStates: SelectOption[] = [
     { value: 'AC', label: 'AC' },
@@ -100,8 +110,65 @@ export class AddressDataComponent implements OnInit {
 
   onCepBlur(): void {
     const cep = this.parentForm.get('zipcode')?.value;
-    if (cep && cep.length === 9) {
 
+    if (cep && cep.length === 9) {
+      this.searchAddressByCep(cep);
     }
+  }
+
+  /**
+   * 🔍 SEARCH ADDRESS BY CEP - Busca endereço por CEP e preenche os campos
+   */
+  private searchAddressByCep(cep: string): void {
+
+    const cleanCep = AddressUtil.formatCepForInput(cep);
+
+
+    if (!this.addressService.validateCep(cleanCep)) {
+      this.toastService.warning('CEP inválido', 'Digite um CEP com 8 dígitos');
+      return;
+    }
+
+    this.isLoadingCep = true;
+
+    this.parentForm.get('zipcode')?.disable();
+
+    this.addressService.getAddressByCep(cleanCep).subscribe({
+      next: (address) => {
+        this.isLoadingCep = false;
+        this.fillAddressFields(address);
+        this.toastService.success('Endereço encontrado!', 'CEP válido');
+
+        this.parentForm.get('zipcode')?.enable();
+      },
+      error: (error) => {
+        this.isLoadingCep = false;
+        const errorMsg = error.message || 'Erro ao buscar endereço';
+        this.toastService.error('Erro ao buscar CEP', errorMsg);
+
+        this.parentForm.get('zipcode')?.enable();
+      }
+    });
+  }
+
+  /**
+   * 📝 FILL ADDRESS FIELDS - Preenche os campos de endereço com os dados da API
+   */
+  private fillAddressFields(address: AddressFormatted): void {
+    this.parentForm.patchValue({
+      street: address.street,
+      neighborhood: address.neighborhood,
+      city: address.city,
+      state: address.state,
+
+      number: this.parentForm.get('number')?.value || '',
+      complement: this.parentForm.get('complement')?.value || ''
+    });
+
+
+    this.parentForm.get('street')?.markAsTouched();
+    this.parentForm.get('neighborhood')?.markAsTouched();
+    this.parentForm.get('city')?.markAsTouched();
+    this.parentForm.get('state')?.markAsTouched();
   }
 }
