@@ -9,14 +9,14 @@ export function copyToClipboard(internalReference: string, event?: MouseEvent) {
     }
     if (navigator && navigator.clipboard) {
         navigator.clipboard.writeText(internalReference).then(() => {
-            // Mostrar toast de sucesso
+
             showToast('success', 'Copiado!', `"${internalReference}" copiado para a área de transferência.`);
         }).catch(err => {
-            // Mostrar toast de erro
+
             showToast('error', 'Erro ao copiar', 'Não foi possível copiar o texto para a área de transferência.');
         });
     } else {
-        // Fallback para navegadores mais antigos
+
         try {
             const textArea = document.createElement('textarea');
             textArea.value = internalReference;
@@ -42,7 +42,7 @@ function showToast(type: 'success' | 'error' | 'warning' | 'info', title: string
             closable: true
         });
     } else {
-        // Fallback para alert se o toast não estiver disponível
+
         alert(`${title}: ${message}`);
     }
 }

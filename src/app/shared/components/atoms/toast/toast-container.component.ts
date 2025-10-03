@@ -12,12 +12,12 @@ export class ToastContainerComponent implements OnInit, OnDestroy {
     toasts: ToastConfig[] = [];
 
     ngOnInit(): void {
-        // Registrar o container globalmente para receber toasts
+
         (window as any).toastContainer = this;
     }
 
     ngOnDestroy(): void {
-        // Limpar referência global
+
         if ((window as any).toastContainer === this) {
             delete (window as any).toastContainer;
         }
@@ -32,7 +32,7 @@ export class ToastContainerComponent implements OnInit, OnDestroy {
 
         this.toasts.push(toast);
 
-        // Auto-remove após a duração especificada
+
         if (toast.duration && toast.duration > 0) {
             setTimeout(() => {
                 this.removeToast(toast);
@@ -51,7 +51,7 @@ export class ToastContainerComponent implements OnInit, OnDestroy {
         this.toasts = [];
     }
 
-    // Métodos de conveniência para cada tipo
+
     success(message: string, title?: string, options?: Partial<ToastConfig>): void {
         this.addToast({
             type: 'success',

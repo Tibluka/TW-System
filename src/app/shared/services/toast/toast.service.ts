@@ -15,7 +15,6 @@ export class ToastService {
         if (container) {
             container.addToast(config);
         } else {
-            console.warn('Toast container not found. Make sure ds-toast-container is added to your app.');
         }
     }
 

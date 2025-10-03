@@ -25,7 +25,7 @@ export class ToastComponent implements OnInit, OnDestroy {
     private timeoutId?: number;
 
     ngOnInit(): void {
-        // Auto-close se duration for definido
+
         if (this.config.duration && this.config.duration > 0) {
             this.timeoutId = window.setTimeout(() => {
                 this.closeToast();
@@ -48,7 +48,7 @@ export class ToastComponent implements OnInit, OnDestroy {
             return this.config.icon;
         }
 
-        // Ícones padrão baseados no tipo
+
         const defaultIcons: Record<ToastType, string> = {
             success: 'fa-solid fa-check-circle',
             error: 'fa-solid fa-exclamation-circle',
