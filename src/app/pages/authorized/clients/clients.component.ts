@@ -10,6 +10,7 @@ import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { IconComponent } from '../../../shared/components/atoms/icon/icon.component';
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
+import { GeneralModalContentComponent } from '../../../shared/components/general/general-modal-content/general-modal-content.component';
 import { DsListViewComponent } from '../../../shared/components/molecules/list-view/list-view.component';
 import { ModalComponent } from "../../../shared/components/organisms/modal/modal.component";
 import { TableCellComponent } from '../../../shared/components/organisms/table/table-cell/table-cell.component';
@@ -31,6 +32,7 @@ import { ClientModalComponent } from "./client-modal/client-modal.component";
     ReactiveFormsModule,
     InputComponent,
     FormsModule,
+    GeneralModalContentComponent,
     DsListViewComponent,
     TableComponent,
     TableRowComponent,
@@ -60,7 +62,7 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
   pagination: PaginationInfo | null = null;
   loading = false;
 
-  // Action Menu
+
   actionMenuItems: ActionMenuItem[] = [
     {
       label: 'Editar',
