@@ -17,6 +17,7 @@ import { IconComponent } from '../../../../shared/components/atoms/icon/icon.com
 import { ProductionReceiptService } from '../../../../shared/services/production-receipt/production-receipt.service';
 import { DeliverySheetsService } from '../../../../shared/services/delivery-sheets/delivery-sheets.service';
 import { ModalService } from '../../../../shared/services/modal/modal.service';
+import { ToastService } from '../../../../shared/services/toast/toast.service';
 
 
 import {
@@ -57,6 +58,7 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
   private productionReceiptService = inject(ProductionReceiptService);
   private deliverySheetsService = inject(DeliverySheetsService);
   private modalService = inject(ModalService);
+  private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
 
@@ -327,12 +329,13 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
         await this.createProductionReceipt(formData as CreateProductionReceiptRequest);
       }
 
+      this.toastService.success('Recibo de produção salvo com sucesso!', 'Sucesso');
       this.modalService.close('production-receipt-modal', {
         action: 'saved',
         data: formData
       });
 
-    } catch (error) {
+    } catch (error: any) {
 
     } finally {
       this.submitting = false;

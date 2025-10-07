@@ -22,6 +22,7 @@ import { TableComponent } from '../../../shared/components/organisms/table/table
 import { DevelopmentService } from '../../../shared/services/development/development.service';
 import { ListViewService, ViewMode } from '../../../shared/services/list-view/list-view.service';
 import { ModalService } from '../../../shared/services/modal/modal.service';
+import { ToastService } from '../../../shared/services/toast/toast.service';
 import { FormValidator } from '../../../shared/utils/form';
 import { copyToClipboard, translateDevelopmentStatus, translateProductionType } from '../../../shared/utils/tools';
 import { DevelopmentModalComponent } from "./development-modal/development-modal.component";
@@ -58,6 +59,7 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
   private developmentService = inject(DevelopmentService);
   private modalService = inject(ModalService);
   private listViewService = inject(ListViewService);
+  private toastService = inject(ToastService);
 
 
   developments: Development[] = [];
@@ -410,6 +412,7 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
    * ❌ STATUS UPDATE FALHOU - Callback quando atualização falha
    */
   onStatusUpdateFailed(result: any): void {
+
     this.showErrorMessage(result.error || 'Erro ao atualizar status');
   }
 
@@ -462,10 +465,14 @@ export class DevelopmentsComponent extends FormValidator implements OnInit, OnDe
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: () => {
+              this.toastService.success('Desenvolvimento excluído com sucesso!', 'Sucesso');
               this.showSuccessMessage(`Desenvolvimento ${development.internalReference} excluído com sucesso.`);
               this.loadDevelopments(); // Recarregar lista
             },
             error: (error) => {
+              this.toastService.error('Erro ao excluir desenvolvimento', 'Falha na operação', {
+                message: error.message || 'Não foi possível excluir o desenvolvimento.'
+              });
               this.showErrorMessage(error.message || 'Erro ao excluir desenvolvimento.');
             }
           });

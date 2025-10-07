@@ -21,6 +21,7 @@ import { TableRowComponent } from '../../../shared/components/organisms/table/ta
 import { ModalService } from '../../../shared/services/modal/modal.service';
 import { DeliverySheetsService } from '../../../shared/services/delivery-sheets/delivery-sheets.service';
 import { ClientService } from '../../../shared/services/clients/clients.service';
+import { ToastService } from '../../../shared/services/toast/toast.service';
 import { FormValidator } from '../../../shared/utils/form';
 import { DeliverySheetModalComponent } from './delivery-sheet-modal/delivery-sheet-modal.component';
 import { copyToClipboard } from '../../../shared/utils/tools';
@@ -56,6 +57,7 @@ export class DeliverySheetsComponent extends FormValidator {
     private modalService = inject(ModalService);
     private deliverySheetsService = inject(DeliverySheetsService);
     private clientsService = inject(ClientService);
+    private toastService = inject(ToastService);
 
 
     deliverySheets: DeliverySheet[] = [];
@@ -119,8 +121,6 @@ export class DeliverySheetsComponent extends FormValidator {
 
     actionMenuItems: ActionMenuItem[] = [
         { value: 'change-status', label: 'Alterar Status', icon: 'fa-solid fa-arrow-right' },
-        { value: 'edit', label: 'Editar', icon: 'fa-solid fa-edit' },
-        { value: 'copy-reference', label: 'Copiar Referência', icon: 'fa-solid fa-copy' },
         { value: 'delete', label: 'Excluir', icon: 'fa-solid fa-trash' }
     ];
 
@@ -465,6 +465,7 @@ export class DeliverySheetsComponent extends FormValidator {
      * ❌ STATUS UPDATE FALHOU - Callback quando atualização falha
      */
     onStatusUpdateFailed(result: any): void {
+
         this.showErrorMessage(result.error || 'Erro ao atualizar status');
     }
 
@@ -526,10 +527,14 @@ export class DeliverySheetsComponent extends FormValidator {
                     .pipe(takeUntil(this.destroy$))
                     .subscribe({
                         next: () => {
+                            this.toastService.success('Ficha de entrega excluída com sucesso!', 'Sucesso');
                             this.showSuccessMessage(`Ficha de entrega ${deliverySheet.internalReference} excluída com sucesso.`);
                             this.loadDeliverySheets(); // Recarregar lista
                         },
                         error: (error) => {
+                            this.toastService.error('Erro ao excluir ficha de entrega', 'Falha na operação', {
+                                message: error.message || 'Não foi possível excluir a ficha de entrega.'
+                            });
                             this.showErrorMessage(error.message || 'Erro ao excluir ficha de entrega.');
                         }
                     });

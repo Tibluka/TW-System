@@ -24,6 +24,7 @@ import { ProductionReceiptModalComponent } from './production-receipt-modal/prod
 
 import { ModalService } from '../../../shared/services/modal/modal.service';
 import { ProductionReceiptService } from '../../../shared/services/production-receipt/production-receipt.service';
+import { ToastService } from '../../../shared/services/toast/toast.service';
 import { DateFormatter } from '../../../shared/utils/date-formatter';
 
 
@@ -78,6 +79,7 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   private productionReceiptService = inject(ProductionReceiptService);
   private modalService = inject(ModalService);
   private clientService = inject(ClientService);
+  private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
 
@@ -285,10 +287,8 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
 
           this.cdr.detectChanges();
         },
-        error: (error: any) => {
+        error: () => {
           this.loading = false;
-
-
           this.cdr.detectChanges();
 
         }
@@ -429,20 +429,9 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   getActionMenuItems(receipt: ProductionReceipt): ActionMenuItem[] {
     const items: ActionMenuItem[] = [
       {
-        label: 'Editar',
-        value: 'edit',
-        icon: 'fa-solid fa-edit'
-      },
-      {
         label: 'Atualizar Status',
         value: 'update-status',
         icon: 'fa-solid fa-refresh',
-        disabled: false
-      },
-      {
-        label: 'Excluir',
-        value: 'delete',
-        icon: 'fa-solid fa-trash',
         disabled: false
       }
     ];
@@ -519,9 +508,13 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: () => {
+              this.toastService.success('Recibo de produção excluído com sucesso!', 'Sucesso');
               this.loadProductionReceipts(); // Recarregar lista
             },
             error: (error) => {
+              this.toastService.error('Erro ao excluir recibo de produção', 'Falha na operação', {
+                message: error.message || 'Não foi possível excluir o recibo de produção.'
+              });
             }
           });
       }
@@ -542,7 +535,6 @@ export class ProductionReceiptComponent extends FormValidator implements OnInit,
   onStatusUpdated(result: any): void {
     if (result.success) {
       this.loadProductionReceipts();
-
     }
   }
 

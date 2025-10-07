@@ -256,10 +256,6 @@
         transition: all 0.2s ease;
         cursor: pointer;
 
-        &:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-        }
 
         .card-header {
             display: flex;
@@ -354,10 +350,6 @@
                 padding: $spacing-xs;
                 border-radius: var(--border-radius-sm);
                 transition: background-color 0.2s ease;
-
-                &:hover {
-                    background-color: var(--neutral-light);
-                }
             }
         }
 

@@ -1,11 +1,11 @@
-
 <form [formGroup]="parentForm" class="address-form">
 
 
     <div class="cep-field">
         <ds-input label="CEP" placeholder="12345-678" formControlName="zipcode" [fullWidth]="true" [required]="true"
             [invalid]="isFieldInvalid('zipcode')" [errorMessage]="getErrorMessage('zipcode')" mask="00000-000"
-            icon="fa-solid fa-map-pin" iconPosition="left" (blur)="onCepBlur()">
+            [icon]="isLoadingCep ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-map-pin'" iconPosition="left"
+            (keyup)="onCepBlur()">
         </ds-input>
     </div>
 
