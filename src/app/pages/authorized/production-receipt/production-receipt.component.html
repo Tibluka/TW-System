@@ -220,12 +220,12 @@
                     </div>
 
                     <div class="card-actions">
-                        <ds-icon icon="fa-solid fa-arrow-right-arrow-left" color="label" fontSize="20px"
-                            cursorType="pointer"
+                        <ds-icon icon="fa-solid fa-refresh" color="label" fontSize="20px" cursorType="pointer"
                             (click)="openStatusUpdater(productionReceipt); $event.stopPropagation()"
-                            title="Alterar Status" />
+                            title="Atualizar Status" />
 
-                        <ds-icon icon="fa-solid fa-trash" color="label" fontSize="20px" cursorType="pointer"
+                        <ds-icon *ngIf="productionReceipt.paymentStatus !== 'PAID'" icon="fa-solid fa-trash"
+                            color="label" fontSize="20px" cursorType="pointer"
                             (click)="deleteProductionReceipt(productionReceipt); $event.stopPropagation()"
                             title="Excluir" />
                     </div>

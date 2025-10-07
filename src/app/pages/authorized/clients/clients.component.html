@@ -39,6 +39,7 @@
                         <ds-table-cell [isHeader]="true" align="left">Email</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="center">Valor por Metro</ds-table-cell>
                         <ds-table-cell [isHeader]="true" align="left">Responsável</ds-table-cell>
+                        <ds-table-cell [isHeader]="true" align="center">Ações</ds-table-cell>
                     </ds-table-row>
 
 
@@ -96,6 +97,12 @@
                                 </div>
                             </div>
                         </ds-table-cell>
+
+                        <ds-table-cell align="center">
+                            <ds-action-menu [items]="actionMenuItems"
+                                (itemSelected)="onActionMenuSelect(client, $event)">
+                            </ds-action-menu>
+                        </ds-table-cell>
                     </ds-table-row>
                 </ds-table>
             </div>
@@ -134,6 +141,9 @@
 
 
 <ds-modal *ngIf="isModalOpen" modalId="client-modal" (modalClosed)="onModalClosed($event)">
-
     <app-client-modal></app-client-modal>
+</ds-modal>
+
+<ds-modal modalId="general-modal">
+    <app-general-modal-content></app-general-modal-content>
 </ds-modal>

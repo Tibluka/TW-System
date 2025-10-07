@@ -10,9 +10,39 @@ export function copyToClipboard(internalReference: string, event?: MouseEvent) {
     if (navigator && navigator.clipboard) {
         navigator.clipboard.writeText(internalReference).then(() => {
 
+            showToast('success', 'Copiado!', `"${internalReference}" copiado para a área de transferência.`);
         }).catch(err => {
-            alert('Erro ao copiar')
+
+            showToast('error', 'Erro ao copiar', 'Não foi possível copiar o texto para a área de transferência.');
         });
+    } else {
+
+        try {
+            const textArea = document.createElement('textarea');
+            textArea.value = internalReference;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showToast('success', 'Copiado!', `"${internalReference}" copiado para a área de transferência.`);
+        } catch (err) {
+            showToast('error', 'Erro ao copiar', 'Não foi possível copiar o texto para a área de transferência.');
+        }
+    }
+}
+
+function showToast(type: 'success' | 'error' | 'warning' | 'info', title: string, message: string): void {
+    const container = (window as any).toastContainer;
+    if (container) {
+        container.addToast({
+            type,
+            title,
+            message,
+            duration: type === 'error' ? 7000 : 5000,
+            closable: true
+        });
+    } else {
+
     }
 }
 

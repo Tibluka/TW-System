@@ -5,6 +5,7 @@ import { TabConfig, TabsComponent } from '../../../../shared/components/molecule
 import { ButtonComponent } from '../../../../shared/components/atoms/button/button.component';
 import { ModalService } from '../../../../shared/services/modal/modal.service';
 import { ClientService } from '../../../../shared/services/clients/clients.service';
+import { ToastService } from '../../../../shared/services/toast/toast.service';
 import { BrazilianState, Client, CreateClientRequest, UpdateClientRequest } from '../../../../models/clients/clients';
 import { CompanyDataComponent } from "./company-data/company-data.component";
 import { ContactDataComponent } from "./contact-data/contact-data.component";
@@ -33,6 +34,7 @@ export class ClientModalComponent implements OnInit {
   modalService = inject(ModalService);
   private formBuilder = inject(FormBuilder);
   private clientService = inject(ClientService);
+  private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
   currentTab = 'company';
@@ -406,7 +408,7 @@ export class ClientModalComponent implements OnInit {
     this.clientService.createClient(clientData).subscribe({
       next: (response) => {
         this.isSaving = false;
-
+        this.toastService.success('Cliente criado com sucesso!', 'Sucesso');
         this.modalService.close('client-modal', {
           action: 'created',
           data: response.data
@@ -427,7 +429,7 @@ export class ClientModalComponent implements OnInit {
     this.clientService.updateClient(this.clientForm.value._id, clientData).subscribe({
       next: (response) => {
         this.isSaving = false;
-
+        this.toastService.success('Cliente atualizado com sucesso!', 'Sucesso');
         this.modalService.close('client-modal', {
           action: 'updated',
           data: response.data

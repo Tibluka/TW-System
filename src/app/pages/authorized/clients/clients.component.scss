@@ -116,9 +116,6 @@
             align-items: center;
             justify-content: center;
 
-            &:hover {
-                transform: scale(1.1);
-            }
         }
     }
 
@@ -179,9 +176,6 @@
             display: flex;
             align-items: center;
 
-            &:hover {
-                text-decoration: underline;
-            }
 
             i {
                 color: $label;

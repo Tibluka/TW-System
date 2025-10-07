@@ -14,6 +14,7 @@ import { FileUploadComponent, UploadedFile } from '../../../../shared/components
 import { ClientService } from '../../../../shared/services/clients/clients.service';
 import { DevelopmentService } from '../../../../shared/services/development/development.service';
 import { ModalService } from '../../../../shared/services/modal/modal.service';
+import { ToastService } from '../../../../shared/services/toast/toast.service';
 import { FormValidator } from '../../../../shared/utils/form';
 
 interface SelectOption {
@@ -45,6 +46,7 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
   private formBuilder = inject(FormBuilder);
   private developmentService = inject(DevelopmentService);
   private clientService = inject(ClientService);
+  private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
   isLoading = false;
@@ -341,6 +343,7 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
           await this.uploadImageToDevelopment(result._id);
         }
 
+        this.toastService.success('Desenvolvimento atualizado com sucesso!', 'Sucesso');
         this.modalService.close('development-modal', {
           action: 'updated',
           data: result
@@ -360,6 +363,7 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
           await this.uploadImageToDevelopment(result._id);
         }
 
+        this.toastService.success('Desenvolvimento criado com sucesso!', 'Sucesso');
         this.modalService.close('development-modal', {
           action: 'created',
           data: result
@@ -367,7 +371,7 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
       }
 
     } catch (error: any) {
-      alert(error.message || 'Erro ao salvar desenvolvimento. Tente novamente.');
+
     } finally {
       this.isSaving = false;
     }
@@ -391,6 +395,9 @@ export class DevelopmentModalComponent extends FormValidator implements OnInit {
       this.uploadedFiles = [];
 
     } catch (uploadError) {
+      this.toastService.error('Erro ao fazer upload da imagem', 'Falha no Upload', {
+        message: 'Desenvolvimento salvo mas imagem não foi enviada.'
+      });
       throw new Error('Erro ao fazer upload da imagem. Desenvolvimento salvo mas imagem não foi enviada.');
     }
   }

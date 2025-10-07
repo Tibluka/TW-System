@@ -6,16 +6,21 @@ import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
 
 import { Client, ClientFilters, ClientListResponse, PaginationInfo } from '../../../models/clients/clients';
+import { ActionMenuComponent, ActionMenuItem } from '../../../shared/components/atoms/action-menu/action-menu.component';
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
 import { IconComponent } from '../../../shared/components/atoms/icon/icon.component';
 import { InputComponent } from '../../../shared/components/atoms/input/input.component';
+import { GeneralModalContentComponent } from '../../../shared/components/general/general-modal-content/general-modal-content.component';
 import { DsListViewComponent } from '../../../shared/components/molecules/list-view/list-view.component';
 import { ModalComponent } from "../../../shared/components/organisms/modal/modal.component";
 import { TableCellComponent } from '../../../shared/components/organisms/table/table-cell/table-cell.component';
 import { TableRowComponent } from '../../../shared/components/organisms/table/table-row/table-row.component';
 import { TableComponent } from '../../../shared/components/organisms/table/table.component';
 import { ClientService } from '../../../shared/services/clients/clients.service';
+import { ErrorHandlerService } from '../../../shared/services/error-handler/error-handler.service';
 import { ModalService } from '../../../shared/services/modal/modal.service';
+import { ToastService } from '../../../shared/services/toast/toast.service';
+import { ErrorHandlerUtil } from '../../../shared/utils/error-handler.util';
 import { FormValidator } from '../../../shared/utils/form';
 import { ClientModalComponent } from "./client-modal/client-modal.component";
 
@@ -23,11 +28,13 @@ import { ClientModalComponent } from "./client-modal/client-modal.component";
   selector: 'app-clients',
   imports: [
     CommonModule,
+    ActionMenuComponent,
     ButtonComponent,
     IconComponent,
     ReactiveFormsModule,
     InputComponent,
     FormsModule,
+    GeneralModalContentComponent,
     DsListViewComponent,
     TableComponent,
     TableRowComponent,
@@ -45,7 +52,9 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
   isModalOpen: boolean = false;
 
   private clientService = inject(ClientService);
+  private errorHandlerService = inject(ErrorHandlerService);
   private modalService = inject(ModalService);
+  private toastService = inject(ToastService);
 
 
   cnpjMask: string = '00.000.000/0000-00';
@@ -55,6 +64,20 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
   clients: Client[] = [];
   pagination: PaginationInfo | null = null;
   loading = false;
+
+
+  actionMenuItems: ActionMenuItem[] = [
+    {
+      label: 'Editar',
+      value: 'edit',
+      icon: 'fa-solid fa-edit'
+    },
+    {
+      label: 'Excluir',
+      value: 'delete',
+      icon: 'fa-solid fa-trash'
+    }
+  ];
 
 
   listViewConfig = {
@@ -110,9 +133,16 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: () => {
+              this.toastService.success('Cliente excluído com sucesso!', 'Sucesso');
               this.loadClients(); // Recarregar lista
             },
             error: (error) => {
+              ErrorHandlerUtil.handleSubscriptionError(
+                error,
+                this.errorHandlerService,
+                this.toastService,
+                'Exclusão de cliente'
+              );
             }
           });
       }
@@ -209,6 +239,7 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
    * ➕ CRIAR - Abre modal para criar novo cliente
    */
   createClient(): void {
+    this.toastService.info('Abrindo formulário para novo cliente...', 'Informação');
 
     this.selectedClientId = undefined;
 
@@ -367,5 +398,20 @@ export class ClientsComponent extends FormValidator implements OnInit, OnDestroy
    */
   get totalPages(): number {
     return this.pagination?.totalPages || 0;
+  }
+
+  /**
+   * 🎯 ON ACTION MENU SELECT - Manipula seleção do menu de ações
+   */
+  onActionMenuSelect(client: Client, item: ActionMenuItem): void {
+    switch (item.value) {
+      case 'edit':
+        this.editClient(client);
+        break;
+      case 'delete':
+        this.deleteClient(client);
+        break;
+      default:
+    }
   }
 }
