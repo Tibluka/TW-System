@@ -21,7 +21,7 @@ export class FileUploadComponent implements OnChanges {
 
   @Input() label: string = '';
   @Input() placeholder: string = 'Clique para selecionar ou arraste arquivos aqui';
-  @Input() helperText: string = 'Apenas imagens (JPG, JPEG, PNG) são aceitas';
+  @Input() helperText: string = 'Apenas imagens (JPG, JPEG, PNG) são aceitas. Tamanho máximo: 5MB por arquivo';
   @Input() multiple: boolean = false;
   @Input() maxFileSize: number = 5 * 1024 * 1024; // 5MB em bytes
   @Input() acceptedTypes: string[] = ['image/jpeg', 'image/jpg', 'image/png'];
@@ -59,6 +59,10 @@ export class FileUploadComponent implements OnChanges {
 
   get labelClasses(): string {
     return this.required ? 'required' : '';
+  }
+
+  get maxFileSizeFormatted(): string {
+    return this.formatFileSize(this.maxFileSize);
   }
 
   onFileSelect(event: Event): void {
@@ -109,7 +113,7 @@ export class FileUploadComponent implements OnChanges {
 
 
       if (file.size > this.maxFileSize) {
-        this.uploadError.emit(`Arquivo muito grande: ${file.name}. Máximo ${this.formatFileSize(this.maxFileSize)}`);
+        this.uploadError.emit(`Arquivo muito grande: ${file.name} (${this.formatFileSize(file.size)}). Tamanho máximo permitido: ${this.formatFileSize(this.maxFileSize)}`);
         continue;
       }
 
