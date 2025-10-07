@@ -3,6 +3,7 @@ import { HttpRequest, HttpHandler, HttpInterceptor, HttpErrorResponse } from '@a
 import { Router } from '@angular/router';
 import { catchError, throwError, Observable } from 'rxjs';
 import { AuthService } from '../auth/auth-service';
+import { ERROR_CODES } from '../error-handler/error-codes';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
@@ -50,18 +51,15 @@ export class JwtInterceptor implements HttpInterceptor {
                     userMessage = 'Problema de conexão. Verifique sua internet.';
 
                 } else {
-
+                    // Usa códigos de erro padronizados baseados no status HTTP
                     switch (error.status) {
                         case 400:
                             userMessage = error.error?.message || 'Dados inválidos fornecidos.';
                             break;
 
                         case 401:
-
                             if (!shouldExclude) {
                                 userMessage = 'Sua sessão expirou. Faça login novamente.';
-
-
                                 this.authService.logout();
                                 this.router.navigate(['/login']);
                             } else {
@@ -70,10 +68,7 @@ export class JwtInterceptor implements HttpInterceptor {
                             break;
 
                         case 403:
-
                             userMessage = 'Você não tem permissão para esta operação.';
-
-
                             break;
 
                         case 404:
@@ -81,29 +76,24 @@ export class JwtInterceptor implements HttpInterceptor {
                             break;
 
                         case 409:
-
                             userMessage = error.error?.message || 'Conflito nos dados fornecidos.';
                             break;
 
                         case 422:
-
                             userMessage = error.error?.message || 'Dados fornecidos são inválidos.';
                             break;
 
                         case 429:
-
                             userMessage = 'Muitas tentativas. Tente novamente em alguns minutos.';
                             break;
 
                         case 500:
-
                             userMessage = 'Erro interno do servidor. Tente novamente mais tarde.';
                             break;
 
                         case 502:
                         case 503:
                         case 504:
-
                             userMessage = 'Serviço temporariamente indisponível. Tente novamente.';
                             break;
 

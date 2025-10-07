@@ -9,7 +9,10 @@ import { ProductionOrdersComponent } from './pages/authorized/production-orders/
 import { ProductionReceiptComponent } from './pages/authorized/production-receipt/production-receipt.component';
 import { ProductionSheetsComponent } from './pages/authorized/production-sheets/production-sheets.component';
 import { DeliverySheetsComponent } from './pages/authorized/delivery-sheets/delivery-sheets.component';
+import { RedirectComponent } from './pages/authorized/redirect/redirect.component';
 import { authenticationGuard } from './shared/services/guards/authentication.guard';
+import { permissionsGuard } from './shared/services/guards/permissions.guard';
+import { Permission } from './models/permissions/permissions';
 
 export const routes: Routes = [
 
@@ -37,32 +40,37 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                redirectTo: 'clients',
-                pathMatch: 'full'
+                component: RedirectComponent
             },
             {
                 path: 'clients',
-                component: ClientsComponent
+                component: ClientsComponent,
+                canActivate: [permissionsGuard(Permission.VIEW_CLIENTS)]
             },
             {
                 path: 'developments',
-                component: DevelopmentsComponent
+                component: DevelopmentsComponent,
+                canActivate: [permissionsGuard(Permission.VIEW_DEVELOPMENTS)]
             },
             {
                 path: 'production-orders',
-                component: ProductionOrdersComponent
+                component: ProductionOrdersComponent,
+                canActivate: [permissionsGuard(Permission.VIEW_PRODUCTION_ORDERS)]
             },
             {
                 path: 'production-sheets',
-                component: ProductionSheetsComponent
+                component: ProductionSheetsComponent,
+                canActivate: [permissionsGuard(Permission.VIEW_PRODUCTION_SHEETS)]
             },
             {
                 path: 'production-receipt',
-                component: ProductionReceiptComponent
+                component: ProductionReceiptComponent,
+                canActivate: [permissionsGuard(Permission.VIEW_PRODUCTION_RECEIPTS)]
             },
             {
                 path: 'delivery-sheets',
-                component: DeliverySheetsComponent
+                component: DeliverySheetsComponent,
+                canActivate: [permissionsGuard(Permission.VIEW_DELIVERY_SHEETS)]
             }
         ]
     },

@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, NgModel, ReactiveFormsModule, Validators } from
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../shared/services/auth/auth-service';
 import { ToastService } from '../../../shared/services/toast/toast.service';
+import { PermissionsService } from '../../../shared/services/permissions/permissions.service';
 
 
 import { ButtonComponent } from '../../../shared/components/atoms/button/button.component';
@@ -36,7 +37,8 @@ export class LoginComponent {
     private authService: AuthService,
     private toastService: ToastService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private permissionsService: PermissionsService
   ) {
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
@@ -56,11 +58,19 @@ export class LoginComponent {
     const { email, password } = this.loginForm.value;
 
     this.authService.login(email, password).subscribe({
-      next: () => {
+      next: (response) => {
+        console.log('✅ Login component - sucesso:', response);
         this.isLoading = false;
-        this.router.navigate(['authorized/clients']);
+
+        // Aguarda um pouco para garantir que as permissões foram carregadas
+        setTimeout(() => {
+          const firstAvailableRoute = this.permissionsService.getFirstAvailableRoute();
+          console.log('🎯 Redirecionando para primeira rota disponível:', firstAvailableRoute);
+          this.router.navigate([firstAvailableRoute]);
+        }, 100);
       },
-      error: () => {
+      error: (error) => {
+        console.error('❌ Login component - erro:', error);
         this.isLoading = false;
         this.errorMessage = 'Credenciais inválidas. Tente novamente.';
         this.toastService.error('Erro no login', 'Credenciais inválidas', {
