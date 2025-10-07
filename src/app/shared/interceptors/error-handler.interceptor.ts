@@ -16,12 +16,14 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return next.handle(request).pipe(
             catchError((error: HttpErrorResponse) => {
+                console.log('🔍 ErrorHandlerInterceptor - processando erro:', error.status, error.url);
 
                 const processedError = this.errorHandlerService.processError(error);
 
-
-                this.showErrorToast(processedError);
-
+                // Só mostra toast para erros que não são de login (para evitar duplicação)
+                if (!request.url.includes('/auth/login')) {
+                    this.showErrorToast(processedError);
+                }
 
                 return throwError(() => processedError);
             })

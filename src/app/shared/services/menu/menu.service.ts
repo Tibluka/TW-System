@@ -1,14 +1,16 @@
 
-import { computed, Injectable, signal, inject } from '@angular/core';
+import { computed, Injectable, signal, inject, effect } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { MenuItem } from '../../../models/menu/menu';
+import { PermissionsService } from '../permissions/permissions.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MenuService {
   private readonly router = inject(Router);
+  private readonly permissionsService = inject(PermissionsService);
 
   private readonly _isCollapsed = signal(false);
   private readonly _isAnimating = signal(false);
@@ -33,6 +35,7 @@ export class MenuService {
     this.initializeDefaultItems();
     this.loadCollapsedState();
     this.setupRouterListener();
+    this.setupPermissionsListener();
     this.setActiveItemFromCurrentRoute(); // 🔧 CORREÇÃO: Definir item ativo na inicialização
   }
 
@@ -178,10 +181,37 @@ export class MenuService {
   }
 
   /**
+   * Configura listener para mudanças de permissões
+   */
+  private setupPermissionsListener(): void {
+    // Usa computed para reagir às mudanças de permissões sem causar loop
+    const filteredMenuItems = computed(() => {
+      const allItems = this.getAllMenuItems();
+      return this.permissionsService.filterMenuItemsByPermissions(allItems);
+    });
+
+    // Atualiza o signal do menu quando as permissões mudam
+    effect(() => {
+      const items = filteredMenuItems();
+      this._menuItems.set(items);
+      this.setActiveItemFromCurrentRoute();
+    });
+  }
+
+
+  /**
    * Inicializa itens padrão do menu
    */
   private initializeDefaultItems(): void {
-    const defaultItems: MenuItem[] = [
+    const defaultItems = this.getAllMenuItems();
+    this.setMenuItems(defaultItems);
+  }
+
+  /**
+   * Retorna todos os itens possíveis do menu
+   */
+  private getAllMenuItems(): MenuItem[] {
+    return [
       {
         id: 'clients',
         label: 'Clientes',
@@ -219,8 +249,6 @@ export class MenuService {
         route: '/authorized/production-receipt'
       }
     ];
-
-    this.setMenuItems(defaultItems);
   }
 
   /**

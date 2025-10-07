@@ -26,7 +26,11 @@
             <h3 class="upload-title" *ngIf="!isProcessing">{{ placeholder }}</h3>
             <p class="upload-subtitle" *ngIf="isProcessing">Processando arquivos...</p>
 
-            <p class="upload-helper" *ngIf="helperText && !isProcessing">{{ helperText }}</p>
+            <p class="upload-helper" *ngIf="helperText && !isProcessing">
+                {{ helperText }}
+                <br>
+                <small class="size-limit">Tamanho máximo: {{ maxFileSizeFormatted }} por arquivo</small>
+            </p>
         </div>
     </div>
 

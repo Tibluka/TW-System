@@ -12,11 +12,20 @@ export interface User {
 
 export interface LoginResponse {
   success: boolean;
-  data: {
+  data?: {
     accessToken: string;
     refreshToken: string;
     user: User;
   };
+  error?: {
+    statusCode: number;
+    isOperational: boolean;
+    status: string;
+    code: number;
+    message: string;
+  };
+  message?: string;
+  code?: number;
 }
 
 @Injectable({
@@ -38,13 +47,34 @@ export class AuthService {
    * Faz login na API
    */
   login(email: string, password: string): Observable<LoginResponse> {
+    console.log('🔐 Iniciando login para:', email);
+    console.log('🌐 URL da API:', `${environment.apiUrl}/auth/login`);
+
     return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, {
       email,
       password
     }).pipe(
-      tap(response => {
-        if (response.success) {
-          this.setAuthData(response.data.accessToken, response.data.user);
+      tap({
+        next: (response) => {
+          console.log('✅ Resposta do servidor recebida:', response);
+
+          if (response.success && response.data) {
+            console.log('✅ Login bem-sucedido, salvando dados...');
+            console.log('👤 Usuário recebido:', response.data.user);
+            console.log('🔑 Role do usuário:', response.data.user.role);
+
+            this.setAuthData(response.data.accessToken, response.data.user);
+            console.log('💾 Dados salvos no localStorage');
+          } else {
+            console.log('❌ Login falhou - success: false ou data ausente');
+            console.log('📝 Detalhes do erro:', response.error || response.message);
+          }
+        },
+        error: (error) => {
+          console.error('❌ Erro HTTP no login:', error);
+          console.error('📝 Status:', error.status);
+          console.error('📝 Mensagem:', error.message);
+          console.error('📝 Resposta completa:', error);
         }
       })
     );
