@@ -355,8 +355,8 @@ export class ProductionSheetModalComponent extends FormValidator implements OnIn
       if (this.isEditMode && this.productionSheetId) {
         const updateData: UpdateProductionSheetRequest = {
           machine: formData.machine,
-          entryDate: DateFormatter.formatDateToISO(formData.entryDate),
-          expectedExitDate: DateFormatter.formatDateToISO(formData.expectedExitDate),
+          entryDate: formData.entryDate,
+          expectedExitDate: formData.expectedExitDate,
           stage: formData.stage,
           productionNotes: formData.productionNotes || undefined,
           temperature: formData.temperature ? parseFloat(formData.temperature) : undefined,

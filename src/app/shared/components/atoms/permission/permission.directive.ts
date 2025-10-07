@@ -25,7 +25,7 @@ export class PermissionDirective {
         this.updateView(permission);
     }
 
-    @Input() set appPermissionMode(mode: 'any' | 'all' = 'any') {
+    @Input() set appPermissionMode(mode: 'any' | 'all') {
         // Este input pode ser usado para controlar se deve verificar 'any' ou 'all' permissões
         // Por enquanto, mantemos a lógica padrão como 'any'
     }

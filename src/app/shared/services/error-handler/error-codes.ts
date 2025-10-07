@@ -275,23 +275,23 @@ export const ERROR_MESSAGES: Record<number, { message: string; title: string; ty
         type: 'warning'
     },
     [ERROR_CODES.PRINTING_RESTRICTION_VIOLATION]: {
-        message: 'Perfil PRINTING tem restrições específicas para esta operação.',
+        message: 'Perfil IMPRESSÃO tem restrições específicas para esta operação.',
         title: 'Restrição de Perfil',
         type: 'warning'
     },
     [ERROR_CODES.PRODUCTION_ORDER_STATUS_RESTRICTION]: {
-        message: 'Você só pode alterar fichas de produção quando a ordem de produção estiver com status PILOT_PRODUCTION.',
+        message: 'Você só pode alterar fichas de produção quando a ordem de produção estiver com status PRODUÇÃO_PILOTO.',
         title: 'Restrição de Status',
         type: 'warning'
     },
     [ERROR_CODES.FIELD_UPDATE_RESTRICTION]: {
-        message: 'Perfil PRINTING só pode alterar os campos etapa e valor de máquina.',
+        message: 'Perfil IMPRESSÃO só pode alterar os campos etapa e valor de máquina.',
         title: 'Restrição de Campos',
         type: 'warning'
     },
     [ERROR_CODES.ENDPOINT_ACCESS_DENIED]: {
-        message: 'Apenas perfis específicos podem acessar este endpoint.',
-        title: 'Endpoint Restrito',
+        message: 'Apenas perfis específicos podem acessar esta funcionalidade.',
+        title: 'Funcionalidade Restrita',
         type: 'error'
     },
     [ERROR_CODES.RESOURCE_CREATION_DENIED]: {
@@ -402,6 +402,7 @@ export const ERROR_MESSAGES: Record<number, { message: string; title: string; ty
 
 /**
  * Função para obter código de erro baseado na mensagem
+ * Prioriza mensagens em português
  */
 export function getErrorCode(message: string): number {
     // Busca exata primeiro
@@ -411,30 +412,53 @@ export function getErrorCode(message: string): number {
     }
 
     // Busca parcial para mensagens que podem variar
-    for (const [key, code] of Object.entries(ERROR_MESSAGE_TO_CODE)) {
+    // Prioriza mensagens em português
+    const portugueseKeys = Object.keys(ERROR_MESSAGE_TO_CODE).filter(key =>
+        key.includes('não') || key.includes('inválido') || key.includes('erro') ||
+        key.includes('permissão') || key.includes('acesso') || key.includes('encontrado')
+    );
+
+    const englishKeys = Object.keys(ERROR_MESSAGE_TO_CODE).filter(key =>
+        !portugueseKeys.includes(key)
+    );
+
+    // Busca primeiro em português
+    for (const key of portugueseKeys) {
         if (message.includes(key)) {
-            return code;
+            return ERROR_MESSAGE_TO_CODE[key];
         }
     }
 
-    // Códigos padrão baseados em palavras-chave
-    if (message.includes('not found') || message.includes('not exist')) {
+    // Depois busca em inglês
+    for (const key of englishKeys) {
+        if (message.includes(key)) {
+            return ERROR_MESSAGE_TO_CODE[key];
+        }
+    }
+
+    // Códigos padrão baseados em palavras-chave (português e inglês)
+    if (message.includes('não encontrado') || message.includes('not found') ||
+        message.includes('não existe') || message.includes('not exist')) {
         return ERROR_CODES.RESOURCE_NOT_FOUND;
     }
 
-    if (message.includes('validation') || message.includes('invalid')) {
+    if (message.includes('validação') || message.includes('validation') ||
+        message.includes('inválido') || message.includes('invalid')) {
         return ERROR_CODES.VALIDATION_ERROR;
     }
 
-    if (message.includes('permission') || message.includes('unauthorized')) {
+    if (message.includes('permissão') || message.includes('permission') ||
+        message.includes('não autorizado') || message.includes('unauthorized')) {
         return ERROR_CODES.INSUFFICIENT_PERMISSIONS;
     }
 
-    if (message.includes('duplicate') || message.includes('already exists')) {
+    if (message.includes('duplicado') || message.includes('duplicate') ||
+        message.includes('já existe') || message.includes('already exists')) {
         return ERROR_CODES.DUPLICATE_ENTRY;
     }
 
-    if (message.includes('database') || message.includes('connection')) {
+    if (message.includes('banco de dados') || message.includes('database') ||
+        message.includes('conexão') || message.includes('connection')) {
         return ERROR_CODES.DATABASE_ERROR;
     }
 
@@ -444,9 +468,10 @@ export function getErrorCode(message: string): number {
 
 /**
  * Mapeamento de mensagens de erro para códigos (baseado no backend)
+ * Inclui mensagens em inglês e português para compatibilidade
  */
 const ERROR_MESSAGE_TO_CODE: Record<string, number> = {
-    // Validação
+    // Validação - Inglês
     'Invalid data': ERROR_CODES.INVALID_DATA,
     'Validation error': ERROR_CODES.VALIDATION_ERROR,
     'Required field is missing': ERROR_CODES.MISSING_REQUIRED_FIELD,
@@ -461,7 +486,22 @@ const ERROR_MESSAGE_TO_CODE: Record<string, number> = {
     'Invalid file type': ERROR_CODES.INVALID_FILE_TYPE,
     'File too large': ERROR_CODES.INVALID_FILE_SIZE,
 
-    // Negócio
+    // Validação - Português
+    'Dados inválidos': ERROR_CODES.INVALID_DATA,
+    'Erro de validação': ERROR_CODES.VALIDATION_ERROR,
+    'Campo obrigatório não preenchido': ERROR_CODES.MISSING_REQUIRED_FIELD,
+    'Formato de email inválido': ERROR_CODES.INVALID_EMAIL_FORMAT,
+    'Formato de senha inválido': ERROR_CODES.INVALID_PASSWORD_FORMAT,
+    'Formato de data inválido': ERROR_CODES.INVALID_DATE_FORMAT,
+    'ID do objeto inválido': ERROR_CODES.INVALID_OBJECT_ID,
+    'Valor de enum inválido': ERROR_CODES.INVALID_ENUM_VALUE,
+    'Tamanho da string inválido': ERROR_CODES.INVALID_STRING_LENGTH,
+    'Número fora do intervalo': ERROR_CODES.INVALID_NUMBER_RANGE,
+    'Tamanho do array inválido': ERROR_CODES.INVALID_ARRAY_LENGTH,
+    'Tipo de arquivo inválido': ERROR_CODES.INVALID_FILE_TYPE,
+    'Arquivo muito grande': ERROR_CODES.INVALID_FILE_SIZE,
+
+    // Negócio - Inglês
     'Development must be approved to create production order': ERROR_CODES.DEVELOPMENT_NOT_APPROVED,
     'Production order already exists for this development': ERROR_CODES.PRODUCTION_ORDER_ALREADY_EXISTS,
     'Delivery sheet already exists for this production sheet': ERROR_CODES.DELIVERY_SHEET_ALREADY_EXISTS,
@@ -475,7 +515,21 @@ const ERROR_MESSAGE_TO_CODE: Record<string, number> = {
     'Invalid production type': ERROR_CODES.INVALID_PRODUCTION_TYPE,
     'Missing production data': ERROR_CODES.MISSING_PRODUCTION_DATA,
 
-    // Autenticação
+    // Negócio - Português
+    'O desenvolvimento deve estar aprovado para criar ordem de produção': ERROR_CODES.DEVELOPMENT_NOT_APPROVED,
+    'Já existe uma ordem de produção para este desenvolvimento': ERROR_CODES.PRODUCTION_ORDER_ALREADY_EXISTS,
+    'Já existe uma ficha de entrega para esta ficha de produção': ERROR_CODES.DELIVERY_SHEET_ALREADY_EXISTS,
+    'Já existe um recibo de produção para esta ficha de entrega': ERROR_CODES.PRODUCTION_RECEIPT_ALREADY_EXISTS,
+    'Permissões insuficientes': ERROR_CODES.INSUFFICIENT_PERMISSIONS,
+    'Operação não permitida': ERROR_CODES.OPERATION_NOT_ALLOWED,
+    'Violação de regra de negócio': ERROR_CODES.BUSINESS_RULE_VIOLATION,
+    'Entrada duplicada': ERROR_CODES.DUPLICATE_ENTRY,
+    'Transição de status inválida': ERROR_CODES.INVALID_STATUS_TRANSITION,
+    'Recurso em uso': ERROR_CODES.RESOURCE_IN_USE,
+    'Tipo de produção inválido': ERROR_CODES.INVALID_PRODUCTION_TYPE,
+    'Dados de produção obrigatórios não fornecidos': ERROR_CODES.MISSING_PRODUCTION_DATA,
+
+    // Autenticação - Inglês
     'Authentication required': ERROR_CODES.AUTHENTICATION_REQUIRED,
     'Invalid credentials': ERROR_CODES.INVALID_CREDENTIALS,
     'Token expired': ERROR_CODES.TOKEN_EXPIRED,
@@ -484,17 +538,31 @@ const ERROR_MESSAGE_TO_CODE: Record<string, number> = {
     'Account locked': ERROR_CODES.ACCOUNT_LOCKED,
     'Session expired': ERROR_CODES.SESSION_EXPIRED,
 
-    // Autorização
+    // Autenticação - Português
+    'Autenticação necessária': ERROR_CODES.AUTHENTICATION_REQUIRED,
+    'Credenciais inválidas': ERROR_CODES.INVALID_CREDENTIALS,
+    'Token expirado': ERROR_CODES.TOKEN_EXPIRED,
+    'Token inválido': ERROR_CODES.TOKEN_INVALID,
+    'Conta desabilitada': ERROR_CODES.ACCOUNT_DISABLED,
+    'Conta bloqueada': ERROR_CODES.ACCOUNT_LOCKED,
+    'Sessão expirada': ERROR_CODES.SESSION_EXPIRED,
+
+    // Autorização - Inglês
     'Role required': ERROR_CODES.ROLE_REQUIRED,
     'Admin required': ERROR_CODES.ADMIN_REQUIRED,
     'Resource access denied': ERROR_CODES.RESOURCE_ACCESS_DENIED,
+
+    // Autorização - Português
+    'Função específica necessária': ERROR_CODES.ROLE_REQUIRED,
+    'Acesso de administrador necessário': ERROR_CODES.ADMIN_REQUIRED,
+    'Acesso ao recurso negado': ERROR_CODES.RESOURCE_ACCESS_DENIED,
     'Acesso negado. Seu perfil': ERROR_CODES.PROFILE_ACCESS_DENIED,
-    'Perfil PRINTING só pode alterar os campos': ERROR_CODES.FIELD_UPDATE_RESTRICTION,
-    'Você só pode alterar fichas de produção quando a ordem de produção estiver com status PILOT_PRODUCTION': ERROR_CODES.PRODUCTION_ORDER_STATUS_RESTRICTION,
+    'Perfil IMPRESSÃO só pode alterar os campos': ERROR_CODES.FIELD_UPDATE_RESTRICTION,
+    'Você só pode alterar fichas de produção quando a ordem de produção estiver com status PRODUÇÃO_PILOTO': ERROR_CODES.PRODUCTION_ORDER_STATUS_RESTRICTION,
     'Acesso negado. Apenas perfis': ERROR_CODES.ENDPOINT_ACCESS_DENIED,
     'Apenas administradores podem criar usuários': ERROR_CODES.RESOURCE_CREATION_DENIED,
 
-    // Recursos
+    // Recursos - Inglês
     'User not found': ERROR_CODES.USER_NOT_FOUND,
     'Client not found': ERROR_CODES.CLIENT_NOT_FOUND,
     'Development not found': ERROR_CODES.DEVELOPMENT_NOT_FOUND,
@@ -505,7 +573,18 @@ const ERROR_MESSAGE_TO_CODE: Record<string, number> = {
     'File not found': ERROR_CODES.FILE_NOT_FOUND,
     'Resource not found': ERROR_CODES.RESOURCE_NOT_FOUND,
 
-    // Sistema
+    // Recursos - Português
+    'Usuário não encontrado': ERROR_CODES.USER_NOT_FOUND,
+    'Cliente não encontrado': ERROR_CODES.CLIENT_NOT_FOUND,
+    'Desenvolvimento não encontrado': ERROR_CODES.DEVELOPMENT_NOT_FOUND,
+    'Ordem de produção não encontrada': ERROR_CODES.PRODUCTION_ORDER_NOT_FOUND,
+    'Ficha de produção não encontrada': ERROR_CODES.PRODUCTION_SHEET_NOT_FOUND,
+    'Ficha de entrega não encontrada': ERROR_CODES.DELIVERY_SHEET_NOT_FOUND,
+    'Recibo de produção não encontrado': ERROR_CODES.PRODUCTION_RECEIPT_NOT_FOUND,
+    'Arquivo não encontrado': ERROR_CODES.FILE_NOT_FOUND,
+    'Recurso não encontrado': ERROR_CODES.RESOURCE_NOT_FOUND,
+
+    // Sistema - Inglês
     'Database error': ERROR_CODES.DATABASE_ERROR,
     'External service error': ERROR_CODES.EXTERNAL_SERVICE_ERROR,
     'File upload error': ERROR_CODES.FILE_UPLOAD_ERROR,
@@ -515,5 +594,17 @@ const ERROR_MESSAGE_TO_CODE: Record<string, number> = {
     'Timeout error': ERROR_CODES.TIMEOUT_ERROR,
     'Network error': ERROR_CODES.NETWORK_ERROR,
     'Configuration error': ERROR_CODES.CONFIGURATION_ERROR,
-    'Too many requests': ERROR_CODES.RATE_LIMIT_EXCEEDED
+    'Too many requests': ERROR_CODES.RATE_LIMIT_EXCEEDED,
+
+    // Sistema - Português
+    'Erro de banco de dados': ERROR_CODES.DATABASE_ERROR,
+    'Erro em serviço externo': ERROR_CODES.EXTERNAL_SERVICE_ERROR,
+    'Erro ao fazer upload do arquivo': ERROR_CODES.FILE_UPLOAD_ERROR,
+    'Erro ao enviar email': ERROR_CODES.EMAIL_SEND_ERROR,
+    'Erro interno do servidor': ERROR_CODES.INTERNAL_SERVER_ERROR,
+    'Serviço indisponível': ERROR_CODES.SERVICE_UNAVAILABLE,
+    'Erro de tempo limite': ERROR_CODES.TIMEOUT_ERROR,
+    'Erro de rede': ERROR_CODES.NETWORK_ERROR,
+    'Erro de configuração': ERROR_CODES.CONFIGURATION_ERROR,
+    'Muitas tentativas': ERROR_CODES.RATE_LIMIT_EXCEEDED
 };

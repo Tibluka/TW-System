@@ -321,7 +321,7 @@ export class DeliverySheetModalComponent extends FormValidator implements OnInit
                     totalValue: parseFloat(formData.totalValue) || 0,
                     notes: formData.notes || undefined,
                     invoiceNumber: formData.invoiceNumber || undefined,
-                    deliveryDate: formData.deliveryDate ? DateFormatter.formatDateToISO(formData.deliveryDate) : undefined,
+                    deliveryDate: formData.deliveryDate ? formData.deliveryDate : undefined,
                     address: {
                         street: formData.address.street,
                         number: formData.address.number,

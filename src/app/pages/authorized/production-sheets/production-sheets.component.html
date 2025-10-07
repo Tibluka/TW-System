@@ -40,8 +40,9 @@
                 [fullWidth]="false">
             </ds-button>
 
-            <ds-button label="Nova Ficha de Produção" variant="fill" icon="fa-solid fa-plus"
-                (onClickEmitter)="createProductionSheet()" class="create-btn" [fullWidth]="false">
+            <ds-button *appPermission="Permission.CREATE_PRODUCTION_SHEETS" label="Nova Ficha de Produção"
+                variant="fill" icon="fa-solid fa-plus" (onClickEmitter)="createProductionSheet()" class="create-btn"
+                [fullWidth]="false">
             </ds-button>
         </div>
     </div>

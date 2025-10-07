@@ -26,6 +26,8 @@ import { ProductionSheetModalComponent } from './production-sheet-modal/producti
 import { GeneralModalContentComponent } from '../../../shared/components/general/general-modal-content/general-modal-content.component';
 import { copyToClipboard } from '../../../shared/utils/tools';
 import { DateFormatter } from '../../../shared/utils/date-formatter';
+import { Permission } from '../../../models/permissions/permissions';
+import { PermissionDirective } from '../../../shared/components/atoms/permission/permission.directive';
 
 @Component({
   selector: 'app-production-sheets',
@@ -45,7 +47,8 @@ import { DateFormatter } from '../../../shared/utils/date-formatter';
     ProductionSheetModalComponent,
     ActionMenuComponent,
     StatusUpdaterComponent,
-    GeneralModalContentComponent
+    GeneralModalContentComponent,
+    PermissionDirective
   ],
   providers: [
     NgModel
@@ -56,6 +59,9 @@ import { DateFormatter } from '../../../shared/utils/date-formatter';
 export class ProductionSheetsComponent extends FormValidator {
 
   isModalOpen: boolean = false;
+
+  // Expor enum Permission para o template
+  Permission = Permission;
 
   private productionSheetsService = inject(ProductionSheetsService);
   private modalService = inject(ModalService);

@@ -210,26 +210,6 @@ export class ProductionReceiptModalComponent extends FormValidator implements On
   }
 
 
-  private async loadProductionReceipt(): Promise<void> {
-    if (!this.productionReceiptId) return;
-
-    this.isLoading = true;
-    try {
-      const response = await lastValueFrom(
-        this.productionReceiptService.getProductionReceiptById(this.productionReceiptId)
-      );
-
-      this.productionReceipt = response.data;
-      this.deliverySheetFound = this.productionReceipt.deliverySheet || null;
-      this.populateForm(this.productionReceipt);
-    } catch (error) {
-
-    } finally {
-      this.isLoading = false;
-    }
-  }
-
-
   private populateForm(productionReceipt: ProductionReceipt): void {
 
     if (productionReceipt.deliverySheet) {
