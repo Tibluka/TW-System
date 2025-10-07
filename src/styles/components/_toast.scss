@@ -1,0 +1,265 @@
+@use 'abstracts/variables' as *;
+@use 'abstracts/spacing' as *;
+@use 'abstracts/typography' as *;
+@use 'sass:color';
+
+// ========================================
+// TOAST CONTAINER
+// ========================================
+.toast-container {
+    position: fixed;
+    top: $spacing-lg;
+    right: $spacing-lg;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    max-width: 400px;
+    width: 100%;
+    pointer-events: none;
+
+    @media (max-width: 768px) {
+        top: $spacing-md;
+        right: $spacing-md;
+        left: $spacing-md;
+        max-width: none;
+    }
+}
+
+// ========================================
+// TOAST COMPONENT
+// ========================================
+.ds-toast {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-sm;
+    padding: $spacing-md;
+    border-radius: $border-radius-md;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    pointer-events: auto;
+    min-height: 60px;
+    max-width: 100%;
+    word-wrap: break-word;
+    animation: slideInRight 0.3s ease-out;
+    transition: all 0.3s ease;
+
+    // Estados de animação
+    &.toast-enter {
+        animation: slideInRight 0.3s ease-out;
+    }
+
+    &.toast-exit {
+        animation: slideOutRight 0.3s ease-in;
+    }
+
+    // ========================================
+    // TIPOS DE TOAST
+    // ========================================
+    &.toast-success {
+        background: $toast-success-bg;
+        border-left: 4px solid $toast-success-border;
+        color: $toast-success-text;
+
+        .toast-icon {
+            color: $toast-success-icon;
+        }
+
+        .toast-close {
+            color: $toast-success-text;
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+        }
+    }
+
+    &.toast-error {
+        background: $toast-error-bg;
+        border-left: 4px solid $toast-error-border;
+        color: $toast-error-text;
+
+        .toast-icon {
+            color: $toast-error-icon;
+        }
+
+        .toast-close {
+            color: $toast-error-text;
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+        }
+    }
+
+    &.toast-warning {
+        background: $toast-warning-bg;
+        border-left: 4px solid $toast-warning-border;
+        color: $toast-warning-text;
+
+        .toast-icon {
+            color: $toast-warning-icon;
+        }
+
+        .toast-close {
+            color: $toast-warning-text;
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+        }
+    }
+
+    &.toast-info {
+        background: $toast-info-bg;
+        border-left: 4px solid $toast-info-border;
+        color: $toast-info-text;
+
+        .toast-icon {
+            color: $toast-info-icon;
+        }
+
+        .toast-close {
+            color: $toast-info-text;
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+        }
+    }
+
+    // ========================================
+    // ELEMENTOS DO TOAST
+    // ========================================
+    .toast-icon {
+        flex-shrink: 0;
+        font-size: 20px;
+        margin-top: 2px;
+    }
+
+    .toast-content {
+        flex: 1;
+        min-width: 0;
+
+        .toast-title {
+            font-weight: $font-weight-xbold;
+            font-size: $font-md;
+            margin: 0 0 $spacing-xs 0;
+            line-height: 1.4;
+        }
+
+        .toast-message {
+            font-size: $font-sm;
+            line-height: 1.5;
+            margin: 0;
+            opacity: 0.9;
+        }
+    }
+
+    .toast-close {
+        flex-shrink: 0;
+        background: none;
+        border: none;
+        padding: $spacing-xs;
+        border-radius: $border-radius-sm;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+
+        &:hover {
+            transform: scale(1.1);
+        }
+
+        &:focus {
+            outline: 2px solid currentColor;
+            outline-offset: 2px;
+        }
+    }
+
+    // ========================================
+    // RESPONSIVIDADE
+    // ========================================
+    @media (max-width: 768px) {
+        padding: $spacing-sm;
+        min-height: 50px;
+
+        .toast-icon {
+            font-size: 18px;
+        }
+
+        .toast-content {
+            .toast-title {
+                font-size: $font-sm;
+            }
+
+            .toast-message {
+                font-size: $font-xs;
+            }
+        }
+
+        .toast-close {
+            width: 28px;
+            height: 28px;
+            font-size: 14px;
+        }
+    }
+}
+
+// ========================================
+// ANIMAÇÕES
+// ========================================
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+// ========================================
+// DARK MODE SUPPORT
+// ========================================
+@media (prefers-color-scheme: dark) {
+    .ds-toast {
+        &.toast-success {
+            background: color.adjust($toast-success-bg, $lightness: -10%);
+            color: $toast-success-text;
+        }
+
+        &.toast-error {
+            background: color.adjust($toast-error-bg, $lightness: -10%);
+            color: $toast-error-text;
+        }
+
+        &.toast-warning {
+            background: color.adjust($toast-warning-bg, $lightness: -10%);
+            color: $toast-warning-text;
+        }
+
+        &.toast-info {
+            background: color.adjust($toast-info-bg, $lightness: -10%);
+            color: $toast-info-text;
+        }
+    }
+}

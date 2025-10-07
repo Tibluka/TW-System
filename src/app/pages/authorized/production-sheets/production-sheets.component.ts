@@ -20,6 +20,7 @@ import { TableRowComponent } from '../../../shared/components/organisms/table/ta
 import { TableComponent } from '../../../shared/components/organisms/table/table.component';
 import { ModalService } from '../../../shared/services/modal/modal.service';
 import { ProductionSheetsService } from '../../../shared/services/production-sheets/production-sheets.service';
+import { ToastService } from '../../../shared/services/toast/toast.service';
 import { FormValidator } from '../../../shared/utils/form';
 import { ProductionSheetModalComponent } from './production-sheet-modal/production-sheet-modal.component';
 import { GeneralModalContentComponent } from '../../../shared/components/general/general-modal-content/general-modal-content.component';
@@ -58,6 +59,7 @@ export class ProductionSheetsComponent extends FormValidator {
 
   private productionSheetsService = inject(ProductionSheetsService);
   private modalService = inject(ModalService);
+  private toastService = inject(ToastService);
 
 
   productionSheets: ProductionSheet[] = [];
@@ -478,7 +480,7 @@ export class ProductionSheetsComponent extends FormValidator {
   /**
    * ⬆️ AVANÇAR ESTÁGIO - Avança para o próximo estágio da produção
    */
-  private advanceProductionSheetStage(productionSheet: ProductionSheet): void {
+  advanceProductionSheetStage(productionSheet: ProductionSheet): void {
     const nextStage = this.getNextStage(productionSheet.stage);
 
     if (!nextStage) {
@@ -532,10 +534,14 @@ export class ProductionSheetsComponent extends FormValidator {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
+          this.toastService.success(`Estágio avançado para "${this.getStageLabel(newStage)}" com sucesso!`, 'Sucesso');
           this.showSuccessMessage(`Estágio avançado para "${this.getStageLabel(newStage)}" com sucesso.`);
           this.loadProductionSheets();
         },
         error: (error) => {
+          this.toastService.error('Erro ao avançar estágio', 'Falha na operação', {
+            message: error.message || 'Não foi possível avançar o estágio.'
+          });
           this.showErrorMessage(error.message || 'Erro ao avançar estágio.');
         }
       });
@@ -572,7 +578,7 @@ export class ProductionSheetsComponent extends FormValidator {
   /**
    * ⬇️ RETROCEDER ESTÁGIO - Retrocede para o estágio anterior da produção
    */
-  private retrocedeProductionSheetStage(productionSheet: ProductionSheet): void {
+  retrocedeProductionSheetStage(productionSheet: ProductionSheet): void {
     const previousStage = this.getPreviousStage(productionSheet.stage);
 
     if (!previousStage) {
@@ -644,6 +650,7 @@ export class ProductionSheetsComponent extends FormValidator {
    * ❌ STATUS UPDATE FALHOU - Callback quando atualização falha
    */
   onStatusUpdateFailed(result: any): void {
+
     this.showErrorMessage(result.error || 'Erro ao atualizar estágio');
   }
 
@@ -705,10 +712,14 @@ export class ProductionSheetsComponent extends FormValidator {
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: () => {
+              this.toastService.success('Ficha de produção excluída com sucesso!', 'Sucesso');
               this.showSuccessMessage(`Ficha de produção ${productionSheet.internalReference} excluída com sucesso.`);
               this.loadProductionSheets(); // Recarregar lista
             },
             error: (error) => {
+              this.toastService.error('Erro ao excluir ficha de produção', 'Falha na operação', {
+                message: error.message || 'Não foi possível excluir a ficha de produção.'
+              });
               this.showErrorMessage(error.message || 'Erro ao excluir ficha de produção.');
             }
           });

@@ -158,3 +158,25 @@ echo -e "  • Linhas em branco excessivas"
 echo ""
 echo -e "${GREEN}✅ Console.logs multi-linha removidos com segurança!${NC}"
 echo -e "${GREEN}✅ Sintaxe preservada - código não quebrado!${NC}"
+
+# Pergunta se deseja dar push caso tenha havido mudanças
+if [[ $PROCESSED -gt 0 ]]; then
+    echo ""
+    echo -e "${YELLOW}Deseja dar push das modificações limpas para o repositório? (s/N)${NC}"
+    read -r -p "> " RESP
+    if [[ "$RESP" =~ ^[sS]$ ]]; then
+        echo -e "${BLUE}🔄 Adicionando arquivos modificados...${NC}"
+        git add .
+        echo -e "${BLUE}✍️  Informe a mensagem do commit (padrão: 'chore: limpeza automatizada'):${NC}"
+        read -r -p "> " COMMIT_MSG
+        if [[ -z "$COMMIT_MSG" ]]; then
+            COMMIT_MSG="chore: limpeza automatizada"
+        fi
+        git commit -m "$COMMIT_MSG"
+        echo -e "${BLUE}🚀 Dando push para o repositório...${NC}"
+        git push
+        echo -e "${GREEN}✅ Push realizado com sucesso!${NC}"
+    else
+        echo -e "${YELLOW}Push não realizado. Modificações estão apenas locais.${NC}"
+    fi
+fi

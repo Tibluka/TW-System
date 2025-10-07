@@ -33,6 +33,7 @@ import { ProductionSheetsService } from '../../../services/production-sheets/pro
 import { ProductionReceiptService } from '../../../services/production-receipt/production-receipt.service';
 import { DeliverySheetsService } from '../../../services/delivery-sheets/delivery-sheets.service';
 import { ModalService } from '../../../services/modal/modal.service';
+import { ToastService } from '../../../services/toast/toast.service';
 import { SelectComponent } from "../../atoms/select/select.component";
 import { FormsModule, NgModel } from '@angular/forms';
 
@@ -80,6 +81,7 @@ export class StatusUpdaterComponent {
     private productionReceiptService = inject(ProductionReceiptService);
     private deliverySheetsService = inject(DeliverySheetsService);
     private modalService = inject(ModalService);
+    private toastService = inject(ToastService);
 
 
     /**
@@ -99,7 +101,7 @@ export class StatusUpdaterComponent {
             showCloseButton: true,
             closeOnBackdropClick: true,
             closeOnEscapeKey: true
-        }).subscribe(result => {
+        }).subscribe(() => {
             this.closeModal();
         });
 
@@ -132,6 +134,12 @@ export class StatusUpdaterComponent {
         try {
             await this.updateEntityStatus(this.entityId, this.selectedStatus);
 
+
+            this.toastService.success(
+                `Status atualizado com sucesso para: ${this.getStatusLabel(this.selectedStatus)}`,
+                'Status Atualizado'
+            );
+
             this.statusUpdated.emit({
                 success: true,
                 newStatus: this.selectedStatus,
@@ -145,6 +153,15 @@ export class StatusUpdaterComponent {
                 newStatus: this.currentStatus,
                 error: error.message || 'Erro ao atualizar status'
             };
+
+
+            this.toastService.error(
+                'Erro ao atualizar status',
+                'Falha na operação',
+                {
+                    message: error.message || 'Não foi possível atualizar o status. Tente novamente.'
+                }
+            );
 
             this.errorMessage = errorResult.error || '';
             this.statusUpdateFailed.emit(errorResult);

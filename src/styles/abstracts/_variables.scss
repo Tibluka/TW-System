@@ -9,6 +9,35 @@ $label: #618495;
 $placeholder: #61646B;
 $tertiary: #F9792A;
 
+// === CORES DOS TOASTS ===
+// Success
+$toast-success-bg: #10b981;
+$toast-success-bg-light: #34d399;
+$toast-success-border: #059669;
+$toast-success-text: #ffffff;
+$toast-success-icon: #ffffff;
+
+// Error
+$toast-error-bg: #ef4444;
+$toast-error-bg-light: #f87171;
+$toast-error-border: #dc2626;
+$toast-error-text: #ffffff;
+$toast-error-icon: #ffffff;
+
+// Warning
+$toast-warning-bg: #f59e0b;
+$toast-warning-bg-light: #fbbf24;
+$toast-warning-border: #d97706;
+$toast-warning-text: #ffffff;
+$toast-warning-icon: #ffffff;
+
+// Info
+$toast-info-bg: #3b82f6;
+$toast-info-bg-light: #60a5fa;
+$toast-info-border: #2563eb;
+$toast-info-text: #ffffff;
+$toast-info-icon: #ffffff;
+
 // === GRADIENTES ===
 $primary-gradient: linear-gradient(180deg, #013048 0%, #01517A 100%);
 $secondary-gradient: linear-gradient(270deg, #1593BB 0%, #0B495C 100%);
