@@ -152,6 +152,7 @@
 
                         <ds-table-cell align="center">
                             <ds-action-menu [items]="getActionMenuItems(productionSheet)"
+                                [disabled]="getActionMenuItems(productionSheet).length === 0"
                                 (itemSelected)="onActionMenuSelect(productionSheet, $event)">
                             </ds-action-menu>
                         </ds-table-cell>

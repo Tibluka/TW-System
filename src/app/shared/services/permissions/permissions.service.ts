@@ -50,9 +50,12 @@ export class PermissionsService {
      * Atualiza as permissões do usuário
      */
     private updateUserPermissions(user: User | null): void {
+        console.log('🔄 PermissionsService - atualizando permissões para usuário:', user);
+
         this._currentUser.set(user);
 
         if (!user) {
+            console.log('❌ Usuário é null, limpando permissões');
             this._userProfile.set(null);
             this._userPermissions.set([]);
             return;
@@ -60,10 +63,14 @@ export class PermissionsService {
 
         // Mapeia o role do usuário para o enum UserProfile
         const profile = this.mapRoleToProfile(user.role);
+        console.log('🎭 Role mapeado:', user.role, '→', profile);
+
         this._userProfile.set(profile);
 
         // Obtém as permissões do perfil
         const permissions = PROFILE_PERMISSIONS[profile] || [];
+        console.log('🔐 Permissões carregadas para', profile, ':', permissions);
+
         this._userPermissions.set(permissions);
     }
 
@@ -79,6 +86,7 @@ export class PermissionsService {
             case 'ADMIN':
                 return UserProfile.ADMIN;
             case 'FINANCIAL':
+            case 'FINANCING': // Aceita ambos os termos
                 return UserProfile.FINANCIAL;
             default:
                 return UserProfile.DEFAULT; // Fallback para DEFAULT
@@ -180,7 +188,16 @@ export class PermissionsService {
      * Filtra itens de menu baseado nas permissões do usuário
      */
     filterMenuItemsByPermissions(menuItems: any[]): any[] {
-        return menuItems.filter(item => this.canViewMenuItem(item.id));
+        console.log('🔍 Filtrando itens de menu:', menuItems.map(item => item.id));
+
+        const filteredItems = menuItems.filter(item => {
+            const canView = this.canViewMenuItem(item.id);
+            console.log(`📋 Item "${item.id}": ${canView ? '✅ VISÍVEL' : '❌ OCULTO'}`);
+            return canView;
+        });
+
+        console.log('✅ Itens filtrados:', filteredItems.map(item => item.id));
+        return filteredItems;
     }
 
     /**

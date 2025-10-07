@@ -28,6 +28,7 @@ import { copyToClipboard } from '../../../shared/utils/tools';
 import { DateFormatter } from '../../../shared/utils/date-formatter';
 import { Permission } from '../../../models/permissions/permissions';
 import { PermissionDirective } from '../../../shared/components/atoms/permission/permission.directive';
+import { PermissionsService } from '../../../shared/services/permissions/permissions.service';
 
 @Component({
   selector: 'app-production-sheets',
@@ -66,6 +67,7 @@ export class ProductionSheetsComponent extends FormValidator {
   private productionSheetsService = inject(ProductionSheetsService);
   private modalService = inject(ModalService);
   private toastService = inject(ToastService);
+  private permissionsService = inject(PermissionsService);
 
 
   productionSheets: ProductionSheet[] = [];
@@ -448,15 +450,18 @@ export class ProductionSheetsComponent extends FormValidator {
    * 📋 ITENS DO MENU - Retorna itens do menu baseado no status da ficha
    */
   getActionMenuItems(productionSheet: ProductionSheet): ActionMenuItem[] {
-    const items: ActionMenuItem[] = [
-      {
+    const items: ActionMenuItem[] = [];
+
+    // Só adiciona "Alterar Estágio" se não for perfil PRINTING
+    if (!this.permissionsService.isPrinting()) {
+      items.push({
         label: 'Alterar Estágio',
         value: 'change-stage',
         icon: 'fa-solid fa-arrow-right-arrow-left'
-      }
-    ];
+      });
+    }
 
-
+    // Só adiciona "Avançar Estágio" se não estiver finalizado
     if (productionSheet.stage !== 'FINISHED') {
       items.push({
         label: 'Avançar Estágio',
@@ -465,24 +470,25 @@ export class ProductionSheetsComponent extends FormValidator {
       });
     }
 
-
-    if (productionSheet.stage !== 'PRINTING') {
+    // Só adiciona "Excluir" se tiver permissão
+    if (this.permissionsService.hasPermission(Permission.DELETE_PRODUCTION_SHEETS)) {
       items.push({
-        label: 'Retroceder Estágio',
-        value: 'retrocede-stage',
-        icon: 'fa-solid fa-arrow-left'
+        label: 'Excluir',
+        value: 'delete',
+        icon: 'fa-solid fa-trash'
       });
     }
 
-
-    items.push({
-      label: 'Excluir',
-      value: 'delete',
-      icon: 'fa-solid fa-trash'
-    });
-
     return items;
   }
+
+  /**
+   * 🔒 VERIFICA SE MENU DEVE ESTAR DESABILITADO
+   */
+  isActionMenuDisabled(productionSheet: ProductionSheet): boolean {
+    return this.getActionMenuItems(productionSheet).length === 0;
+  }
+
   /**
    * ⬆️ AVANÇAR ESTÁGIO - Avança para o próximo estágio da produção
    */

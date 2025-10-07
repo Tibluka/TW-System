@@ -73,6 +73,8 @@ export class LoginComponent {
         console.error('❌ Login component - erro:', error);
         this.isLoading = false;
         this.errorMessage = 'Credenciais inválidas. Tente novamente.';
+
+        // Mostra toast específico para erro de login
         this.toastService.error('Erro no login', 'Credenciais inválidas', {
           message: 'Verifique seu email e senha e tente novamente.'
         });
